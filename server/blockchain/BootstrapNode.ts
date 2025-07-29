@@ -166,25 +166,38 @@ Network: P2P WebSocket
   }
 
   private addTestTransactions(): void {
+    // Create transactions between different validators from our themed list
+    const validatorIds = [
+      'StellarNode', 'NebulaForge', 'QuantumReach', 'OrionPulse', 'DarkMatterLabs',
+      'ByteGuardians', 'ZeroLagOps', 'ChainFlux', 'IronNode', 'SentinelTrust'
+    ];
+    
     const testTransactions = [
       {
-        from: 'user_001',
-        to: 'user_002', 
+        from: validatorIds[0], // StellarNode
+        to: validatorIds[1], // NebulaForge
         amount: 50,
         type: 'transfer',
         timestamp: Date.now()
       },
       {
-        from: 'user_003',
-        to: 'user_001',
+        from: validatorIds[2], // QuantumReach
+        to: validatorIds[3], // OrionPulse
         amount: 25,
         type: 'transfer', 
         timestamp: Date.now()
       },
       {
-        from: 'user_004',
-        to: 'user_005',
+        from: validatorIds[4], // DarkMatterLabs
+        to: validatorIds[5], // ByteGuardians
         amount: 75,
+        type: 'transfer',
+        timestamp: Date.now()
+      },
+      {
+        from: validatorIds[6], // ZeroLagOps
+        to: validatorIds[7], // ChainFlux
+        amount: 100,
         type: 'transfer',
         timestamp: Date.now()
       }

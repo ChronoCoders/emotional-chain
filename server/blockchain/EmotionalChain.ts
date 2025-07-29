@@ -136,9 +136,9 @@ export class EmotionalChain extends EventEmitter {
   public getChainStats(): any {
     return {
       totalBlocks: this.chain.length,
-      totalValidators: 0,
+      totalValidators: this.validators.size,
       difficulty: this.difficulty,
-      miningReward: this.miningReward,
+      baseReward: this.tokenEconomics.rewards.baseBlockReward,
       avgConsensusScore: 0.95,
       avgAuthenticity: 0.93
     };
@@ -181,10 +181,10 @@ export class EmotionalChain extends EventEmitter {
     
     if (activeValidators.length === 0) return null;
     
-    // Select validator with highest emotional score
-    return activeValidators.reduce((best, current) => 
-      current.emotionalScore > best.emotionalScore ? current : best
-    );
+    // Rotate validators based on block count for fair distribution
+    const blockCount = this.chain.length;
+    const validatorIndex = blockCount % activeValidators.length;
+    return activeValidators[validatorIndex];
   }
 
   private mineBlock(): boolean {
