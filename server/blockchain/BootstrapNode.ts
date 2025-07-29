@@ -161,6 +161,8 @@ Network: P2P WebSocket
       this.network.addValidator(validator);
     });
 
+    console.log(`👥 Total ${testValidators.length} validators added to EmotionalChain network`);
+
     // Add some test transactions for mining
     this.addTestTransactions();
   }
@@ -195,7 +197,6 @@ Network: P2P WebSocket
     });
 
     console.log(`📝 Added ${testTransactions.length} test transactions for mining`);
-    console.log(`👥 Total ${testValidators.length} validators added to EmotionalChain network`);
   }
 
   public getMiningStatus(): any {
