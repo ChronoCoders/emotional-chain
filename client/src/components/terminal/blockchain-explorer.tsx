@@ -44,7 +44,7 @@ export default function BlockchainExplorer() {
   };
 
   const formatHash = (hash: string) => {
-    return hash.substring(0, 12) + '...';
+    return hash ? hash.substring(0, 12) + '...' : 'N/A';
   };
 
   const getStatusIcon = (status: string) => {
