@@ -3,9 +3,28 @@ import { useWebSocket } from '@/hooks/use-websocket';
 import { useEffect, useState } from 'react';
 import type { Block, Transaction } from '@shared/schema';
 
+interface WalletInfo {
+  validatorId: string;
+  balance: number;
+  currency: string;
+}
+
+interface WalletStatus {
+  address: string;
+  balance: string;  
+  staked: string;
+  type: string;
+  validatorId: string;
+  authScore: string;
+  stressThreshold: string;
+  validationCount: number;
+  reputation: string;
+}
+
 export default function BlockchainExplorer() {
   const [realtimeBlocks, setRealtimeBlocks] = useState<Block[]>([]);
   const [realtimeTransactions, setRealtimeTransactions] = useState<Transaction[]>([]);
+  const [selectedValidator, setSelectedValidator] = useState<string>('StellarNode');
   const { lastMessage } = useWebSocket();
 
   const { data: initialBlocks = [] } = useQuery<Block[]>({
@@ -16,6 +35,19 @@ export default function BlockchainExplorer() {
   const { data: initialTransactions = [] } = useQuery<Transaction[]>({
     queryKey: ['/api/transactions'],
     select: (data) => data.slice(0, 5)
+  });
+
+  const { data: wallets = [] } = useQuery<WalletInfo[]>({
+    queryKey: ['/api/wallets']
+  });
+
+  const { data: walletStatus } = useQuery<WalletStatus>({
+    queryKey: ['/api/wallet/status', selectedValidator],
+    queryFn: async () => {
+      const response = await fetch(`/api/wallet/status/${selectedValidator}`);
+      if (!response.ok) throw new Error('Failed to fetch wallet status');
+      return response.json();
+    }
   });
 
   // Update with real-time data from WebSocket
@@ -70,6 +102,98 @@ export default function BlockchainExplorer() {
       <h2 className="text-terminal-cyan text-lg font-bold mb-4">
         ┌── LIVE_BLOCKCHAIN_EXPLORER ──┐
       </h2>
+      
+      {/* EmotionalWallet Interface */}
+      <div className="mb-6">
+        <h3 className="text-terminal-orange mb-3">🧠 EmotionalWallet Interface:</h3>
+        <div className="bg-terminal-surface p-4 rounded border border-terminal-border">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Wallet Status */}
+            <div className="space-y-3">
+              <h4 className="text-terminal-cyan font-semibold">💰 Wallet Status</h4>
+              <div className="text-sm space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-terminal-green">Validator:</span>
+                  <select 
+                    value={selectedValidator}
+                    onChange={(e) => setSelectedValidator(e.target.value)}
+                    className="bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1"
+                  >
+                    {wallets.slice(0, 10).map((wallet) => (
+                      <option key={wallet.validatorId} value={wallet.validatorId}>
+                        {wallet.validatorId}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {walletStatus && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Address:</span>
+                      <span className="text-terminal-cyan font-mono text-xs">{walletStatus.address.substring(0, 20)}...</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Balance:</span>
+                      <span className="text-terminal-warning font-bold">{walletStatus.balance}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Staked:</span>
+                      <span className="text-terminal-cyan">{walletStatus.staked}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Type:</span>
+                      <span className="text-terminal-orange">{walletStatus.type}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Emotional Profile */}
+            <div className="space-y-3">
+              <h4 className="text-terminal-cyan font-semibold">🧠 Emotional Profile</h4>
+              <div className="text-sm space-y-1">
+                {walletStatus && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Auth Score:</span>
+                      <span className="text-terminal-success">{walletStatus.authScore}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Stress Threshold:</span>
+                      <span className="text-terminal-warning">{walletStatus.stressThreshold}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Validations:</span>
+                      <span className="text-terminal-cyan">{walletStatus.validationCount}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-terminal-green">Reputation:</span>
+                      <span className="text-terminal-success">{walletStatus.reputation}%</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Top Wallets by Balance */}
+          <div className="mt-4 pt-4 border-t border-terminal-border">
+            <h4 className="text-terminal-cyan font-semibold mb-2">💎 Top Wallet Balances</h4>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+              {wallets
+                .sort((a, b) => b.balance - a.balance)
+                .slice(0, 6)
+                .map((wallet) => (
+                  <div key={wallet.validatorId} className="flex justify-between bg-terminal-background p-2 rounded">
+                    <span className="text-terminal-green">{wallet.validatorId.substring(0, 8)}...</span>
+                    <span className="text-terminal-warning font-bold">{wallet.balance.toFixed(2)} EMO</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </div>
+      </div>
       
       {/* Latest Blocks */}
       <div className="mb-6">

@@ -158,6 +158,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/wallet/status/:validatorId', async (req, res) => {
+    try {
+      const { validatorId } = req.params;
+      const walletStatus = await emotionalChainService.getWalletStatus(validatorId);
+      res.json(walletStatus);
+    } catch (error) {
+      console.error('Error fetching wallet status:', error);
+      res.status(500).json({ error: 'Failed to fetch wallet status' });
+    }
+  });
+
   app.get('/api/validators', async (req, res) => {
     try {
       const validators = await emotionalChainService.getValidators();

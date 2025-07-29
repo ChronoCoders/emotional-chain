@@ -209,6 +209,31 @@ export class EmotionalChainService {
     return new Map();
   }
 
+  public async getWalletStatus(validatorId: string) {
+    if (this.wallet && this.isRunning) {
+      try {
+        // Sync wallet with latest blockchain data
+        this.wallet.syncWithBlockchain();
+        return this.wallet.getStatus(validatorId);
+      } catch (error) {
+        console.error('Error getting wallet status:', error);
+      }
+    }
+    
+    // Fallback status if wallet service not available
+    return {
+      address: '0x0000000000000000000000000000000000000000',
+      balance: '0.00 EMO',
+      staked: '0.00 EMO',
+      type: 'Validator Node',
+      validatorId: validatorId,
+      authScore: '0.0',
+      stressThreshold: '0',
+      validationCount: 0,
+      reputation: '0.0'
+    };
+  }
+
   public async getBiometricData(validatorId: string) {
     if (this.blockchain && this.isRunning) {
       try {
