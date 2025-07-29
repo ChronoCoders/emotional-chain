@@ -64,6 +64,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mining endpoints
+  app.post('/api/mining/start', async (req, res) => {
+    try {
+      const result = await emotionalChainService.startMining();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to start mining' });
+    }
+  });
+
+  app.post('/api/mining/stop', async (req, res) => {
+    try {
+      const result = await emotionalChainService.stopMining();
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to stop mining' });
+    }
+  });
+
+  app.get('/api/mining/status', async (req, res) => {
+    try {
+      const status = await emotionalChainService.getMiningStatus();
+      res.json(status);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get mining status' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates

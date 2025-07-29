@@ -37,6 +37,9 @@ Network: P2P WebSocket
       console.log(`[INFO] Ready to accept peer connections`);
       console.log(`[INFO] Blockchain initialized with genesis block`);
       
+      // Start mining with test validators
+      this.startMining();
+      
       this.startStatsMonitoring();
       
       console.log(`\n[READY] Bootstrap node fully operational on port ${this.port}`);
@@ -100,5 +103,98 @@ Network: P2P WebSocket
 
   public getNetwork(): EmotionalNetwork {
     return this.network;
+  }
+
+  public startMining(): any {
+    // Add test validators with biometric data for mining
+    this.addTestValidators();
+    
+    // Start blockchain mining
+    const result = this.blockchain.startMining();
+    console.log('🚀 Bootstrap node mining started');
+    return result;
+  }
+
+  public stopMining(): any {
+    const result = this.blockchain.stopMining();
+    console.log('🛑 Bootstrap node mining stopped');
+    return result;
+  }
+
+  private addTestValidators(): void {
+    // Add test validators with different emotional/biometric profiles
+    const testValidators = [
+      {
+        id: 'validator_alpha_001',
+        biometricData: {
+          heartRate: 72,
+          stressLevel: 0.2,
+          focusLevel: 0.9,
+          authenticity: 0.95
+        }
+      },
+      {
+        id: 'validator_beta_002', 
+        biometricData: {
+          heartRate: 68,
+          stressLevel: 0.15,
+          focusLevel: 0.85,
+          authenticity: 0.92
+        }
+      },
+      {
+        id: 'validator_gamma_003',
+        biometricData: {
+          heartRate: 75,
+          stressLevel: 0.25,
+          focusLevel: 0.88,
+          authenticity: 0.94
+        }
+      }
+    ];
+
+    testValidators.forEach(validator => {
+      this.blockchain.addValidator(validator.id, validator.biometricData);
+      this.network.addValidator(validator);
+    });
+
+    // Add some test transactions for mining
+    this.addTestTransactions();
+  }
+
+  private addTestTransactions(): void {
+    const testTransactions = [
+      {
+        from: 'user_001',
+        to: 'user_002', 
+        amount: 50,
+        type: 'transfer',
+        timestamp: Date.now()
+      },
+      {
+        from: 'user_003',
+        to: 'user_001',
+        amount: 25,
+        type: 'transfer', 
+        timestamp: Date.now()
+      },
+      {
+        from: 'user_004',
+        to: 'user_005',
+        amount: 75,
+        type: 'transfer',
+        timestamp: Date.now()
+      }
+    ];
+
+    testTransactions.forEach(tx => {
+      this.blockchain.addTransaction(tx);
+    });
+
+    console.log(`📝 Added ${testTransactions.length} test transactions for mining`);
+  }
+
+  public getMiningStatus(): any {
+    return this.blockchain.getMiningStatus();
   }
 }

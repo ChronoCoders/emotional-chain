@@ -38,6 +38,15 @@ export class EmotionalChainService {
     }
   }
 
+  // Helper methods to access blockchain and network through bootstrap node
+  private get blockchain() {
+    return this.bootstrapNode?.getBlockchain();
+  }
+
+  private get network() {
+    return this.bootstrapNode?.getNetwork();
+  }
+
   private async initializeBlockchain() {
     await this.initializeRealBlockchain();
   }
@@ -362,6 +371,27 @@ export class EmotionalChainService {
         }
       }
     }, 5000);
+  }
+
+  public async startMining(): Promise<any> {
+    if (this.bootstrapNode && this.isRunning) {
+      return this.bootstrapNode.startMining();
+    }
+    return { error: 'Bootstrap node not running' };
+  }
+
+  public async stopMining(): Promise<any> {
+    if (this.bootstrapNode && this.isRunning) {
+      return this.bootstrapNode.stopMining();
+    }
+    return { error: 'Bootstrap node not running' };
+  }
+
+  public async getMiningStatus(): Promise<any> {
+    if (this.bootstrapNode && this.isRunning) {
+      return this.bootstrapNode.getMiningStatus();
+    }
+    return { error: 'Bootstrap node not running' };
   }
 
   public shutdown() {
