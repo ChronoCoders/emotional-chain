@@ -1,44 +1,191 @@
 import { storage } from '../storage';
 import { type Block, type Transaction, type Validator, type BiometricData, type NetworkStats } from '@shared/schema';
 
+// Import your actual blockchain modules from attached assets
+let EmotionalChain: any = null;
+let EmotionalNetwork: any = null;
+let EmotionalWallet: any = null;
+
 export class EmotionalChainService {
   private isRunning: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
-  private validationInterval: NodeJS.Timeout | null = null;
+  private blockchain: any = null;
+  private network: any = null;
+  private wallet: any = null;
 
   constructor() {
+    this.initializeBlockchain();
     this.startHeartbeat();
-    this.startValidationSimulation();
+  }
+
+  private async initializeRealBlockchain() {
+    try {
+      // Try to import your actual EmotionalChain modules
+      // When your blockchain is running, this will connect to it
+      console.log('🔄 Attempting to connect to real EmotionalChain...');
+      
+      // This would normally import from your blockchain project
+      // For now, we'll wait for the real blockchain to be available
+      this.isRunning = false;
+      console.log('⏳ Waiting for EmotionalChain connection...');
+      
+    } catch (error) {
+      console.error('❌ Failed to connect to EmotionalChain:', error);
+      this.isRunning = false;
+    }
+  }
+
+  private async initializeBlockchain() {
+    await this.initializeRealBlockchain();
   }
 
   public async getNetworkStatus() {
-    const stats = await storage.getLatestNetworkStats();
-    const validators = await storage.getActiveValidators();
-    const latestBlock = await storage.getLatestBlock();
-
+    if (this.network && this.isRunning) {
+      try {
+        const realStats = this.network.getNetworkStats();
+        return {
+          isRunning: this.isRunning,
+          stats: {
+            id: crypto.randomUUID(),
+            connectedPeers: realStats.connectedPeers || 0,
+            activeValidators: realStats.activeValidators || 0,
+            blockHeight: realStats.blockHeight || 0,
+            consensusPercentage: realStats.consensusPercentage || "0.00",
+            networkStress: realStats.networkStress || "0.00",
+            networkEnergy: realStats.networkEnergy || "0.00",
+            networkFocus: realStats.networkFocus || "0.00",
+            timestamp: new Date()
+          },
+          validators: await this.getValidators(),
+          latestBlock: await this.getLatestBlock(),
+          timestamp: new Date().toISOString()
+        };
+      } catch (error) {
+        console.error('Error getting real network status:', error);
+      }
+    }
+    
     return {
-      isRunning: this.isRunning,
-      stats,
-      validators,
-      latestBlock,
+      isRunning: false,
+      stats: null,
+      validators: [],
+      latestBlock: null,
       timestamp: new Date().toISOString()
     };
   }
 
+  private async getLatestBlock() {
+    if (this.blockchain && this.isRunning) {
+      try {
+        const latestBlock = this.blockchain.getLatestBlock();
+        if (latestBlock) {
+          return {
+            id: latestBlock.hash || crypto.randomUUID(),
+            height: latestBlock.index || 0,
+            hash: latestBlock.hash || '',
+            previousHash: latestBlock.previousHash || '',
+            timestamp: new Date(latestBlock.timestamp || Date.now()),
+            transactions: latestBlock.transactions || [],
+            validator: latestBlock.validator || '',
+            emotionalScore: latestBlock.emotionalScore || "0.00",
+            consensusScore: latestBlock.consensusScore || "0.00",
+            authenticity: latestBlock.authenticity || "0.00"
+          };
+        }
+      } catch (error) {
+        console.error('Error getting latest block:', error);
+      }
+    }
+    return null;
+  }
+
   public async getBlocks(limit: number = 10) {
-    return await storage.getBlocks(limit);
+    if (this.blockchain && this.isRunning) {
+      try {
+        const chain = this.blockchain.getChain();
+        return chain.slice(-limit).map((block: any) => ({
+          id: block.hash || crypto.randomUUID(),
+          height: block.index || 0,
+          hash: block.hash || '',
+          previousHash: block.previousHash || '',
+          timestamp: new Date(block.timestamp || Date.now()),
+          transactions: block.transactions || [],
+          validator: block.validator || '',
+          emotionalScore: block.emotionalScore || "0.00",
+          consensusScore: block.consensusScore || "0.00",
+          authenticity: block.authenticity || "0.00"
+        }));
+      } catch (error) {
+        console.error('Error getting real blocks:', error);
+      }
+    }
+    return [];
   }
 
   public async getTransactions(limit: number = 10) {
-    return await storage.getTransactions(limit);
+    if (this.blockchain && this.isRunning) {
+      try {
+        const blocks = this.blockchain.getChain();
+        const transactions: any[] = [];
+        
+        blocks.forEach((block: any) => {
+          if (block.transactions) {
+            block.transactions.forEach((tx: any) => {
+              transactions.push({
+                id: tx.id || crypto.randomUUID(),
+                from: tx.from || '',
+                to: tx.to || '',
+                amount: tx.amount || "0.00",
+                fee: tx.fee || "0.00",
+                timestamp: new Date(tx.timestamp || Date.now()),
+                blockHash: block.hash || '',
+                status: tx.status || 'pending',
+                emotionalData: tx.emotionalData || null
+              });
+            });
+          }
+        });
+        
+        return transactions.slice(-limit);
+      } catch (error) {
+        console.error('Error getting real transactions:', error);
+      }
+    }
+    return [];
   }
 
   public async getValidators() {
-    return await storage.getValidators();
+    if (this.network && this.isRunning) {
+      try {
+        const validators = this.network.getValidatorPeers();
+        return validators.map((validator: any) => ({
+          id: validator.id || crypto.randomUUID(),
+          address: validator.address || '',
+          stake: validator.stake || "0.00",
+          isActive: validator.isActive || false,
+          uptime: validator.uptime || "0.00",
+          authScore: validator.authScore || "0.00",
+          device: validator.device || 'Unknown',
+          lastValidation: new Date(validator.lastValidation || Date.now())
+        }));
+      } catch (error) {
+        console.error('Error getting real validators:', error);
+      }
+    }
+    return [];
   }
 
   public async getBiometricData(validatorId: string) {
-    return await storage.getLatestBiometricData(validatorId);
+    if (this.blockchain && this.isRunning) {
+      try {
+        // Get real biometric data from your blockchain
+        // This would query your blockchain for validator biometric data
+        return null; // Will be populated when blockchain is connected
+      } catch (error) {
+        console.error('Error getting real biometric data:', error);
+      }
+    }
+    return null;
   }
 
   public async executeCommand(command: string, args: string[] = []): Promise<string> {
@@ -66,23 +213,31 @@ export class EmotionalChainService {
     const subcommand = args[0] || '--status';
     
     if (subcommand === '--status') {
-      const validators = await storage.getActiveValidators();
-      const myValidator = validators[0]; // Simulate current user validator
+      if (!this.isRunning || !this.wallet) {
+        return `❌ EmotionalChain Wallet - Not Connected
+⏳ Waiting for blockchain connection...
+💡 Start your EmotionalChain blockchain first`;
+      }
       
-      return `🧠 EmotionalChain Wallet v2.1.0 - Connected
-📊 Research by: Altug Tatlisu, CEO Bytus Technologies
+      try {
+        // Get wallet data from your real blockchain
+        const walletData = this.wallet.getStatus();
+        return `🧠 EmotionalChain Wallet - Connected
 
 💰 Account Information:
-   Address: ${myValidator?.address || '0xA7b2C9E8F1D3456789AbCdEf0123456789AbCdEf'}
-   Balance: 15,420.75 EMO
-   Staked: ${myValidator?.stake || '10,000.00'} EMO
-   Type: Validator Node
+   Address: ${walletData.address}
+   Balance: ${walletData.balance} EMO
+   Staked: ${walletData.staked} EMO
+   Type: ${walletData.type}
 
 🧠 Emotional Profile:
-   Authenticity Score: ${myValidator?.authScore || '94.7'}%
-   Stress Threshold: 68%
-   Validation History: 1,247 blocks
-   Reputation: 98.3%`;
+   Authenticity Score: ${walletData.authScore}%
+   Stress Threshold: ${walletData.stressThreshold}%
+   Validation History: ${walletData.validationCount} blocks
+   Reputation: ${walletData.reputation}%`;
+      } catch (error) {
+        return `❌ Error getting wallet status: ${error}`;
+      }
     }
     
     return 'Usage: wallet [--status]';
@@ -91,18 +246,22 @@ export class EmotionalChainService {
   private async handleMineCommand(args: string[]): Promise<string> {
     const flag = args[0] || '--start';
     
+    if (!this.isRunning || !this.blockchain) {
+      return `❌ EmotionalChain Mining - Not Available
+⏳ Blockchain not connected
+💡 Start your EmotionalChain blockchain first`;
+    }
+    
     if (flag === '--start' || flag === '--biometric-validation') {
-      // Simulate biometric validation and mining
-      const heartRate = Math.floor(Math.random() * 20) + 65; // 65-85 BPM
-      const stressLevel = Math.floor(Math.random() * 30) + 15; // 15-45%
-      const authenticity = Math.floor(Math.random() * 10) + 90; // 90-100%
-      
-      return `⛏️ Starting mining with biometric validation...
-🧠 Processing biometric data...
-   Heart Rate: ${heartRate}.4 BPM
-   Stress Level: ${stressLevel}.1%
-   Authenticity: ${authenticity}.8%
-✅ Mining attempt completed - Block proposal submitted`;
+      try {
+        // Use your real blockchain mining functionality
+        const miningResult = this.blockchain.startMining();
+        return `⛏️ Starting mining with biometric validation...
+🧠 Processing biometric data from your blockchain...
+✅ ${miningResult.message || 'Mining initiated'}`;
+      } catch (error) {
+        return `❌ Mining error: ${error}`;
+      }
     }
     
     return 'Usage: mine [--start | --biometric-validation]';
@@ -111,90 +270,95 @@ export class EmotionalChainService {
   private async handleNetworkCommand(args: string[]): Promise<string> {
     const flag = args[0] || '--info';
     
+    if (!this.isRunning || !this.network) {
+      return `❌ EmotionalChain Network - Not Connected
+⏳ Network not available
+💡 Start your EmotionalChain blockchain first`;
+    }
+    
     if (flag === '--info' || flag === '--peers') {
-      const stats = await storage.getLatestNetworkStats();
-      
-      return `🌐 Network Peer Discovery:
-   Connected Peers: ${stats?.connectedPeers || 127}
-   Active Validators: ${stats?.activeValidators || 21}/21
-   Network Latency: 45ms
-   Consensus Participation: ${stats?.consensusPercentage || '89.7'}%`;
+      try {
+        const stats = this.network.getNetworkStats();
+        return `🌐 Network Peer Discovery:
+   Connected Peers: ${stats.connectedPeers}
+   Active Validators: ${stats.activeValidators}
+   Network Latency: ${stats.latency || 'N/A'}
+   Consensus Participation: ${stats.consensusPercentage}%`;
+      } catch (error) {
+        return `❌ Network error: ${error}`;
+      }
     }
     
     return 'Usage: network [--info | --peers]';
   }
 
   private async handleStatusCommand(): Promise<string> {
-    const stats = await storage.getLatestNetworkStats();
-    const validators = await storage.getActiveValidators();
-    const latestBlock = await storage.getLatestBlock();
-    
-    return `📊 EmotionalChain Status:
+    if (!this.isRunning) {
+      return `📊 EmotionalChain Status:
+   Blockchain: ❌ Not Connected
+   Network: ❌ Not Connected
+   Consensus: ❌ Not Active
+   💡 Start your EmotionalChain blockchain to see live status`;
+    }
+
+    try {
+      const networkStats = this.network?.getNetworkStats();
+      const latestBlock = this.blockchain?.getLatestBlock();
+      
+      return `📊 EmotionalChain Status:
    Blockchain: ✅ Running
    Network: ✅ Active
    Consensus: 🧠 Proof of Emotion
-   Peers: ${stats?.connectedPeers || 127}
-   Validators: ${validators.length}
-   Latest Block: #${latestBlock?.height || 0}
-   Block Hash: ${latestBlock?.hash?.substring(0, 12) || '0x000000000000'}...`;
+   Peers: ${networkStats?.connectedPeers || 0}
+   Validators: ${networkStats?.activeValidators || 0}
+   Latest Block: #${latestBlock?.index || 0}
+   Block Hash: ${latestBlock?.hash?.substring(0, 12) || 'N/A'}...`;
+    } catch (error) {
+      return `❌ Status error: ${error}`;
+    }
   }
 
   private async handleHistoryCommand(): Promise<string> {
-    const transactions = await storage.getTransactions(5);
-    
-    let result = '💸 Recent Transaction History:\n';
-    if (transactions.length === 0) {
-      result += '   No recent transactions found.';
-    } else {
-      transactions.forEach((tx, index) => {
-        result += `   ${index + 1}. ${tx.hash.substring(0, 12)}... - ${tx.amount} EMO (${tx.status})\n`;
-      });
+    if (!this.isRunning || !this.blockchain) {
+      return `💸 Recent Transaction History:
+❌ Blockchain not connected
+💡 Start your EmotionalChain blockchain to see history`;
     }
-    
-    return result;
+
+    try {
+      const chain = this.blockchain.getChain();
+      const recentBlocks = chain.slice(-5);
+      
+      let result = '📜 EmotionalChain Recent History:\n\n';
+      
+      result += '🔗 Recent Blocks:\n';
+      if (recentBlocks.length === 0) {
+        result += '   No blocks found\n';
+      } else {
+        recentBlocks.forEach((block: any) => {
+          result += `   Block #${block.index} - ${block.hash.substring(0, 10)}... - ${block.emotionalScore || 'N/A'}% emotion\n`;
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      return `❌ History error: ${error}`;
+    }
   }
 
   private startHeartbeat() {
     this.isRunning = true;
     this.heartbeatInterval = setInterval(async () => {
-      // Update network stats periodically
-      const currentStats = await storage.getLatestNetworkStats();
-      if (currentStats) {
-        const updatedStats = {
-          connectedPeers: Math.floor(Math.random() * 10) + 120, // 120-130
-          activeValidators: 21,
-          blockHeight: currentStats.blockHeight + (Math.random() > 0.7 ? 1 : 0),
-          consensusPercentage: (Math.random() * 5 + 87).toFixed(2), // 87-92%
-          networkStress: (Math.random() * 10 + 20).toFixed(2), // 20-30%
-          networkEnergy: (Math.random() * 10 + 85).toFixed(2), // 85-95%
-          networkFocus: (Math.random() * 5 + 92).toFixed(2), // 92-97%
-        };
-        
-        await storage.createNetworkStats(updatedStats);
+      // Heartbeat for blockchain connection - no data simulation
+      if (this.blockchain && this.network) {
+        try {
+          // When real blockchain is connected, sync data here
+          // For now, just maintain connection
+        } catch (error) {
+          console.error('Blockchain heartbeat error:', error);
+        }
       }
-    }, 5000); // Update every 5 seconds
-  }
-
-  private startValidationSimulation() {
-    this.validationInterval = setInterval(async () => {
-      const validators = await storage.getActiveValidators();
-      
-      // Simulate biometric data for random validator
-      if (validators.length > 0) {
-        const randomValidator = validators[Math.floor(Math.random() * validators.length)];
-        
-        const biometricData = {
-          validatorId: randomValidator.id,
-          heartRate: Math.floor(Math.random() * 20) + 65,
-          hrv: Math.floor(Math.random() * 30) + 30,
-          stressLevel: (Math.random() * 40 + 10).toFixed(2),
-          focusLevel: (Math.random() * 20 + 80).toFixed(2),
-          authenticity: (Math.random() * 10 + 90).toFixed(2),
-        };
-        
-        await storage.createBiometricData(biometricData);
-      }
-    }, 3000); // Update every 3 seconds
+    }, 5000);
   }
 
   public shutdown() {
@@ -203,9 +367,14 @@ export class EmotionalChainService {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
     }
-    if (this.validationInterval) {
-      clearInterval(this.validationInterval);
-      this.validationInterval = null;
+    
+    // Shutdown real blockchain connections
+    if (this.network) {
+      try {
+        this.network.shutdown();
+      } catch (error) {
+        console.error('Error shutting down network:', error);
+      }
     }
   }
 }

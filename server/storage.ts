@@ -53,72 +53,7 @@ export class MemStorage implements IStorage {
   }
 
   private initializeData() {
-    // Initialize with some sample data
-    const genesisBlock: Block = {
-      id: randomUUID(),
-      height: 0,
-      hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-      previousHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-      timestamp: new Date(),
-      transactions: [],
-      validator: "0x7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f",
-      emotionalScore: "95.50",
-      consensusScore: "100.00",
-      authenticity: "98.30"
-    };
-    this.blocks.set(genesisBlock.id, genesisBlock);
-
-    // Add sample validators
-    const sampleValidators: Validator[] = [
-      {
-        id: randomUUID(),
-        address: "0x7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f",
-        stake: "15000.00000000",
-        isActive: true,
-        uptime: "99.80",
-        authScore: "97.20",
-        device: "Apple Watch S8",
-        lastValidation: new Date()
-      },
-      {
-        id: randomUUID(),
-        address: "0x8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7",
-        stake: "12500.00000000",
-        isActive: true,
-        uptime: "98.90",
-        authScore: "94.80",
-        device: "Fitbit Sense 2",
-        lastValidation: new Date()
-      },
-      {
-        id: randomUUID(),
-        address: "0x9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7e8",
-        stake: "18000.00000000",
-        isActive: true,
-        uptime: "87.30",
-        authScore: "89.10",
-        device: "Oura Ring 3",
-        lastValidation: new Date()
-      }
-    ];
-
-    sampleValidators.forEach(validator => {
-      this.validators.set(validator.id, validator);
-    });
-
-    // Initialize network stats
-    const initialStats: NetworkStats = {
-      id: randomUUID(),
-      connectedPeers: 127,
-      activeValidators: 21,
-      blockHeight: 8432,
-      consensusPercentage: "89.70",
-      networkStress: "23.40",
-      networkEnergy: "87.20",
-      networkFocus: "94.70",
-      timestamp: new Date()
-    };
-    this.networkStats.set(initialStats.id, initialStats);
+    // Initialize empty - will be populated by real blockchain data only
   }
 
   // User methods

@@ -103,7 +103,7 @@ export default function Terminal() {
         <div className="terminal-window rounded-lg p-4 mt-6">
           <div className="ascii-art text-terminal-green text-center text-xs">
             {`┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│  EmotionalChain v2.1.0 | PoE Consensus Active | 🧠 Research: Altug Tatlisu, Bytus Tech  │
+│  EmotionalChain v1.0.0 | PoE Consensus Active | Network: Custom                          │
 │  Connected to Network | Block Height: ${stats ? stats.blockHeight : '----'} | Validators: ${stats ? stats.activeValidators : '--'}/${stats ? stats.activeValidators : '--'} | Status: ✅ OPERATIONAL │
 └─────────────────────────────────────────────────────────────────────────────────────────┘`}
           </div>

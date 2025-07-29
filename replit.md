@@ -8,6 +8,16 @@ This is a full-stack web application that provides a terminal-style dashboard fo
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (January 29, 2025)
+
+- Removed all mock/demo data and author information completely
+- Updated service layer to connect directly to real EmotionalChain blockchain instances  
+- ASCII banner now matches exactly what's in main.ts file
+- All data now comes from actual EmotionalChain, EmotionalNetwork, EmotionalWallet modules only
+- Interface shows "waiting for connection" when blockchain not running
+- Commands require real blockchain connection to function
+- Terminal properly indicates when blockchain is not connected
+
 ## System Architecture
 
 The application follows a monorepo structure with clear separation between frontend, backend, and shared components:

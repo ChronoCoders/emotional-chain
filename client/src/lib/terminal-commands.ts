@@ -58,8 +58,7 @@ ${TERMINAL_COMMANDS.map(cmd =>
   `   ${cmd.name.padEnd(12)} - ${cmd.description}`
 ).join('\n')}
 
-Type 'help <command>' for detailed usage information.
-Research by: Altug Tatlisu, CEO Bytus Technologies`;
+Type 'help <command>' for detailed usage information.`;
   }
 
   const cmd = TERMINAL_COMMANDS.find(c => c.name === command.toLowerCase());

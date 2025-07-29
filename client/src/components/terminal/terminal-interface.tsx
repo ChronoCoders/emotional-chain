@@ -18,7 +18,7 @@ export default function TerminalInterface({ className = "" }: TerminalInterfaceP
     {
       id: '1',
       type: 'output',
-      content: '🧠 EmotionalChain Terminal v2.1.0 - Ready\n📊 Research by: Altug Tatlisu, CEO Bytus Technologies\n\nType "help" for available commands.',
+      content: '🧠 EmotionalChain Terminal - Ready\n\nType "help" for available commands.',
       timestamp: new Date()
     }
   ]);
