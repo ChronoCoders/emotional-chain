@@ -101,6 +101,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Wallet and transfer endpoints
+  app.get('/api/wallet/:validatorId', async (req, res) => {
+    try {
+      const { validatorId } = req.params;
+      const balance = await emotionalChainService.getWalletBalance(validatorId);
+      
+      res.json({
+        validatorId,
+        balance,
+        currency: 'EMO'
+      });
+    } catch (error) {
+      console.error('Error fetching wallet balance:', error);
+      res.status(500).json({ error: 'Failed to fetch wallet balance' });
+    }
+  });
+
+  app.post('/api/transfer', async (req, res) => {
+    try {
+      const { from, to, amount } = req.body;
+      
+      const success = await emotionalChainService.transferEMO(from, to, amount);
+      
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: `Successfully transferred ${amount} EMO from ${from} to ${to}` 
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          message: 'Transfer failed - insufficient balance' 
+        });
+      }
+    } catch (error) {
+      console.error('Error processing transfer:', error);
+      res.status(500).json({ error: 'Failed to process transfer' });
+    }
+  });
+
+  app.get('/api/wallets', async (req, res) => {
+    try {
+      const wallets = await emotionalChainService.getAllWallets();
+      
+      const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
+        validatorId,
+        balance,
+        currency: 'EMO'
+      }));
+      
+      res.json(walletsArray);
+    } catch (error) {
+      console.error('Error fetching wallets:', error);
+      res.status(500).json({ error: 'Failed to fetch wallets' });
+    }
+  });
+
+  app.get('/api/validators', async (req, res) => {
+    try {
+      const validators = await emotionalChainService.getValidators();
+      res.json(validators);
+    } catch (error) {
+      console.error('Error fetching validators:', error);
+      res.status(500).json({ error: 'Failed to fetch validators' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates

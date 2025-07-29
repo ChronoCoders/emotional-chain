@@ -124,36 +124,34 @@ Network: P2P WebSocket
   private addTestValidators(): void {
     // Add 21 validators with diverse emotional/biometric profiles for real mining
     const testValidators = [
-      // Alpha Series - High Performance Validators
-      { id: 'validator_alpha_001', biometricData: { heartRate: 72, stressLevel: 0.2, focusLevel: 0.9, authenticity: 0.95 }},
-      { id: 'validator_alpha_002', biometricData: { heartRate: 68, stressLevel: 0.15, focusLevel: 0.92, authenticity: 0.97 }},
-      { id: 'validator_alpha_003', biometricData: { heartRate: 70, stressLevel: 0.18, focusLevel: 0.88, authenticity: 0.93 }},
-      { id: 'validator_alpha_004', biometricData: { heartRate: 74, stressLevel: 0.22, focusLevel: 0.89, authenticity: 0.96 }},
-      { id: 'validator_alpha_005', biometricData: { heartRate: 69, stressLevel: 0.16, focusLevel: 0.91, authenticity: 0.94 }},
+      // Elite Validators - Premium Performance
+      { id: 'zenith_prime', biometricData: { heartRate: 65, stressLevel: 0.12, focusLevel: 0.95, authenticity: 0.98 }},
+      { id: 'aurora_nexus', biometricData: { heartRate: 68, stressLevel: 0.15, focusLevel: 0.92, authenticity: 0.97 }},
+      { id: 'quantum_sage', biometricData: { heartRate: 70, stressLevel: 0.18, focusLevel: 0.88, authenticity: 0.93 }},
+      { id: 'stellar_mind', biometricData: { heartRate: 72, stressLevel: 0.2, focusLevel: 0.9, authenticity: 0.95 }},
+      { id: 'phoenix_core', biometricData: { heartRate: 74, stressLevel: 0.22, focusLevel: 0.89, authenticity: 0.96 }},
+      { id: 'titan_flow', biometricData: { heartRate: 69, stressLevel: 0.16, focusLevel: 0.91, authenticity: 0.94 }},
       
-      // Beta Series - Balanced Validators
-      { id: 'validator_beta_001', biometricData: { heartRate: 75, stressLevel: 0.25, focusLevel: 0.85, authenticity: 0.92 }},
-      { id: 'validator_beta_002', biometricData: { heartRate: 73, stressLevel: 0.23, focusLevel: 0.87, authenticity: 0.91 }},
-      { id: 'validator_beta_003', biometricData: { heartRate: 76, stressLevel: 0.27, focusLevel: 0.84, authenticity: 0.89 }},
-      { id: 'validator_beta_004', biometricData: { heartRate: 71, stressLevel: 0.24, focusLevel: 0.86, authenticity: 0.90 }},
-      { id: 'validator_beta_005', biometricData: { heartRate: 77, stressLevel: 0.26, focusLevel: 0.83, authenticity: 0.88 }},
+      // Advanced Validators - High Performance
+      { id: 'crimson_wave', biometricData: { heartRate: 75, stressLevel: 0.25, focusLevel: 0.85, authenticity: 0.92 }},
+      { id: 'silver_torch', biometricData: { heartRate: 73, stressLevel: 0.23, focusLevel: 0.87, authenticity: 0.91 }},
+      { id: 'jade_sentinel', biometricData: { heartRate: 76, stressLevel: 0.27, focusLevel: 0.84, authenticity: 0.89 }},
+      { id: 'azure_guardian', biometricData: { heartRate: 71, stressLevel: 0.24, focusLevel: 0.86, authenticity: 0.90 }},
+      { id: 'ember_knight', biometricData: { heartRate: 77, stressLevel: 0.26, focusLevel: 0.83, authenticity: 0.88 }},
       
-      // Gamma Series - Standard Validators
-      { id: 'validator_gamma_001', biometricData: { heartRate: 78, stressLevel: 0.30, focusLevel: 0.82, authenticity: 0.87 }},
-      { id: 'validator_gamma_002', biometricData: { heartRate: 79, stressLevel: 0.32, focusLevel: 0.80, authenticity: 0.85 }},
-      { id: 'validator_gamma_003', biometricData: { heartRate: 80, stressLevel: 0.29, focusLevel: 0.81, authenticity: 0.86 }},
-      { id: 'validator_gamma_004', biometricData: { heartRate: 82, stressLevel: 0.31, focusLevel: 0.79, authenticity: 0.84 }},
-      { id: 'validator_gamma_005', biometricData: { heartRate: 81, stressLevel: 0.33, focusLevel: 0.78, authenticity: 0.83 }},
+      // Standard Validators - Reliable Performance
+      { id: 'coral_beacon', biometricData: { heartRate: 78, stressLevel: 0.30, focusLevel: 0.82, authenticity: 0.87 }},
+      { id: 'storm_runner', biometricData: { heartRate: 79, stressLevel: 0.32, focusLevel: 0.80, authenticity: 0.85 }},
+      { id: 'void_walker', biometricData: { heartRate: 80, stressLevel: 0.29, focusLevel: 0.81, authenticity: 0.86 }},
+      { id: 'neon_pulse', biometricData: { heartRate: 82, stressLevel: 0.31, focusLevel: 0.79, authenticity: 0.84 }},
+      { id: 'frost_blade', biometricData: { heartRate: 81, stressLevel: 0.33, focusLevel: 0.78, authenticity: 0.83 }},
       
-      // Delta Series - Entry Level Validators
-      { id: 'validator_delta_001', biometricData: { heartRate: 83, stressLevel: 0.35, focusLevel: 0.77, authenticity: 0.82 }},
-      { id: 'validator_delta_002', biometricData: { heartRate: 84, stressLevel: 0.37, focusLevel: 0.76, authenticity: 0.81 }},
-      { id: 'validator_delta_003', biometricData: { heartRate: 85, stressLevel: 0.36, focusLevel: 0.75, authenticity: 0.80 }},
-      { id: 'validator_delta_004', biometricData: { heartRate: 86, stressLevel: 0.38, focusLevel: 0.74, authenticity: 0.79 }},
-      { id: 'validator_delta_005', biometricData: { heartRate: 87, stressLevel: 0.39, focusLevel: 0.73, authenticity: 0.78 }},
-      
-      // Omega Series - Specialized Validator
-      { id: 'validator_omega_001', biometricData: { heartRate: 65, stressLevel: 0.12, focusLevel: 0.95, authenticity: 0.98 }}
+      // Emerging Validators - Growing Performance
+      { id: 'lunar_spark', biometricData: { heartRate: 83, stressLevel: 0.35, focusLevel: 0.77, authenticity: 0.82 }},
+      { id: 'solar_drift', biometricData: { heartRate: 84, stressLevel: 0.37, focusLevel: 0.76, authenticity: 0.81 }},
+      { id: 'ocean_shard', biometricData: { heartRate: 85, stressLevel: 0.36, focusLevel: 0.75, authenticity: 0.80 }},
+      { id: 'wind_cipher', biometricData: { heartRate: 86, stressLevel: 0.38, focusLevel: 0.74, authenticity: 0.79 }},
+      { id: 'echo_prism', biometricData: { heartRate: 87, stressLevel: 0.39, focusLevel: 0.73, authenticity: 0.78 }}
     ];
 
     testValidators.forEach(validator => {

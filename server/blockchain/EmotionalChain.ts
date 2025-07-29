@@ -10,6 +10,7 @@ export class EmotionalChain extends EventEmitter {
   private isMining: boolean = false;
   private miningInterval: NodeJS.Timeout | null = null;
   private validators: Map<string, any> = new Map();
+  private wallets: Map<string, number> = new Map(); // Validator wallets for EMO storage
   
   // Token Economics from attached specification
   private tokenEconomics = {
@@ -156,6 +157,10 @@ export class EmotionalChain extends EventEmitter {
       blocksValidated: 0,
       emotionalScore: this.calculateEmotionalScore(biometricData)
     });
+    
+    // Initialize validator wallet with 0 EMO balance
+    this.wallets.set(validatorId, 0);
+    
     console.log(`✅ Validator ${validatorId.substring(0, 8)}... added with emotional score: ${this.calculateEmotionalScore(biometricData)}%`);
     return true;
   }
@@ -388,6 +393,42 @@ export class EmotionalChain extends EventEmitter {
       rewards: this.tokenEconomics.rewards,
       contractStatus: "AUTHENTIC_DISTRIBUTION_ACTIVE"
     };
+  }
+
+  public transferEMO(from: string, to: string, amount: number): boolean {
+    const fromBalance = this.wallets.get(from) || 0;
+    
+    if (fromBalance < amount) {
+      return false; // Insufficient balance
+    }
+    
+    // Deduct from sender
+    this.wallets.set(from, fromBalance - amount);
+    
+    // Add to recipient (create wallet if doesn't exist)
+    const toBalance = this.wallets.get(to) || 0;
+    this.wallets.set(to, toBalance + amount);
+    
+    // Record transaction
+    this.addTransaction({
+      id: crypto.randomUUID(),
+      from,
+      to,
+      amount,
+      type: 'transfer',
+      timestamp: Date.now(),
+      fee: 0.1 // Small transaction fee
+    });
+    
+    return true;
+  }
+
+  public getWalletBalance(validatorId: string): number {
+    return this.wallets.get(validatorId) || 0;
+  }
+
+  public getAllWallets(): Map<string, number> {
+    return new Map(this.wallets);
   }
 
   public getMiningStatus(): any {

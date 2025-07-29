@@ -174,6 +174,7 @@ export class EmotionalChainService {
           id: validator.id || crypto.randomUUID(),
           address: validator.address || '',
           stake: validator.stake || "0.00",
+          balance: this.blockchain ? this.blockchain.getWalletBalance(validator.id) : 0,
           isActive: validator.isActive || false,
           uptime: validator.uptime || "0.00",
           authScore: validator.authScore || "0.00",
@@ -185,6 +186,27 @@ export class EmotionalChainService {
       }
     }
     return [];
+  }
+
+  public async transferEMO(from: string, to: string, amount: number): Promise<boolean> {
+    if (this.blockchain && this.isRunning) {
+      return this.blockchain.transferEMO(from, to, amount);
+    }
+    return false;
+  }
+
+  public async getWalletBalance(validatorId: string): Promise<number> {
+    if (this.blockchain && this.isRunning) {
+      return this.blockchain.getWalletBalance(validatorId);
+    }
+    return 0;
+  }
+
+  public async getAllWallets(): Promise<Map<string, number>> {
+    if (this.blockchain && this.isRunning) {
+      return this.blockchain.getAllWallets();
+    }
+    return new Map();
   }
 
   public async getBiometricData(validatorId: string) {
