@@ -32,12 +32,15 @@ Preferred communication style: Simple, everyday language.
 - Real-time block visualization with mining animations
 - Full-width block display above terminal interface
 - Live token economics dashboard with pool utilization tracking
-- **WALLET SYSTEM**: Integrated original EmotionalWallet.ts with enhanced functionality
-- Complete multi-validator wallet system with unique addresses for each validator
-- Real-time balance tracking and EMO token transfers between validators
+- **WALLET SYSTEM**: Fully operational EmotionalWallet.ts integration with real-time balance updates
+- Complete multi-validator wallet system with unique addresses for each validator  
+- Real-time balance tracking: validators earn actual EMO tokens from mining (67-71 EMO per block)
+- Live wallet balance updates via API endpoints (/api/wallet/{validatorId}, /api/wallets)
 - Enhanced terminal commands: wallet --status, wallet --list, individual validator wallets
 - Creative themed validator names: StellarNode, NebulaForge, QuantumReach, OrionPulse, DarkMatterLabs, etc.
 - Organized by themes: Cosmic/Sci-Fi, Tech/Futuristic, Security/Trust, Creative/Myth-Inspired
+- **VALIDATOR ROTATION**: Fixed rotation algorithm - all validators now take turns mining blocks
+- Proper validator selection based on block count for fair reward distribution
 
 ## System Architecture
 

@@ -277,6 +277,10 @@ export class EmotionalChain extends EventEmitter {
           emotionalScore: selectedValidator.emotionalScore,
           consensusScore: this.calculateConsensusScore()
         });
+
+        // CRITICAL: Update actual wallet balance with the total reward
+        const currentBalance = this.wallets.get(selectedValidator.id) || 0;
+        this.wallets.set(selectedValidator.id, currentBalance + totalReward);
       }
       
       // Update validator stats
