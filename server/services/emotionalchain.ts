@@ -245,6 +245,7 @@ export class EmotionalChainService {
 
   private async handleWalletCommand(args: string[]): Promise<string> {
     const subcommand = args[0] || '--status';
+    const validatorId = args[1]; // Optional validator ID
     
     if (subcommand === '--status') {
       if (!this.isRunning || !this.wallet) {
@@ -254,14 +255,18 @@ export class EmotionalChainService {
       }
       
       try {
+        // Sync wallet with latest blockchain data
+        this.wallet.syncWithBlockchain();
+        
         // Get wallet data from your real blockchain
-        const walletData = this.wallet.getStatus();
+        const walletData = this.wallet.getStatus(validatorId);
         return `🧠 EmotionalChain Wallet - Connected
 
 💰 Account Information:
+   Validator: ${walletData.validatorId}
    Address: ${walletData.address}
-   Balance: ${walletData.balance} EMO
-   Staked: ${walletData.staked} EMO
+   Balance: ${walletData.balance}
+   Staked: ${walletData.staked}
    Type: ${walletData.type}
 
 🧠 Emotional Profile:
@@ -274,7 +279,27 @@ export class EmotionalChainService {
       }
     }
     
-    return 'Usage: wallet [--status]';
+    if (subcommand === '--list') {
+      if (!this.isRunning || !this.wallet) {
+        return `❌ EmotionalChain Wallet - Not Connected`;
+      }
+      
+      try {
+        this.wallet.syncWithBlockchain();
+        const allWallets = this.wallet.getAllWallets();
+        let result = `🧠 EmotionalChain Validator Wallets\n\n`;
+        
+        Array.from(allWallets.entries()).forEach(([validatorId, wallet]) => {
+          result += `💎 ${validatorId}: ${wallet.balance.toFixed(2)} EMO\n`;
+        });
+        
+        return result;
+      } catch (error) {
+        return `❌ Error listing wallets: ${error}`;
+      }
+    }
+    
+    return 'Usage: wallet [--status] [--list] [validator_id]';
   }
 
   private async handleMineCommand(args: string[]): Promise<string> {
