@@ -19,13 +19,12 @@ export class BootstrapNode {
     try {
       console.log(`
 ===============================================
-    EMOTIONALCHAIN BOOTSTRAP NODE
+         EMOTIONALCHAIN BOOTSTRAP NODE
 ===============================================
-Starting bootstrap node on port ${this.port}
+Port: ${this.port}
 Consensus: Proof of Emotion
 Network: P2P WebSocket
-===============================================
-      `);
+===============================================`);
       
       console.log(`[INIT] Initializing EmotionalChain blockchain...`);
       console.log(`[INIT] Setting up P2P network on port ${this.port}...`);
