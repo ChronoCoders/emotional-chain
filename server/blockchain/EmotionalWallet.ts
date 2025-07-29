@@ -103,11 +103,11 @@ export class EmotionalWallet {
 
   public updateWalletBalance(validatorId: string, balance: number): void {
     if (this.wallets.has(validatorId)) {
-      const wallet = this.wallets.get(validatorId);
-      wallet.balance = balance;
+      const wallet = this.wallets.get(validatorId)!;
+      wallet.balance = balance; // Set absolute balance from blockchain
       this.wallets.set(validatorId, wallet);
     } else {
-      // Create new wallet for validator
+      // Create new wallet for validator with blockchain balance
       this.wallets.set(validatorId, {
         address: this.generateAddress(validatorId),
         balance: balance,
@@ -146,11 +146,15 @@ export class EmotionalWallet {
   }
 
   public syncWithBlockchain(): void {
-    // Sync wallet balances with blockchain
+    // CRITICAL: Force sync all wallet balances with blockchain
     if (this.blockchain && this.blockchain.getAllWallets) {
       const blockchainWallets = this.blockchain.getAllWallets();
+      
+      // Clear any cached balances that might be wrong
       blockchainWallets.forEach((balance: number, validatorId: string) => {
+        // Always set the absolute balance from blockchain source
         this.updateWalletBalance(validatorId, balance);
+        console.log(`🔄 Synced ${validatorId}: ${balance} EMO from blockchain`);
       });
     }
   }

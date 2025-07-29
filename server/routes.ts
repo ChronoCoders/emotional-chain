@@ -143,6 +143,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/wallets', async (req, res) => {
     try {
+      // CRITICAL: Force sync with blockchain before returning data
+      if (emotionalChainService.wallet) {
+        emotionalChainService.wallet.syncWithBlockchain();
+      }
+      
       const wallets = await emotionalChainService.getAllWallets();
       
       const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
