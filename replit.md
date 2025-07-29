@@ -1,121 +1,121 @@
-# EmotionalChain Blockchain Dashboard
+# EmotionalChain Blockchain Application
 
 ## Overview
 
-This is a full-stack web application that provides a terminal-style dashboard for the EmotionalChain blockchain project. EmotionalChain is a novel blockchain implementation that uses "Proof of Emotion" consensus mechanism with biometric validation. The application features a React frontend with a terminal interface and an Express.js backend that simulates blockchain operations and network status.
+This project is a full-stack web application implementing **EmotionalChain**, the world's first emotion-powered blockchain using Proof of Emotion (PoE) consensus. The application features a terminal-style interface for interacting with blockchain operations, monitoring network status, and managing validators with biometric data integration.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (January 29, 2025)
-
-- Implemented actual EmotionalChain bootstrap node from user's attached files
-- Bootstrap node running with proper banner (removed all author information)  
-- ASCII banner matches exactly what's shown in user's image
-- Bootstrap node operational on port 8000 with P2P WebSocket
-- All data comes from real blockchain modules: EmotionalChain, EmotionalNetwork, EmotionalWallet
-- Network shows "isRunning: true" with actual blockchain stats
-- Bootstrap node logs show "1 blocks, 0 validators" - actual blockchain data
-- Terminal interface displays real-time data from running bootstrap node
-- Clean footer with proper ASCII borders showing network statistics
-- **MAJOR UPDATE**: Implemented comprehensive token economics system
-- 21 validators added with diverse emotional/biometric profiles
-- Real EMO token mining with authentic reward distribution
-- Token economics: 1B EMO max supply, 4 reward pools (staking, wellness, ecosystem, team)
-- Mining rewards: 50 EMO base + up to 25 EMO consensus bonus + validation rewards
-- Staking system: 5% base APY, up to 15% with wellness/authenticity multipliers
-- All rewards deducted from actual token pools (400M EMO staking pool)
-- Zero pre-mint policy - all tokens earned through emotional validation
-- **VISUAL UPDATE**: Added Bitcoin-style visual block explorer
-- Color-coded block cards showing hash, rewards, emotional scores, consensus data
-- Real-time block visualization with mining animations
-- Full-width block display above terminal interface
-- Live token economics dashboard with pool utilization tracking
-- **WALLET SYSTEM**: Fully operational EmotionalWallet.ts integration with real-time balance updates
-- Complete multi-validator wallet system with unique addresses for each validator  
-- Real-time balance tracking: validators earn actual EMO tokens from mining (67-71 EMO per block)
-- Live wallet balance updates via API endpoints (/api/wallet/{validatorId}, /api/wallets)
-- Enhanced terminal commands: wallet --status, wallet --list, individual validator wallets
-- Creative themed validator names: StellarNode, NebulaForge, QuantumReach, OrionPulse, DarkMatterLabs, etc.
-- Organized by themes: Cosmic/Sci-Fi, Tech/Futuristic, Security/Trust, Creative/Myth-Inspired
-- **VALIDATOR ROTATION**: Fixed rotation algorithm - all validators now take turns mining blocks
-- Proper validator selection based on block count for fair reward distribution
-
 ## System Architecture
 
-The application follows a monorepo structure with clear separation between frontend, backend, and shared components:
-
-- **Frontend**: React with TypeScript, using Vite for development and building
-- **Backend**: Express.js server with TypeScript
-- **Database**: PostgreSQL with Drizzle ORM for data persistence
-- **Real-time Communication**: WebSocket connection for live updates
-- **UI Framework**: Tailwind CSS with shadcn/ui components
+### Frontend Architecture
+- **Framework**: React with TypeScript
 - **Routing**: Wouter for client-side routing
+- **State Management**: TanStack Query for server state management
+- **UI Library**: shadcn/ui components built on Radix UI primitives
+- **Styling**: Tailwind CSS with custom terminal theme
+- **Build Tool**: Vite for development and production builds
+
+### Backend Architecture
+- **Runtime**: Node.js with Express.js
+- **Language**: TypeScript with ES modules
+- **API Pattern**: RESTful endpoints with WebSocket support for real-time updates
+- **Middleware**: Custom logging and error handling middleware
+
+### Terminal Interface Design
+The application uses a unique terminal-style interface with:
+- ASCII art banner for branding
+- Green terminal color scheme
+- Real-time data streaming via WebSocket
+- Command-line interface for blockchain operations
 
 ## Key Components
 
-### Frontend Architecture
-- **Terminal Interface**: Main UI component mimicking a blockchain terminal
-- **Dashboard Components**: Modular components for blockchain explorer, validator dashboard, consensus monitor, and biometric status
-- **Real-time Updates**: WebSocket integration for live data streaming
-- **Responsive Design**: Terminal-themed design with green/cyan color scheme
+### Blockchain Core
+- **EmotionalChain**: Core blockchain implementation with PoE consensus
+- **EmotionalNetwork**: P2P networking layer for validator communication
+- **EmotionalWallet**: Multi-wallet system for validator nodes
+- **BootstrapNode**: Entry point for network initialization
 
-### Backend Architecture
-- **RESTful API**: Express routes for blockchain data access
-- **WebSocket Server**: Real-time communication for live updates
-- **Service Layer**: EmotionalChain service for blockchain operations simulation
-- **Memory Storage**: In-memory storage implementation with planned database integration
+### Data Layer
+- **Database**: PostgreSQL with Drizzle ORM
+- **Connection**: Neon Database serverless adapter
+- **Schema**: Comprehensive blockchain entities (blocks, transactions, validators, biometric data)
 
-### Shared Schema
-- **Database Models**: Drizzle schema defining blocks, transactions, validators, biometric data, and network statistics
-- **Type Definitions**: Shared TypeScript types between frontend and backend
+### Real-time Features
+- **WebSocket Server**: Custom WebSocket implementation for live updates
+- **Terminal Commands**: Interactive command system for blockchain operations
+- **Live Monitoring**: Real-time network statistics and validator status
+
+### UI Components
+- **Terminal Interface**: Command-line style interaction
+- **Blockchain Explorer**: Visual block and transaction explorer
+- **Validator Dashboard**: Real-time validator monitoring
+- **Biometric Status**: Integration with wearable devices
+- **Consensus Monitor**: PoE consensus visualization
 
 ## Data Flow
 
-1. **Initial Load**: Frontend queries REST API endpoints for initial blockchain data
-2. **Real-time Updates**: WebSocket connection provides live updates for network status, new blocks, and transactions
-3. **Command Processing**: Terminal interface sends commands through WebSocket for execution
-4. **Data Persistence**: Backend stores blockchain data using Drizzle ORM with PostgreSQL
+1. **User Interaction**: Commands entered through terminal interface
+2. **WebSocket Communication**: Real-time bidirectional data flow
+3. **API Layer**: RESTful endpoints for blockchain data
+4. **Blockchain Processing**: EmotionalChain core processes transactions
+5. **Database Persistence**: Data stored via Drizzle ORM
+6. **Real-time Updates**: WebSocket broadcasts updates to connected clients
+
+### Key Data Entities
+- **Blocks**: Blockchain blocks with emotional consensus scores
+- **Transactions**: Financial transactions with validation status
+- **Validators**: Node operators with biometric authentication
+- **Biometric Data**: Heart rate, stress, and focus metrics
+- **Network Stats**: Overall network health and performance
 
 ## External Dependencies
 
-### Frontend Dependencies
-- **React Ecosystem**: React 18, React Query for data fetching, React Hook Form
-- **UI Components**: Radix UI primitives, shadcn/ui component library
-- **Styling**: Tailwind CSS with custom terminal theme
-- **WebSocket**: Native WebSocket API for real-time communication
+### Core Dependencies
+- **@neondatabase/serverless**: PostgreSQL serverless connection
+- **drizzle-orm**: Type-safe database ORM
+- **@tanstack/react-query**: Server state management
+- **ws**: WebSocket server implementation
+- **express**: Web server framework
 
-### Backend Dependencies
-- **Server Framework**: Express.js with TypeScript support
-- **Database**: Drizzle ORM with PostgreSQL (Neon serverless)
-- **WebSocket**: ws library for WebSocket server implementation
-- **Development**: tsx for TypeScript execution, Vite for development server
+### UI Dependencies
+- **@radix-ui/***: Accessible UI primitives
+- **tailwindcss**: Utility-first CSS framework
+- **lucide-react**: Icon library
+- **wouter**: Lightweight router
 
-### Build Tools
-- **TypeScript**: Strict type checking across the entire codebase
-- **Vite**: Frontend build tool with HMR support
-- **esbuild**: Backend bundling for production
-- **PostCSS**: CSS processing with Tailwind
+### Development Tools
+- **vite**: Build tool and dev server
+- **typescript**: Type checking
+- **tsx**: TypeScript execution
+- **esbuild**: Production bundling
 
 ## Deployment Strategy
 
-The application is designed for deployment on platforms like Replit or similar cloud environments:
+### Development Environment
+- **Dev Server**: Vite dev server with HMR
+- **API Server**: Express server with tsx
+- **Database**: Drizzle migrations for schema management
+- **Real-time**: WebSocket server integrated with Express
 
-### Development
-- **Frontend**: Vite dev server with HMR
-- **Backend**: tsx for direct TypeScript execution
-- **Database**: Environment-based configuration with DATABASE_URL
+### Production Build
+- **Frontend**: Vite builds to `dist/public`
+- **Backend**: esbuild bundles server to `dist/index.js`
+- **Static Assets**: Served via Express static middleware
+- **Environment**: NODE_ENV controls build optimizations
 
-### Production
-- **Frontend**: Static build output served by Express
-- **Backend**: Bundled with esbuild for Node.js execution
-- **Database**: PostgreSQL connection via environment variables
-- **Process Management**: Single Node.js process serving both frontend and backend
+### Database Management
+- **Migrations**: Drizzle Kit handles schema migrations
+- **Connection**: DATABASE_URL environment variable required
+- **Dialect**: PostgreSQL with serverless adapter
 
-### Configuration
-- **Environment Variables**: DATABASE_URL for database connection
-- **Build Scripts**: Separate build processes for frontend and backend
-- **Static Serving**: Express serves built frontend assets in production
+### Key Scripts
+- `npm run dev`: Development with hot reload
+- `npm run build`: Production build
+- `npm run start`: Production server
+- `npm run db:push`: Apply database schema changes
 
-The architecture supports both development and production environments with appropriate tooling for each context, following modern full-stack TypeScript patterns with emphasis on type safety and developer experience.
+The application implements a sophisticated blockchain system with a unique terminal interface, emphasizing real-time interaction and biometric validation for a next-generation blockchain experience.

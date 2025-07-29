@@ -177,6 +177,45 @@ export default function BlockchainExplorer() {
             </div>
           </div>
 
+          {/* Transfer Interface */}
+          <div className="mt-4 pt-4 border-t border-terminal-border">
+            <h4 className="text-terminal-cyan font-semibold mb-2">💸 Transfer EMO Tokens</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
+              <div>
+                <label className="text-terminal-green block mb-1">From:</label>
+                <select className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1">
+                  {wallets.filter(w => w.balance > 0).map((wallet) => (
+                    <option key={wallet.validatorId} value={wallet.validatorId}>
+                      {wallet.validatorId} ({wallet.balance.toFixed(2)} EMO)
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-terminal-green block mb-1">To:</label>
+                <select className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1">
+                  {wallets.map((wallet) => (
+                    <option key={wallet.validatorId} value={wallet.validatorId}>
+                      {wallet.validatorId}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="text-terminal-green block mb-1">Amount (EMO):</label>
+                <input 
+                  type="number" 
+                  step="0.01" 
+                  placeholder="0.00"
+                  className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1"
+                />
+              </div>
+            </div>
+            <button className="mt-2 bg-terminal-cyan text-terminal-background px-4 py-2 rounded hover:bg-terminal-orange transition-colors">
+              Send EMO
+            </button>
+          </div>
+
           {/* Top Wallets by Balance */}
           <div className="mt-4 pt-4 border-t border-terminal-border">
             <h4 className="text-terminal-cyan font-semibold mb-2">💎 Top Wallet Balances</h4>

@@ -175,16 +175,21 @@ export class EmotionalChain extends EventEmitter {
   }
 
   private selectValidator(): any | null {
-    const activeValidators = Array.from(this.validators.values())
-      .filter(v => Date.now() - v.lastActive < 60000) // Active within 1 minute
+    const allValidators = Array.from(this.validators.values())
       .filter(v => this.isValidEmotionalProof(v.emotionalScore));
     
-    if (activeValidators.length === 0) return null;
+    if (allValidators.length === 0) return null;
     
-    // Rotate validators based on block count for fair distribution
+    // Rotate through ALL validators for fair distribution (removed lastActive filter)
+    // This ensures all 21 validators get mining opportunities
     const blockCount = this.chain.length;
-    const validatorIndex = blockCount % activeValidators.length;
-    return activeValidators[validatorIndex];
+    const validatorIndex = blockCount % allValidators.length;
+    const selectedValidator = allValidators[validatorIndex];
+    
+    // Update lastActive when selected
+    selectedValidator.lastActive = Date.now();
+    
+    return selectedValidator;
   }
 
   private mineBlock(): boolean {
