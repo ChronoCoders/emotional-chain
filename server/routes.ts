@@ -169,6 +169,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sync wallet with blockchain
+  app.post('/api/wallet/sync', async (req, res) => {
+    try {
+      await emotionalChainService.syncWalletWithBlockchain();
+      res.json({ success: true, message: 'Wallet synced with blockchain' });
+    } catch (error) {
+      console.error('Error syncing wallet:', error);
+      res.status(500).json({ error: 'Failed to sync wallet' });
+    }
+  });
+
   app.get('/api/validators', async (req, res) => {
     try {
       const validators = await emotionalChainService.getValidators();

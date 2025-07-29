@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useEffect, useState } from 'react';
 import type { Block, Transaction } from '@shared/schema';
@@ -25,6 +26,8 @@ export default function BlockchainExplorer() {
   const [realtimeBlocks, setRealtimeBlocks] = useState<Block[]>([]);
   const [realtimeTransactions, setRealtimeTransactions] = useState<Transaction[]>([]);
   const [selectedValidator, setSelectedValidator] = useState<string>('StellarNode');
+  const [transferForm, setTransferForm] = useState<{ from: string; to: string; amount: string }>({ from: '', to: '', amount: '' });
+  const [transferStatus, setTransferStatus] = useState<{ success: boolean; message: string } | null>(null);
   const { lastMessage } = useWebSocket();
 
   const { data: initialBlocks = [] } = useQuery<Block[]>({
@@ -94,6 +97,55 @@ export default function BlockchainExplorer() {
       case 'pending': return 'text-terminal-warning';
       case 'failed': return 'text-terminal-error';
       default: return 'text-terminal-warning';
+    }
+  };
+
+  const handleTransfer = async () => {
+    if (!transferForm.from || !transferForm.to || !transferForm.amount || parseFloat(transferForm.amount) <= 0) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: transferForm.from,
+          to: transferForm.to,
+          amount: parseFloat(transferForm.amount)
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setTransferStatus({ success: true, message: data.message });
+        setTransferForm({ from: '', to: '', amount: '' });
+        // Refresh wallet data
+        queryClient.invalidateQueries({ queryKey: ['/api/wallets'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/wallet/status', transferForm.from] });
+        queryClient.invalidateQueries({ queryKey: ['/api/wallet/status', transferForm.to] });
+      } else {
+        setTransferStatus({ success: false, message: data.message || 'Transfer failed' });
+      }
+    } catch (error) {
+      setTransferStatus({ success: false, message: 'Transfer failed - network error' });
+    }
+
+    // Clear status after 5 seconds
+    setTimeout(() => setTransferStatus(null), 5000);
+  };
+
+  const handleSyncWallet = async () => {
+    try {
+      await fetch('/api/wallet/sync', { method: 'POST' });
+      queryClient.invalidateQueries({ queryKey: ['/api/wallets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/wallet/status'] });
+      setTransferStatus({ success: true, message: 'Wallets synced successfully' });
+      setTimeout(() => setTransferStatus(null), 3000);
+    } catch (error) {
+      setTransferStatus({ success: false, message: 'Sync failed' });
+      setTimeout(() => setTransferStatus(null), 3000);
     }
   };
 
@@ -183,7 +235,12 @@ export default function BlockchainExplorer() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
               <div>
                 <label className="text-terminal-green block mb-1">From:</label>
-                <select className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1">
+                <select 
+                  value={transferForm.from}
+                  onChange={(e) => setTransferForm(prev => ({ ...prev, from: e.target.value }))}
+                  className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1"
+                >
+                  <option value="">Select sender...</option>
                   {wallets.filter(w => w.balance > 0).map((wallet) => (
                     <option key={wallet.validatorId} value={wallet.validatorId}>
                       {wallet.validatorId} ({wallet.balance.toFixed(2)} EMO)
@@ -193,7 +250,12 @@ export default function BlockchainExplorer() {
               </div>
               <div>
                 <label className="text-terminal-green block mb-1">To:</label>
-                <select className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1">
+                <select 
+                  value={transferForm.to}
+                  onChange={(e) => setTransferForm(prev => ({ ...prev, to: e.target.value }))}
+                  className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1"
+                >
+                  <option value="">Select recipient...</option>
                   {wallets.map((wallet) => (
                     <option key={wallet.validatorId} value={wallet.validatorId}>
                       {wallet.validatorId}
@@ -207,13 +269,32 @@ export default function BlockchainExplorer() {
                   type="number" 
                   step="0.01" 
                   placeholder="0.00"
+                  value={transferForm.amount}
+                  onChange={(e) => setTransferForm(prev => ({ ...prev, amount: e.target.value }))}
                   className="w-full bg-terminal-background text-terminal-green border border-terminal-border rounded px-2 py-1"
                 />
               </div>
             </div>
-            <button className="mt-2 bg-terminal-cyan text-terminal-background px-4 py-2 rounded hover:bg-terminal-orange transition-colors">
-              Send EMO
-            </button>
+            <div className="flex gap-2 mt-2">
+              <button 
+                onClick={handleTransfer}
+                disabled={!transferForm.from || !transferForm.to || !transferForm.amount || parseFloat(transferForm.amount) <= 0}
+                className="bg-terminal-cyan text-terminal-background px-4 py-2 rounded hover:bg-terminal-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Send EMO
+              </button>
+              <button 
+                onClick={handleSyncWallet}
+                className="bg-terminal-green text-terminal-background px-4 py-2 rounded hover:bg-terminal-cyan transition-colors"
+              >
+                Sync Wallets
+              </button>
+            </div>
+            {transferStatus && (
+              <div className={`mt-2 p-2 rounded text-sm ${transferStatus.success ? 'bg-green-900/20 text-green-400' : 'bg-red-900/20 text-red-400'}`}>
+                {transferStatus.message}
+              </div>
+            )}
           </div>
 
           {/* Top Wallets by Balance */}

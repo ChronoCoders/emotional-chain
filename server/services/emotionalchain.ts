@@ -286,6 +286,12 @@ export class EmotionalChainService {
     return devices[hash % devices.length];
   }
 
+  public async syncWalletWithBlockchain(): Promise<void> {
+    if (this.wallet) {
+      this.wallet.syncWithBlockchain();
+    }
+  }
+
   public async executeCommand(command: string, args: string[] = []): Promise<string> {
     try {
       switch (command.toLowerCase()) {
