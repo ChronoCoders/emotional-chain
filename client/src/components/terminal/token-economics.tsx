@@ -50,31 +50,36 @@ export default function TokenEconomics() {
 
   const currentEconomics = realtimeEconomics || economics;
 
-  const formatEMO = (amount: number) => {
+  // Return loading state if no economics data or if there's an error
+  if (!currentEconomics || !currentEconomics.pools || !currentEconomics.pools.staking) {
+    return (
+      <div className="p-4 bg-terminal-bg border border-terminal-border">
+        <div className="text-terminal-warning text-sm">
+          {currentEconomics?.error ? `Error: ${currentEconomics.error}` : 'Loading token economics...'}
+        </div>
+      </div>
+    );
+  }
+
+  const formatEMO = (amount: number | undefined) => {
+    if (!amount && amount !== 0) return '0 EMO';
     if (amount >= 1000000) {
       return `${(amount / 1000000).toFixed(1)}M EMO`;
     }
     return `${amount.toLocaleString()} EMO`;
   };
 
-  const formatPercentage = (value: number) => {
+  const formatPercentage = (value: number | undefined) => {
+    if (!value && value !== 0) return '0.0%';
     return `${value.toFixed(3)}%`;
   };
 
-  const calculateUtilization = (allocated: number, remaining: number) => {
+  const calculateUtilization = (allocated: number | undefined, remaining: number | undefined) => {
+    if (!allocated || !remaining) return 0;
     return ((allocated - remaining) / allocated) * 100;
   };
 
-  if (!currentEconomics) {
-    return (
-      <div className="terminal-window rounded-lg p-6">
-        <h2 className="text-terminal-cyan text-lg font-bold mb-4">
-          ┌── EMO_TOKEN_ECONOMICS ──┐
-        </h2>
-        <div className="text-terminal-green">Loading token data...</div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="terminal-window rounded-lg p-6">
@@ -90,17 +95,17 @@ export default function TokenEconomics() {
         <div className="grid grid-cols-2 gap-4 text-xs">
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="text-terminal-warning">TOTAL SUPPLY</div>
-            <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics.totalSupply)}</div>
-            <div className="text-terminal-dim text-xs">{formatPercentage(currentEconomics.percentageIssued)} issued</div>
+            <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics?.totalSupply)}</div>
+            <div className="text-terminal-dim text-xs">{formatPercentage(currentEconomics?.percentageIssued)} issued</div>
           </div>
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="text-terminal-warning">MAX SUPPLY</div>
-            <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics.maxSupply)}</div>
+            <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics?.maxSupply)}</div>
             <div className="text-terminal-dim text-xs">Hard cap enforced</div>
           </div>
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="text-terminal-warning">CIRCULATING</div>
-            <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics.circulatingSupply)}</div>
+            <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics?.circulatingSupply)}</div>
             <div className="text-terminal-dim text-xs">Actively earned</div>
           </div>
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">

@@ -27,9 +27,16 @@ export class EmotionalWallet {
   }
 
   private generateAddress(validatorId: string): string {
-    // Generate consistent address from validator ID
-    const hash = require('crypto').createHash('sha256').update(validatorId).digest('hex');
-    return '0x' + hash.substring(0, 40).toUpperCase();
+    // Generate consistent address from validator ID using simple hash
+    let hash = 0;
+    for (let i = 0; i < validatorId.length; i++) {
+      const char = validatorId.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    // Convert to positive hex and pad to 40 characters
+    const hexHash = Math.abs(hash).toString(16).padStart(8, '0').repeat(5).substring(0, 40);
+    return '0x' + hexHash.toUpperCase();
   }
 
   public getStatus(validatorId?: string): any {
@@ -50,15 +57,15 @@ export class EmotionalWallet {
       }
     }
 
-    // Default wallet status - use zenith_prime as primary
-    const primaryWallet = this.wallets.get('zenith_prime');
+    // Default wallet status - use StellarNode as primary
+    const primaryWallet = this.wallets.get('StellarNode');
     if (primaryWallet) {
       return {
         address: primaryWallet.address,
         balance: primaryWallet.balance + ' EMO',
         staked: primaryWallet.staked + ' EMO',
         type: 'Validator Node',
-        validatorId: 'zenith_prime',
+        validatorId: 'StellarNode',
         authScore: '94.7',
         stressThreshold: '68',
         validationCount: 1247,
@@ -86,7 +93,7 @@ export class EmotionalWallet {
     }
     
     // Return primary wallet balance
-    const primaryWallet = this.wallets.get('zenith_prime');
+    const primaryWallet = this.wallets.get('StellarNode');
     return primaryWallet ? primaryWallet.balance : 0;
   }
 
