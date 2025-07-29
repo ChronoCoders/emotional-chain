@@ -214,7 +214,19 @@ export class EmotionalChainService {
       try {
         // Sync wallet with latest blockchain data
         this.wallet.syncWithBlockchain();
-        return this.wallet.getStatus(validatorId);
+        
+        // Get real balance from blockchain
+        const blockchainWallets = this.blockchain?.getAllWallets();
+        const realBalance = blockchainWallets?.get(validatorId) || 0;
+        
+        // Get wallet status with real balance
+        const status = this.wallet.getStatus(validatorId);
+        
+        // Override balance with real blockchain balance
+        return {
+          ...status,
+          balance: `${realBalance.toFixed(2)} EMO`
+        };
       } catch (error) {
         console.error('Error getting wallet status:', error);
       }
