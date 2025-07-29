@@ -124,6 +124,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const latestBlocks = await emotionalChainService.getBlocks(3);
           const latestTransactions = await emotionalChainService.getTransactions(5);
           const validators = await emotionalChainService.getValidators();
+          const tokenEconomics = await emotionalChainService.getTokenEconomics();
 
           ws.send(JSON.stringify({
             type: 'update',
@@ -132,6 +133,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               latestBlocks,
               latestTransactions,
               validators,
+              tokenEconomics,
               timestamp: new Date().toISOString()
             }
           }));
