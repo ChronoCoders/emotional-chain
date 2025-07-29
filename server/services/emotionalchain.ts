@@ -1,14 +1,12 @@
 import { storage } from '../storage';
 import { type Block, type Transaction, type Validator, type BiometricData, type NetworkStats } from '@shared/schema';
-import { EmotionalChain } from '../blockchain/EmotionalChain';
-import { EmotionalNetwork } from '../blockchain/EmotionalNetwork';
+import { BootstrapNode } from '../blockchain/BootstrapNode';
 import { EmotionalWallet } from '../blockchain/EmotionalWallet';
 
 export class EmotionalChainService {
   private isRunning: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
-  private blockchain: EmotionalChain | null = null;
-  private network: EmotionalNetwork | null = null;
+  private bootstrapNode: BootstrapNode | null = null;
   private wallet: EmotionalWallet | null = null;
 
   constructor() {
@@ -18,23 +16,24 @@ export class EmotionalChainService {
 
   private async initializeRealBlockchain() {
     try {
-      console.log('🔄 Starting EmotionalChain blockchain...');
+      console.log('🔄 Starting EmotionalChain Bootstrap Node...');
       
-      // Initialize your actual blockchain components
-      this.blockchain = new EmotionalChain();
-      console.log('✅ EmotionalChain initialized');
+      // Initialize bootstrap node with your actual blockchain
+      this.bootstrapNode = new BootstrapNode(8000);
+      await this.bootstrapNode.start();
       
-      this.network = new EmotionalNetwork(this.blockchain, `node_${Date.now()}`, 8001);
-      console.log('✅ EmotionalNetwork initialized');
-      
-      this.wallet = new EmotionalWallet(this.blockchain, this.network);
+      // Initialize wallet with the bootstrap node's blockchain and network
+      this.wallet = new EmotionalWallet(
+        this.bootstrapNode.getBlockchain(), 
+        this.bootstrapNode.getNetwork()
+      );
       console.log('✅ EmotionalWallet initialized');
       
       this.isRunning = true;
-      console.log('🎉 EmotionalChain is now running!');
+      console.log('🎉 EmotionalChain Bootstrap Node is fully operational!');
       
     } catch (error) {
-      console.error('❌ Failed to start EmotionalChain:', error);
+      console.error('❌ Failed to start EmotionalChain Bootstrap Node:', error);
       this.isRunning = false;
     }
   }
@@ -44,9 +43,9 @@ export class EmotionalChainService {
   }
 
   public async getNetworkStatus() {
-    if (this.network && this.isRunning) {
+    if (this.bootstrapNode && this.isRunning) {
       try {
-        const realStats = this.network.getNetworkStats();
+        const realStats = this.bootstrapNode.getNetwork().getNetworkStats();
         return {
           isRunning: this.isRunning,
           stats: {
@@ -79,9 +78,9 @@ export class EmotionalChainService {
   }
 
   private async getLatestBlock() {
-    if (this.blockchain && this.isRunning) {
+    if (this.bootstrapNode && this.isRunning) {
       try {
-        const latestBlock = this.blockchain.getLatestBlock();
+        const latestBlock = this.bootstrapNode.getBlockchain().getLatestBlock();
         if (latestBlock) {
           return {
             id: latestBlock.hash || crypto.randomUUID(),
