@@ -22,7 +22,8 @@ export default function VisualBlocks() {
   const blocks = realtimeBlocks.length > 0 ? realtimeBlocks : initialBlocks;
 
   const formatHash = (hash: string) => {
-    return hash ? `${hash.substring(0, 8)}...${hash.substring(-8)}` : 'N/A';
+    if (!hash) return 'N/A';
+    return `${hash.substring(0, 8)}...${hash.substring(hash.length - 8)}`;
   };
 
   const formatTimeAgo = (timestamp: string | Date) => {
@@ -92,7 +93,7 @@ export default function VisualBlocks() {
               {/* Block Hash */}
               <div className="mb-3">
                 <div className="text-xs text-terminal-warning">HASH</div>
-                <div className="text-terminal-cyan font-mono text-sm">
+                <div className="text-terminal-cyan font-mono text-sm break-all overflow-hidden">
                   {formatHash(block.hash)}
                 </div>
               </div>
@@ -129,7 +130,7 @@ export default function VisualBlocks() {
               <div className="mt-3 pt-3 border-t border-terminal-border">
                 <div className="text-xs">
                   <div className="text-terminal-warning">MINED BY</div>
-                  <div className="text-terminal-cyan font-mono">
+                  <div className="text-terminal-cyan font-mono text-xs break-all">
                     {block.validator ? `${block.validator.substring(0, 12)}...` : 'Unknown'}
                   </div>
                 </div>
