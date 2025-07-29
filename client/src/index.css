@@ -1,0 +1,191 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 4%);
+  --foreground: hsl(120, 100%, 50%);
+  --muted: hsl(0, 0%, 6.7%);
+  --muted-foreground: hsl(120, 20%, 60%);
+  --popover: hsl(0, 0%, 6.7%);
+  --popover-foreground: hsl(120, 100%, 50%);
+  --card: hsl(0, 0%, 6.7%);
+  --card-foreground: hsl(120, 100%, 50%);
+  --border: hsl(0, 0%, 20%);
+  --input: hsl(0, 0%, 20%);
+  --primary: hsl(180, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 4%);
+  --secondary: hsl(0, 0%, 6.7%);
+  --secondary-foreground: hsl(120, 100%, 50%);
+  --accent: hsl(0, 0%, 6.7%);
+  --accent-foreground: hsl(120, 100%, 50%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(120, 100%, 50%);
+  --radius: 0.5rem;
+  
+  /* Terminal specific colors */
+  --terminal-bg: hsl(0, 0%, 4%);
+  --terminal-surface: hsl(0, 0%, 6.7%);
+  --terminal-border: hsl(0, 0%, 20%);
+  --terminal-green: hsl(120, 100%, 50%);
+  --terminal-cyan: hsl(180, 100%, 50%);
+  --terminal-orange: hsl(25, 100%, 60%);
+  --terminal-gold: hsl(51, 100%, 50%);
+  --terminal-error: hsl(0, 100%, 60%);
+  --terminal-success: hsl(120, 100%, 60%);
+  --terminal-warning: hsl(51, 100%, 60%);
+}
+
+.dark {
+  --background: hsl(0, 0%, 4%);
+  --foreground: hsl(120, 100%, 50%);
+  --muted: hsl(0, 0%, 6.7%);
+  --muted-foreground: hsl(120, 20%, 60%);
+  --popover: hsl(0, 0%, 6.7%);
+  --popover-foreground: hsl(120, 100%, 50%);
+  --card: hsl(0, 0%, 6.7%);
+  --card-foreground: hsl(120, 100%, 50%);
+  --border: hsl(0, 0%, 20%);
+  --input: hsl(0, 0%, 20%);
+  --primary: hsl(180, 100%, 50%);
+  --primary-foreground: hsl(0, 0%, 4%);
+  --secondary: hsl(0, 0%, 6.7%);
+  --secondary-foreground: hsl(120, 100%, 50%);
+  --accent: hsl(0, 0%, 6.7%);
+  --accent-foreground: hsl(120, 100%, 50%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(120, 100%, 50%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-mono antialiased;
+    background: var(--terminal-bg);
+    color: var(--terminal-green);
+    overflow-x: hidden;
+  }
+}
+
+@layer utilities {
+  .terminal-window {
+    background: var(--terminal-surface);
+    border: 2px solid var(--terminal-border);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+  }
+
+  .ascii-art {
+    white-space: pre;
+    line-height: 1.2;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  .terminal-text {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  }
+
+  .text-terminal-bg { color: var(--terminal-bg); }
+  .text-terminal-surface { color: var(--terminal-surface); }
+  .text-terminal-border { color: var(--terminal-border); }
+  .text-terminal-green { color: var(--terminal-green); }
+  .text-terminal-cyan { color: var(--terminal-cyan); }
+  .text-terminal-orange { color: var(--terminal-orange); }
+  .text-terminal-gold { color: var(--terminal-gold); }
+  .text-terminal-error { color: var(--terminal-error); }
+  .text-terminal-success { color: var(--terminal-success); }
+  .text-terminal-warning { color: var(--terminal-warning); }
+
+  .bg-terminal-bg { background-color: var(--terminal-bg); }
+  .bg-terminal-surface { background-color: var(--terminal-surface); }
+  .bg-terminal-border { background-color: var(--terminal-border); }
+
+  .border-terminal-border { border-color: var(--terminal-border); }
+
+  .cursor::after {
+    content: '█';
+    animation: blink 1s infinite;
+  }
+
+  .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+  }
+
+  .status-online { 
+    background: var(--terminal-success); 
+    box-shadow: 0 0 10px var(--terminal-success); 
+  }
+  
+  .status-offline { 
+    background: var(--terminal-error); 
+    box-shadow: 0 0 10px var(--terminal-error); 
+  }
+  
+  .status-warning { 
+    background: var(--terminal-warning); 
+    box-shadow: 0 0 10px var(--terminal-warning); 
+  }
+
+  .progress-bar {
+    background: linear-gradient(90deg, var(--terminal-green) 0%, var(--terminal-cyan) 50%, var(--terminal-orange) 100%);
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .terminal-table th, .terminal-table td {
+    border: 1px solid var(--terminal-border);
+    padding: 8px 12px;
+  }
+
+  .scrollbar-terminal {
+    scrollbar-width: thin;
+    scrollbar-color: var(--terminal-green) var(--terminal-surface);
+  }
+
+  .scrollbar-terminal::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .scrollbar-terminal::-webkit-scrollbar-track {
+    background: var(--terminal-surface);
+  }
+
+  .scrollbar-terminal::-webkit-scrollbar-thumb {
+    background: var(--terminal-green);
+    border-radius: 4px;
+  }
+
+  .matrix-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.1;
+  }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px var(--terminal-green); }
+  100% { box-shadow: 0 0 20px var(--terminal-green), 0 0 30px var(--terminal-green); }
+}
+
+@keyframes matrix {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
