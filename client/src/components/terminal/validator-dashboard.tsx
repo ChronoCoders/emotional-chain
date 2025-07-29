@@ -54,7 +54,7 @@ export default function ValidatorDashboard() {
           <div key={validator.id} className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="flex items-center justify-between mb-2">
               <div className="text-terminal-cyan font-bold text-sm">
-                Validator #{String(index + 1).padStart(3, '0')}
+                {validator.id}
               </div>
               <span className={`status-indicator ${getStatusColor(getValidatorStatus(validator))}`}></span>
             </div>
