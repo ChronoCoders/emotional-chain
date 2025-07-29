@@ -35,8 +35,7 @@ export default function ConsensusMonitor() {
   const progressBars = [
     { label: 'Network Stress', value: parseFloat(stats.networkStress), color: 'terminal-error' },
     { label: 'Network Energy', value: parseFloat(stats.networkEnergy), color: 'terminal-success' },
-    { label: 'Network Focus', value: parseFloat(stats.networkFocus), color: 'terminal-cyan' },
-    { label: 'Authenticity', value: 96.1, color: 'terminal-success' } // Mock authenticity for demo
+    { label: 'Network Focus', value: parseFloat(stats.networkFocus), color: 'terminal-cyan' }
   ];
 
   return (
