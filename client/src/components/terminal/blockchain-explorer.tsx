@@ -41,7 +41,9 @@ export default function BlockchainExplorer() {
   });
 
   const { data: wallets = [] } = useQuery<WalletInfo[]>({
-    queryKey: ['/api/wallets']
+    queryKey: ['/api/wallets'],
+    refetchInterval: 5000, // Refresh every 5 seconds  
+    refetchIntervalInBackground: true
   });
 
   const { data: walletStatus } = useQuery<WalletStatus>({
@@ -50,7 +52,9 @@ export default function BlockchainExplorer() {
       const response = await fetch(`/api/wallet/status/${selectedValidator}`);
       if (!response.ok) throw new Error('Failed to fetch wallet status');
       return response.json();
-    }
+    },
+    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchIntervalInBackground: true
   });
 
   // Update with real-time data from WebSocket
@@ -62,6 +66,10 @@ export default function BlockchainExplorer() {
       if (lastMessage.data.latestTransactions) {
         setRealtimeTransactions(lastMessage.data.latestTransactions);
       }
+      
+      // Force refresh wallet data when new blocks are mined
+      queryClient.invalidateQueries({ queryKey: ['/api/wallets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/wallet/status'] });
     }
   }, [lastMessage]);
 
