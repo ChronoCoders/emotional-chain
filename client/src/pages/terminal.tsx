@@ -102,10 +102,10 @@ export default function Terminal() {
         {/* Footer */}
         <div className="terminal-window rounded-lg p-4 mt-6">
           <div className="ascii-art text-terminal-green text-center text-xs">
-            {`+-----------------------------------------------------------------------------------------+
-|  EmotionalChain v1.0.0 | PoE Consensus Active | Network: Custom                        |
-|  Connected to Network | Block Height: ${stats ? stats.blockHeight : '----'} | Validators: ${stats ? stats.activeValidators : '--'}/${stats ? stats.activeValidators : '--'} | Status: ✅ OPERATIONAL |
-+-----------------------------------------------------------------------------------------+`}
+            {`┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│  EmotionalChain v1.0.0 | PoE Consensus Active | Network: Custom                          │
+│  Connected to Network | Block Height: ${stats ? stats.blockHeight : '----'} | Validators: ${stats ? stats.activeValidators : '--'}/${stats ? stats.activeValidators : '--'} | Status: ✅ OPERATIONAL │
+└─────────────────────────────────────────────────────────────────────────────────────────┘`}
           </div>
         </div>
       </div>
