@@ -8,6 +8,7 @@ import ConsensusMonitor from '@/components/terminal/consensus-monitor';
 import ValidatorDashboard from '@/components/terminal/validator-dashboard';
 import BiometricStatus from '@/components/terminal/biometric-status';
 import TokenEconomics from '@/components/terminal/token-economics';
+import VisualBlocks from '@/components/terminal/visual-blocks';
 import type { NetworkStats } from '@shared/schema';
 
 export default function Terminal() {
@@ -83,6 +84,9 @@ export default function Terminal() {
             </div>
           </div>
         </div>
+
+        {/* Visual Block Explorer - Full Width */}
+        <VisualBlocks />
 
         {/* Command Interface & Main Content Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
