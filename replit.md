@@ -27,6 +27,11 @@ Preferred communication style: Simple, everyday language.
 - Staking system: 5% base APY, up to 15% with wellness/authenticity multipliers
 - All rewards deducted from actual token pools (400M EMO staking pool)
 - Zero pre-mint policy - all tokens earned through emotional validation
+- **VISUAL UPDATE**: Added Bitcoin-style visual block explorer
+- Color-coded block cards showing hash, rewards, emotional scores, consensus data
+- Real-time block visualization with mining animations
+- Full-width block display above terminal interface
+- Live token economics dashboard with pool utilization tracking
 
 ## System Architecture
 
