@@ -24,7 +24,6 @@ export class BootstrapNode {
 Starting bootstrap node on port ${this.port}
 Consensus: Proof of Emotion
 Network: P2P WebSocket
-CEO: Altug Tatlisu - Bytus Technologies
 ===============================================
       `);
       
