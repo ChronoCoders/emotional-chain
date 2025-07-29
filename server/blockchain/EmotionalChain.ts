@@ -6,11 +6,35 @@ import * as crypto from 'crypto';
 export class EmotionalChain extends EventEmitter {
   private chain: any[] = [];
   private pendingTransactions: any[] = [];
-  private miningReward: number = 100;
   private difficulty: number = 2;
   private isMining: boolean = false;
   private miningInterval: NodeJS.Timeout | null = null;
   private validators: Map<string, any> = new Map();
+  
+  // Token Economics from attached specification
+  private tokenEconomics = {
+    maxSupply: 1000000000, // 1 billion EMO hard cap
+    totalSupply: 0,
+    circulatingSupply: 0,
+    pools: {
+      stakingPool: { allocated: 400000000, remaining: 400000000 },
+      wellnessPool: { allocated: 200000000, remaining: 200000000 },
+      ecosystemPool: { allocated: 250000000, remaining: 250000000 },
+      teamAllocation: { allocated: 150000000, remaining: 150000000 }
+    },
+    rewards: {
+      baseBlockReward: 50, // 50 EMO base mining reward
+      baseValidationReward: 5, // 5 EMO base validation reward
+      emotionalConsensusBonus: 25, // Up to 25 EMO bonus
+      minimumValidatorStake: 10000 // 10,000 EMO minimum stake
+    },
+    staking: {
+      baseRate: 0.05, // 5% APY
+      wellnessMultiplier: 1.5, // Up to 1.5x for wellness > 80%
+      authenticityMultiplier: 2.0, // Up to 2.0x for authenticity > 90%
+      maxAPY: 0.15 // 15% maximum APY
+    }
+  };
 
   constructor() {
     super();
@@ -54,6 +78,45 @@ export class EmotionalChain extends EventEmitter {
     ) * 100;
     
     return Math.round(emotionalScore * 100) / 100;
+  }
+
+  private calculateWellnessMultiplier(emotionalScore: number): number {
+    // Wellness multiplier for staking rewards (up to 1.5x for score > 80%)
+    if (emotionalScore >= 80) {
+      return 1.0 + ((emotionalScore - 80) / 20) * 0.5; // Linear scale to 1.5x
+    }
+    return 1.0;
+  }
+
+  private calculateAuthenticityMultiplier(authenticity: number): number {
+    // Authenticity multiplier for staking rewards (up to 2.0x for authenticity > 90%)
+    if (authenticity >= 0.9) {
+      return 1.0 + ((authenticity - 0.9) / 0.1) * 1.0; // Linear scale to 2.0x
+    }
+    return authenticity * 1.11; // Scale from 0-2.0x based on authenticity
+  }
+
+  private calculateValidationReward(validator: any, consensusScore: number): number {
+    const baseReward = this.tokenEconomics.rewards.baseValidationReward;
+    const consensusMultiplier = Math.max(0.6, consensusScore / 100); // 0.6-1.0 based on consensus
+    const authenticityMultiplier = Math.max(0.7, validator.biometricData?.authenticity || 0.7);
+    
+    return Math.round(baseReward * consensusMultiplier * authenticityMultiplier * 100) / 100;
+  }
+
+  private calculateMiningReward(validator: any, transactionFees: number = 0): number {
+    const baseReward = this.tokenEconomics.rewards.baseBlockReward;
+    const consensusBonus = this.calculateConsensusBonus(validator.emotionalScore);
+    
+    return baseReward + transactionFees + consensusBonus;
+  }
+
+  private calculateConsensusBonus(emotionalScore: number): number {
+    // Emotional consensus bonus up to 25 EMO based on validator performance
+    const maxBonus = this.tokenEconomics.rewards.emotionalConsensusBonus;
+    const bonusMultiplier = Math.max(0, (emotionalScore - 75) / 25); // Bonus starts at 75% score
+    
+    return Math.round(maxBonus * bonusMultiplier * 100) / 100;
   }
 
   private isValidEmotionalProof(emotionalScore: number): boolean {
@@ -170,21 +233,56 @@ export class EmotionalChain extends EventEmitter {
       // Clear pending transactions
       this.pendingTransactions = [];
       
-      // Reward validator
-      this.addTransaction({
-        from: 'system',
-        to: selectedValidator.id,
-        amount: this.miningReward,
-        type: 'mining_reward',
-        timestamp: Date.now()
-      });
+      // Calculate transaction fees from block
+      const transactionFees = newBlock.transactions.reduce((total: number, tx: any) => 
+        total + (tx.fee || 0), 0);
+      
+      // Calculate authentic mining reward based on token economics
+      const miningReward = this.calculateMiningReward(selectedValidator, transactionFees);
+      const validationReward = this.calculateValidationReward(selectedValidator, this.calculateConsensusScore());
+      const totalReward = miningReward + validationReward;
+      
+      // Deduct from staking pool
+      if (this.tokenEconomics.pools.stakingPool.remaining >= totalReward) {
+        this.tokenEconomics.pools.stakingPool.remaining -= totalReward;
+        this.tokenEconomics.totalSupply += totalReward;
+        this.tokenEconomics.circulatingSupply += totalReward;
+        
+        // Add mining reward transaction
+        this.addTransaction({
+          from: 'stakingPool',
+          to: selectedValidator.id,
+          amount: miningReward,
+          type: 'mining_reward',
+          timestamp: Date.now(),
+          breakdown: {
+            baseReward: this.tokenEconomics.rewards.baseBlockReward,
+            consensusBonus: this.calculateConsensusBonus(selectedValidator.emotionalScore),
+            transactionFees: transactionFees
+          }
+        });
+        
+        // Add validation reward transaction
+        this.addTransaction({
+          from: 'stakingPool',
+          to: selectedValidator.id,
+          amount: validationReward,
+          type: 'validation_reward',
+          timestamp: Date.now(),
+          emotionalScore: selectedValidator.emotionalScore,
+          consensusScore: this.calculateConsensusScore()
+        });
+      }
       
       // Update validator stats
       selectedValidator.blocksValidated++;
       selectedValidator.lastActive = Date.now();
       
       console.log(`✅ Block ${newBlock.index} mined successfully! Hash: ${hash.substring(0, 16)}...`);
-      console.log(`💰 Validator ${selectedValidator.id.substring(0, 8)}... rewarded ${this.miningReward} EMO`);
+      console.log(`💰 Validator ${selectedValidator.id.substring(0, 8)}... earned ${totalReward} EMO total`);
+      console.log(`   ⛏️  Mining: ${miningReward} EMO (${this.tokenEconomics.rewards.baseBlockReward} base + ${this.calculateConsensusBonus(selectedValidator.emotionalScore)} bonus)`);
+      console.log(`   ✅ Validation: ${validationReward} EMO (emotional consensus reward)`);
+      console.log(`   📊 Pool Status: ${this.tokenEconomics.pools.stakingPool.remaining.toLocaleString()} EMO remaining`);
       
       // Emit mining event
       this.emit('blockMined', newBlock);
@@ -262,6 +360,36 @@ export class EmotionalChain extends EventEmitter {
     };
   }
 
+  public getTokenEconomics(): any {
+    const percentageIssued = (this.tokenEconomics.totalSupply / this.tokenEconomics.maxSupply) * 100;
+    
+    return {
+      totalSupply: this.tokenEconomics.totalSupply,
+      maxSupply: this.tokenEconomics.maxSupply,
+      circulatingSupply: this.tokenEconomics.circulatingSupply,
+      percentageIssued: Math.round(percentageIssued * 100) / 100,
+      pools: {
+        staking: {
+          allocated: this.tokenEconomics.pools.stakingPool.allocated,
+          remaining: this.tokenEconomics.pools.stakingPool.remaining,
+          utilized: this.tokenEconomics.pools.stakingPool.allocated - this.tokenEconomics.pools.stakingPool.remaining
+        },
+        wellness: {
+          allocated: this.tokenEconomics.pools.wellnessPool.allocated,
+          remaining: this.tokenEconomics.pools.wellnessPool.remaining,
+          utilized: 0
+        },
+        ecosystem: {
+          allocated: this.tokenEconomics.pools.ecosystemPool.allocated,
+          remaining: this.tokenEconomics.pools.ecosystemPool.remaining,
+          utilized: 0
+        }
+      },
+      rewards: this.tokenEconomics.rewards,
+      contractStatus: "AUTHENTIC_DISTRIBUTION_ACTIVE"
+    };
+  }
+
   public getMiningStatus(): any {
     return {
       isActive: this.isMining,
@@ -271,7 +399,8 @@ export class EmotionalChain extends EventEmitter {
       pendingTransactions: this.pendingTransactions.length,
       difficulty: this.difficulty,
       lastBlock: this.getLatestBlock(),
-      consensusScore: this.calculateConsensusScore()
+      consensusScore: this.calculateConsensusScore(),
+      tokenEconomics: this.getTokenEconomics()
     };
   }
 }

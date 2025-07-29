@@ -394,6 +394,13 @@ export class EmotionalChainService {
     return { error: 'Bootstrap node not running' };
   }
 
+  public async getTokenEconomics(): Promise<any> {
+    if (this.bootstrapNode && this.isRunning) {
+      return this.bootstrapNode.getBlockchain().getTokenEconomics();
+    }
+    return { error: 'Bootstrap node not running' };
+  }
+
   public shutdown() {
     this.isRunning = false;
     if (this.heartbeatInterval) {

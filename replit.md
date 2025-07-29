@@ -19,6 +19,14 @@ Preferred communication style: Simple, everyday language.
 - Bootstrap node logs show "1 blocks, 0 validators" - actual blockchain data
 - Terminal interface displays real-time data from running bootstrap node
 - Clean footer with proper ASCII borders showing network statistics
+- **MAJOR UPDATE**: Implemented comprehensive token economics system
+- 21 validators added with diverse emotional/biometric profiles
+- Real EMO token mining with authentic reward distribution
+- Token economics: 1B EMO max supply, 4 reward pools (staking, wellness, ecosystem, team)
+- Mining rewards: 50 EMO base + up to 25 EMO consensus bonus + validation rewards
+- Staking system: 5% base APY, up to 15% with wellness/authenticity multipliers
+- All rewards deducted from actual token pools (400M EMO staking pool)
+- Zero pre-mint policy - all tokens earned through emotional validation
 
 ## System Architecture
 

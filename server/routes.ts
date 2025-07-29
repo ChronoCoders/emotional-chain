@@ -92,6 +92,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get('/api/token/economics', async (req, res) => {
+    try {
+      const economics = await emotionalChainService.getTokenEconomics();
+      res.json(economics);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get token economics' });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server for real-time updates
