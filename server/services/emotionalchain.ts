@@ -1,17 +1,15 @@
 import { storage } from '../storage';
 import { type Block, type Transaction, type Validator, type BiometricData, type NetworkStats } from '@shared/schema';
-
-// Import your actual blockchain modules from attached assets
-let EmotionalChain: any = null;
-let EmotionalNetwork: any = null;
-let EmotionalWallet: any = null;
+import { EmotionalChain } from '../blockchain/EmotionalChain';
+import { EmotionalNetwork } from '../blockchain/EmotionalNetwork';
+import { EmotionalWallet } from '../blockchain/EmotionalWallet';
 
 export class EmotionalChainService {
   private isRunning: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
-  private blockchain: any = null;
-  private network: any = null;
-  private wallet: any = null;
+  private blockchain: EmotionalChain | null = null;
+  private network: EmotionalNetwork | null = null;
+  private wallet: EmotionalWallet | null = null;
 
   constructor() {
     this.initializeBlockchain();
@@ -20,17 +18,23 @@ export class EmotionalChainService {
 
   private async initializeRealBlockchain() {
     try {
-      // Try to import your actual EmotionalChain modules
-      // When your blockchain is running, this will connect to it
-      console.log('🔄 Attempting to connect to real EmotionalChain...');
+      console.log('🔄 Starting EmotionalChain blockchain...');
       
-      // This would normally import from your blockchain project
-      // For now, we'll wait for the real blockchain to be available
-      this.isRunning = false;
-      console.log('⏳ Waiting for EmotionalChain connection...');
+      // Initialize your actual blockchain components
+      this.blockchain = new EmotionalChain();
+      console.log('✅ EmotionalChain initialized');
+      
+      this.network = new EmotionalNetwork(this.blockchain, `node_${Date.now()}`, 8001);
+      console.log('✅ EmotionalNetwork initialized');
+      
+      this.wallet = new EmotionalWallet(this.blockchain, this.network);
+      console.log('✅ EmotionalWallet initialized');
+      
+      this.isRunning = true;
+      console.log('🎉 EmotionalChain is now running!');
       
     } catch (error) {
-      console.error('❌ Failed to connect to EmotionalChain:', error);
+      console.error('❌ Failed to start EmotionalChain:', error);
       this.isRunning = false;
     }
   }
