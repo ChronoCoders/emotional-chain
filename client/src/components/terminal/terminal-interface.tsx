@@ -84,11 +84,23 @@ export default function TerminalInterface({ className = "" }: TerminalInterfaceP
       return;
     }
 
+    // Handle status command - show connection and network info
+    if (command.toLowerCase() === 'status') {
+      if (isConnected) {
+        addLine('output', '✅ Connected to EmotionalChain network\n📡 Real-time data streaming active\n🔗 WebSocket connection established');
+        // Send command to get detailed status
+        sendCommand('status', args);
+      } else {
+        addLine('error', '❌ Not connected to EmotionalChain network\n🔄 Attempting to reconnect...\n💡 The blockchain is running - connection will restore automatically');
+      }
+      return;
+    }
+
     // Send command via WebSocket if connected
     if (isConnected) {
       sendCommand(command, args);
     } else {
-      addLine('error', '❌ Not connected to EmotionalChain network. Attempting to reconnect...');
+      addLine('error', '❌ Not connected to EmotionalChain network. Attempting to reconnect...\n💡 Type "status" to check connection state');
     }
   };
 
