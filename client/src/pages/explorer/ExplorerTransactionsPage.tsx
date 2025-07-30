@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatNumber, formatAddress } from "../../lib/utils";
+import { formatEmoToUSD } from "@shared/constants";
 import { ArrowRight, CheckCircle, Clock, Search, Filter } from "lucide-react";
 
 export default function ExplorerTransactionsPage() {
@@ -211,7 +212,7 @@ export default function ExplorerTransactionsPage() {
                     {formatNumber(tx.amount)} EMO
                   </p>
                   <p className="text-slate-400 text-sm">
-                    ${formatNumber(tx.amount * 0.85)}
+                    {formatEmoToUSD(tx.amount)}
                   </p>
                   <p className="text-slate-500 text-xs mt-1">
                     {formatTimeAgo(tx.timestamp)}

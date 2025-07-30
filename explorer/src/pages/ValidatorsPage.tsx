@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "../lib/api";
 import { formatNumber, formatAddress, getEmotionalScoreColor, calculateAPY } from "../lib/utils";
+import { formatEmoToUSD, calculateUSDValue } from "@shared/constants";
 import { Users, Heart, Zap, DollarSign, TrendingUp, Shield } from "lucide-react";
 
 export default function ValidatorsPage() {
@@ -138,7 +139,7 @@ export default function ValidatorsPage() {
                             {formatNumber(validator.balance)} EMO
                           </p>
                           <p className="text-slate-400 text-sm">
-                            ${formatNumber(validator.balance * 0.85)}
+                            {formatEmoToUSD(validator.balance)}
                           </p>
                         </div>
                       </td>

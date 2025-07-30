@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { formatNumber, formatLargeNumber } from "../../lib/utils";
 import { Activity, Users, Zap, TrendingUp, Shield, Timer, DollarSign, Heart } from "lucide-react";
 import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
+import { formatEmoToUSD, calculateUSDValue, EMO_PRICE_USD } from "@shared/constants";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function ExplorerHomePage() {
@@ -99,7 +100,7 @@ export default function ExplorerHomePage() {
         <MetricCard
           title="Active Validators"
           value={activeValidators.toString()}
-          change={`${formatNumber(totalEMO)} EMO staked`}
+          change={`${formatNumber(totalEMO)} EMO • ${formatEmoToUSD(totalEMO)}`}
           icon={Users}
           trend="up"
           color="blue"
@@ -246,6 +247,9 @@ export default function ExplorerHomePage() {
                       <p className="text-white font-semibold">
                         {formatNumber(validator.balance)} EMO
                       </p>
+                      <p className="text-slate-400 text-sm">
+                        {formatEmoToUSD(validator.balance)}
+                      </p>
                     </div>
                   </div>
                 );
@@ -261,9 +265,12 @@ export default function ExplorerHomePage() {
           
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="text-slate-400 text-sm">Total Staked</p>
+              <p className="text-slate-400 text-sm">Total Network Value</p>
               <p className="text-white font-semibold text-lg">
                 {formatNumber(totalEMO)} EMO
+              </p>
+              <p className="text-slate-400 text-sm">
+                {formatEmoToUSD(totalEMO)}
               </p>
             </div>
             <div className="text-center">
