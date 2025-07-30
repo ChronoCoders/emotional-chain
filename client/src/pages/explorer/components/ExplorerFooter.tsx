@@ -1,5 +1,4 @@
 import { Github, Globe, Twitter } from "lucide-react";
-import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 
 export default function ExplorerFooter() {
   return (
@@ -9,8 +8,8 @@ export default function ExplorerFooter() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="flex-shrink-0 w-8 h-8">
-                <EmotionalChainLogo size={32} className="text-green-400" />
+              <div className="w-8 h-8 bg-green-400 rounded flex items-center justify-center">
+                <span className="text-white font-bold text-sm">EC</span>
               </div>
               <div>
                 <h3 className="text-lg font-bold text-white">EmotionalChain</h3>

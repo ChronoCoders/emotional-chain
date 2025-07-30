@@ -1,6 +1,5 @@
 import { Link, useLocation } from "wouter";
 import { Activity, Users, Zap, BarChart3, ArrowLeft, HeartHandshake } from "lucide-react";
-import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 
 export default function ExplorerHeader() {
   const [location] = useLocation();
@@ -30,8 +29,8 @@ export default function ExplorerHeader() {
             
             <Link href="/explorer">
               <div className="flex items-center justify-center space-x-3">
-                <div className="flex-shrink-0">
-                  <EmotionalChainLogo size={32} className="text-green-400" />
+                <div className="w-8 h-8 bg-green-400 rounded flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">EC</span>
                 </div>
                 <div className="text-center">
                   <h1 className="text-xl font-bold text-white">EmotionalChain</h1>
