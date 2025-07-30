@@ -4,10 +4,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import TerminalInterface from "@/pages/terminal";
+import ExplorerApp from "@/pages/explorer/ExplorerApp";
 
 function Router() {
   return (
     <Switch>
+      <Route path="/explorer" component={ExplorerApp} />
+      <Route path="/explorer/*" component={ExplorerApp} />
       <Route path="/" component={TerminalInterface} />
       <Route component={TerminalInterface} />
     </Switch>

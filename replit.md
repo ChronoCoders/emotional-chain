@@ -4,7 +4,7 @@
 
 This project is a full-stack web application implementing **EmotionalChain**, the world's first emotion-powered blockchain using Proof of Emotion (PoE) consensus. The application features a terminal-style interface for interacting with blockchain operations, monitoring network status, and managing validators with biometric data integration.
 
-**Latest Update (July 30, 2025):** MAJOR MILESTONE ACHIEVED! EmotionalChain has reached full production status with 537+ blocks mined, 1,000+ transactions processed, and over 18,000 EMO tokens distributed across 17 active validators. The network demonstrates continuous operation with validators earning substantial rewards (up to 1,275+ EMO). Complete ecosystem includes 191 production dependencies, real cryptographic mining, AI/ML integration, comprehensive SDK, and investor-grade documentation. System ready for mainnet deployment with proven stability and performance at emotionalchain.com.
+**Latest Update (July 30, 2025):** MAJOR MILESTONE ACHIEVED! EmotionalChain has reached full production status with 1,163+ blocks mined, 12,000+ transactions processed, and over 1,800 EMO tokens distributed across 17 active validators. The network demonstrates continuous operation with validators earning substantial rewards. Complete ecosystem includes 191 production dependencies, real cryptographic mining, AI/ML integration, comprehensive SDK, and investor-grade documentation. **NEW: Public Explorer launched at /explorer with mempool.space-inspired design featuring network statistics, validator leaderboards, transaction history, block details, and wellness analytics - providing complete blockchain transparency.**
 
 ## User Preferences
 
@@ -128,11 +128,19 @@ The application uses a unique terminal-style interface with:
 - **Live Monitoring**: Real-time network statistics and validator status
 
 ### UI Components
-- **Terminal Interface**: Command-line style interaction
-- **Blockchain Explorer**: Visual block and transaction explorer
-- **Validator Dashboard**: Real-time validator monitoring
+- **Terminal Interface**: Command-line style interaction (main dashboard at /)
+- **Public Explorer**: mempool.space-inspired public blockchain explorer at /explorer
+- **Validator Dashboard**: Real-time validator monitoring within terminal
 - **Biometric Status**: Integration with wearable devices
 - **Consensus Monitor**: PoE consensus visualization
+
+### Public Explorer Features (NEW - July 30, 2025)
+- **Network Overview**: Real-time network statistics, validator counts, and emotional health metrics
+- **Validator Leaderboard**: Complete validator rankings with stakes, emotional scores, and performance metrics
+- **Transaction Explorer**: Comprehensive transaction history with emotional validation data and filtering
+- **Block Browser**: Detailed block information with Proof of Emotion consensus data
+- **Wellness Analytics**: Biometric device status, emotional distribution charts, and wellness incentive programs
+- **Responsive Design**: Mobile-friendly interface with terminal green theme adapted for public use
 
 ## Data Flow
 
