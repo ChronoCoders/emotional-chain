@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Activity, Users, Zap, Heart, BarChart3, ArrowLeft } from "lucide-react";
+import { Activity, Users, Zap, BarChart3, ArrowLeft, HeartHandshake } from "lucide-react";
 import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 
 export default function ExplorerHeader() {
@@ -10,7 +10,7 @@ export default function ExplorerHeader() {
     { name: "Validators", href: "/explorer/validators", icon: Users },
     { name: "Blocks", href: "/explorer/blocks", icon: Zap },
     { name: "Transactions", href: "/explorer/transactions", icon: BarChart3 },
-    { name: "Wellness", href: "/explorer/wellness", icon: Heart },
+    { name: "Wellness", href: "/explorer/wellness", icon: HeartHandshake },
   ];
 
   return (
