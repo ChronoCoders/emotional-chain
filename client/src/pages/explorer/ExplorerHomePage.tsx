@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { formatNumber, formatLargeNumber } from "../../lib/utils";
-import { Activity, Users, Zap, TrendingUp, Shield, Timer, DollarSign } from "lucide-react";
+import { Activity, Users, Zap, TrendingUp, Shield, Timer, DollarSign, Heart } from "lucide-react";
 import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
