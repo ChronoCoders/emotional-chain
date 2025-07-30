@@ -124,6 +124,42 @@ export const insertBiometricDataSchema = createInsertSchema(biometricData).omit(
   createdAt: true,
 });
 
+// Type exports for the application
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
+export type Block = typeof blocks.$inferSelect;
+export type InsertBlock = z.infer<typeof insertBlockSchema>;
+
+export type Transaction = typeof transactions.$inferSelect;
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+
+export type ValidatorState = typeof validatorStates.$inferSelect;
+export type InsertValidatorState = z.infer<typeof insertValidatorStateSchema>;
+
+export type BiometricData = typeof biometricData.$inferSelect;
+export type InsertBiometricData = z.infer<typeof insertBiometricDataSchema>;
+
+export type ConsensusRound = typeof consensusRounds.$inferSelect;
+export type PeerReputation = typeof peerReputation.$inferSelect;
+export type StorageMetrics = typeof storageMetrics.$inferSelect;
+
+// Legacy type aliases for backward compatibility
+export type Validator = ValidatorState;
+export type InsertValidator = InsertValidatorState;
+
+// Placeholder types for not-yet-implemented features
+export type NetworkStats = {
+  id: string;
+  timestamp: Date;
+  activeValidators: number;
+  totalTransactions: number;
+  networkHashrate: string;
+  consensusHealth: number;
+};
+
+export type InsertNetworkStats = Omit<NetworkStats, 'id' | 'timestamp'>;
+
 export const insertConsensusRoundSchema = createInsertSchema(consensusRounds).omit({
   createdAt: true,
 });

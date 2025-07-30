@@ -200,23 +200,271 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Import the new database storage system
-import { DatabaseStorage } from '../storage/DatabaseStorage';
+// Import database storage
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable } from "@shared/schema";
 
-// Initialize the database storage (will be replaced in blockchain integration)
-export const storage = new MemStorage();
-
-// New storage system (will replace MemStorage)
-let databaseStorage: DatabaseStorage | null = null;
-
-export async function initializeDatabaseStorage(): Promise<DatabaseStorage> {
-  if (!databaseStorage) {
-    databaseStorage = new DatabaseStorage();
-    await databaseStorage.initialize();
+// Database Storage Implementation
+export class DatabaseStorage implements IStorage {
+  // User methods
+  async getUser(id: string): Promise<User | undefined> {
+    // User management implementation would go here if needed
+    return undefined;
   }
-  return databaseStorage;
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    // User management implementation would go here if needed  
+    return undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    // User management implementation would go here if needed
+    throw new Error("User management not implemented in blockchain storage");
+  }
+
+  // Block methods
+  async getBlocks(limit: number = 10): Promise<Block[]> {
+    const results = await db.select().from(blocksTable)
+      .orderBy(blocksTable.height)
+      .limit(limit);
+    
+    return results.map(this.mapBlockFromDatabase);
+  }
+
+  async getLatestBlock(): Promise<Block | undefined> {
+    const results = await db.select().from(blocksTable)
+      .orderBy(blocksTable.height)
+      .limit(1);
+    
+    return results.length > 0 ? this.mapBlockFromDatabase(results[0]) : undefined;
+  }
+
+  async createBlock(insertBlock: InsertBlock): Promise<Block> {
+    const blockData = {
+      height: insertBlock.height,
+      hash: insertBlock.hash,
+      previousHash: insertBlock.previousHash,
+      merkleRoot: insertBlock.merkleRoot || '',
+      timestamp: insertBlock.timestamp,
+      nonce: insertBlock.nonce,
+      difficulty: insertBlock.difficulty,
+      validatorId: insertBlock.validatorId,
+      emotionalScore: insertBlock.emotionalScore.toString(),
+      emotionalProof: insertBlock.emotionalProof || {},
+      blockData: insertBlock.blockData || {},
+      transactionCount: insertBlock.transactionCount || 0
+    };
+
+    const [result] = await db.insert(blocksTable).values(blockData).returning();
+    console.log(`📦 Block ${insertBlock.height} saved to database: ${insertBlock.hash}`);
+    
+    return this.mapBlockFromDatabase(result);
+  }
+
+  async getBlockByHeight(height: number): Promise<Block | undefined> {
+    const results = await db.select().from(blocksTable)
+      .where(eq(blocksTable.height, height))
+      .limit(1);
+    
+    return results.length > 0 ? this.mapBlockFromDatabase(results[0]) : undefined;
+  }
+
+  // Transaction methods
+  async getTransactions(limit: number = 10): Promise<Transaction[]> {
+    const results = await db.select().from(transactionsTable)
+      .orderBy(transactionsTable.timestamp)
+      .limit(limit);
+    
+    return results.map(this.mapTransactionFromDatabase);
+  }
+
+  async getTransactionsByBlock(blockHash: string): Promise<Transaction[]> {
+    const results = await db.select().from(transactionsTable)
+      .where(eq(transactionsTable.blockHash, blockHash));
+    
+    return results.map(this.mapTransactionFromDatabase);
+  }
+
+  async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
+    const txData = {
+      hash: insertTransaction.hash,
+      blockHash: insertTransaction.blockHash,
+      fromAddress: insertTransaction.fromAddress,
+      toAddress: insertTransaction.toAddress,
+      amount: insertTransaction.amount.toString(),
+      fee: insertTransaction.fee?.toString() || '0',
+      timestamp: insertTransaction.timestamp,
+      signature: insertTransaction.signature,
+      biometricData: insertTransaction.biometricData || {},
+      transactionData: insertTransaction.transactionData || {},
+      status: insertTransaction.status || 'confirmed'
+    };
+
+    const [result] = await db.insert(transactionsTable).values(txData).returning();
+    console.log(`💳 Transaction saved to database: ${insertTransaction.hash}`);
+    
+    return this.mapTransactionFromDatabase(result);
+  }
+
+  async updateTransactionStatus(id: string, status: string): Promise<void> {
+    await db.update(transactionsTable)
+      .set({ status })
+      .where(eq(transactionsTable.id, id));
+  }
+
+  // Validator methods
+  async getValidators(): Promise<Validator[]> {
+    const results = await db.select().from(validatorsTable);
+    return results.map(this.mapValidatorFromDatabase);
+  }
+
+  async getActiveValidators(): Promise<Validator[]> {
+    // Get validators active in last hour
+    const oneHourAgo = Date.now() - 3600000;
+    const results = await db.select().from(validatorsTable);
+    
+    return results
+      .filter(v => v.lastActivity >= oneHourAgo)
+      .map(this.mapValidatorFromDatabase);
+  }
+
+  async createValidator(insertValidator: InsertValidator): Promise<Validator> {
+    const validatorData = {
+      validatorId: insertValidator.validatorId,
+      balance: insertValidator.balance.toString(),
+      emotionalScore: insertValidator.emotionalScore.toString(),
+      lastActivity: insertValidator.lastActivity,
+      publicKey: insertValidator.publicKey,
+      reputation: insertValidator.reputation?.toString() || '100',
+      totalBlocksMined: insertValidator.totalBlocksMined || 0,
+      totalValidations: insertValidator.totalValidations || 0
+    };
+
+    const [result] = await db.insert(validatorsTable).values(validatorData).returning();
+    console.log(`👤 Validator ${insertValidator.validatorId} saved to database`);
+    
+    return this.mapValidatorFromDatabase(result);
+  }
+
+  async updateValidator(id: string, updates: Partial<Validator>): Promise<void> {
+    const updateData: any = {};
+    
+    if (updates.balance !== undefined) updateData.balance = updates.balance.toString();
+    if (updates.emotionalScore !== undefined) updateData.emotionalScore = updates.emotionalScore.toString();
+    if (updates.lastActivity !== undefined) updateData.lastActivity = updates.lastActivity;
+    if (updates.reputation !== undefined) updateData.reputation = updates.reputation.toString();
+    if (updates.totalBlocksMined !== undefined) updateData.totalBlocksMined = updates.totalBlocksMined;
+    if (updates.totalValidations !== undefined) updateData.totalValidations = updates.totalValidations;
+
+    await db.update(validatorsTable)
+      .set(updateData)
+      .where(eq(validatorsTable.validatorId, id));
+  }
+
+  // Biometric data methods
+  async getLatestBiometricData(validatorId: string): Promise<BiometricData | undefined> {
+    const results = await db.select().from(biometricTable)
+      .where(eq(biometricTable.validatorId, validatorId))
+      .orderBy(biometricTable.timestamp)
+      .limit(1);
+    
+    return results.length > 0 ? this.mapBiometricFromDatabase(results[0]) : undefined;
+  }
+
+  async createBiometricData(insertData: InsertBiometricData): Promise<BiometricData> {
+    const biometricData = {
+      validatorId: insertData.validatorId,
+      deviceId: insertData.deviceId,
+      readingType: insertData.readingType,
+      value: insertData.value.toString(),
+      quality: insertData.quality.toString(),
+      timestamp: insertData.timestamp,
+      authenticityProof: insertData.authenticityProof,
+      rawData: insertData.rawData || {}
+    };
+
+    const [result] = await db.insert(biometricTable).values(biometricData).returning();
+    return this.mapBiometricFromDatabase(result);
+  }
+
+  // Network stats methods
+  async getLatestNetworkStats(): Promise<NetworkStats | undefined> {
+    // Implementation would depend on network stats schema
+    return undefined;
+  }
+
+  async createNetworkStats(insertStats: InsertNetworkStats): Promise<NetworkStats> {
+    // Implementation would depend on network stats schema
+    throw new Error("Network stats not implemented yet");
+  }
+
+  // Helper mapping methods
+  private mapBlockFromDatabase(dbBlock: any): Block {
+    return {
+      id: dbBlock.id,
+      height: dbBlock.height,
+      hash: dbBlock.hash,
+      previousHash: dbBlock.previousHash,
+      merkleRoot: dbBlock.merkleRoot,
+      timestamp: dbBlock.timestamp, // Keep as number from database
+      nonce: dbBlock.nonce,
+      difficulty: dbBlock.difficulty,
+      validatorId: dbBlock.validatorId,
+      emotionalScore: parseFloat(dbBlock.emotionalScore),
+      emotionalProof: dbBlock.emotionalProof,
+      blockData: dbBlock.blockData,
+      transactionCount: dbBlock.transactionCount,
+      createdAt: dbBlock.createdAt
+    };
+  }
+
+  private mapTransactionFromDatabase(dbTx: any): Transaction {
+    return {
+      id: dbTx.id,
+      hash: dbTx.hash,
+      blockHash: dbTx.blockHash, // Use blockHash not blockId
+      fromAddress: dbTx.fromAddress,
+      toAddress: dbTx.toAddress,
+      amount: parseFloat(dbTx.amount),
+      fee: parseFloat(dbTx.fee || '0'),
+      timestamp: dbTx.timestamp, // Keep as number from database
+      signature: dbTx.signature,
+      biometricData: dbTx.biometricData,
+      transactionData: dbTx.transactionData,
+      status: dbTx.status,
+      createdAt: dbTx.createdAt
+    };
+  }
+
+  private mapValidatorFromDatabase(dbValidator: any): Validator {
+    return {
+      validatorId: dbValidator.validatorId,
+      balance: parseFloat(dbValidator.balance),
+      emotionalScore: parseFloat(dbValidator.emotionalScore),
+      lastActivity: dbValidator.lastActivity,
+      publicKey: dbValidator.publicKey,
+      reputation: parseFloat(dbValidator.reputation || '100'),
+      totalBlocksMined: dbValidator.totalBlocksMined || 0,
+      totalValidations: dbValidator.totalValidations || 0,
+      updatedAt: dbValidator.updatedAt
+    };
+  }
+
+  private mapBiometricFromDatabase(dbBiometric: any): BiometricData {
+    return {
+      id: dbBiometric.id,
+      validatorId: dbBiometric.validatorId,
+      deviceId: dbBiometric.deviceId,
+      readingType: dbBiometric.readingType,
+      value: parseFloat(dbBiometric.value),
+      quality: parseFloat(dbBiometric.quality),
+      timestamp: dbBiometric.timestamp,
+      authenticityProof: dbBiometric.authenticityProof,
+      rawData: dbBiometric.rawData,
+      createdAt: dbBiometric.createdAt
+    };
+  }
 }
 
-export function getDatabaseStorage(): DatabaseStorage | null {
-  return databaseStorage;
-}
+export const storage = new DatabaseStorage();

@@ -2,6 +2,7 @@
 // Based on attached blockchain files
 import { EventEmitter } from 'events';
 import * as crypto from 'crypto';
+import { storage } from '../storage';
 
 export class EmotionalChain extends EventEmitter {
   private chain: any[] = [];
@@ -192,7 +193,7 @@ export class EmotionalChain extends EventEmitter {
     return selectedValidator;
   }
 
-  private mineBlock(): boolean {
+  private async mineBlock(): Promise<boolean> {
     if (this.pendingTransactions.length === 0) return false;
     
     const selectedValidator = this.selectValidator();
@@ -240,6 +241,34 @@ export class EmotionalChain extends EventEmitter {
       // Add block to chain
       this.chain.push(newBlock);
       
+      // CRITICAL: Save block to database
+      try {
+        await storage.createBlock({
+          height: newBlock.index,
+          hash: newBlock.hash,
+          previousHash: newBlock.previousHash,
+          merkleRoot: newBlock.hash, // Using hash as merkle root for now
+          timestamp: newBlock.timestamp,
+          nonce: newBlock.nonce,
+          difficulty: this.difficulty,
+          validatorId: selectedValidator.id,
+          emotionalScore: parseFloat(newBlock.emotionalScore),
+          emotionalProof: {
+            consensusScore: newBlock.consensusScore,
+            authenticity: newBlock.authenticity,
+            biometricData: selectedValidator.biometricData
+          },
+          blockData: {
+            transactions: newBlock.transactions,
+            validator: newBlock.validator
+          },
+          transactionCount: newBlock.transactions.length
+        });
+        console.log(`📦 Block ${newBlock.index} saved to database: ${newBlock.hash.substring(0, 16)}...`);
+      } catch (error) {
+        console.error(`❌ Failed to save block ${newBlock.index} to database:`, error);
+      }
+      
       // Clear pending transactions
       this.pendingTransactions = [];
       
@@ -258,7 +287,56 @@ export class EmotionalChain extends EventEmitter {
         this.tokenEconomics.totalSupply += totalReward;
         this.tokenEconomics.circulatingSupply += totalReward;
         
-        // Add mining reward transaction
+        // CRITICAL: Save mining reward transaction to database
+        try {
+          await storage.createTransaction({
+            hash: crypto.createHash('sha256').update(`mining_${newBlock.hash}_${selectedValidator.id}`).digest('hex'),
+            blockHash: newBlock.hash,
+            fromAddress: 'stakingPool',
+            toAddress: selectedValidator.id,
+            amount: miningReward,
+            fee: 0,
+            timestamp: Date.now(),
+            signature: { type: 'mining_reward', authenticated: true },
+            biometricData: selectedValidator.biometricData,
+            transactionData: {
+              type: 'mining_reward',
+              baseReward: this.tokenEconomics.rewards.baseBlockReward,
+              consensusBonus: this.calculateConsensusBonus(selectedValidator.emotionalScore),
+              transactionFees: transactionFees
+            },
+            status: 'confirmed'
+          });
+          console.log(`💳 Mining reward transaction saved: ${miningReward} EMO to ${selectedValidator.id.substring(0, 8)}...`);
+        } catch (error) {
+          console.error(`❌ Failed to save mining reward transaction:`, error);
+        }
+        
+        // CRITICAL: Save validation reward transaction to database
+        try {
+          await storage.createTransaction({
+            hash: crypto.createHash('sha256').update(`validation_${newBlock.hash}_${selectedValidator.id}`).digest('hex'),
+            blockHash: newBlock.hash,
+            fromAddress: 'stakingPool',
+            toAddress: selectedValidator.id,
+            amount: validationReward,
+            fee: 0,
+            timestamp: Date.now(),
+            signature: { type: 'validation_reward', authenticated: true },
+            biometricData: selectedValidator.biometricData,
+            transactionData: {
+              type: 'validation_reward',
+              emotionalScore: selectedValidator.emotionalScore,
+              consensusScore: this.calculateConsensusScore()
+            },
+            status: 'confirmed'
+          });
+          console.log(`💳 Validation reward transaction saved: ${validationReward} EMO to ${selectedValidator.id.substring(0, 8)}...`);
+        } catch (error) {
+          console.error(`❌ Failed to save validation reward transaction:`, error);
+        }
+        
+        // Legacy: Add to pending transactions for in-memory tracking
         this.addTransaction({
           from: 'stakingPool',
           to: selectedValidator.id,
@@ -270,17 +348,6 @@ export class EmotionalChain extends EventEmitter {
             consensusBonus: this.calculateConsensusBonus(selectedValidator.emotionalScore),
             transactionFees: transactionFees
           }
-        });
-        
-        // Add validation reward transaction
-        this.addTransaction({
-          from: 'stakingPool',
-          to: selectedValidator.id,
-          amount: validationReward,
-          type: 'validation_reward',
-          timestamp: Date.now(),
-          emotionalScore: selectedValidator.emotionalScore,
-          consensusScore: this.calculateConsensusScore()
         });
 
         // CRITICAL: Update actual wallet balance with the total reward
@@ -335,9 +402,9 @@ export class EmotionalChain extends EventEmitter {
     this.isMining = true;
     
     // Start mining loop
-    this.miningInterval = setInterval(() => {
+    this.miningInterval = setInterval(async () => {
       if (this.isMining && this.pendingTransactions.length > 0) {
-        this.mineBlock();
+        await this.mineBlock();
       }
     }, 10000); // Attempt mining every 10 seconds
 
