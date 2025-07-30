@@ -40,7 +40,57 @@ export class EmotionalChain extends EventEmitter {
 
   constructor() {
     super();
-    this.createGenesisBlock();
+    // Note: initializeBlockchain is async but we can't await in constructor
+    // This will be called immediately but blockchain might not be fully loaded initially
+    this.initializeBlockchain().catch(console.error);
+  }
+
+  private async initializeBlockchain() {
+    console.log('[INIT] Initializing EmotionalChain blockchain...');
+    
+    try {
+      // Try to load existing blockchain from database
+      const existingBlocks = await this.loadBlockchainFromDatabase();
+      
+      if (existingBlocks.length > 0) {
+        console.log(`[RESTORE] Loading ${existingBlocks.length} blocks from database...`);
+        this.chain = existingBlocks;
+        console.log(`[RESTORE] Blockchain restored to block ${this.chain.length - 1}`);
+        console.log(`[RESTORE] Latest block hash: ${this.chain[this.chain.length - 1].hash.substring(0, 12)}...`);
+      } else {
+        console.log('[GENESIS] Creating genesis block...');
+        this.createGenesisBlock();
+      }
+    } catch (error) {
+      console.error('[ERROR] Failed to load blockchain from database:', error);
+      console.log('[FALLBACK] Creating genesis block...');
+      this.createGenesisBlock();
+    }
+  }
+
+  private async loadBlockchainFromDatabase(): Promise<any[]> {
+    try {
+      const blocks = await storage.getAllBlocks();
+      
+      // Convert database blocks to blockchain format
+      return blocks
+        .sort((a, b) => a.height - b.height) // Sort by height
+        .map(block => ({
+          index: block.height,
+          timestamp: new Date(block.timestamp).getTime(),
+          transactions: typeof block.transactions === 'string' ? JSON.parse(block.transactions) : (block.transactions || []),
+          previousHash: block.previousHash,
+          hash: block.hash,
+          nonce: block.nonce || 0,
+          emotionalScore: block.emotionalScore || "0.00",
+          consensusScore: block.consensusScore || "0.00",
+          authenticity: block.authenticity || "0.00",
+          validator: block.validator || "unknown"
+        }));
+    } catch (error) {
+      console.error('Error loading blockchain from database:', error);
+      return [];
+    }
   }
 
   private createGenesisBlock() {

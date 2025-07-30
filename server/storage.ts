@@ -9,6 +9,7 @@ export interface IStorage {
 
   // Block methods
   getBlocks(limit?: number): Promise<Block[]>;
+  getAllBlocks(): Promise<Block[]>;
   getLatestBlock(): Promise<Block | undefined>;
   createBlock(block: InsertBlock): Promise<Block>;
   getBlockByHeight(height: number): Promise<Block | undefined>;
@@ -80,6 +81,11 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.height - a.height)
       .slice(0, limit);
     return blocks;
+  }
+
+  async getAllBlocks(): Promise<Block[]> {
+    return Array.from(this.blocks.values())
+      .sort((a, b) => a.height - b.height);
   }
 
   async getLatestBlock(): Promise<Block | undefined> {
@@ -228,6 +234,13 @@ export class DatabaseStorage implements IStorage {
     const results = await db.select().from(blocksTable)
       .orderBy(blocksTable.height)
       .limit(limit);
+    
+    return results.map(this.mapBlockFromDatabase);
+  }
+
+  async getAllBlocks(): Promise<Block[]> {
+    const results = await db.select().from(blocksTable)
+      .orderBy(blocksTable.height);
     
     return results.map(this.mapBlockFromDatabase);
   }
