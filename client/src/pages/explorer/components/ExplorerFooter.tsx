@@ -9,7 +9,7 @@ export default function ExplorerFooter() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 w-8 h-8">
                 <EmotionalChainLogo size={32} className="text-green-400" />
               </div>
               <div>
