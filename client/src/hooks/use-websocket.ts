@@ -23,11 +23,13 @@ export function useWebSocket(): UseWebSocketReturn {
 
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/ws`;
+    const hostname = window.location.hostname;
+    const port = window.location.port || '5000'; // Default to 5000 if port is undefined
+    const wsUrl = `${protocol}//${hostname}:${port}/ws`;
     
     const connect = () => {
       try {
+        console.log(`🔗 Attempting WebSocket connection to: ${wsUrl}`);
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
 
