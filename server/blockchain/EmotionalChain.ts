@@ -339,8 +339,9 @@ export class EmotionalChain extends EventEmitter {
         
         // CRITICAL: Save mining reward transaction to database
         try {
-          await storage.createTransaction({
-            hash: crypto.createHash('sha256').update(`mining_${newBlock.hash}_${selectedValidator.id}`).digest('hex'),
+          const miningTxHash = crypto.createHash('sha256').update(`mining_${newBlock.hash}_${selectedValidator.id}`).digest('hex');
+          const miningTransaction = await storage.createTransaction({
+            hash: miningTxHash,
             blockHash: newBlock.hash,
             fromAddress: 'stakingPool',
             toAddress: selectedValidator.id,
@@ -358,14 +359,16 @@ export class EmotionalChain extends EventEmitter {
             status: 'confirmed'
           });
           console.log(`💳 Mining reward transaction saved: ${miningReward} EMO to ${selectedValidator.id.substring(0, 8)}...`);
+          console.log(`   💳 TX ID: ${miningTransaction.id} | Hash: ${miningTxHash.substring(0, 12)}...`);
         } catch (error) {
           console.error(`❌ Failed to save mining reward transaction:`, error);
         }
         
         // CRITICAL: Save validation reward transaction to database
         try {
-          await storage.createTransaction({
-            hash: crypto.createHash('sha256').update(`validation_${newBlock.hash}_${selectedValidator.id}`).digest('hex'),
+          const validationTxHash = crypto.createHash('sha256').update(`validation_${newBlock.hash}_${selectedValidator.id}`).digest('hex');
+          const validationTransaction = await storage.createTransaction({
+            hash: validationTxHash,
             blockHash: newBlock.hash,
             fromAddress: 'stakingPool',
             toAddress: selectedValidator.id,
@@ -381,7 +384,8 @@ export class EmotionalChain extends EventEmitter {
             },
             status: 'confirmed'
           });
-          console.log(`💳 Validation reward transaction saved: ${validationReward} EMO to ${selectedValidator.id.substring(0, 8)}...`);
+          console.log(`💳 Validation reward transaction saved: ${validationReward.toFixed(2)} EMO to ${selectedValidator.id.substring(0, 8)}...`);
+          console.log(`   💳 TX ID: ${validationTransaction.id} | Hash: ${validationTxHash.substring(0, 12)}...`);
         } catch (error) {
           console.error(`❌ Failed to save validation reward transaction:`, error);
         }
