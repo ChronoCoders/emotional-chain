@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useEffect, useState } from 'react';
+import { Link } from 'wouter';
+import { ExternalLink } from 'lucide-react';
 import AsciBanner from '@/components/terminal/ascii-banner';
 import TerminalInterface from '@/components/terminal/terminal-interface';
 import BlockchainExplorer from '@/components/terminal/blockchain-explorer';
@@ -43,7 +45,15 @@ export default function Terminal() {
       <div className="relative z-10 p-4">
         {/* Main Terminal Header */}
         <div className="terminal-window rounded-lg p-6 mb-6">
-          <AsciBanner className="mb-4" />
+          <div className="flex justify-between items-start mb-4">
+            <AsciBanner className="flex-1" />
+            <Link href="/explorer">
+              <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-4 py-2 text-terminal-success font-mono text-sm transition-colors cursor-pointer flex items-center gap-2">
+                <ExternalLink size={16} />
+                PUBLIC EXPLORER
+              </div>
+            </Link>
+          </div>
           
           {/* System Status */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
