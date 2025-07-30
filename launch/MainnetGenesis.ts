@@ -1,464 +1,462 @@
 /**
  * EmotionalChain Mainnet Genesis Configuration
- * Production launch infrastructure with founding validators and tokenomics
+ * Production genesis block with founding validators and tokenomics
  */
 
-import { KeyPair } from '../crypto/KeyPair';
-import { Block } from '../crypto/Block';
-import { Transaction } from '../crypto/Transaction';
-// Define BiometricData interface locally since it's not exported from BiometricDevice
-interface BiometricData {
-  heartRate: number;
-  stressLevel: number;
-  focusLevel: number;
-  authenticity: number;
-  timestamp: number;
-}
+import crypto from 'crypto';
 
-export interface FoundingValidator {
+export interface GenesisValidator {
   id: string;
-  stake: number;
-  region: string;
+  address: string;
   publicKey: string;
-  biometricProfile: BiometricData;
-  partnershipType: 'healthcare' | 'technology' | 'academic' | 'wellness' | 'biometric' | 'financial' | 'community';
-  complianceLevel: 'HIPAA' | 'GDPR' | 'SOC2' | 'ISO27001' | 'ALL';
+  stake: number;
+  region: 'north_america' | 'europe' | 'asia_pacific';
+  biometricDevices: string[];
+  emotionalScore: number;
+  reputation: number;
 }
 
-export interface TokenDistribution {
-  validatorStakes: number;
-  publicSale: number;
-  teamAllocation: number;
-  ecosystemFund: number;
-  reserves: number;
-}
-
-export interface NetworkParameters {
+export interface GenesisConfig {
+  chainId: number;
+  networkName: string;
+  genesisTime: string;
   blockTime: number;
-  epochDuration: number;
-  emotionalThreshold: number;
-  byzantineTolerance: number;
-  maxValidators: number;
-  minStake: number;
-}
-
-export interface MainnetGenesisConfig {
-  timestamp: string;
-  initialValidators: FoundingValidator[];
-  tokenDistribution: TokenDistribution;
-  networkParameters: NetworkParameters;
-  genesisBlock: Block;
-  launchReadiness: boolean;
-}
-
-// Production Genesis Configuration
-export const MainnetGenesis: MainnetGenesisConfig = {
-  timestamp: '2025-01-01T00:00:00Z', // New Year Launch
-  initialValidators: [
-    // Healthcare Partners
-    {
-      id: 'MayoClinicNode',
-      stake: 100000,
-      region: 'US-East',
-      publicKey: '0x04f6b23b7a8d9c3e2f1a4d5c6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6',
-      biometricProfile: { heartRate: 72, stressLevel: 0.15, focusLevel: 0.95, authenticity: 0.98, timestamp: Date.now() },
-      partnershipType: 'healthcare',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'StanfordMedNode',
-      stake: 100000,
-      region: 'US-West',
-      publicKey: '0x04a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1',
-      biometricProfile: { heartRate: 74, stressLevel: 0.18, focusLevel: 0.92, authenticity: 0.97, timestamp: Date.now() },
-      partnershipType: 'healthcare',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'NHSValidator',
-      stake: 100000,
-      region: 'EU-West',
-      publicKey: '0x04b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2',
-      biometricProfile: { heartRate: 71, stressLevel: 0.20, focusLevel: 0.90, authenticity: 0.96, timestamp: Date.now() },
-      partnershipType: 'healthcare',
-      complianceLevel: 'GDPR'
-    },
-    
-    // Technology Partners  
-    {
-      id: 'GoogleHealthNode',
-      stake: 150000,
-      region: 'Global',
-      publicKey: '0x04c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3',
-      biometricProfile: { heartRate: 76, stressLevel: 0.12, focusLevel: 0.98, authenticity: 0.99, timestamp: Date.now() },
-      partnershipType: 'technology',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'AppleWellnessNode',
-      stake: 150000,
-      region: 'Global',
-      publicKey: '0x04d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4',
-      biometricProfile: { heartRate: 73, stressLevel: 0.14, focusLevel: 0.96, authenticity: 0.98, timestamp: Date.now() },
-      partnershipType: 'technology',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'SamsungBioNode',
-      stake: 120000,
-      region: 'Asia',
-      publicKey: '0x04e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5',
-      biometricProfile: { heartRate: 75, stressLevel: 0.16, focusLevel: 0.94, authenticity: 0.97, timestamp: Date.now() },
-      partnershipType: 'technology',
-      complianceLevel: 'ISO27001'
-    },
-    
-    // Academic Institutions
-    {
-      id: 'MITEmotionLab',
-      stake: 80000,
-      region: 'US-East',
-      publicKey: '0x04f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6',
-      biometricProfile: { heartRate: 78, stressLevel: 0.22, focusLevel: 0.88, authenticity: 0.95, timestamp: Date.now() },
-      partnershipType: 'academic',
-      complianceLevel: 'SOC2'
-    },
-    {
-      id: 'StanfordAILab',
-      stake: 80000,
-      region: 'US-West',
-      publicKey: '0x04a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7',
-      biometricProfile: { heartRate: 77, stressLevel: 0.19, focusLevel: 0.91, authenticity: 0.96, timestamp: Date.now() },
-      partnershipType: 'academic',
-      complianceLevel: 'SOC2'
-    },
-    {
-      id: 'OxfordNeuroscience',
-      stake: 80000,
-      region: 'EU-West',
-      publicKey: '0x04b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8',
-      biometricProfile: { heartRate: 70, stressLevel: 0.17, focusLevel: 0.93, authenticity: 0.97, timestamp: Date.now() },
-      partnershipType: 'academic',
-      complianceLevel: 'GDPR'
-    },
-    
-    // Wellness Companies
-    {
-      id: 'HeadspaceValidator',
-      stake: 90000,
-      region: 'Global',
-      publicKey: '0x04c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9',
-      biometricProfile: { heartRate: 69, stressLevel: 0.10, focusLevel: 0.99, authenticity: 0.98, timestamp: Date.now() },
-      partnershipType: 'wellness',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'CalmNetwork',
-      stake: 90000,
-      region: 'Global',
-      publicKey: '0x04d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0',
-      biometricProfile: { heartRate: 68, stressLevel: 0.08, focusLevel: 0.97, authenticity: 0.99, timestamp: Date.now() },
-      partnershipType: 'wellness',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'FitbitConsensus',
-      stake: 85000,
-      region: 'Global',
-      publicKey: '0x04e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1',
-      biometricProfile: { heartRate: 74, stressLevel: 0.13, focusLevel: 0.95, authenticity: 0.97, timestamp: Date.now() },
-      partnershipType: 'wellness',
-      complianceLevel: 'ALL'
-    },
-    
-    // Biometric Device Manufacturers
-    {
-      id: 'PolarSports',
-      stake: 75000,
-      region: 'EU-North',
-      publicKey: '0x04f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2',
-      biometricProfile: { heartRate: 79, stressLevel: 0.25, focusLevel: 0.85, authenticity: 0.94, timestamp: Date.now() },
-      partnershipType: 'biometric',
-      complianceLevel: 'GDPR'
-    },
-    {
-      id: 'GarminFitness',
-      stake: 75000,
-      region: 'US-Central',
-      publicKey: '0x04a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3',
-      biometricProfile: { heartRate: 80, stressLevel: 0.24, focusLevel: 0.87, authenticity: 0.95, timestamp: Date.now() },
-      partnershipType: 'biometric',
-      complianceLevel: 'SOC2'
-    },
-    {
-      id: 'OuraRingNode',
-      stake: 70000,
-      region: 'EU-West',
-      publicKey: '0x04b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4',
-      biometricProfile: { heartRate: 72, stressLevel: 0.21, focusLevel: 0.89, authenticity: 0.96, timestamp: Date.now() },
-      partnershipType: 'biometric',
-      complianceLevel: 'GDPR'
-    },
-    
-    // Financial Partners
-    {
-      id: 'JPMorganDigital',
-      stake: 200000,
-      region: 'US-East',
-      publicKey: '0x04c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5',
-      biometricProfile: { heartRate: 75, stressLevel: 0.18, focusLevel: 0.92, authenticity: 0.98, timestamp: Date.now() },
-      partnershipType: 'financial',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'VisaWellness',
-      stake: 180000,
-      region: 'Global',
-      publicKey: '0x04d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6',
-      biometricProfile: { heartRate: 73, stressLevel: 0.16, focusLevel: 0.94, authenticity: 0.97, timestamp: Date.now() },
-      partnershipType: 'financial',
-      complianceLevel: 'ALL'
-    },
-    {
-      id: 'MastercardHealth',
-      stake: 180000,
-      region: 'Global',
-      publicKey: '0x04e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7',
-      biometricProfile: { heartRate: 74, stressLevel: 0.17, focusLevel: 0.93, authenticity: 0.98, timestamp: Date.now() },
-      partnershipType: 'financial',
-      complianceLevel: 'ALL'
-    },
-    
-    // Community Validators
-    {
-      id: 'CommunityNode1',
-      stake: 50000,
-      region: 'Global',
-      publicKey: '0x04f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8',
-      biometricProfile: { heartRate: 76, stressLevel: 0.23, focusLevel: 0.86, authenticity: 0.93, timestamp: Date.now() },
-      partnershipType: 'community',
-      complianceLevel: 'SOC2'
-    },
-    {
-      id: 'CommunityNode2',
-      stake: 50000,
-      region: 'Global',
-      publicKey: '0x04a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9',
-      biometricProfile: { heartRate: 77, stressLevel: 0.26, focusLevel: 0.84, authenticity: 0.92, timestamp: Date.now() },
-      partnershipType: 'community',
-      complianceLevel: 'SOC2'
-    },
-    {
-      id: 'CommunityNode3',
-      stake: 50000,
-      region: 'Global',
-      publicKey: '0x04b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0',
-      biometricProfile: { heartRate: 78, stressLevel: 0.28, focusLevel: 0.82, authenticity: 0.91, timestamp: Date.now() },
-      partnershipType: 'community',
-      complianceLevel: 'SOC2'
-    }
-  ],
-
-  tokenDistribution: {
-    validatorStakes: 2275000,      // 45.5% - Validator stakes
-    publicSale: 1500000,           // 30% - Public token sale
-    teamAllocation: 500000,        // 10% - Team allocation (4-year vest)
-    ecosystemFund: 400000,         // 8% - Ecosystem development
-    reserves: 325000               // 6.5% - Strategic reserves
-  },
-
+  consensusType: string;
+  totalSupply: number;
+  tokenSymbol: string;
+  tokenName: string;
+  validators: GenesisValidator[];
+  tokenomics: {
+    stakingPool: number;
+    wellnessPool: number;
+    ecosystemPool: number;
+    teamAllocation: number;
+  };
   networkParameters: {
-    blockTime: 30,                 // 30 second blocks
-    epochDuration: 2880,           // Daily epochs (2880 blocks)
-    emotionalThreshold: 75.0,      // 75% minimum emotional score
-    byzantineTolerance: 0.33,      // 33% Byzantine fault tolerance
-    maxValidators: 101,            // Scale to 101 validators
-    minStake: 50000                // 50,000 EMO minimum stake
+    emotionalThreshold: number;
+    minStake: number;
+    maxValidators: number;
+    byzantineTolerance: number;
+    blockConfirmations: number;
+  };
+}
+
+export const FOUNDING_VALIDATORS: GenesisValidator[] = [
+  // North America Region (7 validators)
+  {
+    id: 'StellarNode',
+    address: '0x467E9D57467E9D574CE47CE47CE47CE47CE47CE4',
+    publicKey: '0x04a7b1e5c4d8f3a2b9e6c7d8f3a2b9e6c7d8f3a2b9e6c7d8f3a2b9e6c7d8f3a2b9',
+    stake: 100000,
+    region: 'north_america',
+    biometricDevices: ['polar_h10', 'garmin_watch', 'muse_headband'],
+    emotionalScore: 92.5,
+    reputation: 100
+  },
+  {
+    id: 'NebulaForge',
+    address: '0x568F0E68568F0E685D58CE58CE58CE58CE58CE58C',
+    publicKey: '0x04b8c2f6d5e9g4b3c0f7d8e9g4b3c0f7d8e9g4b3c0f7d8e9g4b3c0f7d8e9g4b3c0',
+    stake: 100000,
+    region: 'north_america',
+    biometricDevices: ['fitbit_sense', 'empatica_e4', 'polar_h10'],
+    emotionalScore: 89.3,
+    reputation: 100
+  },
+  {
+    id: 'QuantumReach',
+    address: '0x669G1F79669G1F796E69DF69DF69DF69DF69DF69D',
+    publicKey: '0x04c9d3g7e6f0h5c4d1g8e9f0h5c4d1g8e9f0h5c4d1g8e9f0h5c4d1g8e9f0h5c4d1',
+    stake: 100000,
+    region: 'north_america',
+    biometricDevices: ['apple_watch', 'oura_ring', 'muse_headband'],
+    emotionalScore: 90.8,
+    reputation: 100
+  },
+  {
+    id: 'OrionPulse',
+    address: '0x770H2G80770H2G807F70EF70EF70EF70EF70EF70E',
+    publicKey: '0x04d0e4h8f7g1i6d5e2h9f0g1i6d5e2h9f0g1i6d5e2h9f0g1i6d5e2h9f0g1i6d5e2',
+    stake: 100000,
+    region: 'north_america',
+    biometricDevices: ['garmin_vivosmart', 'polar_verity', 'empatica_e4'],
+    emotionalScore: 88.7,
+    reputation: 100
+  },
+  {
+    id: 'DarkMatterLabs',
+    address: '0x881I3H91881I3H918G81FG81FG81FG81FG81FG81F',
+    publicKey: '0x04e1f5i9g8h2j7e6f3i0g8h2j7e6f3i0g8h2j7e6f3i0g8h2j7e6f3i0g8h2j7e6f3',
+    stake: 100000,
+    region: 'north_america',
+    biometricDevices: ['whoop_strap', 'hexoskin', 'muse_headband'],
+    emotionalScore: 91.2,
+    reputation: 100
+  },
+  {
+    id: 'GravityCore',
+    address: '0x992J4I02992J4I029H92GH92GH92GH92GH92GH92G',
+    publicKey: '0x04f2g6j0h9i3k8f7g4j1h9i3k8f7g4j1h9i3k8f7g4j1h9i3k8f7g4j1h9i3k8f7g4',
+    stake: 100000,
+    region: 'north_america',
+    biometricDevices: ['bioharness', 'polar_h10', 'emotiv_epoc'],
+    emotionalScore: 93.1,
+    reputation: 100
+  },
+  {
+    id: 'AstroSentinel',
+    address: '0xAA3K5J13AA3K5J13AI03HI03HI03HI03HI03HI03H',
+    publicKey: '0x04g3h7k1i0j4l9g8h5k2i0j4l9g8h5k2i0j4l9g8h5k2i0j4l9g8h5k2i0j4l9g8h5',
+    stake: 100000,
+    region: 'north_america',
+    biometricDevices: ['samsung_galaxy_watch', 'zephyr_biomodule', 'muse_s'],
+    emotionalScore: 87.9,
+    reputation: 100
   },
 
-  genesisBlock: new Block(
-    0,
-    '0x0000000000000000000000000000000000000000000000000000000000000000',
-    [],
-    { heartRate: 72, stressLevel: 0.15, focusLevel: 0.95, authenticity: 1.0, timestamp: Date.now() }
-  ),
+  // Europe Region (7 validators)
+  {
+    id: 'ByteGuardians',
+    address: '0xBB4L6K24BB4L6K24BJ14IJ14IJ14IJ14IJ14IJ14I',
+    publicKey: '0x04h4i8l2j1k5m0h9i6l3j1k5m0h9i6l3j1k5m0h9i6l3j1k5m0h9i6l3j1k5m0h9i6',
+    stake: 100000,
+    region: 'europe',
+    biometricDevices: ['garmin_fenix', 'polar_oh1', 'neurosky_mindwave'],
+    emotionalScore: 89.5,
+    reputation: 100
+  },
+  {
+    id: 'ZeroLagOps',
+    address: '0xCC5M7L35CC5M7L35CK25JK25JK25JK25JK25JK25J',
+    publicKey: '0x04i5j9m3k2l6n1i0j7m4k2l6n1i0j7m4k2l6n1i0j7m4k2l6n1i0j7m4k2l6n1i0j7',
+    stake: 100000,
+    region: 'europe',
+    biometricDevices: ['fitbit_charge', 'empatica_embrace', 'muse_headband'],
+    emotionalScore: 90.3,
+    reputation: 100
+  },
+  {
+    id: 'ChainFlux',
+    address: '0xDD6N8M46DD6N8M46DL36KL36KL36KL36KL36KL36K',
+    publicKey: '0x04j6k0n4l3m7o2j1k8n5l3m7o2j1k8n5l3m7o2j1k8n5l3m7o2j1k8n5l3m7o2j1k8',
+    stake: 100000,
+    region: 'europe',
+    biometricDevices: ['polar_vantage', 'biovotion_vsm', 'emotiv_insight'],
+    emotionalScore: 88.1,
+    reputation: 100
+  },
+  {
+    id: 'BlockNerve',
+    address: '0xEE7O9N57EE7O9N57EM47LM47LM47LM47LM47LM47L',
+    publicKey: '0x04k7l1o5m4n8p3k2l9o6m4n8p3k2l9o6m4n8p3k2l9o6m4n8p3k2l9o6m4n8p3k2l9',
+    stake: 100000,
+    region: 'europe',
+    biometricDevices: ['suunto_9', 'hexoskin_smart', 'muse_2'],
+    emotionalScore: 91.7,
+    reputation: 100
+  },
+  {
+    id: 'ValidatorX',
+    address: '0xFF8P0O68FF8P0O68FN58MN58MN58MN58MN58MN58M',
+    publicKey: '0x04l8m2p6n5o9q4l3m0p7n5o9q4l3m0p7n5o9q4l3m0p7n5o9q4l3m0p7n5o9q4l3m0',
+    stake: 100000,
+    region: 'europe',
+    biometricDevices: ['garmin_venu', 'polar_ignite', 'neurosky_eeg'],
+    emotionalScore: 86.4,
+    reputation: 100
+  },
+  {
+    id: 'NovaSync',
+    address: '0x009Q1P79009Q1P79GO69NO69NO69NO69NO69NO69N',
+    publicKey: '0x04m9n3q7o6p0r5m4n1q8o6p0r5m4n1q8o6p0r5m4n1q8o6p0r5m4n1q8o6p0r5m4n1',
+    stake: 100000,
+    region: 'europe',
+    biometricDevices: ['amazfit_gts', 'empatica_e4', 'emotiv_epoc_x'],
+    emotionalScore: 89.9,
+    reputation: 100
+  },
+  {
+    id: 'IronNode',
+    address: '0x110R2Q80110R2Q80HP70OP70OP70OP70OP70OP70O',
+    publicKey: '0x04n0o4r8p7q1s6n5o2r9p7q1s6n5o2r9p7q1s6n5o2r9p7q1s6n5o2r9p7q1s6n5o2',
+    stake: 100000,
+    region: 'europe',
+    biometricDevices: ['withings_scanwatch', 'polar_h9', 'muse_headband'],
+    emotionalScore: 92.3,
+    reputation: 100
+  },
 
-  launchReadiness: false
+  // Asia-Pacific Region (7 validators)
+  {
+    id: 'SentinelTrust',
+    address: '0x221S3R91221S3R91IQ81PQ81PQ81PQ81PQ81PQ81P',
+    publicKey: '0x04o1p5s9q8r2t7o6p3s0q8r2t7o6p3s0q8r2t7o6p3s0q8r2t7o6p3s0q8r2t7o6p3',
+    stake: 100000,
+    region: 'asia_pacific',
+    biometricDevices: ['xiaomi_mi_band', 'polar_verity_sense', 'neurosky_mindset'],
+    emotionalScore: 88.6,
+    reputation: 100
+  },
+  {
+    id: 'VaultProof',
+    address: '0x332T4S02332T4S02JR92QR92QR92QR92QR92QR92Q',
+    publicKey: '0x04p2q6t0r9s3u8p7q4t1r9s3u8p7q4t1r9s3u8p7q4t1r9s3u8p7q4t1r9s3u8p7q4',
+    stake: 100000,
+    region: 'asia_pacific',
+    biometricDevices: ['huawei_watch_gt', 'empatica_embrace_plus', 'emotiv_insight'],
+    emotionalScore: 90.1,
+    reputation: 100
+  },
+  {
+    id: 'SecureMesh',
+    address: '0x443U5T13443U5T13KS03RS03RS03RS03RS03RS03R',
+    publicKey: '0x04q3r7u1s0t4v9q8r5u2s0t4v9q8r5u2s0t4v9q8r5u2s0t4v9q8r5u2s0t4v9q8r5',
+    stake: 100000,
+    region: 'asia_pacific',
+    biometricDevices: ['samsung_galaxy_active', 'polar_oh1_plus', 'muse_headband'],
+    emotionalScore: 87.2,
+    reputation: 100
+  },
+  {
+    id: 'WatchtowerOne',
+    address: '0x554V6U24554V6U24LT14ST14ST14ST14ST14ST14S',
+    publicKey: '0x04r4s8v2t1u5w0r9s6v3t1u5w0r9s6v3t1u5w0r9s6v3t1u5w0r9s6v3t1u5w0r9s6',
+    stake: 100000,
+    region: 'asia_pacific',
+    biometricDevices: ['oppo_watch', 'bioharness_3', 'neurosky_eeg_headset'],
+    emotionalScore: 91.4,
+    reputation: 100
+  },
+  {
+    id: 'AetherRunes',
+    address: '0x665W7V35665W7V35MU25TU25TU25TU25TU25TU25T',
+    publicKey: '0x04s5t9w3u2v6x1s0t7w4u2v6x1s0t7w4u2v6x1s0t7w4u2v6x1s0t7w4u2v6x1s0t7',
+    stake: 100000,
+    region: 'asia_pacific',
+    biometricDevices: ['fossil_gen_5', 'empatica_e4_wristband', 'emotiv_epoc_flex'],
+    emotionalScore: 89.8,
+    reputation: 100
+  },
+  {
+    id: 'ChronoKeep',
+    address: '0x776X8W46776X8W46NV36UV36UV36UV36UV36UV36U',
+    publicKey: '0x04t6u0x4v3w7y2t1u8x5v3w7y2t1u8x5v3w7y2t1u8x5v3w7y2t1u8x5v3w7y2t1u8',
+    stake: 100000,
+    region: 'asia_pacific',
+    biometricDevices: ['ticwatch_pro', 'polar_vantage_v2', 'muse_s_headband'],
+    emotionalScore: 92.9,
+    reputation: 100
+  },
+  {
+    id: 'SolForge',
+    address: '0x887Y9X57887Y9X57OW47VW47VW47VW47VW47VW47V',
+    publicKey: '0x04u7v1y5w4x8z3u2v9y6w4x8z3u2v9y6w4x8z3u2v9y6w4x8z3u2v9y6w4x8z3u2v9',
+    stake: 100000,
+    region: 'asia_pacific',
+    biometricDevices: ['realme_watch', 'hexoskin_smart_shirt', 'emotiv_insight_5'],
+    emotionalScore: 88.5,
+    reputation: 100
+  }
+];
+
+export const MAINNET_GENESIS_CONFIG: GenesisConfig = {
+  chainId: 2025,
+  networkName: 'EmotionalChain Mainnet',
+  genesisTime: '2025-01-01T00:00:00.000Z',
+  blockTime: 30,
+  consensusType: 'ProofOfEmotion',
+  totalSupply: 1000000000, // 1 billion EMO
+  tokenSymbol: 'EMO',
+  tokenName: 'EmotionalChain Token',
+  validators: FOUNDING_VALIDATORS,
+  tokenomics: {
+    stakingPool: 400000000,    // 400M EMO (40%)
+    wellnessPool: 200000000,   // 200M EMO (20%)
+    ecosystemPool: 250000000,  // 250M EMO (25%)
+    teamAllocation: 150000000  // 150M EMO (15%)
+  },
+  networkParameters: {
+    emotionalThreshold: 75.0,
+    minStake: 50000,
+    maxValidators: 101,
+    byzantineTolerance: 0.33,
+    blockConfirmations: 12
+  }
 };
 
-export class MainnetLauncher {
-  private genesis: MainnetGenesisConfig;
-  private launchChecklist: Map<string, boolean> = new Map();
-
-  constructor() {
-    this.genesis = MainnetGenesis;
-    this.initializeLaunchChecklist();
-  }
-
-  private initializeLaunchChecklist(): void {
-    // Technical Readiness
-    this.launchChecklist.set('security_audit_complete', false);
-    this.launchChecklist.set('load_testing_10k_tps', false);
-    this.launchChecklist.set('multi_region_deployment', false);
-    this.launchChecklist.set('disaster_recovery_tested', false);
-
-    // Legal & Compliance
-    this.launchChecklist.set('regulatory_legal_opinion', false);
-    this.launchChecklist.set('data_protection_compliance', false);
-    this.launchChecklist.set('partnership_agreements_signed', false);
-
-    // Business Readiness
-    this.launchChecklist.set('exchange_listing_confirmations', false);
-    this.launchChecklist.set('market_maker_agreements', false);
-    this.launchChecklist.set('pr_campaign_launched', false);
-
-    // Operational Readiness
-    this.launchChecklist.set('support_team_trained', false);
-    this.launchChecklist.set('community_moderation_setup', false);
-    this.launchChecklist.set('documentation_complete', false);
-  }
-
-  public async validateFoundingValidators(): Promise<boolean> {
-    console.log('🔍 Validating founding validators...');
+export class MainnetGenesis {
+  public static createGenesisBlock(): {
+    index: number;
+    timestamp: number;
+    previousHash: string;
+    transactions: any[];
+    hash: string;
+    nonce: number;
+    validators: GenesisValidator[];
+    totalSupply: number;
+    genesisConfig: GenesisConfig;
+  } {
+    const genesisTimestamp = new Date('2025-01-01T00:00:00.000Z').getTime();
     
-    let validValidators = 0;
-    for (const validator of this.genesis.initialValidators) {
-      // Validate biometric authenticity
-      if (validator.biometricProfile.authenticity >= 0.90) {
-        // Validate stake requirements
-        if (validator.stake >= this.genesis.networkParameters.minStake) {
-          // Validate compliance level
-          if (validator.complianceLevel !== null) {
-            validValidators++;
-            console.log(`✅ ${validator.id}: Valid founding validator`);
-          }
-        }
-      }
-    }
-
-    const validationRate = validValidators / this.genesis.initialValidators.length;
-    console.log(`📊 Validator validation rate: ${(validationRate * 100).toFixed(1)}%`);
-    
-    return validValidators >= 21; // Minimum 21 validators required
-  }
-
-  public async generateGenesisBlock(): Promise<Block> {
-    console.log('🚀 Generating mainnet genesis block...');
-    
-    // Create genesis transactions for initial token distribution
-    const genesisTransactions: Transaction[] = [];
-    
-    for (const validator of this.genesis.initialValidators) {
-      const keyPair = new KeyPair();
-      const transaction = new Transaction(
-        '0x0000000000000000000000000000000000000000', // Genesis address
-        validator.publicKey,
-        validator.stake,
-        0, // No fee for genesis
-        validator.biometricProfile
-      );
-      
-      // Sign with genesis key
-      transaction.sign(keyPair);
-      genesisTransactions.push(transaction);
-    }
-
-    // Create genesis block
-    const genesisBlock = new Block(
-      0,
-      '0x0000000000000000000000000000000000000000000000000000000000000000',
-      genesisTransactions,
+    // Create genesis transactions for token distribution
+    const genesisTransactions = [
+      // Staking pool allocation
       {
-        heartRate: 75,
-        stressLevel: 0.05,
-        focusLevel: 1.0,
-        authenticity: 1.0,
-        timestamp: new Date(this.genesis.timestamp).getTime()
-      }
+        from: '0x0000000000000000000000000000000000000000',
+        to: '0xSTAKING_POOL_CONTRACT_ADDRESS_HERE',
+        amount: MAINNET_GENESIS_CONFIG.tokenomics.stakingPool,
+        type: 'genesis_allocation',
+        purpose: 'staking_pool'
+      },
+      // Wellness pool allocation
+      {
+        from: '0x0000000000000000000000000000000000000000',
+        to: '0xWELLNESS_POOL_CONTRACT_ADDRESS_HERE',
+        amount: MAINNET_GENESIS_CONFIG.tokenomics.wellnessPool,
+        type: 'genesis_allocation',
+        purpose: 'wellness_pool'
+      },
+      // Ecosystem pool allocation
+      {
+        from: '0x0000000000000000000000000000000000000000',
+        to: '0xECOSYSTEM_POOL_CONTRACT_ADDRESS_HERE',
+        amount: MAINNET_GENESIS_CONFIG.tokenomics.ecosystemPool,
+        type: 'genesis_allocation',
+        purpose: 'ecosystem_pool'
+      },
+      // Validator initial stakes
+      ...FOUNDING_VALIDATORS.map(validator => ({
+        from: '0x0000000000000000000000000000000000000000',
+        to: validator.address,
+        amount: validator.stake,
+        type: 'genesis_stake',
+        purpose: 'validator_stake',
+        validatorId: validator.id
+      }))
+    ];
+
+    // Calculate genesis block hash
+    const genesisBlockData = {
+      index: 0,
+      timestamp: genesisTimestamp,
+      previousHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      transactions: genesisTransactions,
+      nonce: 0,
+      config: MAINNET_GENESIS_CONFIG
+    };
+
+    const hash = crypto
+      .createHash('sha256')
+      .update(JSON.stringify(genesisBlockData))
+      .digest('hex');
+
+    console.log(`🌟 Genesis block created for EmotionalChain Mainnet`);
+    console.log(`📅 Genesis time: ${new Date(genesisTimestamp).toISOString()}`);
+    console.log(`🔗 Chain ID: ${MAINNET_GENESIS_CONFIG.chainId}`);
+    console.log(`👥 Founding validators: ${FOUNDING_VALIDATORS.length}`);
+    console.log(`💰 Total supply: ${MAINNET_GENESIS_CONFIG.totalSupply.toLocaleString()} EMO`);
+    console.log(`🏆 Genesis hash: 0x${hash}`);
+
+    return {
+      index: 0,
+      timestamp: genesisTimestamp,
+      previousHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
+      transactions: genesisTransactions,
+      hash: `0x${hash}`,
+      nonce: 0,
+      validators: FOUNDING_VALIDATORS,
+      totalSupply: MAINNET_GENESIS_CONFIG.totalSupply,
+      genesisConfig: MAINNET_GENESIS_CONFIG
+    };
+  }
+
+  public static validateGenesisConfig(): {
+    valid: boolean;
+    errors: string[];
+    warnings: string[];
+  } {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    // Validate validator count
+    if (FOUNDING_VALIDATORS.length !== 21) {
+      errors.push(`Expected 21 founding validators, got ${FOUNDING_VALIDATORS.length}`);
+    }
+
+    // Validate regional distribution
+    const regions = FOUNDING_VALIDATORS.reduce((acc, v) => {
+      acc[v.region] = (acc[v.region] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    if (regions.north_america !== 7) {
+      errors.push(`Expected 7 North America validators, got ${regions.north_america || 0}`);
+    }
+    if (regions.europe !== 7) {
+      errors.push(`Expected 7 Europe validators, got ${regions.europe || 0}`);
+    }
+    if (regions.asia_pacific !== 7) {
+      errors.push(`Expected 7 Asia-Pacific validators, got ${regions.asia_pacific || 0}`);
+    }
+
+    // Validate total stake allocation
+    const totalValidatorStake = FOUNDING_VALIDATORS.reduce((sum, v) => sum + v.stake, 0);
+    const expectedValidatorStake = 21 * 100000; // 2.1M EMO
+    if (totalValidatorStake !== expectedValidatorStake) {
+      errors.push(`Total validator stake mismatch: expected ${expectedValidatorStake}, got ${totalValidatorStake}`);
+    }
+
+    // Validate tokenomics distribution
+    const totalTokenomics = Object.values(MAINNET_GENESIS_CONFIG.tokenomics).reduce((sum, val) => sum + val, 0);
+    if (totalTokenomics !== MAINNET_GENESIS_CONFIG.totalSupply) {
+      errors.push(`Tokenomics distribution error: ${totalTokenomics} !== ${MAINNET_GENESIS_CONFIG.totalSupply}`);
+    }
+
+    // Validate emotional scores
+    const lowScoreValidators = FOUNDING_VALIDATORS.filter(v => v.emotionalScore < 85);
+    if (lowScoreValidators.length > 0) {
+      warnings.push(`${lowScoreValidators.length} validators have emotional scores below 85%`);
+    }
+
+    // Validate biometric device coverage
+    const deviceCoverage = FOUNDING_VALIDATORS.every(v => 
+      v.biometricDevices.length >= 2 && 
+      v.biometricDevices.some(device => device.includes('polar') || device.includes('garmin'))
     );
-
-    console.log(`✅ Genesis block generated with ${genesisTransactions.length} transactions`);
-    console.log(`📊 Total genesis EMO distributed: ${this.genesis.tokenDistribution.validatorStakes.toLocaleString()}`);
-    
-    return genesisBlock;
-  }
-
-  public checkLaunchReadiness(): { ready: boolean; score: number; issues: string[] } {
-    let completedItems = 0;
-    const totalItems = this.launchChecklist.size;
-    const issues: string[] = [];
-
-    for (const [item, completed] of this.launchChecklist.entries()) {
-      if (completed) {
-        completedItems++;
-      } else {
-        issues.push(item.replace(/_/g, ' '));
-      }
+    if (!deviceCoverage) {
+      warnings.push('Some validators may have insufficient biometric device coverage');
     }
 
-    const score = (completedItems / totalItems) * 100;
-    const ready = score >= 85; // 85% completion required for launch
-
-    return { ready, score, issues };
+    return { valid: errors.length === 0, errors, warnings };
   }
 
-  public async executeLaunch(): Promise<{ success: boolean; message: string }> {
-    console.log('🚀 EMOTIONALCHAIN MAINNET LAUNCH SEQUENCE');
-    console.log('=========================================');
+  public static getNetworkSummary(): {
+    chainId: number;
+    networkName: string;
+    totalSupply: string;
+    foundingValidators: number;
+    regionalDistribution: Record<string, number>;
+    averageEmotionalScore: number;
+    totalStakeAllocated: number;
+    launchDate: string;
+  } {
+    const regions = FOUNDING_VALIDATORS.reduce((acc, v) => {
+      acc[v.region] = (acc[v.region] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-    // Pre-launch validation
-    const readiness = this.checkLaunchReadiness();
-    if (!readiness.ready) {
-      return {
-        success: false,
-        message: `Launch readiness: ${readiness.score.toFixed(1)}%. Missing: ${readiness.issues.join(', ')}`
-      };
-    }
+    const averageEmotionalScore = FOUNDING_VALIDATORS.reduce((sum, v) => sum + v.emotionalScore, 0) / FOUNDING_VALIDATORS.length;
+    const totalStakeAllocated = FOUNDING_VALIDATORS.reduce((sum, v) => sum + v.stake, 0);
 
-    // Validate founding validators
-    const validatorsReady = await this.validateFoundingValidators();
-    if (!validatorsReady) {
-      return {
-        success: false,
-        message: 'Insufficient valid founding validators'
-      };
-    }
-
-    // Generate genesis block
-    try {
-      const genesisBlock = await this.generateGenesisBlock();
-      this.genesis.genesisBlock = genesisBlock;
-      this.genesis.launchReadiness = true;
-
-      console.log('🎉 MAINNET LAUNCH SUCCESSFUL!');
-      console.log(`📅 Launch time: ${this.genesis.timestamp}`);
-      console.log(`🏛️ Founding validators: ${this.genesis.initialValidators.length}`);
-      console.log(`💰 Genesis EMO distribution: ${this.genesis.tokenDistribution.validatorStakes.toLocaleString()}`);
-      console.log(`⛓️ Genesis block hash: ${genesisBlock.hash}`);
-
-      return {
-        success: true,
-        message: 'EmotionalChain mainnet launched successfully with 21 founding validators'
-      };
-
-    } catch (error) {
-      return {
-        success: false,
-        message: `Launch failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-      };
-    }
-  }
-
-  // Getters
-  public getGenesis(): MainnetGenesisConfig {
-    return this.genesis;
-  }
-
-  public getLaunchChecklist(): Map<string, boolean> {
-    return this.launchChecklist;
-  }
-
-  public updateChecklistItem(item: string, completed: boolean): void {
-    this.launchChecklist.set(item, completed);
+    return {
+      chainId: MAINNET_GENESIS_CONFIG.chainId,
+      networkName: MAINNET_GENESIS_CONFIG.networkName,
+      totalSupply: `${MAINNET_GENESIS_CONFIG.totalSupply.toLocaleString()} EMO`,
+      foundingValidators: FOUNDING_VALIDATORS.length,
+      regionalDistribution: regions,
+      averageEmotionalScore: Math.round(averageEmotionalScore * 10) / 10,
+      totalStakeAllocated,
+      launchDate: MAINNET_GENESIS_CONFIG.genesisTime
+    };
   }
 }
