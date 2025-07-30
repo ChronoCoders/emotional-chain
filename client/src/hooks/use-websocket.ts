@@ -24,8 +24,8 @@ export function useWebSocket(): UseWebSocketReturn {
   useEffect(() => {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const hostname = window.location.hostname;
-    const port = window.location.port || '5000'; // Default to 5000 if port is undefined
-    const wsUrl = `${protocol}//${hostname}:${port}/ws`;
+    const port = window.location.port || (protocol === "wss:" ? "443" : "80");
+    const wsUrl = `${protocol}//${hostname}${port ? `:${port}` : ""}/ws`;
     
     const connect = () => {
       try {
@@ -51,12 +51,14 @@ export function useWebSocket(): UseWebSocketReturn {
           console.log('WebSocket disconnected:', event.code, event.reason);
           setIsConnected(false);
           
-          // Attempt to reconnect after 3 seconds
-          setTimeout(() => {
-            if (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED) {
-              connect();
-            }
-          }, 3000);
+          // Only reconnect if it wasn't closed intentionally (code 1000)
+          if (event.code !== 1000) {
+            setTimeout(() => {
+              if (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED) {
+                connect();
+              }
+            }, 5000); // Increased to 5 seconds to reduce spam
+          }
         };
 
         socket.onerror = (error) => {

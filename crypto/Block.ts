@@ -85,9 +85,7 @@ export class Block {
    * This is NOT traditional Proof of Work - it's just a light difficulty check
    */
   public mineBlock(): boolean {
-    console.log(`⛏️  Mining block ${this.index} with Proof of Emotion...`);
-    console.log(`🧠 Validator: ${this.validator} (Emotional Score: ${this.emotionalScore}%)`);
-    
+    // Light mining - Proof of Emotion consensus (low computational requirement)
     const target = '0'.repeat(this.difficulty);
     const maxNonce = 100000; // Light computational limit
     
@@ -97,13 +95,11 @@ export class Block {
       this.hash = this.calculateHash();
       
       if (this.hash.substring(0, this.difficulty) === target) {
-        console.log(`✅ Block mined! Hash: ${this.hash.substring(0, 16)}... (nonce: ${nonce})`);
         return true;
       }
     }
     
-    console.log(`❌ Mining failed - max nonce reached for block ${this.index}`);
-    return false;
+    return false; // Mining failed
   }
 
   /**
