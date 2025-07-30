@@ -97,9 +97,9 @@ export default function TokenEconomics() {
         </h3>
         <div className="grid grid-cols-2 gap-4 text-xs">
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
-            <div className="text-terminal-warning">TOTAL SUPPLY</div>
+            <div className="text-terminal-warning">TOTAL MINED</div>
             <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics?.totalSupply)}</div>
-            <div className="text-terminal-dim text-xs">{formatPercentage(currentEconomics?.percentageIssued)} issued</div>
+            <div className="text-terminal-dim text-xs">{formatPercentage(currentEconomics?.percentageIssued)} of max supply</div>
           </div>
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="text-terminal-warning">MAX SUPPLY</div>
@@ -107,9 +107,9 @@ export default function TokenEconomics() {
             <div className="text-terminal-dim text-xs">Hard cap enforced</div>
           </div>
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
-            <div className="text-terminal-warning">CIRCULATING</div>
+            <div className="text-terminal-warning">CIRCULATING SUPPLY</div>
             <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics?.circulatingSupply)}</div>
-            <div className="text-terminal-dim text-xs">Actively earned</div>
+            <div className="text-terminal-dim text-xs">Available to validators</div>
           </div>
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="text-terminal-warning">STATUS</div>
