@@ -414,7 +414,7 @@ export default function BlockchainExplorer() {
             <tbody className="text-terminal-green">
               {transactions.map((tx) => (
                 <tr key={tx.id}>
-                  <td className="terminal-text">{formatHash(tx.hash)}</td>
+                  <td className="terminal-text">{tx.id ? tx.id.substring(0, 8) + '...' : 'N/A'}</td>
                   <td className="terminal-text">{formatHash(tx.from)}</td>
                   <td className="terminal-text">{formatHash(tx.to)}</td>
                   <td className="text-right">{tx.amount} EMO</td>

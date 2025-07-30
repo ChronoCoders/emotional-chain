@@ -135,35 +135,27 @@ export class EmotionalChainService {
   }
 
   public async getTransactions(limit: number = 10) {
-    if (this.blockchain && this.isRunning) {
-      try {
-        const blocks = this.blockchain.getChain();
-        const transactions: any[] = [];
-        
-        blocks.forEach((block: any) => {
-          if (block.transactions) {
-            block.transactions.forEach((tx: any) => {
-              transactions.push({
-                id: tx.id || crypto.randomUUID(),
-                from: tx.from || '',
-                to: tx.to || '',
-                amount: tx.amount || "0.00",
-                fee: tx.fee || "0.00",
-                timestamp: new Date(tx.timestamp || Date.now()),
-                blockHash: block.hash || '',
-                status: tx.status || 'pending',
-                emotionalData: tx.emotionalData || null
-              });
-            });
-          }
-        });
-        
-        return transactions.slice(-limit);
-      } catch (error) {
-        console.error('Error getting real transactions:', error);
-      }
+    try {
+      // Get real transactions from database instead of blockchain memory
+      const dbTransactions = await storage.getTransactions(limit);
+      
+      // Convert database transactions to API format
+      return dbTransactions.map(tx => ({
+        id: tx.id, // Use actual database ID
+        hash: tx.hash,
+        from: tx.fromAddress || tx.from || '',
+        to: tx.toAddress || tx.to || '',
+        amount: typeof tx.amount === 'string' ? tx.amount : tx.amount.toString(),
+        fee: tx.fee ? (typeof tx.fee === 'string' ? tx.fee : tx.fee.toString()) : "0.00",
+        timestamp: tx.timestamp,
+        blockHash: tx.blockHash || tx.blockId || '',
+        status: tx.status || 'confirmed',
+        emotionalData: tx.biometricData || null
+      }));
+    } catch (error) {
+      console.error('Error getting transactions from database:', error);
+      return [];
     }
-    return [];
   }
 
   public async getValidators() {
