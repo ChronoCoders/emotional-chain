@@ -500,18 +500,25 @@ export class EmotionalChain extends EventEmitter {
   }
 
   public getTokenEconomics(): any {
-    const percentageIssued = (this.tokenEconomics.totalSupply / this.tokenEconomics.maxSupply) * 100;
+    // Calculate real circulating supply from actual validator balances
+    let realCirculatingSupply = 0;
+    const allBalances = this.getAllWallets();
+    realCirculatingSupply = Array.from(allBalances.values()).reduce((sum, balance) => sum + balance, 0);
+    
+    // Update token economics with real values
+    const realTotalSupply = realCirculatingSupply;
+    const percentageIssued = (realTotalSupply / this.tokenEconomics.maxSupply) * 100;
     
     return {
-      totalSupply: this.tokenEconomics.totalSupply,
+      totalSupply: realTotalSupply,
       maxSupply: this.tokenEconomics.maxSupply,
-      circulatingSupply: this.tokenEconomics.circulatingSupply,
-      percentageIssued: Math.round(percentageIssued * 100) / 100,
+      circulatingSupply: realCirculatingSupply,
+      percentageIssued: Math.round(percentageIssued * 1000) / 1000,
       pools: {
         staking: {
           allocated: this.tokenEconomics.pools.stakingPool.allocated,
           remaining: this.tokenEconomics.pools.stakingPool.remaining,
-          utilized: this.tokenEconomics.pools.stakingPool.allocated - this.tokenEconomics.pools.stakingPool.remaining
+          utilized: realCirculatingSupply
         },
         wellness: {
           allocated: this.tokenEconomics.pools.wellnessPool.allocated,
