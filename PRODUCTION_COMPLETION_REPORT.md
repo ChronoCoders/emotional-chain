@@ -302,7 +302,7 @@ EmotionalChain has achieved **100% production readiness** with all critical comp
 **Security Clearance:** APPROVED  
 **Performance Verification:** TARGETS EXCEEDED  
 
-**EmotionalChain is now the world's first complete, production-ready, emotion-powered blockchain.**
+**EmotionalChain is now the world's first complete, production-ready, emotion-powered blockchain at emotionalchain.com.**
 
 ---
 

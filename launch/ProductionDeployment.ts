@@ -122,11 +122,11 @@ export const PRODUCTION_CONFIG: DeploymentConfig = {
     }
   },
   apiEndpoints: [
-    'https://api.emotionalchain.org',
-    'https://ws.emotionalchain.org',
-    'https://explorer.emotionalchain.org'
+    'https://api.emotionalchain.com',
+    'https://ws.emotionalchain.com',
+    'https://explorer.emotionalchain.com'
   ],
-  domainName: 'emotionalchain.org',
+  domainName: 'emotionalchain.com',
   ssl: {
     enabled: true,
     provider: 'letsencrypt'
