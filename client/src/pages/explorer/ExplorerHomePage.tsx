@@ -71,8 +71,8 @@ export default function ExplorerHomePage() {
       {/* Hero Section */}
       <div className="text-center py-12 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700">
         <div className="flex items-center justify-center mb-4">
-          <div className="w-12 h-12 bg-green-400 rounded-lg flex items-center justify-center mr-4 animate-pulse">
-            <span className="text-white font-bold text-lg">EC</span>
+          <div className="w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-lg flex items-center justify-center mr-4 animate-pulse">
+            <span className="text-white font-bold text-2xl">🧠</span>
           </div>
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">EmotionalChain Explorer</h1>
