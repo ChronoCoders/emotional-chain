@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { formatNumber, formatLargeNumber } from "../../lib/utils";
-import { Activity, Users, Zap, Heart, TrendingUp, Shield, Timer, DollarSign } from "lucide-react";
+import { Activity, Users, Zap, TrendingUp, Shield, Timer, DollarSign } from "lucide-react";
+import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function ExplorerHomePage() {
@@ -71,7 +72,9 @@ export default function ExplorerHomePage() {
       {/* Hero Section */}
       <div className="text-center py-12 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700">
         <div className="flex items-center justify-center mb-4">
-          <Heart className="w-12 h-12 text-green-400 animate-pulse mr-4" />
+          <div className="mr-4">
+            <EmotionalChainLogo size={48} className="text-green-400 animate-pulse" />
+          </div>
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">EmotionalChain Explorer</h1>
             <p className="text-slate-300 text-lg">World's First Emotion-Powered Blockchain</p>
