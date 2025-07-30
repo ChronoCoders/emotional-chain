@@ -144,9 +144,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/wallets', async (req, res) => {
     try {
       // CRITICAL: Force sync with blockchain before returning data
-      if (emotionalChainService.wallet) {
-        emotionalChainService.wallet.syncWithBlockchain();
-      }
+      await emotionalChainService.syncWalletWithBlockchain();
       
       const wallets = await emotionalChainService.getAllWallets();
       

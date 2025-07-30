@@ -285,7 +285,11 @@ export class EmotionalChain extends EventEmitter {
 
         // CRITICAL: Update actual wallet balance with the total reward
         const currentBalance = this.wallets.get(selectedValidator.id) || 0;
-        this.wallets.set(selectedValidator.id, currentBalance + totalReward);
+        const newBalance = currentBalance + totalReward;
+        this.wallets.set(selectedValidator.id, newBalance);
+        
+        // Debug logging for balance updates
+        console.log(`💳 Wallet Update: ${selectedValidator.id} balance: ${currentBalance} → ${newBalance} EMO`);
       }
       
       // Update validator stats
