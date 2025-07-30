@@ -22,8 +22,6 @@ export default function EmotionalChainLogo({ size = 48, className = "" }: Emotio
         strokeWidth="2"
         strokeDasharray="8 4"
         opacity="0.6"
-        className="animate-spin"
-        style={{ animationDuration: '20s' }}
       />
       
       {/* Inner hexagonal blockchain structure */}
@@ -67,7 +65,6 @@ export default function EmotionalChainLogo({ size = 48, className = "" }: Emotio
           stroke="currentColor"
           strokeWidth="1"
           opacity="0.4"
-          className="animate-pulse"
         />
       </g>
       

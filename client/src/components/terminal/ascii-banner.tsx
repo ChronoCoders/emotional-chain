@@ -1,5 +1,3 @@
-import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
-
 interface AsciBannerProps {
   className?: string;
 }
@@ -7,9 +5,6 @@ interface AsciBannerProps {
 export default function AsciBanner({ className = "" }: AsciBannerProps) {
   return (
     <div className={`ascii-art text-terminal-cyan text-center ${className}`}>
-      <div className="flex justify-center mb-4">
-        <EmotionalChainLogo size={64} className="text-terminal-cyan" />
-      </div>
       {`███████╗███╗   ███╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██╗      
 ██╔════╝████╗ ████║██╔═══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║██╔══██╗██║      
 █████╗  ██╔████╔██║██║   ██║   ██║   ██║██║   ██║██╔██╗ ██║███████║██║      
