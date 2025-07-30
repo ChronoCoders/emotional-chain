@@ -30,7 +30,9 @@ export default function ExplorerHeader() {
             
             <Link href="/explorer">
               <div className="flex items-center justify-center space-x-3">
-                <EmotionalChainLogo size={32} className="text-green-400" />
+                <div className="flex-shrink-0">
+                  <EmotionalChainLogo size={32} className="text-green-400" />
+                </div>
                 <div className="text-center">
                   <h1 className="text-xl font-bold text-white">EmotionalChain</h1>
                   <p className="text-xs text-slate-400">Explorer</p>
