@@ -71,6 +71,9 @@ export default function TokenEconomics() {
 
   const formatPercentage = (value: number | undefined) => {
     if (!value && value !== 0) return '0.0%';
+    if (value < 0.001) {
+      return `${value.toFixed(6)}%`; // Show more precision for very small percentages
+    }
     return `${value.toFixed(3)}%`;
   };
 

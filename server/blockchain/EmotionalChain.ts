@@ -507,13 +507,14 @@ export class EmotionalChain extends EventEmitter {
     
     // Update token economics with real values
     const realTotalSupply = realCirculatingSupply;
-    const percentageIssued = (realTotalSupply / this.tokenEconomics.maxSupply) * 100;
+    // Calculate percentage with higher precision to avoid floating point issues
+    const percentageIssued = Number(((realTotalSupply / this.tokenEconomics.maxSupply) * 100).toFixed(8));
     
     return {
       totalSupply: realTotalSupply,
       maxSupply: this.tokenEconomics.maxSupply,
       circulatingSupply: realCirculatingSupply,
-      percentageIssued: Math.round(percentageIssued * 1000) / 1000,
+      percentageIssued: percentageIssued, // Already formatted with proper precision
       pools: {
         staking: {
           allocated: this.tokenEconomics.pools.stakingPool.allocated,
