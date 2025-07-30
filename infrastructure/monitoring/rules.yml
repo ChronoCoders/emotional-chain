@@ -1,0 +1,350 @@
+groups:
+  - name: emotional_chain_alerts
+    rules:
+      # High-level network health alerts
+      - alert: NetworkHealthLow
+        expr: emotional_chain_network_health < 50
+        for: 2m
+        labels:
+          severity: critical
+          service: emotionalchain
+        annotations:
+          summary: "EmotionalChain network health critically low"
+          description: "Network health is {{ $value }}%, below critical threshold of 50%"
+
+      - alert: ValidatorParticipationLow
+        expr: emotional_chain_validator_participation_rate < 67
+        for: 3m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Validator participation below Byzantine threshold"
+          description: "Validator participation is {{ $value }}%, below Byzantine threshold of 67%"
+
+      # Consensus performance alerts
+      - alert: ConsensusRoundFailure
+        expr: increase(emotional_chain_consensus_rounds_total{status="failure"}[5m]) > 3
+        for: 1m
+        labels:
+          severity: critical
+          service: emotionalchain
+        annotations:
+          summary: "Multiple consensus round failures detected"
+          description: "{{ $value }} consensus failures in the last 5 minutes"
+
+      - alert: BlockTimeHigh
+        expr: emotional_chain_block_time_seconds > 60
+        for: 5m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Block production time too high"
+          description: "Block time is {{ $value }}s, exceeding 60s threshold"
+
+      - alert: EmotionalScoreLow
+        expr: avg(emotional_chain_emotional_score) < 75
+        for: 10m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Average emotional score below threshold"
+          description: "Network emotional score is {{ $value }}%, below 75% threshold"
+
+      # Byzantine failure alerts
+      - alert: ByzantineFailureSpike
+        expr: increase(emotional_chain_byzantine_failures_total[10m]) > 5
+        for: 1m
+        labels:
+          severity: critical
+          service: emotionalchain
+        annotations:
+          summary: "High number of Byzantine failures detected"
+          description: "{{ $value }} Byzantine failures detected in 10 minutes"
+
+      # Node health alerts
+      - alert: NodeDown
+        expr: up{job=~"emotional-.*"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: emotionalchain
+        annotations:
+          summary: "EmotionalChain node is down"
+          description: "Node {{ $labels.instance }} has been down for more than 1 minute"
+
+      - alert: NodeHighMemoryUsage
+        expr: emotional_chain_system_resources{resource_type="memory_rss"} / 1024 / 1024 / 1024 > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Node memory usage high"
+          description: "Node {{ $labels.node_id }} memory usage is {{ $value }}GB (>80%)"
+
+      - alert: NodeHighCPUUsage
+        expr: rate(emotional_chain_system_resources{resource_type="cpu_user"}[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Node CPU usage high"
+          description: "Node {{ $labels.node_id }} CPU usage is {{ $value * 100 }}% (>80%)"
+
+  - name: infrastructure_alerts
+    rules:
+      # Database alerts
+      - alert: PostgreSQLDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: database
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "PostgreSQL database has been down for more than 1 minute"
+
+      - alert: PostgreSQLTooManyConnections
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+        for: 2m
+        labels:
+          severity: warning
+          service: database
+        annotations:
+          summary: "PostgreSQL too many connections"
+          description: "PostgreSQL connection usage is {{ $value * 100 }}% (>80%)"
+
+      # Redis alerts
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been down for more than 1 minute"
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: cache
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis memory usage is {{ $value * 100 }}% (>90%)"
+
+      # IPFS alerts
+      - alert: IPFSDown
+        expr: up{job="ipfs"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: storage
+        annotations:
+          summary: "IPFS node is down"
+          description: "IPFS distributed storage has been down for more than 2 minutes"
+
+  - name: performance_alerts
+    rules:
+      # Load balancer alerts
+      - alert: LoadBalancerHighLatency
+        expr: lb_average_response_time_ms > 5000
+        for: 3m
+        labels:
+          severity: warning
+          service: loadbalancer
+        annotations:
+          summary: "Load balancer high latency"
+          description: "Average response time is {{ $value }}ms (>5s)"
+
+      - alert: LoadBalancerCircuitBreakersOpen
+        expr: lb_circuit_breakers_open > 0
+        for: 1m
+        labels:
+          severity: warning
+          service: loadbalancer
+        annotations:
+          summary: "Load balancer circuit breakers open"
+          description: "{{ $value }} circuit breakers are currently open"
+
+      # Transaction throughput alerts
+      - alert: TransactionThroughputLow
+        expr: rate(emotional_chain_transactions_total[5m]) < 10
+        for: 10m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Transaction throughput low"
+          description: "Transaction rate is {{ $value }} TPS, below 10 TPS threshold"
+
+      - alert: TransactionSuccessRateLow
+        expr: rate(emotional_chain_transactions_total{status="success"}[5m]) / rate(emotional_chain_transactions_total[5m]) < 0.95
+        for: 5m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Transaction success rate low"
+          description: "Transaction success rate is {{ $value * 100 }}% (< 95%)"
+
+  - name: security_alerts
+    rules:
+      # Rate limiting alerts
+      - alert: HighRateLimitHits
+        expr: increase(http_requests_total{code="429"}[5m]) > 100
+        for: 1m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "High number of rate limit hits"
+          description: "{{ $value }} rate limit hits in the last 5 minutes"
+
+      # Authentication alerts
+      - alert: HighAuthenticationFailures
+        expr: increase(auth_failures_total[5m]) > 50
+        for: 2m
+        labels:
+          severity: warning
+          service: security
+        annotations:
+          summary: "High number of authentication failures"
+          description: "{{ $value }} authentication failures in the last 5 minutes"
+
+      # DDoS detection
+      - alert: PossibleDDoSAttack
+        expr: rate(http_requests_total[1m]) > 1000
+        for: 30s
+        labels:
+          severity: critical
+          service: security
+        annotations:
+          summary: "Possible DDoS attack detected"
+          description: "Request rate is {{ $value }} per second (>1000/s)"
+
+  - name: system_alerts
+    rules:
+      # Disk space alerts
+      - alert: DiskSpaceHigh
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "Disk space usage high"
+          description: "Disk usage is {{ $value * 100 }}% on {{ $labels.instance }} (>85%)"
+
+      - alert: DiskSpaceCritical
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes > 0.95
+        for: 1m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "Disk space critically low"
+          description: "Disk usage is {{ $value * 100 }}% on {{ $labels.instance }} (>95%)"
+
+      # Memory alerts
+      - alert: MemoryUsageHigh
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "Memory usage high"
+          description: "Memory usage is {{ $value * 100 }}% on {{ $labels.instance }} (>85%)"
+
+      - alert: MemoryUsageCritical
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "Memory usage critically high"
+          description: "Memory usage is {{ $value * 100 }}% on {{ $labels.instance }} (>95%)"
+
+      # CPU alerts
+      - alert: CPUUsageHigh
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "CPU usage high"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }} (>80%)"
+
+      - alert: CPUUsageCritical
+        expr: 100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+          service: system
+        annotations:
+          summary: "CPU usage critically high"
+          description: "CPU usage is {{ $value }}% on {{ $labels.instance }} (>95%)"
+
+      # Load average alerts
+      - alert: LoadAverageHigh
+        expr: node_load15 / count(node_cpu_seconds_total{mode="idle"}) > 1.5
+        for: 10m
+        labels:
+          severity: warning
+          service: system
+        annotations:
+          summary: "Load average high"
+          description: "15-minute load average is {{ $value }} on {{ $labels.instance }}"
+
+  - name: business_logic_alerts
+    rules:
+      # Emotional validation alerts
+      - alert: BiometricDeviceDisconnected
+        expr: biometric_device_connected == 0
+        for: 1m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Biometric device disconnected"
+          description: "Biometric device for validator {{ $labels.validator_id }} is disconnected"
+
+      - alert: EmotionalValidationFailures
+        expr: increase(emotional_validation_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "High emotional validation failures"
+          description: "{{ $value }} emotional validation failures in the last 5 minutes"
+
+      # Fork resolution alerts
+      - alert: ChainForkDetected
+        expr: increase(chain_forks_detected_total[1m]) > 0
+        for: 0s
+        labels:
+          severity: warning
+          service: emotionalchain
+        annotations:
+          summary: "Blockchain fork detected"
+          description: "A fork has been detected in the EmotionalChain blockchain"
+
+      - alert: ForkResolutionTimeout
+        expr: chain_fork_resolution_duration_seconds > 300
+        for: 0s
+        labels:
+          severity: critical
+          service: emotionalchain
+        annotations:
+          summary: "Fork resolution taking too long"
+          description: "Fork resolution has been running for {{ $value }}s (>5 minutes)"

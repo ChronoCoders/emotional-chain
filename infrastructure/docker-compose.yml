@@ -1,0 +1,379 @@
+version: '3.8'
+
+services:
+  # EmotionalChain Bootstrap Node
+  bootstrap-node:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    container_name: emotional-bootstrap
+    environment:
+      - NODE_TYPE=bootstrap
+      - NODE_ID=bootstrap-1
+      - PORT=8000
+      - DATA_DIR=/app/data
+      - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "8000:8000"
+    volumes:
+      - bootstrap-data:/app/data
+      - ./config:/app/config
+    networks:
+      - emotional-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # EmotionalChain Validator Nodes
+  validator-1:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    container_name: emotional-validator-1
+    environment:
+      - NODE_TYPE=validator
+      - NODE_ID=validator-1
+      - PORT=8001
+      - DATA_DIR=/app/data
+      - BOOTSTRAP_PEERS=bootstrap-node:8000
+      - DATABASE_URL=${DATABASE_URL}
+      - VALIDATOR_PRIVATE_KEY=${VALIDATOR_1_PRIVATE_KEY}
+    ports:
+      - "8001:8001"
+    volumes:
+      - validator1-data:/app/data
+    networks:
+      - emotional-network
+    depends_on:
+      - bootstrap-node
+      - postgres
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  validator-2:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    container_name: emotional-validator-2
+    environment:
+      - NODE_TYPE=validator
+      - NODE_ID=validator-2
+      - PORT=8002
+      - DATA_DIR=/app/data
+      - BOOTSTRAP_PEERS=bootstrap-node:8000
+      - DATABASE_URL=${DATABASE_URL}
+      - VALIDATOR_PRIVATE_KEY=${VALIDATOR_2_PRIVATE_KEY}
+    ports:
+      - "8002:8002"
+    volumes:
+      - validator2-data:/app/data
+    networks:
+      - emotional-network
+    depends_on:
+      - bootstrap-node
+      - postgres
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  validator-3:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    container_name: emotional-validator-3
+    environment:
+      - NODE_TYPE=validator
+      - NODE_ID=validator-3
+      - PORT=8003
+      - DATA_DIR=/app/data
+      - BOOTSTRAP_PEERS=bootstrap-node:8000
+      - DATABASE_URL=${DATABASE_URL}
+      - VALIDATOR_PRIVATE_KEY=${VALIDATOR_3_PRIVATE_KEY}
+    ports:
+      - "8003:8003"
+    volumes:
+      - validator3-data:/app/data
+    networks:
+      - emotional-network
+    depends_on:
+      - bootstrap-node
+      - postgres
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+  # API Gateway and Load Balancer
+  api-gateway:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+    container_name: emotional-api-gateway
+    environment:
+      - NODE_TYPE=api
+      - NODE_ID=api-gateway
+      - PORT=8080
+      - DATA_DIR=/app/data
+      - UPSTREAM_NODES=validator-1:8001,validator-2:8002,validator-3:8003
+    ports:
+      - "8080:8080"
+    volumes:
+      - gateway-data:/app/data
+    networks:
+      - emotional-network
+    depends_on:
+      - validator-1
+      - validator-2
+      - validator-3
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: emotional-postgres
+    environment:
+      - POSTGRES_DB=emotionalchain
+      - POSTGRES_USER=${POSTGRES_USER:-emotionalchain}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - emotional-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-emotionalchain}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for Caching and Session Storage
+  redis:
+    image: redis:7-alpine
+    container_name: emotional-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - emotional-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # IPFS for Distributed Storage
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: emotional-ipfs
+    ports:
+      - "4001:4001"     # P2P port
+      - "5001:5001"     # API port
+      - "8081:8080"     # Gateway port
+    volumes:
+      - ipfs-data:/data/ipfs
+      - ipfs-staging:/export
+    networks:
+      - emotional-network
+    restart: unless-stopped
+    environment:
+      - IPFS_PROFILE=server
+
+  # Prometheus for Metrics Collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: emotional-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/rules.yml:/etc/prometheus/rules.yml
+      - prometheus-data:/prometheus
+    networks:
+      - emotional-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+
+  # Grafana for Monitoring Dashboards
+  grafana:
+    image: grafana/grafana:latest
+    container_name: emotional-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - emotional-network
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+
+  # AlertManager for Alert Handling
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: emotional-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager-data:/alertmanager
+    networks:
+      - emotional-network
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+
+  # Elasticsearch for Log Aggregation
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: emotional-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - emotional-network
+    restart: unless-stopped
+
+  # Kibana for Log Visualization
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: emotional-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - emotional-network
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  # Logstash for Log Processing
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: emotional-logstash
+    volumes:
+      - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline
+      - ./monitoring/logstash/config:/usr/share/logstash/config
+    networks:
+      - emotional-network
+    depends_on:
+      - elasticsearch
+    restart: unless-stopped
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: emotional-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - nginx-logs:/var/log/nginx
+    networks:
+      - emotional-network
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+
+  # Backup Service
+  backup:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile.backup
+    container_name: emotional-backup
+    environment:
+      - BACKUP_SCHEDULE=0 2 * * *  # Daily at 2 AM
+      - POSTGRES_URL=${DATABASE_URL}
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - backup-data:/backups
+      - postgres-data:/source/postgres:ro
+      - bootstrap-data:/source/bootstrap:ro
+      - validator1-data:/source/validator1:ro
+      - validator2-data:/source/validator2:ro
+      - validator3-data:/source/validator3:ro
+    networks:
+      - emotional-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+volumes:
+  # Application data
+  bootstrap-data:
+  validator1-data:
+  validator2-data:
+  validator3-data:
+  gateway-data:
+  
+  # Database data
+  postgres-data:
+  redis-data:
+  ipfs-data:
+  ipfs-staging:
+  
+  # Monitoring data
+  prometheus-data:
+  grafana-data:
+  alertmanager-data:
+  elasticsearch-data:
+  
+  # Other data
+  nginx-logs:
+  backup-data:
+
+networks:
+  emotional-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
