@@ -200,4 +200,23 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Import the new database storage system
+import { DatabaseStorage } from '../storage/DatabaseStorage';
+
+// Initialize the database storage (will be replaced in blockchain integration)
 export const storage = new MemStorage();
+
+// New storage system (will replace MemStorage)
+let databaseStorage: DatabaseStorage | null = null;
+
+export async function initializeDatabaseStorage(): Promise<DatabaseStorage> {
+  if (!databaseStorage) {
+    databaseStorage = new DatabaseStorage();
+    await databaseStorage.initialize();
+  }
+  return databaseStorage;
+}
+
+export function getDatabaseStorage(): DatabaseStorage | null {
+  return databaseStorage;
+}

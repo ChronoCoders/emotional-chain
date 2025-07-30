@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, decimal, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, decimal, timestamp, boolean, jsonb, bigint } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -14,58 +14,89 @@ export const blocks = pgTable("blocks", {
   height: integer("height").notNull(),
   hash: text("hash").notNull().unique(),
   previousHash: text("previous_hash").notNull(),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
-  transactions: text("transactions").array().notNull().default([]),
-  validator: text("validator").notNull(),
+  merkleRoot: text("merkle_root").notNull(),
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  nonce: integer("nonce").notNull(),
+  difficulty: integer("difficulty").notNull(),
+  validatorId: text("validator_id").notNull(),
   emotionalScore: decimal("emotional_score", { precision: 5, scale: 2 }).notNull(),
-  consensusScore: decimal("consensus_score", { precision: 5, scale: 2 }).notNull(),
-  authenticity: decimal("authenticity", { precision: 5, scale: 2 }).notNull(),
+  emotionalProof: jsonb("emotional_proof"),
+  blockData: jsonb("block_data"),
+  transactionCount: integer("transaction_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const transactions = pgTable("transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   hash: text("hash").notNull().unique(),
-  from: text("from").notNull(),
-  to: text("to").notNull(),
+  blockHash: text("block_hash").references(() => blocks.hash),
+  fromAddress: text("from_address").notNull(),
+  toAddress: text("to_address").notNull(),
   amount: decimal("amount", { precision: 18, scale: 8 }).notNull(),
-  fee: decimal("fee", { precision: 18, scale: 8 }).notNull(),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
-  blockId: varchar("block_id").references(() => blocks.id),
-  status: text("status").notNull().default("pending"),
+  fee: decimal("fee", { precision: 18, scale: 8 }).default("0"),
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  signature: jsonb("signature").notNull(),
+  biometricData: jsonb("biometric_data"),
+  transactionData: jsonb("transaction_data"),
+  status: text("status").notNull().default("confirmed"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const validators = pgTable("validators", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  address: text("address").notNull().unique(),
-  stake: decimal("stake", { precision: 18, scale: 8 }).notNull(),
-  isActive: boolean("is_active").notNull().default(true),
-  uptime: decimal("uptime", { precision: 5, scale: 2 }).notNull().default("0"),
-  authScore: decimal("auth_score", { precision: 5, scale: 2 }).notNull().default("0"),
-  device: text("device"),
-  lastValidation: timestamp("last_validation"),
+export const validatorStates = pgTable("validator_states", {
+  validatorId: text("validator_id").primaryKey(),
+  balance: decimal("balance", { precision: 18, scale: 8 }).notNull().default("0"),
+  emotionalScore: decimal("emotional_score", { precision: 5, scale: 2 }).notNull().default("0"),
+  lastActivity: bigint("last_activity", { mode: "number" }).notNull(),
+  publicKey: text("public_key").notNull(),
+  reputation: decimal("reputation", { precision: 5, scale: 2 }).default("100"),
+  totalBlocksMined: integer("total_blocks_mined").default(0),
+  totalValidations: integer("total_validations").default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const biometricData = pgTable("biometric_data", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  validatorId: varchar("validator_id").references(() => validators.id).notNull(),
-  heartRate: integer("heart_rate"),
-  hrv: integer("hrv"),
-  stressLevel: decimal("stress_level", { precision: 5, scale: 2 }),
-  focusLevel: decimal("focus_level", { precision: 5, scale: 2 }),
-  authenticity: decimal("authenticity", { precision: 5, scale: 2 }),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  validatorId: text("validator_id").references(() => validatorStates.validatorId).notNull(),
+  deviceId: text("device_id").notNull(),
+  readingType: text("reading_type").notNull(),
+  value: decimal("value", { precision: 10, scale: 4 }).notNull(),
+  quality: decimal("quality", { precision: 3, scale: 2 }).notNull(),
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  authenticityProof: jsonb("authenticity_proof").notNull(),
+  rawData: jsonb("raw_data"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const networkStats = pgTable("network_stats", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  connectedPeers: integer("connected_peers").notNull().default(0),
-  activeValidators: integer("active_validators").notNull().default(0),
-  blockHeight: integer("block_height").notNull().default(0),
-  consensusPercentage: decimal("consensus_percentage", { precision: 5, scale: 2 }).notNull().default("0"),
-  networkStress: decimal("network_stress", { precision: 5, scale: 2 }).notNull().default("0"),
-  networkEnergy: decimal("network_energy", { precision: 5, scale: 2 }).notNull().default("0"),
-  networkFocus: decimal("network_focus", { precision: 5, scale: 2 }).notNull().default("0"),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
+// Consensus rounds table
+export const consensusRounds = pgTable("consensus_rounds", {
+  roundId: integer("round_id").primaryKey(),
+  participants: text("participants").array().notNull(),
+  emotionalScores: jsonb("emotional_scores").notNull(),
+  consensusStrength: decimal("consensus_strength", { precision: 5, scale: 2 }).notNull(),
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  blockHash: text("block_hash").references(() => blocks.hash),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Peer reputation table
+export const peerReputation = pgTable("peer_reputation", {
+  peerId: text("peer_id").primaryKey(),
+  reputation: decimal("reputation", { precision: 5, scale: 2 }).notNull().default("100"),
+  connectionCount: integer("connection_count").default(0),
+  uptimePercentage: decimal("uptime_percentage", { precision: 5, scale: 2 }).default("0"),
+  messageSuccessRate: decimal("message_success_rate", { precision: 5, scale: 2 }).default("100"),
+  lastSeen: bigint("last_seen", { mode: "number" }).notNull(),
+  metadata: jsonb("metadata"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Storage metrics table
+export const storageMetrics = pgTable("storage_metrics", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  metricName: text("metric_name").notNull(),
+  metricValue: decimal("metric_value", { precision: 18, scale: 8 }).notNull(),
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Insert schemas
@@ -76,27 +107,34 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const insertBlockSchema = createInsertSchema(blocks).omit({
   id: true,
-  timestamp: true,
+  createdAt: true,
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
   id: true,
-  timestamp: true,
+  createdAt: true,
 });
 
-export const insertValidatorSchema = createInsertSchema(validators).omit({
-  id: true,
-  lastValidation: true,
+export const insertValidatorStateSchema = createInsertSchema(validatorStates).omit({
+  updatedAt: true,
 });
 
 export const insertBiometricDataSchema = createInsertSchema(biometricData).omit({
   id: true,
-  timestamp: true,
+  createdAt: true,
 });
 
-export const insertNetworkStatsSchema = createInsertSchema(networkStats).omit({
+export const insertConsensusRoundSchema = createInsertSchema(consensusRounds).omit({
+  createdAt: true,
+});
+
+export const insertPeerReputationSchema = createInsertSchema(peerReputation).omit({
+  updatedAt: true,
+});
+
+export const insertStorageMetricsSchema = createInsertSchema(storageMetrics).omit({
   id: true,
-  timestamp: true,
+  createdAt: true,
 });
 
 // Types
@@ -109,11 +147,33 @@ export type Block = typeof blocks.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 
-export type InsertValidator = z.infer<typeof insertValidatorSchema>;
-export type Validator = typeof validators.$inferSelect;
+export type InsertValidatorState = z.infer<typeof insertValidatorStateSchema>;
+export type ValidatorState = typeof validatorStates.$inferSelect;
 
 export type InsertBiometricData = z.infer<typeof insertBiometricDataSchema>;
 export type BiometricData = typeof biometricData.$inferSelect;
 
-export type InsertNetworkStats = z.infer<typeof insertNetworkStatsSchema>;
-export type NetworkStats = typeof networkStats.$inferSelect;
+export type InsertConsensusRound = z.infer<typeof insertConsensusRoundSchema>;
+export type ConsensusRound = typeof consensusRounds.$inferSelect;
+
+export type InsertPeerReputation = z.infer<typeof insertPeerReputationSchema>;
+export type PeerReputation = typeof peerReputation.$inferSelect;
+
+export type InsertStorageMetrics = z.infer<typeof insertStorageMetricsSchema>;
+export type StorageMetrics = typeof storageMetrics.$inferSelect;
+
+// Legacy compatibility types (for gradual migration)
+export type Validator = ValidatorState;
+export type InsertValidator = InsertValidatorState;
+export type NetworkStats = {
+  id: string;
+  connectedPeers: number;
+  activeValidators: number;
+  blockHeight: number;
+  consensusPercentage: string;
+  networkStress: string;
+  networkEnergy: string;
+  networkFocus: string;
+  timestamp: Date;
+};
+export type InsertNetworkStats = Omit<NetworkStats, "id" | "timestamp">;
