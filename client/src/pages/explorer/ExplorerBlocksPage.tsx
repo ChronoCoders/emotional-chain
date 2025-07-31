@@ -1,41 +1,47 @@
+import { useQuery } from "@tanstack/react-query";
 import { formatNumber } from "../../lib/utils";
 import { Zap, User, Hash, Clock, Database } from "lucide-react";
 
 export default function ExplorerBlocksPage() {
-  // Generate mock blocks since we're focusing on authentic data display
-  const generateMockBlocks = (count: number) => {
-    const validators = [
-      'StellarNode', 'NebulaForge', 'QuantumReach', 'OrionPulse', 'DarkMatterLabs',
-      'GravityCore', 'AstroSentinel', 'ByteGuardians', 'ZeroLagOps', 'ChainFlux'
-    ];
-    
-    const blocks = [];
-    const baseHeight = 1163;
-    
-    for (let i = 0; i < count; i++) {
-      const timestamp = Date.now() - (i * 30000); // 30 seconds apart
-      blocks.push({
-        height: baseHeight - i,
-        hash: `0x${Math.random().toString(16).substring(2, 66)}`,
-        timestamp,
-        validator: validators[Math.floor(Math.random() * validators.length)],
-        transactionCount: Math.floor(Math.random() * 15) + 1,
-        reward: 50 + Math.random() * 25,
-        emotionalConsensus: {
-          score: 70 + Math.random() * 25,
-          participants: Math.floor(Math.random() * 8) + 12,
-        },
-        size: Math.floor(Math.random() * 2000) + 500,
-      });
-    }
-    
-    return blocks;
-  };
+  // Fetch real block data from blockchain API
+  const { data: blockData, isLoading } = useQuery({
+    queryKey: ['network-stats'],
+    queryFn: async () => {
+      const response = await fetch('/api/network/status');
+      return response.json();
+    },
+  });
 
-  const blocks = generateMockBlocks(50);
-  const latestBlock = blocks[0];
-  const avgBlockTime = 30; // seconds
-  const totalBlocks = latestBlock?.height || 1163;
+  const { data: wallets } = useQuery({
+    queryKey: ['wallets'],
+    queryFn: async () => {
+      const response = await fetch('/api/wallets');
+      return response.json();
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-slate-700 rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+        </div>
+        <div className="space-y-4">
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-pulse">
+              <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const stats = blockData?.stats;
+  const totalBlocks = stats?.blockHeight || 0;
+  const avgBlockTime = 30; // Real EmotionalChain block time
 
   const formatTimeAgo = (timestamp: number) => {
     const now = Date.now();

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { formatNumber, formatAddress } from "../../lib/utils";
 import { formatEmoToUSD } from "@shared/constants";
 import { ArrowRight, CheckCircle, Clock, Search, Filter } from "lucide-react";
@@ -7,40 +8,41 @@ export default function ExplorerTransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
 
-  // Generate mock transactions since we're using authentic data approach
-  const generateMockTransactions = (count: number) => {
-    const types = ['transfer', 'stake', 'unstake', 'reward', 'delegation'];
-    const statuses = ['confirmed', 'pending'];
-    const mockTxs = [];
+  // Fetch real transaction data from blockchain API
+  const { data: transactions, isLoading } = useQuery({
+    queryKey: ['transactions'],
+    queryFn: async () => {
+      const response = await fetch('/api/transactions');
+      return response.json();
+    },
+  });
 
-    for (let i = 0; i < count; i++) {
-      const timestamp = Date.now() - (Math.random() * 86400000 * 7);
-      mockTxs.push({
-        id: `tx_${i}`,
-        hash: `0x${Math.random().toString(16).substring(2, 66)}`,
-        from: `0x${Math.random().toString(16).substring(2, 42)}`,
-        to: `0x${Math.random().toString(16).substring(2, 42)}`,
-        amount: Math.random() * 1000 + 10,
-        type: types[Math.floor(Math.random() * types.length)],
-        timestamp,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        emotionalData: Math.random() > 0.3 ? {
-          authenticity: 70 + Math.random() * 30,
-          emotionalScore: 60 + Math.random() * 40,
-        } : undefined,
-      });
-    }
+  if (isLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-slate-700 rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+        </div>
+        <div className="space-y-4">
+          {[...Array(10)].map((_, i) => (
+            <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-pulse">
+              <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
-    return mockTxs.sort((a, b) => b.timestamp - a.timestamp);
-  };
+  const realTransactions = transactions || [];
 
-  const mockTransactions = generateMockTransactions(50);
-
-  const filteredTransactions = mockTransactions.filter(tx => {
+  const filteredTransactions = realTransactions.filter((tx: any) => {
     const matchesSearch = !searchTerm || 
-      tx.hash.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tx.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tx.to.toLowerCase().includes(searchTerm.toLowerCase());
+      tx.hash?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.to?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = filterType === "all" || tx.type === filterType;
     
@@ -65,7 +67,10 @@ export default function ExplorerTransactionsPage() {
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Transactions</h1>
         <p className="text-slate-400">
-          All transactions on the EmotionalChain network with emotional validation data
+          {filteredTransactions.length > 0 
+            ? `${filteredTransactions.length} authentic transactions on the EmotionalChain network`
+            : "No transactions available - EmotionalChain network is building authentic transaction history"
+          }
         </p>
       </div>
 
@@ -137,20 +142,29 @@ export default function ExplorerTransactionsPage() {
         </div>
 
         <div className="divide-y divide-slate-700/50">
-          {filteredTransactions.map((tx) => (
+          {filteredTransactions.length === 0 ? (
+            <div className="p-12 text-center">
+              <Clock className="w-12 h-12 text-slate-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-white mb-2">Building Transaction History</h3>
+              <p className="text-slate-400">
+                EmotionalChain is actively mining blocks and processing transactions. 
+                Authentic transaction data will appear here as the network grows.
+              </p>
+            </div>
+          ) : filteredTransactions.map((tx: any) => (
             <div
-              key={tx.id}
+              key={tx.id || tx.hash}
               className="p-6 hover:bg-slate-900/30 transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   {/* Status Icon */}
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                    tx.status === 'confirmed' 
+                    tx.status === 'confirmed' || tx.status === 'mined'
                       ? 'bg-green-500/20 border border-green-500/30' 
                       : 'bg-yellow-500/20 border border-yellow-500/30'
                   }`}>
-                    {tx.status === 'confirmed' ? (
+                    {tx.status === 'confirmed' || tx.status === 'mined' ? (
                       <CheckCircle className="w-5 h-5 text-green-400" />
                     ) : (
                       <Clock className="w-5 h-5 text-yellow-400" />

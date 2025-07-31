@@ -24,36 +24,8 @@ export default function RecentTransactions() {
     );
   }
 
-  // Generate mock transactions since we don't have real transaction data yet
-  const mockTransactions = [
-    {
-      hash: "0xa1b2c3d4e5f6789012345678901234567890123456789012345678901234567890",
-      from: "0x1234567890123456789012345678901234567890",
-      to: "0x0987654321098765432109876543210987654321",
-      amount: 125.50,
-      type: "transfer",
-      timestamp: Date.now() - 120000,
-      status: "confirmed",
-    },
-    {
-      hash: "0xb2c3d4e5f6789012345678901234567890123456789012345678901234567890a1",
-      from: "0x2345678901234567890123456789012345678901",
-      to: "0x1876543210987654321098765432109876543210",
-      amount: 50.75,
-      type: "stake",
-      timestamp: Date.now() - 240000,
-      status: "confirmed",
-    },
-    {
-      hash: "0xc3d4e5f6789012345678901234567890123456789012345678901234567890a1b2",
-      from: "0x3456789012345678901234567890123456789012",
-      to: "0x2765432109876543210987654321098765432109",
-      amount: 200.00,
-      type: "reward",
-      timestamp: Date.now() - 360000,
-      status: "pending",
-    },
-  ];
+  // Use only real transaction data from blockchain - no fake data
+  const realTransactions = transactions || [];
 
   return (
     <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
@@ -68,7 +40,14 @@ export default function RecentTransactions() {
       </div>
 
       <div className="space-y-3">
-        {mockTransactions.map((tx) => (
+        {realTransactions.length === 0 ? (
+          <div className="text-center py-8">
+            <Clock className="w-8 h-8 text-slate-500 mx-auto mb-2" />
+            <p className="text-slate-400 text-sm">
+              Building authentic transaction history as EmotionalChain processes blocks
+            </p>
+          </div>
+        ) : realTransactions.map((tx: any) => (
           <div
             key={tx.hash}
             className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-slate-600/50 hover:border-slate-500 transition-colors"

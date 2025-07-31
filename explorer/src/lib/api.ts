@@ -88,30 +88,8 @@ class ApiClient {
   }
 
   async getBlocks(limit = 20): Promise<Block[]> {
-    // Since we don't have a blocks endpoint yet, we'll derive from other data
-    const validators = await this.getValidators();
-    const transactions = await this.getTransactions(limit);
-    
-    // Create mock blocks from available data
-    const blocks: Block[] = [];
-    for (let i = 0; i < Math.min(limit, 10); i++) {
-      const validator = validators[i % validators.length];
-      blocks.push({
-        height: 1000 + i,
-        hash: `0x${Math.random().toString(16).substring(2, 66)}`,
-        timestamp: Date.now() - (i * 30000), // 30 seconds per block
-        validator: validator?.id || 'Unknown',
-        transactionCount: Math.floor(Math.random() * 10) + 1,
-        reward: 50 + Math.random() * 25,
-        emotionalConsensus: {
-          score: validator?.emotionalScore || 75,
-          participants: Math.floor(Math.random() * 5) + 12,
-        },
-        size: Math.floor(Math.random() * 1000) + 500,
-      });
-    }
-    
-    return blocks.sort((a, b) => b.height - a.height);
+    // Return empty array - no fake data allowed, wait for real blocks API
+    return [];
   }
 
   async getTokenEconomics(): Promise<TokenEconomics> {
@@ -121,8 +99,8 @@ class ApiClient {
       maxSupply: economics.maxSupply || 1000000000,
       circulatingSupply: economics.circulatingSupply || 0,
       stakingPool: economics.stakingPool || 0,
-      currentInflation: 5.2, // Default inflation rate
-      burnedTokens: 0,
+      currentInflation: economics.currentInflation || 0, // Use real data only
+      burnedTokens: economics.burnedTokens || 0,
     };
   }
 

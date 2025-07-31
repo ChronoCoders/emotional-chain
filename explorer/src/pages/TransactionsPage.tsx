@@ -14,39 +14,14 @@ export default function TransactionsPage() {
     queryFn: () => apiClient.getTransactions(100),
   });
 
-  // Generate more mock transactions for the page
-  const generateMockTransactions = (count: number) => {
-    const types = ['transfer', 'stake', 'unstake', 'reward', 'delegation'];
-    const statuses = ['confirmed', 'pending', 'failed'];
-    const mockTxs = [];
+  // Use real transactions from API - no more fake data
+  const allTransactions = [...(transactions || [])];
 
-    for (let i = 0; i < count; i++) {
-      mockTxs.push({
-        id: `tx_${i}`,
-        hash: `0x${Math.random().toString(16).substring(2, 66)}`,
-        from: `0x${Math.random().toString(16).substring(2, 42)}`,
-        to: `0x${Math.random().toString(16).substring(2, 42)}`,
-        amount: Math.random() * 1000 + 10,
-        type: types[Math.floor(Math.random() * types.length)],
-        timestamp: Date.now() - (Math.random() * 86400000 * 7), // Random within last week
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        emotionalData: Math.random() > 0.3 ? {
-          authenticity: 70 + Math.random() * 30,
-          emotionalScore: 60 + Math.random() * 40,
-        } : undefined,
-      });
-    }
-
-    return mockTxs;
-  };
-
-  const mockTransactions = generateMockTransactions(50);
-
-  const filteredTransactions = mockTransactions.filter(tx => {
+  const filteredTransactions = allTransactions.filter((tx: any) => {
     const matchesSearch = !searchTerm || 
-      tx.hash.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tx.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      tx.to.toLowerCase().includes(searchTerm.toLowerCase());
+      tx.hash?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      tx.to?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = filterType === "all" || tx.type === filterType;
     

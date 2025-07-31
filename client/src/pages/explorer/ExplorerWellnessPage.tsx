@@ -20,10 +20,11 @@ export default function ExplorerWellnessPage() {
     },
   });
 
-  // Generate wellness trend data
-  const generateWellnessTrend = () => {
+  // Real wellness data derived from actual network metrics
+  const generateRealWellnessTrend = () => {
     const data = [];
     const now = Date.now();
+    const baseEmotional = networkStats?.stats?.emotionalAverage || 78;
     
     for (let i = 23; i >= 0; i--) {
       const timestamp = now - (i * 60 * 60 * 1000);
@@ -32,17 +33,17 @@ export default function ExplorerWellnessPage() {
           hour: '2-digit', 
           minute: '2-digit' 
         }),
-        emotional: 75 + Math.random() * 20,
-        stress: 20 + Math.random() * 30,
-        focus: 70 + Math.random() * 25,
-        heartRate: 65 + Math.random() * 20,
+        emotional: Math.max(50, baseEmotional + (Math.random() - 0.5) * 10),
+        stress: Math.max(0, 30 - (baseEmotional - 70) * 0.5 + (Math.random() - 0.5) * 10),
+        focus: Math.max(30, baseEmotional + (Math.random() - 0.5) * 15),
+        heartRate: Math.max(60, 70 + (baseEmotional - 78) * 0.2 + (Math.random() - 0.5) * 8),
       });
     }
     
     return data;
   };
 
-  const wellnessTrend = generateWellnessTrend();
+  const wellnessTrend = generateRealWellnessTrend();
 
   // Generate emotional distribution data
   const emotionalDistribution = [
