@@ -207,13 +207,13 @@ export default function ExplorerTransactionsPage() {
                         <div className="flex items-center space-x-1">
                           <span className="text-slate-400">Authenticity:</span>
                           <span className="text-green-400 font-medium">
-                            {Math.round(tx.emotionalData.authenticity)}%
+                            {Math.round((tx.emotionalData.authenticity || 0) * 100)}%
                           </span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <span className="text-slate-400">Emotional:</span>
+                          <span className="text-slate-400">Focus:</span>
                           <span className="text-blue-400 font-medium">
-                            {Math.round(tx.emotionalData.emotionalScore)}%
+                            {Math.round((tx.emotionalData.focusLevel || 0) * 100)}%
                           </span>
                         </div>
                       </div>
@@ -237,11 +237,7 @@ export default function ExplorerTransactionsPage() {
           ))}
         </div>
 
-        {filteredTransactions.length === 0 && (
-          <div className="p-12 text-center">
-            <p className="text-slate-400">No transactions found matching your criteria.</p>
-          </div>
-        )}
+
       </div>
     </div>
   );
