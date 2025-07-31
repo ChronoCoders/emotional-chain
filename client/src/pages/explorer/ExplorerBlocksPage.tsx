@@ -118,8 +118,8 @@ export default function ExplorerBlocksPage() {
             <h3 className="text-slate-300 text-sm font-medium">Transactions (24h)</h3>
             <Zap className="w-5 h-5 text-yellow-400" />
           </div>
-          <p className="text-2xl font-bold text-white">{formatNumber(2880)}</p>
-          <p className="text-slate-400 text-sm">120 tx/hour avg</p>
+          <p className="text-2xl font-bold text-white">{formatNumber(blocks?.length * 24 || 0)}</p>
+          <p className="text-slate-400 text-sm">{blocks?.length || 0} blocks/hour avg</p>
         </div>
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
@@ -127,8 +127,10 @@ export default function ExplorerBlocksPage() {
             <h3 className="text-slate-300 text-sm font-medium">Avg Emotional Score</h3>
             <Hash className="w-5 h-5 text-green-400" />
           </div>
-          <p className="text-2xl font-bold text-green-400">82.3%</p>
-          <p className="text-green-400 text-sm">+1.2% today</p>
+          <p className="text-2xl font-bold text-green-400">
+            {Math.round(blocks?.reduce((sum: number, block: any) => sum + parseFloat(block.emotionalScore || 0), 0) / (blocks?.length || 1))}%
+          </p>
+          <p className="text-green-400 text-sm">Real-time average</p>
         </div>
       </div>
 
@@ -186,27 +188,27 @@ export default function ExplorerBlocksPage() {
                     <div>
                       <div className="flex items-center space-x-2 mb-1">
                         <span className="text-green-400 font-medium">
-                          {Math.round(block.emotionalConsensus.score)}%
+                          {Math.round(parseFloat(block.emotionalScore) || 0)}%
                         </span>
                         <span className="text-slate-400 text-sm">
-                          ({block.emotionalConsensus.participants} validators)
+                          ({Math.round(parseFloat(block.consensusScore) || 0)}% consensus)
                         </span>
                       </div>
                       <div className="w-full bg-slate-700 rounded-full h-1.5">
                         <div
                           className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-1.5 rounded-full"
-                          style={{ width: `${block.emotionalConsensus.score}%` }}
+                          style={{ width: `${parseFloat(block.emotionalScore) || 0}%` }}
                         ></div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
                     <span className="text-green-400 font-medium">
-                      +{formatNumber(block.reward)} EMO
+                      +{formatNumber(block.transactions?.[0]?.amount || 0)} EMO
                     </span>
                   </td>
                   <td className="p-4">
-                    <span className="text-slate-300">{formatBytes(block.size)}</span>
+                    <span className="text-slate-300">{formatBytes(JSON.stringify(block).length)}</span>
                   </td>
                 </tr>
               ))}

@@ -1,0 +1,58 @@
+client:536 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/?token=z2VaQlUxiq5N' failed: 
+setupWebSocket @ client:536
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=z2VaQlUxiq5N' is invalid.
+    at setupWebSocket (client:536:19)
+    at fallback (client:509:16)
+    at WebSocket.<anonymous> (client:555:7)
+ExplorerBlocksPage.tsx:189 Uncaught TypeError: Cannot read properties of undefined (reading 'score')
+    at ExplorerBlocksPage.tsx:189:64
+    at Array.map (<anonymous>)
+    at ExplorerBlocksPage (ExplorerBlocksPage.tsx:155:24)
+    at renderWithHooks (chunk-WERSD76P.js?v=6778b580:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=6778b580:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=6778b580:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=6778b580:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=6778b580:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=6778b580:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=6778b580:19765:15)
+ExplorerBlocksPage.tsx:189 Uncaught TypeError: Cannot read properties of undefined (reading 'score')
+    at ExplorerBlocksPage.tsx:189:64
+    at Array.map (<anonymous>)
+    at ExplorerBlocksPage (ExplorerBlocksPage.tsx:155:24)
+    at renderWithHooks (chunk-WERSD76P.js?v=6778b580:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=6778b580:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=6778b580:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=6778b580:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=6778b580:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=6778b580:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=6778b580:19765:15)
+hook.js:608 The above error occurred in the <ExplorerBlocksPage> component:
+
+    at ExplorerBlocksPage (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/src/pages/explorer/ExplorerBlocksPage.tsx:23:39)
+    at Route (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=6778b580:323:16)
+    at Switch (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=6778b580:379:17)
+    at main
+    at div
+    at ExplorerApp (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/src/pages/explorer/ExplorerApp.tsx:28:22)
+    at Route (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=6778b580:323:16)
+    at Switch (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=6778b580:379:17)
+    at Router
+    at Provider (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-532U4VYK.js?v=6778b580:72:15)
+    at TooltipProvider (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=6778b580:2247:5)
+    at QueryClientProvider (https://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=6778b580:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+overrideMethod @ hook.js:608
+chunk-WERSD76P.js?v=6778b580:9129 Uncaught TypeError: Cannot read properties of undefined (reading 'score')
+    at ExplorerBlocksPage.tsx:189:64
+    at Array.map (<anonymous>)
+    at ExplorerBlocksPage (ExplorerBlocksPage.tsx:155:24)
+    at renderWithHooks (chunk-WERSD76P.js?v=6778b580:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=6778b580:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=6778b580:15924:22)
+    at beginWork$1 (chunk-WERSD76P.js?v=6778b580:19753:22)
+    at performUnitOfWork (chunk-WERSD76P.js?v=6778b580:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=6778b580:19137:13)
+    at renderRootSync (chunk-WERSD76P.js?v=6778b580:19116:15)

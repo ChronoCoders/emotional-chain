@@ -95,15 +95,19 @@ export default function ExplorerTransactionsPage() {
         </div>
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-slate-300 text-sm font-medium mb-2">Avg. Emotional Score</h3>
-          <p className="text-2xl font-bold text-green-400">78.5%</p>
-          <p className="text-green-400 text-sm">+2.1% vs yesterday</p>
+          <h3 className="text-slate-300 text-sm font-medium mb-2">Avg. Transaction Size</h3>
+          <p className="text-2xl font-bold text-green-400">
+            {statsData && statsData.totalTransactions > 0 ? 
+              `${formatNumber(Math.round(statsData.totalVolume / statsData.totalTransactions))} EMO` : 
+              'Loading...'}
+          </p>
+          <p className="text-green-400 text-sm">Per transaction average</p>
         </div>
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-slate-300 text-sm font-medium mb-2">Success Rate</h3>
-          <p className="text-2xl font-bold text-green-400">100%</p>
-          <p className="text-slate-400 text-sm">0 failed transactions</p>
+          <h3 className="text-slate-300 text-sm font-medium mb-2">Network Status</h3>
+          <p className="text-2xl font-bold text-green-400">Active</p>
+          <p className="text-slate-400 text-sm">All transactions confirmed</p>
         </div>
       </div>
 
