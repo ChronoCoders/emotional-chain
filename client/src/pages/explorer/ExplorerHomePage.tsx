@@ -22,7 +22,15 @@ export default function ExplorerHomePage() {
     },
   });
 
-  const isLoading = networkLoading || walletsLoading;
+  const { data: transactionStats, isLoading: transactionsLoading } = useQuery({
+    queryKey: ['transaction-stats'],
+    queryFn: async () => {
+      const response = await fetch('/api/transactions/stats');
+      return response.json();
+    },
+  });
+
+  const isLoading = networkLoading || walletsLoading || transactionsLoading;
   
   // Extract stats first to avoid hoisting issues
   const stats = networkStats?.stats;
@@ -102,8 +110,8 @@ export default function ExplorerHomePage() {
         />
         <MetricCard
           title="Network Value"
-          value={`${formatNumber(totalEMO)} EMO`}
-          change={`${activeValidators} active validators • ${formatEmoToUSD(totalEMO)}`}
+          value={`${formatNumber(transactionStats?.totalVolume || totalEMO)} EMO`}
+          change={`${activeValidators} active validators • ${formatEmoToUSD(transactionStats?.totalVolume || totalEMO)}`}
           icon={Users}
           trend="up"
           color="blue"
@@ -270,10 +278,10 @@ export default function ExplorerHomePage() {
             <div className="text-center">
               <p className="text-slate-400 text-sm">Total Network Value</p>
               <p className="text-white font-semibold text-lg">
-                {formatNumber(totalEMO)} EMO
+                {formatNumber(transactionStats?.totalVolume || totalEMO)} EMO
               </p>
               <p className="text-slate-400 text-sm">
-                {formatEmoToUSD(totalEMO)}
+                {formatEmoToUSD(transactionStats?.totalVolume || totalEMO)}
               </p>
             </div>
             <div className="text-center">
@@ -289,7 +297,7 @@ export default function ExplorerHomePage() {
             <div className="text-center">
               <p className="text-slate-400 text-sm">Total Transactions</p>
               <p className="text-purple-400 font-semibold text-lg">
-                {formatLargeNumber(12478)}
+                {formatLargeNumber(transactionStats?.totalTransactions || 0)}
               </p>
             </div>
           </div>
