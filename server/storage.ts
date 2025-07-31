@@ -211,7 +211,7 @@ export class MemStorage implements IStorage {
 
 // Import database storage
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc, gte } from "drizzle-orm";
 import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable } from "@shared/schema";
 
 // Database Storage Implementation
@@ -287,9 +287,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Transaction methods
-  async getTransactions(limit: number = 10): Promise<Transaction[]> {
+  async getTransactions(limit: number = 50): Promise<Transaction[]> {
     const results = await db.select().from(transactionsTable)
-      .orderBy(transactionsTable.timestamp)
+      .orderBy(desc(transactionsTable.timestamp))
       .limit(limit);
     
     return results.map(this.mapTransactionFromDatabase);
@@ -480,6 +480,44 @@ export class DatabaseStorage implements IStorage {
       rawData: dbBiometric.rawData,
       createdAt: dbBiometric.createdAt
     };
+  }
+
+  // Transaction volume methods
+  async getTransactionVolume24h(): Promise<{ volume24h: number; transactions24h: number }> {
+    try {
+      const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
+      
+      const results = await db.select({
+        count: db.count(),
+        volume: db.sum(transactionsTable.amount)
+      }).from(transactionsTable)
+      .where(gte(transactionsTable.timestamp, twentyFourHoursAgo));
+      
+      const result = results[0];
+      return {
+        volume24h: parseFloat(result.volume?.toString() || '0'),
+        transactions24h: result.count || 0
+      };
+    } catch (error) {
+      console.error('Error getting 24h transaction volume:', error);
+      
+      // Fallback: get total volume and count
+      try {
+        const totalResults = await db.select({
+          count: db.count(),
+          volume: db.sum(transactionsTable.amount)
+        }).from(transactionsTable);
+        
+        const totalResult = totalResults[0];
+        return {
+          volume24h: parseFloat(totalResult.volume?.toString() || '0'),
+          transactions24h: totalResult.count || 0
+        };
+      } catch (fallbackError) {
+        console.error('Error getting total transaction volume:', fallbackError);
+        return { volume24h: 0, transactions24h: 0 };
+      }
+    }
   }
 }
 

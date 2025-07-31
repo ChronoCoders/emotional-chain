@@ -160,12 +160,9 @@ export class EmotionalChainService {
 
   public async getTransactionVolume(): Promise<{ volume24h: number; transactions24h: number }> {
     try {
-      // This would call a storage method to get 24h volume from database
-      // For now, return real data that we calculated earlier
-      return {
-        volume24h: 100376.47, // Actual database value we verified
-        transactions24h: 3194  // Actual count we verified
-      };
+      // Get real-time volume from database
+      const volumeData = await storage.getTransactionVolume24h();
+      return volumeData;
     } catch (error) {
       console.error('Error getting transaction volume:', error);
       return { volume24h: 0, transactions24h: 0 };
