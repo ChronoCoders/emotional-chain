@@ -1,0 +1,58 @@
+You are now responsible for strictly enforcing the centralized configuration policy across 100% of the EmotionalChain codebase.
+
+🔥 ABSOLUTE REQUIREMENTS (No Exceptions):
+Eliminate all remaining hardcoded values, thresholds, timeouts, constants, and magic numbers across every file, module, SDK, and test.
+
+Enforce Zod-based validation for every configuration field at runtime — system must crash immediately if a config is missing, invalid, or improperly typed.
+
+Require environment variable override support for every config key.
+
+Audit every usage of config:
+
+Log and snapshot config at startup
+
+Store into config_snapshots table with timestamp + deployment ID
+
+Compare diffs between last and current config snapshots
+
+✅ TASK LIST (MUST COMPLETE):
+ Search the ENTIRE codebase for any remaining hardcoded values, log their location, and move them into the config system.
+
+ Extend shared/config.ts to include any newly required config keys.
+
+ Ensure all modules (SDKs, core engine, biometric, consensus, P2P, deployment, testing) import config strictly from shared/config.ts.
+
+ Integrate the config.fuzzer.ts into test pipeline to validate edge cases and corrupted configs.
+
+ Ensure all real-time services (WebSocket, consensus engine, biometric streams) are configurable via CONFIG — including retry intervals, batch sizes, buffer sizes, heartbeat timers.
+
+ If any value is currently inlined in a .ts file and not in CONFIG, that file is non-compliant. Fix it.
+
+ Extend the internal /api/internal/config endpoint to:
+
+Return full active config
+
+Show config snapshot history
+
+Show diffs between snapshots
+
+ On startup, log the full validated CONFIG object with redacted sensitive fields (.env.SECRETS) and store the hash of the config object in logs.
+
+❌ FAILURE CONDITIONS:
+❌ Any remaining hardcoded values detected after this pass
+
+❌ Missing or partial config validation
+
+❌ Any runtime parameter that cannot be overridden by ENV
+
+❌ Any config key undocumented, untyped, or missing audit logging
+
+❌ Failing startup without detailed error message if config is invalid
+
+🛡 POLICY:
+"If a parameter is not explicitly defined in CONFIG, it does not exist."
+
+💀 FINAL WARNING:
+This is not cosmetic. This is hard governance. The system MUST behave identically across environments by controlling configuration solely through structured input, with no assumptions, no silent fallbacks, and no defaults baked into the logic.
+
+Proceed with zero trust, zero tolerance, and 100% enforcement.

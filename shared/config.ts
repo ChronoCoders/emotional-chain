@@ -103,3 +103,6 @@ export const aiConfig = CONFIG.ai;
 export const infrastructureConfig = CONFIG.infrastructure;
 export const storageConfig = CONFIG.storage;
 export const performanceConfig = CONFIG.performance;
+export const sdkConfig = CONFIG.sdk;
+export const auditConfig = CONFIG.audit;
+export const smartContractsConfig = CONFIG.smartContracts;

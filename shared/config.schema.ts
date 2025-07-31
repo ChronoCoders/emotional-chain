@@ -221,6 +221,49 @@ const PerformanceSchema = z.object({
   }),
 });
 
+// SDK Configuration Schema
+const SdkSchema = z.object({
+  timeout: z.number().int().min(1000).max(300000).default(60000),
+  retryAttempts: z.number().int().min(1).max(10).default(3),
+  retryDelay: z.number().int().min(100).max(10000).default(1000),
+  pollInterval: z.number().int().min(500).max(30000).default(2000),
+  transactionTimeout: z.number().int().min(5000).max(300000).default(60000),
+  emotionalThresholdDefault: z.number().min(0).max(100).default(75),
+  websocketHeartbeatInterval: z.number().int().min(1000).max(60000).default(30000),
+});
+
+// Audit Configuration Schema  
+const AuditSchema = z.object({
+  enabled: z.boolean().default(true),
+  sampleSizes: z.object({
+    blocks: z.number().int().min(1).max(100).default(5),
+    transactions: z.number().int().min(1).max(100).default(10),
+    validators: z.number().int().min(1).max(10).default(3),
+    smartContracts: z.number().int().min(1).max(10).default(2),
+  }),
+  intervalMs: z.number().int().min(60000).max(86400000).default(3600000), // 1 hour
+  maxRetries: z.number().int().min(1).max(10).default(3),
+});
+
+// Smart Contract Configuration Schema
+const SmartContractSchema = z.object({
+  execution: z.object({
+    gasLimit: z.number().int().min(10000).max(100000000).default(10000000),
+    executionTimeout: z.number().int().min(1000).max(300000).default(30000),
+    maxRecursionDepth: z.number().int().min(10).max(1000).default(100),
+  }),
+  deployment: z.object({
+    maxContractSize: z.number().int().min(1024).max(10485760).default(1048576), // 1MB
+    deploymentFee: z.number().min(0).max(1000).default(10),
+    verificationRequired: z.boolean().default(false),
+  }),
+  wellness: z.object({
+    rewardThresholds: z.array(z.number()).default([60, 75, 85, 95]),
+    penaltyMultipliers: z.array(z.number()).default([0.5, 0.25, 0.1]),
+    maxGoalDuration: z.number().int().min(86400000).max(31536000000).default(2592000000), // 30 days
+  }),
+});
+
 // Main Configuration Schema
 export const ConfigSchema = z.object({
   network: NetworkSchema,
@@ -231,6 +274,9 @@ export const ConfigSchema = z.object({
   infrastructure: InfrastructureSchema,
   storage: StorageSchema,
   performance: PerformanceSchema,
+  sdk: SdkSchema,
+  audit: AuditSchema,
+  smartContracts: SmartContractSchema,
 });
 
 export type EmotionalChainConfig = z.infer<typeof ConfigSchema>;

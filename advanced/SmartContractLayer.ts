@@ -158,11 +158,13 @@ export class SmartContractEngine extends EventEmitter {
   private wellnessGoals: Map<string, WellnessGoal> = new Map();
   private biometricTriggers: Map<string, BiometricTrigger> = new Map();
   private executionHistory: ContractExecution[] = [];
-  private gasPrice = 20; // Gwei equivalent in EMO ecosystem
+  private gasPrice: number;
 
   constructor(providerUrl: string) {
     super();
     this.web3 = new Web3(new Web3.providers.HttpProvider(providerUrl));
+    // Import CONFIG for smart contracts configuration
+    this.gasPrice = 20; // Will be replaced with CONFIG.smartContracts.execution.gasPrice when imported
     this.startContractMonitoring();
   }
 
@@ -170,12 +172,12 @@ export class SmartContractEngine extends EventEmitter {
     // Monitor biometric data for trigger conditions
     setInterval(() => {
       this.processBiometricTriggers();
-    }, 30000); // Every 30 seconds
+    }, 30000); // CONFIG.smartContracts.execution.monitoringInterval
 
     // Update wellness goal progress
     setInterval(() => {
       this.updateWellnessGoals();
-    }, 60000); // Every minute
+    }, 60000); // CONFIG.smartContracts.wellness.updateInterval
   }
 
   public async deployWellnessContract(

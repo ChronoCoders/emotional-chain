@@ -6,6 +6,7 @@
 import { advancedFeaturesService } from "./advanced-features";
 import { emotionalChainService } from "./emotionalchain";
 import { storage } from "../storage";
+import { CONFIG } from "../../shared/config";
 
 export class DataIntegrityAudit {
 
@@ -46,8 +47,8 @@ export class DataIntegrityAudit {
       // Verify all blockchain data comes from database
       const networkStatus = await emotionalChainService.getNetworkStatus();
       const validators = await emotionalChainService.getValidators();
-      const blocks = await emotionalChainService.getBlocks(5);
-      const transactions = await storage.getTransactions(10);
+      const blocks = await emotionalChainService.getBlocks(CONFIG.audit.sampleSizes.blocks);
+      const transactions = await storage.getTransactions(CONFIG.audit.sampleSizes.transactions);
       const wallets = await emotionalChainService.getAllWallets();
 
       return {
@@ -61,7 +62,7 @@ export class DataIntegrityAudit {
           dataSource: 'database',
           verified: true,
           count: validators.length,
-          sample: validators.slice(0, 3).map(v => ({ id: v.validatorId, balance: v.emotionalScore }))
+          sample: validators.slice(0, CONFIG.audit.sampleSizes.validators).map(v => ({ id: v.validatorId, balance: v.emotionalScore }))
         },
         blocks: {
           dataSource: 'database', 
@@ -103,7 +104,7 @@ export class DataIntegrityAudit {
           dataSource: 'database',
           verified: true,
           count: integrity.smartContracts,
-          sample: smartContracts.slice(0, 2).map(c => ({ 
+          sample: smartContracts.slice(0, CONFIG.audit.sampleSizes.smartContracts).map(c => ({ 
             address: c.contractAddress, 
             type: c.contractType,
             participants: c.participantCount 

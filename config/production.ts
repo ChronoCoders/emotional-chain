@@ -1,3 +1,6 @@
+// DEPRECATED: This file contains hardcoded values and violates CONFIG policy
+// All values should be configured through shared/config.ts system
+// This file is kept only for reference and migration purposes
 export const productionConfig = {
   // Network configuration
   network: {

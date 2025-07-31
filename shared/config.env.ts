@@ -234,4 +234,47 @@ export const rawConfig = {
       latencyMonitoring: parseBoolean(process.env.LATENCY_MONITORING, true),
     },
   },
+
+  // SDK Configuration
+  sdk: {
+    timeout: parseInt(process.env.SDK_TIMEOUT, 60000),
+    retryAttempts: parseInt(process.env.SDK_RETRY_ATTEMPTS, 3),
+    retryDelay: parseInt(process.env.SDK_RETRY_DELAY, 1000),
+    pollInterval: parseInt(process.env.SDK_POLL_INTERVAL, 2000),
+    transactionTimeout: parseInt(process.env.SDK_TRANSACTION_TIMEOUT, 60000),
+    emotionalThresholdDefault: parseFloat(process.env.SDK_EMOTIONAL_THRESHOLD_DEFAULT, 75),
+    websocketHeartbeatInterval: parseInt(process.env.SDK_WEBSOCKET_HEARTBEAT_INTERVAL, 30000),
+  },
+
+  // Audit Configuration
+  audit: {
+    enabled: parseBoolean(process.env.AUDIT_ENABLED, true),
+    sampleSizes: {
+      blocks: parseInt(process.env.AUDIT_SAMPLE_BLOCKS, 5),
+      transactions: parseInt(process.env.AUDIT_SAMPLE_TRANSACTIONS, 10),
+      validators: parseInt(process.env.AUDIT_SAMPLE_VALIDATORS, 3),
+      smartContracts: parseInt(process.env.AUDIT_SAMPLE_SMART_CONTRACTS, 2),
+    },
+    intervalMs: parseInt(process.env.AUDIT_INTERVAL_MS, 3600000), // 1 hour
+    maxRetries: parseInt(process.env.AUDIT_MAX_RETRIES, 3),
+  },
+
+  // Smart Contract Configuration
+  smartContracts: {
+    execution: {
+      gasLimit: parseInt(process.env.SMART_CONTRACT_GAS_LIMIT, 10000000),
+      executionTimeout: parseInt(process.env.SMART_CONTRACT_EXECUTION_TIMEOUT, 30000),
+      maxRecursionDepth: parseInt(process.env.SMART_CONTRACT_MAX_RECURSION_DEPTH, 100),
+    },
+    deployment: {
+      maxContractSize: parseInt(process.env.SMART_CONTRACT_MAX_SIZE, 1048576), // 1MB
+      deploymentFee: parseFloat(process.env.SMART_CONTRACT_DEPLOYMENT_FEE, 10),
+      verificationRequired: parseBoolean(process.env.SMART_CONTRACT_VERIFICATION_REQUIRED, false),
+    },
+    wellness: {
+      rewardThresholds: process.env.SMART_CONTRACT_REWARD_THRESHOLDS?.split(',').map(Number) || [60, 75, 85, 95],
+      penaltyMultipliers: process.env.SMART_CONTRACT_PENALTY_MULTIPLIERS?.split(',').map(Number) || [0.5, 0.25, 0.1],
+      maxGoalDuration: parseInt(process.env.SMART_CONTRACT_MAX_GOAL_DURATION, 2592000000), // 30 days
+    },
+  },
 };

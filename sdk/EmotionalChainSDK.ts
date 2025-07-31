@@ -34,6 +34,9 @@ export interface EmotionalChainConfig {
   timeout?: number;
   retries?: number;
   websocketEndpoint?: string;
+  pollInterval?: number;
+  transactionTimeout?: number;
+  emotionalThresholdDefault?: number;
 }
 
 export interface Transaction {
@@ -85,9 +88,12 @@ export class EmotionalChain extends EventEmitter {
     super();
     
     this.config = {
-      timeout: 30000,
-      retries: 3,
-      network: 'mainnet',
+      timeout: config.timeout || 30000,
+      retries: config.retries || 3,
+      network: config.network || 'mainnet',
+      pollInterval: config.pollInterval || 2000,
+      transactionTimeout: config.transactionTimeout || 60000,
+      emotionalThresholdDefault: config.emotionalThresholdDefault || 75,
       ...config
     };
     
@@ -227,7 +233,7 @@ export class EmotionalChain extends EventEmitter {
       // Validate emotional authentication if required
       if (request.requireEmotionalAuth) {
         const emotionalScore = await this.biometric.getCurrentEmotionalScore();
-        const threshold = request.emotionalThreshold || 75;
+        const threshold = request.emotionalThreshold || this.config.emotionalThresholdDefault;
         
         if (emotionalScore < threshold) {
           throw new Error(`Emotional score ${emotionalScore}% below threshold ${threshold}%`);
@@ -261,10 +267,11 @@ export class EmotionalChain extends EventEmitter {
     return response.data.transactions;
   }
   
-  async waitForTransaction(hash: string, timeout = 60000): Promise<Transaction> {
+  async waitForTransaction(hash: string, timeout?: number): Promise<Transaction> {
+    const actualTimeout = timeout || this.config.transactionTimeout;
     const startTime = Date.now();
     
-    while (Date.now() - startTime < timeout) {
+    while (Date.now() - startTime < actualTimeout) {
       try {
         const tx = await this.getTransaction(hash);
         
@@ -272,14 +279,14 @@ export class EmotionalChain extends EventEmitter {
           return tx;
         }
         
-        await this.delay(2000); // Poll every 2 seconds
+        await this.delay(this.config.pollInterval);
       } catch (error) {
         // Transaction might not exist yet, continue polling
-        await this.delay(2000);
+        await this.delay(this.config.pollInterval);
       }
     }
     
-    throw new Error(`Transaction ${hash} timeout after ${timeout}ms`);
+    throw new Error(`Transaction ${hash} timeout after ${actualTimeout}ms`);
   }
   
   // Block and blockchain methods
