@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import crypto from 'crypto';
+import { CONFIG } from '../shared/config';
 
 // Define BiometricData interface locally
 interface BiometricData {
@@ -629,7 +630,7 @@ export class PrivacyEngine extends EventEmitter {
   }
 
   private cleanupExpiredProofs(): void {
-    const oneHourAgo = Date.now() - 60 * 60 * 1000;
+    const expirationTime = Date.now() - (CONFIG.security.zkpProofs.proofExpirationHours * 60 * 60 * 1000);
     let cleaned = 0;
 
     for (const [proofId, proof] of this.zkProofs.entries()) {

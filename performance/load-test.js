@@ -28,7 +28,7 @@ class LoadTester {
       
       const options = {
         hostname: url.hostname,
-        port: url.port || 5000,
+        port: url.port || process.env.PORT || 5000,
         path: url.pathname + url.search,
         method: method,
         headers: {

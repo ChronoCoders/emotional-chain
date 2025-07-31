@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import * as tf from '@tensorflow/tfjs-node';
+import { CONFIG } from '../shared/config';
 
 // Define interfaces locally
 interface BiometricReading {
@@ -423,12 +424,12 @@ export class AIConsensusEngine extends EventEmitter {
       optimizedParams.dispose();
 
       const consensusConfig: ConsensusConfig = {
-        blockTime: Math.max(15, Math.min(60, params[0] * 60)),
-        emotionalThreshold: Math.max(65, Math.min(95, params[1] * 100)),
+        blockTime: Math.max(CONFIG.consensus.timing.blockTime * 0.5, Math.min(CONFIG.consensus.timing.blockTime * 2, params[0] * CONFIG.consensus.timing.blockTime * 2)),
+        emotionalThreshold: Math.max(CONFIG.consensus.thresholds.emotionalScore * 0.87, Math.min(95, params[1] * 100)),
         validatorRotationSpeed: Math.max(0.1, Math.min(1.0, params[2])),
-        consensusTimeout: Math.max(5000, Math.min(30000, params[3] * 30000)),
-        rewardMultiplier: Math.max(0.5, Math.min(3.0, params[4] * 3)),
-        anomalyTolerance: Math.max(0.1, Math.min(0.8, params[5])),
+        consensusTimeout: Math.max(CONFIG.consensus.timing.consensusRoundTimeout * 0.17, Math.min(CONFIG.consensus.timing.consensusRoundTimeout, params[3] * CONFIG.consensus.timing.consensusRoundTimeout)),
+        rewardMultiplier: Math.max(CONFIG.consensus.rewards.emotionalBonus.multiplier * 0.33, Math.min(CONFIG.consensus.rewards.emotionalBonus.multiplier * 2, params[4] * CONFIG.consensus.rewards.emotionalBonus.multiplier * 2)),
+        anomalyTolerance: Math.max(CONFIG.ai.models.anomalyDetector.sensitivity * 0.125, Math.min(CONFIG.ai.models.anomalyDetector.sensitivity, params[5])),
         adaptiveScaling: params[6] > 0.5
       };
 

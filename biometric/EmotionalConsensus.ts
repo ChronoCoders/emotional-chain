@@ -1,5 +1,6 @@
 import { BiometricReading } from './BiometricDevice';
 import { AuthenticityProof, AuthenticityProofGenerator } from './AuthenticityProof';
+import { CONFIG, configHelpers } from '../shared/config';
 
 export interface EmotionalProfile {
   validatorId: string;
@@ -33,11 +34,20 @@ export interface ConsensusResult {
 }
 
 export class EmotionalConsensusEngine {
-  private readonly MIN_CONSENSUS_SCORE = 75.0;
-  private readonly MIN_AUTHENTICITY = 0.80;
-  private readonly MIN_DEVICES = 2; // Require multiple biometric modalities
-  private readonly MAX_STRESS_LEVEL = 70; // Max stress for consensus participation
-  private readonly MIN_FOCUS_LEVEL = 60; // Min focus for consensus participation
+  private readonly MIN_CONSENSUS_SCORE: number;
+  private readonly MIN_AUTHENTICITY: number;
+  private readonly MIN_DEVICES: number;
+  private readonly MAX_STRESS_LEVEL: number;
+  private readonly MIN_FOCUS_LEVEL: number;
+
+  constructor() {
+    // All thresholds now configurable via centralized config
+    this.MIN_CONSENSUS_SCORE = CONFIG.consensus.thresholds.emotionalScore;
+    this.MIN_AUTHENTICITY = CONFIG.biometric.thresholds.authenticity.minimumScore;
+    this.MIN_DEVICES = CONFIG.biometric.validation.minimumDevices;
+    this.MAX_STRESS_LEVEL = CONFIG.biometric.thresholds.stressLevel.alertThreshold;
+    this.MIN_FOCUS_LEVEL = CONFIG.biometric.thresholds.focusScore.requiredMinimum;
+  }
 
   /**
    * Calculate comprehensive emotional score from multiple biometric readings
@@ -445,26 +455,37 @@ export class EmotionalConsensusEngine {
 
   /**
    * Update consensus thresholds (for network governance)
+   * All validation ranges now use configurable bounds
    */
   public updateConsensusThresholds(thresholds: any): void {
     if (thresholds.minConsensusScore !== undefined) {
-      (this as any).MIN_CONSENSUS_SCORE = Math.max(50, Math.min(95, thresholds.minConsensusScore));
+      const minBound = CONFIG.consensus.thresholds.emotionalScore * 0.67; // 67% of configured threshold as minimum
+      const maxBound = 95;
+      (this as any).MIN_CONSENSUS_SCORE = Math.max(minBound, Math.min(maxBound, thresholds.minConsensusScore));
     }
     
     if (thresholds.minAuthenticity !== undefined) {
-      (this as any).MIN_AUTHENTICITY = Math.max(0.5, Math.min(1.0, thresholds.minAuthenticity));
+      const minBound = CONFIG.biometric.thresholds.authenticity.minimumScore * 0.62; // 62% of configured minimum
+      const maxBound = 1.0;
+      (this as any).MIN_AUTHENTICITY = Math.max(minBound, Math.min(maxBound, thresholds.minAuthenticity));
     }
     
     if (thresholds.minDevices !== undefined) {
-      (this as any).MIN_DEVICES = Math.max(1, Math.min(5, thresholds.minDevices));
+      const minBound = CONFIG.biometric.validation.minimumDevices;
+      const maxBound = CONFIG.biometric.validation.maximumDevices;
+      (this as any).MIN_DEVICES = Math.max(minBound, Math.min(maxBound, thresholds.minDevices));
     }
     
     if (thresholds.maxStressLevel !== undefined) {
-      (this as any).MAX_STRESS_LEVEL = Math.max(30, Math.min(90, thresholds.maxStressLevel));
+      const minBound = CONFIG.biometric.thresholds.stressLevel.min + 30;
+      const maxBound = CONFIG.biometric.thresholds.stressLevel.alertThreshold;
+      (this as any).MAX_STRESS_LEVEL = Math.max(minBound, Math.min(maxBound, thresholds.maxStressLevel));
     }
     
     if (thresholds.minFocusLevel !== undefined) {
-      (this as any).MIN_FOCUS_LEVEL = Math.max(30, Math.min(90, thresholds.minFocusLevel));
+      const minBound = CONFIG.biometric.thresholds.focusScore.requiredMinimum * 0.5;
+      const maxBound = CONFIG.biometric.thresholds.focusScore.max;
+      (this as any).MIN_FOCUS_LEVEL = Math.max(minBound, Math.min(maxBound, thresholds.minFocusLevel));
     }
     
     console.log('🎯 Consensus thresholds updated:', this.getConsensusThresholds());

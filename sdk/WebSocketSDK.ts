@@ -1,5 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 import { io, Socket } from 'socket.io-client';
+import { CONFIG } from '../shared/config';
 
 /**
  * WebSocketSDK - Real-time WebSocket connection management
@@ -57,11 +58,11 @@ export class WebSocketSDK extends EventEmitter {
     super();
     
     this.config = {
-      reconnectAttempts: 5,
-      reconnectDelay: 2000,
-      timeout: 30000,
-      pingInterval: 30000,
-      pongTimeout: 5000,
+      reconnectAttempts: CONFIG.network.protocols.websocket.reconnectAttempts,
+      reconnectDelay: CONFIG.network.protocols.websocket.reconnectDelay,
+      timeout: CONFIG.network.timeouts.websocket,
+      pingInterval: CONFIG.network.protocols.websocket.heartbeatInterval,
+      pongTimeout: CONFIG.network.timeouts.connection / 2,
       ...config
     };
   }

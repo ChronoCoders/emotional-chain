@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import crypto from 'crypto';
+import { CONFIG } from '../shared/config';
 
 export interface IPFSNode {
   id: string;
@@ -513,7 +514,8 @@ export class IPFSStorage extends EventEmitter {
         return node && node.online;
       }).length;
 
-      if (onlineReplicas < status.targetReplicas * 0.7) { // Less than 70% target
+      const replicationThreshold = CONFIG.storage.replication.minimumReplicas / CONFIG.storage.replication.targetReplicas; // Dynamic threshold
+      if (onlineReplicas < status.targetReplicas * replicationThreshold) { // Based on configured replication policy
         console.warn(`⚠️ Replication degraded for ${hash}: ${onlineReplicas}/${status.targetReplicas}`);
         await this.ensureReplication(hash, status.targetReplicas);
       }

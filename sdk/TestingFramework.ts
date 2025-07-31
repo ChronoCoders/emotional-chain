@@ -2,6 +2,7 @@ import { EmotionalChain, EmotionalChainConfig } from './EmotionalChainSDK';
 import { BiometricDevice, BiometricReading, EmotionalState } from './BiometricSDK';
 import { ValidatorInfo, ConsensusRound } from './ConsensusSDK';
 import { Wallet } from './WalletSDK';
+import { CONFIG } from '../shared/config';
 
 /**
  * Comprehensive testing utilities for EmotionalChain dApp developers
@@ -59,8 +60,8 @@ export class EmotionalChainTester {
       network: 'testnet',
       mockMode: true,
       logLevel: 'info',
-      timeout: 30000,
-      retries: 3,
+      timeout: CONFIG.network.timeouts.request,
+      retries: CONFIG.network.protocols.websocket.reconnectAttempts,
       ...config
     };
   }
@@ -657,6 +658,8 @@ export class MockDataGenerator {
   
   static generateValidator(): ValidatorInfo {
     const id = `validator-${Math.random().toString(36).substr(2, 9)}`;
+    const baseEmotionalScore = CONFIG.consensus.thresholds.emotionalScore;
+    const minStake = CONFIG.consensus.quorum.minimumValidators * 1000; // Dynamic minimum stake
     
     return {
       id,
@@ -664,28 +667,30 @@ export class MockDataGenerator {
         Math.floor(Math.random() * 16).toString(16)
       ).join(''),
       name: `Validator ${id}`,
-      emotionalScore: 70 + Math.random() * 25,
-      participationRate: 0.8 + Math.random() * 0.2,
-      reputationScore: 80 + Math.random() * 20,
+      emotionalScore: baseEmotionalScore * 0.93 + Math.random() * (100 - baseEmotionalScore),
+      participationRate: CONFIG.consensus.thresholds.participationRate + Math.random() * (1 - CONFIG.consensus.thresholds.participationRate),
+      reputationScore: CONFIG.consensus.thresholds.networkHealthMinimum + Math.random() * (100 - CONFIG.consensus.thresholds.networkHealthMinimum),
       status: 'active',
-      stake: 1000 + Math.random() * 9000,
-      rewards: Math.random() * 500,
-      penalties: Math.random() * 50,
-      lastActive: Date.now() - Math.random() * 86400000,
+      stake: minStake + Math.random() * (minStake * 9),
+      rewards: Math.random() * CONFIG.consensus.rewards.baseValidatorReward * 10,
+      penalties: Math.random() * CONFIG.consensus.rewards.baseValidatorReward,
+      lastActive: Date.now() - Math.random() * CONFIG.biometric.devices.dataRetentionDays * 24 * 60 * 60 * 1000,
       biometricDevices: ['heartrate', 'stress']
     };
   }
   
   static generateConsensusRound(): ConsensusRound {
     const roundId = `round-${Date.now()}`;
+    const blockTimeMs = CONFIG.consensus.timing.blockTime * 1000;
+    const consensusTimeoutMs = CONFIG.consensus.timing.consensusRoundTimeout;
     
     return {
       roundId,
-      epoch: Math.floor(Date.now() / 30000),
+      epoch: Math.floor(Date.now() / blockTimeMs),
       phase: 'commit',
-      startTime: Date.now() - 25000,
+      startTime: Date.now() - (consensusTimeoutMs * 0.83),
       endTime: Date.now(),
-      duration: 25000,
+      duration: Math.floor(consensusTimeoutMs * 0.83 / 1000)000,
       blockNumber: Math.floor(Math.random() * 10000),
       proposer: 'validator-' + Math.random().toString(36).substr(2, 9),
       participants: Array.from({ length: 5 }, () => 

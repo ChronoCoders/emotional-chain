@@ -4,6 +4,7 @@ import { createHash, randomBytes } from 'crypto';
 import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
 import winston from 'winston';
+import { CONFIG, configHelpers } from '../shared/config';
 
 /**
  * Production security hardening and threat protection
@@ -90,17 +91,17 @@ export class SecurityManager extends EventEmitter {
   }
   
   private startSecurityMonitoring(): void {
-    // Monitor for threats every 30 seconds
+    // Monitor for threats using configurable intervals
     setInterval(() => {
       this.analyzeThreatPatterns();
       this.cleanupExpiredSessions();
       this.cleanupFailedAttempts();
-    }, 30000);
+    }, CONFIG.infrastructure.monitoring.metricsInterval);
     
-    // DDoS detection every 10 seconds
+    // DDoS detection using configurable interval
     setInterval(() => {
       this.detectDDoSAttacks();
-    }, 10000);
+    }, CONFIG.infrastructure.monitoring.metricsInterval / 3);
   }
   
   // Helmet security middleware configuration
@@ -121,7 +122,7 @@ export class SecurityManager extends EventEmitter {
       },
       crossOriginEmbedderPolicy: false,
       hsts: {
-        maxAge: 31536000,
+        maxAge: CONFIG.security.authentication.sessionTimeout,
         includeSubDomains: true,
         preload: true
       }
@@ -131,8 +132,8 @@ export class SecurityManager extends EventEmitter {
   // Rate limiting middleware
   getRateLimitConfig() {
     return rateLimit({
-      windowMs: 60 * 1000, // 1 minute
-      max: this.config.rateLimitPerMinute,
+      windowMs: CONFIG.security.rateLimiting.windowSize,
+      max: CONFIG.security.rateLimiting.requestsPerMinute,
       message: 'Too many requests from this IP',
       standardHeaders: true,
       legacyHeaders: false,
@@ -145,9 +146,10 @@ export class SecurityManager extends EventEmitter {
           blocked: true
         });
         
+        const windowSeconds = CONFIG.security.rateLimiting.windowSize / 1000;
         res.status(429).json({
           error: 'Rate limit exceeded',
-          retryAfter: Math.ceil(60 - (Date.now() % 60000) / 1000)
+          retryAfter: Math.ceil(windowSeconds - (Date.now() % CONFIG.security.rateLimiting.windowSize) / 1000)
         });
       }
     });
@@ -155,15 +157,18 @@ export class SecurityManager extends EventEmitter {
   
   // API Key management
   async generateApiKey(permissions: string[], customConfig?: Partial<ApiKey>): Promise<{ keyId: string; key: string }> {
-    const keyId = randomBytes(16).toString('hex');
-    const key = randomBytes(32).toString('hex');
+    const keyIdLength = CONFIG.security.authentication.apiKeyLength / 2; // hex is 2 chars per byte
+    const keyLength = CONFIG.security.authentication.apiKeyLength;
+    const keyId = randomBytes(keyIdLength).toString('hex');
+    const key = randomBytes(keyLength).toString('hex');
     const hashedKey = createHash('sha256').update(key).digest('hex');
     
     const apiKey: ApiKey = {
       keyId,
       hashedKey,
       permissions,
-      rateLimit: this.config.rateLimitPerMinute,
+      rateLimit: CONFIG.security.rateLimiting.requestsPerMinute,
+      expiresAt: Date.now() + (CONFIG.security.authentication.apiKeyExpirationDays * 24 * 60 * 60 * 1000),
       createdAt: Date.now(),
       active: true,
       ...customConfig
@@ -520,13 +525,14 @@ export class SecurityManager extends EventEmitter {
       recommendations.push('Enable brute force protection');
     }
     
-    if (this.config.rateLimitPerMinute > 1000) {
+    const maxRecommendedRate = CONFIG.security.rateLimiting.requestsPerMinute * 1.5; // 150% of configured as threshold
+    if (this.config.rateLimitPerMinute > maxRecommendedRate) {
       vulnerabilities.push({
         type: 'rate_limiting',
         severity: 'medium',
-        description: 'Rate limit too high - may allow DDoS attacks'
+        description: `Rate limit too high (${this.config.rateLimitPerMinute} > ${maxRecommendedRate}) - may allow DDoS attacks`
       });
-      recommendations.push('Reduce rate limit to reasonable levels');
+      recommendations.push(`Reduce rate limit to below ${maxRecommendedRate} requests per minute`);
     }
     
     // Check for weak API keys

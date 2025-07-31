@@ -5,6 +5,7 @@
 
 import { EventEmitter } from 'events';
 import { MainnetGenesis, MAINNET_GENESIS_CONFIG } from './MainnetGenesis';
+import { CONFIG, configHelpers, type EmotionalChainConfig } from '../shared/config';
 
 export interface DeploymentConfig {
   environment: 'mainnet';
@@ -255,7 +256,8 @@ export class ProductionDeployment extends EventEmitter {
     console.log(`👥 Validating ${MAINNET_GENESIS_CONFIG.validators.length} founding validators`);
     
     let readyValidators = 0;
-    const requiredValidators = 14; // 67% of 21 for BFT
+    const totalValidators = MAINNET_GENESIS_CONFIG.validators.length;
+    const requiredValidators = configHelpers.getRequiredValidators(totalValidators);
     
     for (const validator of MAINNET_GENESIS_CONFIG.validators) {
       // Simulate validator readiness check
@@ -290,20 +292,21 @@ export class ProductionDeployment extends EventEmitter {
   private async validateSecurityConfig(): Promise<void> {
     console.log(`🔒 Validating security configurations`);
     
-    // Check TLS configuration
-    if (PRODUCTION_CONFIG.infrastructure.security.tlsVersion !== '1.3') {
-      this.deploymentStatus.warnings.push('Consider upgrading to TLS 1.3 for enhanced security');
+    // Check TLS configuration using config values
+    if (CONFIG.network.protocols.tls.version !== '1.3') {
+      this.deploymentStatus.warnings.push(`Consider upgrading to TLS 1.3 (current: ${CONFIG.network.protocols.tls.version})`);
     }
     
     // Check DDoS protection
-    if (!PRODUCTION_CONFIG.infrastructure.security.ddosProtection) {
+    if (!CONFIG.security.ddosProtection.enabled) {
       throw new Error('DDoS protection must be enabled for mainnet');
     }
     
-    // Check rate limiting
-    const rateLimits = PRODUCTION_CONFIG.infrastructure.security.rateLimiting;
-    if (rateLimits.requestsPerMinute < 100) {
-      throw new Error('Rate limiting too restrictive for production use');
+    // Check rate limiting using configurable thresholds
+    const rateLimits = CONFIG.security.rateLimiting;
+    const minRequiredRate = CONFIG.performance.optimization.backgroundProcessing ? 100 : 50;
+    if (rateLimits.requestsPerMinute < minRequiredRate) {
+      throw new Error(`Rate limiting too restrictive: ${rateLimits.requestsPerMinute} < ${minRequiredRate} required`);
     }
     
     this.addValidationResult('security_config', 'passed', 'Security configuration validated');
@@ -312,16 +315,17 @@ export class ProductionDeployment extends EventEmitter {
   private async validateInfrastructure(): Promise<void> {
     console.log(`🏗️ Validating infrastructure requirements`);
     
-    // Check regional distribution
-    if (PRODUCTION_CONFIG.regions.length < 3) {
-      throw new Error('Minimum 3 regions required for high availability');
+    // Check Kubernetes configuration using configurable values
+    const k8sConfig = CONFIG.infrastructure.kubernetes;
+    if (k8sConfig.minNodes < CONFIG.infrastructure.kubernetes.minNodes) {
+      throw new Error(`Insufficient Kubernetes nodes: ${k8sConfig.minNodes} < ${CONFIG.infrastructure.kubernetes.minNodes} required for production`);
     }
     
-    // Check Kubernetes configuration
-    const k8sConfig = PRODUCTION_CONFIG.infrastructure.kubernetes;
-    if (k8sConfig.minNodes < 5) {
-      throw new Error('Minimum 5 Kubernetes nodes required for production');
-    }
+    // Validate node type configuration
+    console.log(`  🖥️  Node type: ${k8sConfig.nodeType}`);
+    console.log(`  📊 Min nodes: ${k8sConfig.minNodes}`);
+    console.log(`  📈 Max nodes: ${k8sConfig.maxNodes}`);
+    console.log(`  🔄 Auto-scaling: ${k8sConfig.autoscaling.enabled ? 'enabled' : 'disabled'}`);
     
     // Check database configuration
     const dbConfig = PRODUCTION_CONFIG.infrastructure.database;

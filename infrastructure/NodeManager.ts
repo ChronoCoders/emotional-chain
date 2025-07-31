@@ -3,6 +3,7 @@ import * as os from 'os';
 import * as fs from 'fs/promises';
 import { performance } from 'perf_hooks';
 import winston from 'winston';
+import { CONFIG } from '../shared/config';
 
 /**
  * Production node lifecycle management
@@ -403,8 +404,8 @@ export class NodeManager extends EventEmitter {
     try {
       await this.shutdown();
       
-      // Wait a moment before reinitializing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Wait before reinitializing using configurable delay
+      await new Promise(resolve => setTimeout(resolve, CONFIG.network.protocols.websocket.reconnectDelay));
       
       await this.initialize();
       
