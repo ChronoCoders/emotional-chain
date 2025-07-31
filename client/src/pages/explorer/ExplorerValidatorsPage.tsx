@@ -143,7 +143,7 @@ export default function ExplorerValidatorsPage() {
                             {formatNumber(validator.balance)} EMO
                           </p>
                           <p className="text-slate-400 text-sm">
-                            ${formatNumber(validator.balance * 0.85)}
+                            ${formatNumber(validator.balance * 0.01)}
                           </p>
                         </div>
                       </td>
@@ -181,7 +181,7 @@ export default function ExplorerValidatorsPage() {
                             +{formatNumber(dailyRewards)} EMO
                           </p>
                           <p className="text-slate-400 text-sm">
-                            {avgAPY}% APY
+                            Daily EMO rewards
                           </p>
                         </div>
                       </td>
