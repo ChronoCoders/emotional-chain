@@ -27,9 +27,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/transactions", async (req, res) => {
     try {
-      const limit = parseInt(req.query.limit as string) || 10;
-      const transactions = await emotionalChainService.getTransactions(limit);
+      const limit = parseInt(req.query.limit as string) || 50;
+      const transactions = await storage.getTransactions(limit);
       res.json(transactions);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get("/api/transactions/stats", async (req, res) => {
+    try {
+      const totalCount = await storage.getTotalTransactionCount();
+      const totalVolume = await storage.getTotalTransactionVolume();
+      res.json({
+        totalTransactions: totalCount,
+        totalVolume: totalVolume
+      });
     } catch (error) {
       res.status(500).json({ error: (error as Error).message });
     }

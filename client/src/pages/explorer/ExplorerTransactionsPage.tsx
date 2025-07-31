@@ -8,7 +8,7 @@ export default function ExplorerTransactionsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
 
-  // Fetch real transaction data from blockchain API
+  // Fetch real transaction data from database API
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['transactions'],
     queryFn: async () => {
@@ -17,11 +17,11 @@ export default function ExplorerTransactionsPage() {
     },
   });
 
-  // Fetch 24h volume data
-  const { data: volumeData } = useQuery({
-    queryKey: ['transaction-volume'],
+  // Fetch real transaction stats from database
+  const { data: statsData } = useQuery({
+    queryKey: ['transaction-stats'],
     queryFn: async () => {
-      const response = await fetch('/api/transactions/volume');
+      const response = await fetch('/api/transactions/stats');
       return response.json();
     },
   });
@@ -76,7 +76,7 @@ export default function ExplorerTransactionsPage() {
       <div>
         <h1 className="text-3xl font-bold text-white mb-2">Transactions</h1>
         <p className="text-slate-400">
-          4,280 authentic transactions on the EmotionalChain network - showing most recent 50
+          {statsData ? `${formatNumber(statsData.totalTransactions)} authentic transactions on the EmotionalChain network - showing most recent ${transactions?.length || 0}` : 'Loading transaction count...'}
         </p>
       </div>
 
@@ -84,14 +84,14 @@ export default function ExplorerTransactionsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <h3 className="text-slate-300 text-sm font-medium mb-2">Total Transactions</h3>
-          <p className="text-2xl font-bold text-white">{formatNumber(realTransactions.length)}</p>
-          <p className="text-green-400 text-sm">Recent 50 of {formatNumber(4280)} total</p>
+          <p className="text-2xl font-bold text-white">{statsData ? formatNumber(statsData.totalTransactions) : 'Loading...'}</p>
+          <p className="text-green-400 text-sm">Database verified count</p>
         </div>
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <h3 className="text-slate-300 text-sm font-medium mb-2">Total Volume</h3>
-          <p className="text-2xl font-bold text-white">134,634 EMO</p>
-          <p className="text-slate-400 text-sm">$1,346 USD</p>
+          <p className="text-2xl font-bold text-white">{statsData ? `${formatNumber(Math.round(statsData.totalVolume))} EMO` : 'Loading...'}</p>
+          <p className="text-slate-400 text-sm">{statsData ? `$${formatNumber(Math.round(statsData.totalVolume * 0.01))} USD` : 'Calculating...'}</p>
         </div>
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">

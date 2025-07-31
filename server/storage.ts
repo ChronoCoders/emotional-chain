@@ -211,7 +211,7 @@ export class MemStorage implements IStorage {
 
 // Import database storage
 import { db } from "./db";
-import { eq, desc, gte } from "drizzle-orm";
+import { eq, desc, gte, sql, count, sum } from "drizzle-orm";
 import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable } from "@shared/schema";
 
 // Database Storage Implementation
@@ -293,6 +293,20 @@ export class DatabaseStorage implements IStorage {
       .limit(limit);
     
     return results.map(this.mapTransactionFromDatabase);
+  }
+
+  async getTotalTransactionCount(): Promise<number> {
+    const result = await db.select({ 
+      count: sql`COUNT(*)`
+    }).from(transactionsTable);
+    return parseInt(result[0]?.count?.toString() || '0');
+  }
+
+  async getTotalTransactionVolume(): Promise<number> {
+    const result = await db.select({ 
+      volume: sql`SUM(CAST(${transactionsTable.amount} AS DECIMAL))`
+    }).from(transactionsTable);
+    return parseFloat(result[0]?.volume?.toString() || '0');
   }
 
   async getTransactionsByBlock(blockHash: string): Promise<Transaction[]> {
@@ -488,8 +502,8 @@ export class DatabaseStorage implements IStorage {
       const twentyFourHoursAgo = Date.now() - (24 * 60 * 60 * 1000);
       
       const results = await db.select({
-        count: db.count(),
-        volume: db.sum(transactionsTable.amount)
+        count: sql`COUNT(*)`,
+        volume: sql`SUM(CAST(${transactionsTable.amount} AS DECIMAL))`
       }).from(transactionsTable)
       .where(gte(transactionsTable.timestamp, twentyFourHoursAgo));
       
@@ -504,8 +518,8 @@ export class DatabaseStorage implements IStorage {
       // Fallback: get total volume and count
       try {
         const totalResults = await db.select({
-          count: db.count(),
-          volume: db.sum(transactionsTable.amount)
+          count: sql`COUNT(*)`,
+          volume: sql`SUM(CAST(${transactionsTable.amount} AS DECIMAL))`
         }).from(transactionsTable);
         
         const totalResult = totalResults[0];
