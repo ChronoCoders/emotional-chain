@@ -125,10 +125,10 @@ export default function TokenEconomics() {
           [TOKEN_POOLS]
         </h3>
         <div className="space-y-3">
-          {/* Staking Pool */}
+          {/* Mining Pool */}
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-terminal-warning">STAKING POOL (40%)</span>
+              <span className="text-terminal-warning">MINING POOL (40%)</span>
               <span className="text-terminal-cyan">{formatEMO(currentEconomics.pools.staking.remaining)}</span>
             </div>
             <div className="bg-terminal-bg rounded-full h-2 mb-1">
@@ -138,7 +138,7 @@ export default function TokenEconomics() {
               ></div>
             </div>
             <div className="text-terminal-dim text-xs">
-              Utilized: {formatEMO(currentEconomics.pools.staking.utilized)} / {formatEMO(currentEconomics.pools.staking.allocated)}
+              Distributed: {formatEMO(currentEconomics.pools.staking.utilized)} / {formatEMO(currentEconomics.pools.staking.allocated)}
             </div>
           </div>
 
@@ -197,8 +197,8 @@ export default function TokenEconomics() {
             <div className="text-terminal-cyan">Up to {currentEconomics.rewards.emotionalConsensusBonus} EMO</div>
           </div>
           <div className="bg-terminal-surface p-2 rounded border border-terminal-border">
-            <div className="text-terminal-warning">MIN STAKE</div>
-            <div className="text-terminal-cyan">{formatEMO(currentEconomics.rewards.minimumValidatorStake)}</div>
+            <div className="text-terminal-warning">TOTAL POOL</div>
+            <div className="text-terminal-cyan">{formatEMO(currentEconomics.pools.staking.allocated)}</div>
           </div>
         </div>
       </div>

@@ -38,8 +38,8 @@ export default function ValidatorDashboard() {
     }
   };
 
-  const formatStake = (stake: string) => {
-    const num = parseFloat(stake);
+  const formatEmoEarned = (emoEarned: string) => {
+    const num = parseFloat(emoEarned);
     return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
@@ -59,7 +59,7 @@ export default function ValidatorDashboard() {
               <span className={`status-indicator ${getStatusColor(getValidatorStatus(validator))}`}></span>
             </div>
             <div className="text-terminal-green text-xs space-y-1">
-              <div>Stake: {formatStake(validator.stake)} EMO</div>
+              <div>EMO Earned: {formatEmoEarned(validator.stake)} EMO</div>
               <div>Uptime: {parseFloat(validator.uptime).toFixed(1)}%</div>
               <div>Auth Score: {parseFloat(validator.authScore).toFixed(1)}%</div>
               <div>Device: {validator.device || 'Unknown Device'}</div>

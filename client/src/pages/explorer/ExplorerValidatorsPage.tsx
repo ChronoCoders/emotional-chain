@@ -39,8 +39,8 @@ export default function ExplorerValidatorsPage() {
   }
 
   const activeValidators = (wallets || []).filter((wallet: any) => wallet.balance > 0);
-  const totalStaked = activeValidators.reduce((sum: number, validator: any) => sum + validator.balance, 0);
-  const avgAPY = 12.5;
+  const totalEmoEarned = activeValidators.reduce((sum: number, validator: any) => sum + validator.balance, 0);
+  const avgBlockReward = 61; // Average 53-71 EMO per selection based on live data
 
   return (
     <div className="space-y-8">
@@ -65,20 +65,20 @@ export default function ExplorerValidatorsPage() {
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Total Staked</h3>
+            <h3 className="text-slate-300 text-sm font-medium">Total EMO Earned</h3>
             <DollarSign className="w-5 h-5 text-green-400" />
           </div>
-          <p className="text-2xl font-bold text-white">{formatNumber(totalStaked)} EMO</p>
-          <p className="text-slate-400 text-sm">${formatNumber(totalStaked * 0.85)} USD</p>
+          <p className="text-2xl font-bold text-white">{formatNumber(totalEmoEarned)} EMO</p>
+          <p className="text-slate-400 text-sm">${formatNumber(totalEmoEarned * 0.01)} USD</p>
         </div>
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Average APY</h3>
+            <h3 className="text-slate-300 text-sm font-medium">Avg Block Rewards</h3>
             <TrendingUp className="w-5 h-5 text-green-400" />
           </div>
-          <p className="text-2xl font-bold text-white">{avgAPY}%</p>
-          <p className="text-green-400 text-sm">+0.5% this month</p>
+          <p className="text-2xl font-bold text-white">{avgBlockReward} EMO</p>
+          <p className="text-green-400 text-sm">53-71 EMO range</p>
         </div>
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
@@ -104,10 +104,10 @@ export default function ExplorerValidatorsPage() {
             <thead className="bg-slate-900/50">
               <tr>
                 <th className="text-left p-4 text-slate-300 font-medium">Validator</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Stake</th>
+                <th className="text-left p-4 text-slate-300 font-medium">EMO Earned</th>
                 <th className="text-left p-4 text-slate-300 font-medium">Emotional Score</th>
                 <th className="text-left p-4 text-slate-300 font-medium">Performance</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Rewards (24h)</th>
+                <th className="text-left p-4 text-slate-300 font-medium">Block Rewards</th>
                 <th className="text-left p-4 text-slate-300 font-medium">Status</th>
               </tr>
             </thead>
@@ -117,7 +117,7 @@ export default function ExplorerValidatorsPage() {
                 .map((validator: any, index: number) => {
                   const emotionalScore = 70 + Math.random() * 25;
                   const performance = 85 + Math.random() * 12;
-                  const dailyRewards = validator.balance * 0.0003; // ~12% APY
+                  const dailyRewards = Math.random() * 18 + 53; // 53-71 EMO per selection
                   
                   return (
                     <tr
@@ -199,27 +199,27 @@ export default function ExplorerValidatorsPage() {
         </div>
       </div>
 
-      {/* Staking Information */}
+      {/* Emotional Mining Information */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
         <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-          <Zap className="w-5 h-5 mr-2 text-yellow-400" />
-          Become a Validator
+          <Heart className="w-5 h-5 mr-2 text-pink-400" />
+          Earn Through Emotional Mining
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <h4 className="text-white font-medium mb-2">Minimum Stake</h4>
-            <p className="text-2xl font-bold text-green-400">50,000 EMO</p>
-            <p className="text-slate-400 text-sm">Required to become a validator</p>
+            <h4 className="text-white font-medium mb-2">Base Mining Reward</h4>
+            <p className="text-2xl font-bold text-green-400">50 EMO</p>
+            <p className="text-slate-400 text-sm">Per block mined with PoE</p>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-2">Delegation</h4>
-            <p className="text-2xl font-bold text-blue-400">1,000 EMO</p>
-            <p className="text-slate-400 text-sm">Minimum delegation amount</p>
+            <h4 className="text-white font-medium mb-2">Emotional Bonus</h4>
+            <p className="text-2xl font-bold text-blue-400">0-25 EMO</p>
+            <p className="text-slate-400 text-sm">Based on wellness score</p>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-2">Unbonding Period</h4>
-            <p className="text-2xl font-bold text-purple-400">21 Days</p>
-            <p className="text-slate-400 text-sm">Time to unstake tokens</p>
+            <h4 className="text-white font-medium mb-2">Validation Reward</h4>
+            <p className="text-2xl font-bold text-purple-400">5 EMO</p>
+            <p className="text-slate-400 text-sm">Per consensus validation</p>
           </div>
         </div>
       </div>

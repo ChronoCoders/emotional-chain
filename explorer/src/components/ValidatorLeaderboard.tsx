@@ -105,7 +105,7 @@ export default function ValidatorLeaderboard() {
       <div className="mt-6 pt-4 border-t border-slate-700">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <p className="text-slate-400 text-sm">Total Staked</p>
+            <p className="text-slate-400 text-sm">Total EMO Earned</p>
             <p className="text-white font-semibold">
               {formatNumber(topValidators.reduce((sum, v) => sum + v.balance, 0))} EMO
             </p>
