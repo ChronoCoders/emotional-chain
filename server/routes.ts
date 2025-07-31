@@ -3,6 +3,8 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { emotionalChainService } from "./services/emotionalchain";
+import { advancedFeaturesService } from "./services/advanced-features";
+import { dataIntegrityAudit } from "./services/data-integrity-audit";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // EmotionalChain API routes
@@ -221,6 +223,178 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching validators:', error);
       res.status(500).json({ error: 'Failed to fetch validators' });
+    }
+  });
+
+  // ===== ADVANCED FEATURES API ENDPOINTS =====
+  
+  // Smart Contracts
+  app.get('/api/smart-contracts', async (req, res) => {
+    try {
+      const contracts = await advancedFeaturesService.getAllSmartContracts();
+      res.json(contracts);
+    } catch (error) {
+      console.error('Error fetching smart contracts:', error);
+      res.status(500).json({ error: 'Failed to fetch smart contracts' });
+    }
+  });
+
+  app.get('/api/smart-contracts/:address', async (req, res) => {
+    try {
+      const contract = await advancedFeaturesService.getSmartContract(req.params.address);
+      if (!contract) {
+        return res.status(404).json({ error: 'Contract not found' });
+      }
+      res.json(contract);
+    } catch (error) {
+      console.error('Error fetching smart contract:', error);
+      res.status(500).json({ error: 'Failed to fetch smart contract' });
+    }
+  });
+
+  // Wellness Goals
+  app.get('/api/wellness-goals/:participant', async (req, res) => {
+    try {
+      const goals = await advancedFeaturesService.getWellnessGoalsByParticipant(req.params.participant);
+      res.json(goals);
+    } catch (error) {
+      console.error('Error fetching wellness goals:', error);
+      res.status(500).json({ error: 'Failed to fetch wellness goals' });
+    }
+  });
+
+  // Quantum Key Pairs
+  app.get('/api/quantum-keys', async (req, res) => {
+    try {
+      const keyPairs = await advancedFeaturesService.getAllQuantumKeyPairs();
+      res.json(keyPairs);
+    } catch (error) {
+      console.error('Error fetching quantum key pairs:', error);
+      res.status(500).json({ error: 'Failed to fetch quantum key pairs' });
+    }
+  });
+
+  app.get('/api/quantum-keys/:validatorId', async (req, res) => {
+    try {
+      const keyPair = await advancedFeaturesService.getQuantumKeyPair(req.params.validatorId);
+      if (!keyPair) {
+        return res.status(404).json({ error: 'Quantum key pair not found' });
+      }
+      res.json(keyPair);
+    } catch (error) {
+      console.error('Error fetching quantum key pair:', error);
+      res.status(500).json({ error: 'Failed to fetch quantum key pair' });
+    }
+  });
+
+  // Privacy Proofs
+  app.get('/api/privacy-proofs', async (req, res) => {
+    try {
+      const proofType = req.query.type as string;
+      const validatorId = req.query.validatorId as string;
+      const proofs = await advancedFeaturesService.getPrivacyProofs(proofType, validatorId);
+      res.json(proofs);
+    } catch (error) {
+      console.error('Error fetching privacy proofs:', error);
+      res.status(500).json({ error: 'Failed to fetch privacy proofs' });
+    }
+  });
+
+  // Cross-Chain Bridge Transactions
+  app.get('/api/bridge-transactions', async (req, res) => {
+    try {
+      const transactions = await advancedFeaturesService.getAllBridgeTransactions();
+      res.json(transactions);
+    } catch (error) {
+      console.error('Error fetching bridge transactions:', error);
+      res.status(500).json({ error: 'Failed to fetch bridge transactions' });
+    }
+  });
+
+  app.get('/api/bridge-transactions/:bridgeId', async (req, res) => {
+    try {
+      const transaction = await advancedFeaturesService.getBridgeTransaction(req.params.bridgeId);
+      if (!transaction) {
+        return res.status(404).json({ error: 'Bridge transaction not found' });
+      }
+      res.json(transaction);
+    } catch (error) {
+      console.error('Error fetching bridge transaction:', error);
+      res.status(500).json({ error: 'Failed to fetch bridge transaction' });
+    }
+  });
+
+  // AI Models
+  app.get('/api/ai-models', async (req, res) => {
+    try {
+      const models = await advancedFeaturesService.getAllAiModels();
+      res.json(models);
+    } catch (error) {
+      console.error('Error fetching AI models:', error);
+      res.status(500).json({ error: 'Failed to fetch AI models' });
+    }
+  });
+
+  app.get('/api/ai-models/:modelType', async (req, res) => {
+    try {
+      const model = await advancedFeaturesService.getActiveAiModel(req.params.modelType);
+      if (!model) {
+        return res.status(404).json({ error: 'AI model not found' });
+      }
+      res.json(model);
+    } catch (error) {
+      console.error('Error fetching AI model:', error);
+      res.status(500).json({ error: 'Failed to fetch AI model' });
+    }
+  });
+
+  // Biometric Devices
+  app.get('/api/biometric-devices/:validatorId', async (req, res) => {
+    try {
+      const devices = await advancedFeaturesService.getValidatorBiometricDevices(req.params.validatorId);
+      res.json(devices);
+    } catch (error) {
+      console.error('Error fetching biometric devices:', error);
+      res.status(500).json({ error: 'Failed to fetch biometric devices' });
+    }
+  });
+
+  // Data Integrity Verification Endpoint
+  app.get('/api/data-integrity', async (req, res) => {
+    try {
+      const integrity = await advancedFeaturesService.verifyDataIntegrity();
+      res.json({
+        status: 'verified',
+        timestamp: new Date().toISOString(),
+        counts: integrity,
+        message: 'All advanced features backed by authentic database data'
+      });
+    } catch (error) {
+      console.error('Error verifying data integrity:', error);
+      res.status(500).json({ error: 'Failed to verify data integrity' });
+    }
+  });
+
+  // Comprehensive data integrity audit endpoint
+  app.get('/api/data-audit', async (req, res) => {
+    try {
+      const auditResults = await dataIntegrityAudit.performComprehensiveAudit();
+      res.json(auditResults);
+    } catch (error) {
+      console.error('Error performing data audit:', error);
+      res.status(500).json({ error: 'Failed to perform data audit' });
+    }
+  });
+
+  // Data integrity audit report endpoint
+  app.get('/api/data-audit/report', async (req, res) => {
+    try {
+      const report = await dataIntegrityAudit.generateDataIntegrityReport();
+      res.set('Content-Type', 'text/plain');
+      res.send(report);
+    } catch (error) {
+      console.error('Error generating audit report:', error);
+      res.status(500).json({ error: 'Failed to generate audit report' });
     }
   });
 

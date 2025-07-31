@@ -67,6 +67,122 @@ export const biometricData = pgTable("biometric_data", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Smart contracts table
+export const smartContracts = pgTable("smart_contracts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  contractAddress: text("contract_address").notNull().unique(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'wellness_incentive', 'emotional_trigger', 'biometric_reward'
+  deployerAddress: text("deployer_address").notNull(),
+  emotionalThreshold: decimal("emotional_threshold", { precision: 5, scale: 2 }).notNull(),
+  totalValue: decimal("total_value", { precision: 18, scale: 8 }).default("0"),
+  isActive: boolean("is_active").default(true),
+  bytecode: text("bytecode").notNull(),
+  abi: jsonb("abi").notNull(),
+  metadata: jsonb("metadata"),
+  participants: text("participants").array().default(sql`'{}'::text[]`),
+  deployedAt: timestamp("deployed_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Wellness goals table
+export const wellnessGoals = pgTable("wellness_goals", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  contractAddress: text("contract_address").references(() => smartContracts.contractAddress).notNull(),
+  participant: text("participant").notNull(),
+  targetScore: decimal("target_score", { precision: 5, scale: 2 }).notNull(),
+  duration: integer("duration").notNull(), // days
+  currentProgress: decimal("current_progress", { precision: 5, scale: 2 }).default("0"),
+  reward: decimal("reward", { precision: 18, scale: 8 }).notNull(),
+  completed: boolean("completed").default(false),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  biometricHistory: jsonb("biometric_history").default(sql`'[]'::jsonb`),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Quantum key pairs table
+export const quantumKeyPairs = pgTable("quantum_key_pairs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  validatorId: text("validator_id").references(() => validatorStates.validatorId).notNull(),
+  algorithm: text("algorithm").notNull(), // 'CRYSTALS-Dilithium', 'CRYSTALS-Kyber', 'FALCON'
+  publicKey: text("public_key").notNull(),
+  privateKey: text("private_key").notNull(), // Encrypted storage
+  keySize: integer("key_size").notNull(),
+  securityLevel: integer("security_level").notNull(), // 128, 192, 256
+  status: text("status").default("active"), // 'active', 'deprecated', 'compromised'
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+});
+
+// Privacy proofs table  
+export const privacyProofs = pgTable("privacy_proofs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  proofType: text("proof_type").notNull(), // 'zero_knowledge', 'ring_signature', 'homomorphic'
+  validatorId: text("validator_id").references(() => validatorStates.validatorId),
+  commitment: text("commitment").notNull(),
+  nullifierHash: text("nullifier_hash"),
+  proof: jsonb("proof").notNull(),
+  anonymitySet: integer("anonymity_set"),
+  isValid: boolean("is_valid").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Cross-chain bridge transactions table
+export const bridgeTransactions = pgTable("bridge_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  bridgeId: text("bridge_id").notNull(),
+  sourceChain: text("source_chain").notNull(),
+  targetChain: text("target_chain").notNull(),
+  sourceTxHash: text("source_tx_hash").notNull(),
+  targetTxHash: text("target_tx_hash"),
+  amount: decimal("amount", { precision: 18, scale: 8 }).notNull(),
+  tokenSymbol: text("token_symbol").notNull(),
+  sender: text("sender").notNull(),
+  recipient: text("recipient").notNull(),
+  status: text("status").default("pending"), // 'pending', 'confirmed', 'completed', 'failed'
+  emotionalMetadata: jsonb("emotional_metadata"),
+  bridgeFee: decimal("bridge_fee", { precision: 18, scale: 8 }).notNull(),
+  estimatedTime: integer("estimated_time").notNull(), // seconds
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// AI model training data table
+export const aiModelData = pgTable("ai_model_data", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  modelName: text("model_name").notNull(),
+  modelType: text("model_type").notNull(), // 'emotional_predictor', 'anomaly_detector', 'consensus_optimizer'
+  accuracy: decimal("accuracy", { precision: 5, scale: 4 }).notNull(),
+  precision: decimal("precision", { precision: 5, scale: 4 }).notNull(),
+  recall: decimal("recall", { precision: 5, scale: 4 }).notNull(),
+  f1Score: decimal("f1_score", { precision: 5, scale: 4 }).notNull(),
+  trainingDataSize: integer("training_data_size").notNull(),
+  version: text("version").notNull(),
+  modelWeights: text("model_weights"), // File path or blob reference
+  hyperparameters: jsonb("hyperparameters"),
+  lastTraining: timestamp("last_training").defaultNow(),
+  isActive: boolean("is_active").default(true),
+});
+
+// Biometric device registry table
+export const biometricDevices = pgTable("biometric_devices", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  deviceId: text("device_id").notNull().unique(),
+  validatorId: text("validator_id").references(() => validatorStates.validatorId).notNull(),
+  deviceType: text("device_type").notNull(), // 'heartRate', 'stress', 'focus', 'multi_sensor'
+  manufacturer: text("manufacturer").notNull(),
+  model: text("model").notNull(),
+  firmwareVersion: text("firmware_version"),
+  calibrationData: jsonb("calibration_data"),
+  status: text("status").default("active"), // 'active', 'inactive', 'maintenance', 'error'
+  lastActivity: timestamp("last_activity"),
+  batteryLevel: integer("battery_level"),
+  signalQuality: decimal("signal_quality", { precision: 3, scale: 2 }),
+  authenticityVerified: boolean("authenticity_verified").default(false),
+  registeredAt: timestamp("registered_at").defaultNow(),
+});
+
 // Consensus rounds table
 export const consensusRounds = pgTable("consensus_rounds", {
   roundId: integer("round_id").primaryKey(),
@@ -99,7 +215,7 @@ export const storageMetrics = pgTable("storage_metrics", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Insert schemas
+// Insert schemas for all tables
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -124,41 +240,41 @@ export const insertBiometricDataSchema = createInsertSchema(biometricData).omit(
   createdAt: true,
 });
 
-// Type exports for the application
-export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
+export const insertSmartContractSchema = createInsertSchema(smartContracts).omit({
+  id: true,
+  deployedAt: true,
+  updatedAt: true,
+});
 
-export type Block = typeof blocks.$inferSelect;
-export type InsertBlock = z.infer<typeof insertBlockSchema>;
+export const insertWellnessGoalSchema = createInsertSchema(wellnessGoals).omit({
+  id: true,
+  createdAt: true,
+});
 
-export type Transaction = typeof transactions.$inferSelect;
-export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export const insertQuantumKeyPairSchema = createInsertSchema(quantumKeyPairs).omit({
+  id: true,
+  createdAt: true,
+});
 
-export type ValidatorState = typeof validatorStates.$inferSelect;
-export type InsertValidatorState = z.infer<typeof insertValidatorStateSchema>;
+export const insertPrivacyProofSchema = createInsertSchema(privacyProofs).omit({
+  id: true,
+  createdAt: true,
+});
 
-export type BiometricData = typeof biometricData.$inferSelect;
-export type InsertBiometricData = z.infer<typeof insertBiometricDataSchema>;
+export const insertBridgeTransactionSchema = createInsertSchema(bridgeTransactions).omit({
+  id: true,
+  createdAt: true,
+});
 
-export type ConsensusRound = typeof consensusRounds.$inferSelect;
-export type PeerReputation = typeof peerReputation.$inferSelect;
-export type StorageMetrics = typeof storageMetrics.$inferSelect;
+export const insertAiModelDataSchema = createInsertSchema(aiModelData).omit({
+  id: true,
+  lastTraining: true,
+});
 
-// Legacy type aliases for backward compatibility
-export type Validator = ValidatorState;
-export type InsertValidator = InsertValidatorState;
-
-// Placeholder types for not-yet-implemented features
-export type NetworkStats = {
-  id: string;
-  timestamp: Date;
-  activeValidators: number;
-  totalTransactions: number;
-  networkHashrate: string;
-  consensusHealth: number;
-};
-
-export type InsertNetworkStats = Omit<NetworkStats, 'id' | 'timestamp'>;
+export const insertBiometricDeviceSchema = createInsertSchema(biometricDevices).omit({
+  id: true,
+  registeredAt: true,
+});
 
 export const insertConsensusRoundSchema = createInsertSchema(consensusRounds).omit({
   createdAt: true,
@@ -173,37 +289,61 @@ export const insertStorageMetricsSchema = createInsertSchema(storageMetrics).omi
   createdAt: true,
 });
 
-// Types
-export type InsertUser = z.infer<typeof insertUserSchema>;
+// Type exports for all tables
 export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
 
-export type InsertBlock = z.infer<typeof insertBlockSchema>;
 export type Block = typeof blocks.$inferSelect;
+export type InsertBlock = z.infer<typeof insertBlockSchema>;
 
-export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
+export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 
-export type InsertValidatorState = z.infer<typeof insertValidatorStateSchema>;
 export type ValidatorState = typeof validatorStates.$inferSelect;
+export type InsertValidatorState = z.infer<typeof insertValidatorStateSchema>;
 
+export type BiometricDataRecord = typeof biometricData.$inferSelect;
 export type InsertBiometricData = z.infer<typeof insertBiometricDataSchema>;
-export type BiometricData = typeof biometricData.$inferSelect;
 
-export type InsertConsensusRound = z.infer<typeof insertConsensusRoundSchema>;
+export type SmartContract = typeof smartContracts.$inferSelect;
+export type InsertSmartContract = z.infer<typeof insertSmartContractSchema>;
+
+export type WellnessGoal = typeof wellnessGoals.$inferSelect;
+export type InsertWellnessGoal = z.infer<typeof insertWellnessGoalSchema>;
+
+export type QuantumKeyPair = typeof quantumKeyPairs.$inferSelect;
+export type InsertQuantumKeyPair = z.infer<typeof insertQuantumKeyPairSchema>;
+
+export type PrivacyProof = typeof privacyProofs.$inferSelect;
+export type InsertPrivacyProof = z.infer<typeof insertPrivacyProofSchema>;
+
+export type BridgeTransaction = typeof bridgeTransactions.$inferSelect;
+export type InsertBridgeTransaction = z.infer<typeof insertBridgeTransactionSchema>;
+
+export type AiModelData = typeof aiModelData.$inferSelect;
+export type InsertAiModelData = z.infer<typeof insertAiModelDataSchema>;
+
+export type BiometricDevice = typeof biometricDevices.$inferSelect;
+export type InsertBiometricDevice = z.infer<typeof insertBiometricDeviceSchema>;
+
 export type ConsensusRound = typeof consensusRounds.$inferSelect;
+export type InsertConsensusRound = z.infer<typeof insertConsensusRoundSchema>;
 
-export type InsertPeerReputation = z.infer<typeof insertPeerReputationSchema>;
 export type PeerReputation = typeof peerReputation.$inferSelect;
+export type InsertPeerReputation = z.infer<typeof insertPeerReputationSchema>;
 
-export type InsertStorageMetrics = z.infer<typeof insertStorageMetricsSchema>;
 export type StorageMetrics = typeof storageMetrics.$inferSelect;
+export type InsertStorageMetrics = z.infer<typeof insertStorageMetricsSchema>;
 
-// Legacy compatibility types (for gradual migration)
+// Legacy type aliases for backward compatibility
 export type Validator = ValidatorState;
 export type InsertValidator = InsertValidatorState;
+export type BiometricData = BiometricDataRecord;
+
+// Runtime compatibility types
 export type NetworkStats = {
   id: string;
-  connectedPeers: number;
+  connectedPeers: number;  
   activeValidators: number;
   blockHeight: number;
   consensusPercentage: string;
@@ -212,4 +352,5 @@ export type NetworkStats = {
   networkFocus: string;
   timestamp: Date;
 };
+
 export type InsertNetworkStats = Omit<NetworkStats, "id" | "timestamp">;

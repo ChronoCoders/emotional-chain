@@ -190,7 +190,7 @@ export class SmartContractEngine extends EventEmitter {
       console.log(`🚀 Deploying wellness contract for ${creator}`);
 
       // Generate contract address (simplified - in reality would deploy to EVM)
-      const contractAddress = `0x${crypto.randomBytes(20).toString('hex')}`;
+      const contractAddress = `0x${Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b => b.toString(16).padStart(2, '0')).join('')}`;
 
       const contract: EmotionalContract = {
         address: contractAddress,
