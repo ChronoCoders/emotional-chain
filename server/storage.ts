@@ -33,6 +33,9 @@ export interface IStorage {
   // Network stats methods
   getLatestNetworkStats(): Promise<NetworkStats | undefined>;
   createNetworkStats(stats: InsertNetworkStats): Promise<NetworkStats>;
+
+  // Wallet methods for database sync
+  getWalletsFromDatabase(): Promise<any[]>;
 }
 
 export class MemStorage implements IStorage {

@@ -56,11 +56,11 @@ export default function ExplorerValidatorsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Active Validators</h3>
+            <h3 className="text-slate-300 text-sm font-medium">Total Validators</h3>
             <Users className="w-5 h-5 text-blue-400" />
           </div>
-          <p className="text-2xl font-bold text-white">{activeValidators.length}</p>
-          <p className="text-green-400 text-sm">+2 this week</p>
+          <p className="text-2xl font-bold text-white">{(wallets || []).length}</p>
+          <p className="text-green-400 text-sm">{activeValidators.length} active</p>
         </div>
 
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
@@ -112,7 +112,7 @@ export default function ExplorerValidatorsPage() {
               </tr>
             </thead>
             <tbody>
-              {activeValidators
+              {wallets
                 .sort((a: any, b: any) => b.balance - a.balance)
                 .map((validator: any, index: number) => {
                   const emotionalScore = 70 + Math.random() * 25;

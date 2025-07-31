@@ -53,6 +53,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/wallets/database", async (req, res) => {
+    try {
+      const wallets = await storage.getWalletsFromDatabase();
+      res.json(wallets);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
   app.get("/api/biometric/:validatorId", async (req, res) => {
     try {
       const { validatorId } = req.params;

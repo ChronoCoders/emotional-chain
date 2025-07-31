@@ -101,9 +101,9 @@ export default function ExplorerHomePage() {
           color={networkStats?.isRunning ? "green" : "red"}
         />
         <MetricCard
-          title="Active Validators"
-          value={activeValidators.toString()}
-          change={`${formatNumber(totalEMO)} EMO • ${formatEmoToUSD(totalEMO)}`}
+          title="Network Value"
+          value={`${formatNumber(totalEMO)} EMO`}
+          change={`${activeValidators} active validators • ${formatEmoToUSD(totalEMO)}`}
           icon={Users}
           trend="up"
           color="blue"
