@@ -178,7 +178,7 @@ export default function ExplorerBlocksPage() {
                   <td className="p-4">
                     <div className="flex items-center space-x-2">
                       <User className="w-4 h-4 text-slate-400" />
-                      <span className="text-white">{block.validator}</span>
+                      <span className="text-white">{block.validator || '⚠️ Missing Validator'}</span>
                     </div>
                   </td>
                   <td className="p-4">
