@@ -4,18 +4,19 @@ import { Zap, User, Hash, Clock, Database } from "lucide-react";
 
 export default function ExplorerBlocksPage() {
   // Fetch real block data from blockchain API
-  const { data: blockData, isLoading } = useQuery({
-    queryKey: ['network-stats'],
+  const { data: blocks, isLoading } = useQuery({
+    queryKey: ['blocks'],
     queryFn: async () => {
-      const response = await fetch('/api/network/status');
+      const response = await fetch('/api/blocks');
       return response.json();
     },
   });
 
-  const { data: wallets } = useQuery({
-    queryKey: ['wallets'],
+  // Fetch network stats for additional data
+  const { data: networkStats } = useQuery({
+    queryKey: ['network-stats'],
     queryFn: async () => {
-      const response = await fetch('/api/wallets');
+      const response = await fetch('/api/network/status');
       return response.json();
     },
   });
@@ -39,9 +40,21 @@ export default function ExplorerBlocksPage() {
     );
   }
 
-  const stats = blockData?.stats;
-  const totalBlocks = stats?.blockHeight || 0;
+  const stats = networkStats?.stats;
+  const totalBlocks = stats?.blockHeight || blocks?.length || 0;
   const avgBlockTime = 30; // Real EmotionalChain block time
+  const latestBlock = blocks?.[0]; // Most recent block
+  
+  if (!blocks) {
+    return (
+      <div className="space-y-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-slate-700 rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
 
   const formatTimeAgo = (timestamp: number) => {
     const now = Date.now();
@@ -87,7 +100,7 @@ export default function ExplorerBlocksPage() {
           </div>
           <p className="text-2xl font-bold text-white">#{formatNumber(totalBlocks)}</p>
           <p className="text-slate-400 text-sm">
-            {latestBlock ? formatTimeAgo(latestBlock.timestamp) : 'Just now'}
+            {latestBlock ? formatTimeAgo(new Date(latestBlock.timestamp).getTime()) : 'Just now'}
           </p>
         </div>
         
@@ -139,7 +152,7 @@ export default function ExplorerBlocksPage() {
               </tr>
             </thead>
             <tbody>
-              {blocks.map((block) => (
+              {blocks?.map((block: any) => (
                 <tr
                   key={block.height}
                   className="border-b border-slate-700/50 hover:bg-slate-900/30 transition-colors"
@@ -158,7 +171,7 @@ export default function ExplorerBlocksPage() {
                     </div>
                   </td>
                   <td className="p-4">
-                    <p className="text-slate-300">{formatTimeAgo(block.timestamp)}</p>
+                    <p className="text-slate-300">{formatTimeAgo(new Date(block.timestamp).getTime())}</p>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center space-x-2">
@@ -167,7 +180,7 @@ export default function ExplorerBlocksPage() {
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className="text-white font-medium">{block.transactionCount}</span>
+                    <span className="text-white font-medium">{block.transactions?.length || 1}</span>
                   </td>
                   <td className="p-4">
                     <div>
