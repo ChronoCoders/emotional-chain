@@ -35,6 +35,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/transactions/volume", async (req, res) => {
+    try {
+      const volumeData = await emotionalChainService.getTransactionVolume();
+      res.json(volumeData);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
   app.get("/api/validators", async (req, res) => {
     try {
       const validators = await emotionalChainService.getValidators();

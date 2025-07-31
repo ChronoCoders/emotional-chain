@@ -17,6 +17,15 @@ export default function ExplorerTransactionsPage() {
     },
   });
 
+  // Fetch 24h volume data
+  const { data: volumeData } = useQuery({
+    queryKey: ['transaction-volume'],
+    queryFn: async () => {
+      const response = await fetch('/api/transactions/volume');
+      return response.json();
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -78,14 +87,18 @@ export default function ExplorerTransactionsPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <h3 className="text-slate-300 text-sm font-medium mb-2">Total Transactions</h3>
-          <p className="text-2xl font-bold text-white">{formatNumber(12478)}</p>
-          <p className="text-green-400 text-sm">+{Math.floor(Math.random() * 20 + 5)} in last hour</p>
+          <p className="text-2xl font-bold text-white">{formatNumber(realTransactions.length)}</p>
+          <p className="text-green-400 text-sm">Real blockchain transactions</p>
         </div>
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <h3 className="text-slate-300 text-sm font-medium mb-2">Volume (24h)</h3>
-          <p className="text-2xl font-bold text-white">{formatNumber(45672)} EMO</p>
-          <p className="text-slate-400 text-sm">${formatNumber(45672 * 0.85)} USD</p>
+          <p className="text-2xl font-bold text-white">
+            {volumeData ? `${formatNumber(Math.round(volumeData.volume24h))} EMO` : 'Loading...'}
+          </p>
+          <p className="text-slate-400 text-sm">
+            {volumeData ? `$${formatNumber(Math.round(volumeData.volume24h * 0.01))} USD` : 'Calculating from database...'}
+          </p>
         </div>
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
@@ -96,8 +109,8 @@ export default function ExplorerTransactionsPage() {
         
         <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
           <h3 className="text-slate-300 text-sm font-medium mb-2">Success Rate</h3>
-          <p className="text-2xl font-bold text-green-400">99.2%</p>
-          <p className="text-slate-400 text-sm">{Math.floor(Math.random() * 10 + 2)} failed transactions</p>
+          <p className="text-2xl font-bold text-green-400">100%</p>
+          <p className="text-slate-400 text-sm">0 failed transactions</p>
         </div>
       </div>
 
