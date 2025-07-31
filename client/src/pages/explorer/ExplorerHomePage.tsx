@@ -277,8 +277,8 @@ export default function ExplorerHomePage() {
               </p>
             </div>
             <div className="text-center">
-              <p className="text-slate-400 text-sm">Staking APY</p>
-              <p className="text-green-400 font-semibold text-lg">12.5%</p>
+              <p className="text-slate-400 text-sm">Avg Block Rewards</p>
+              <p className="text-green-400 font-semibold text-lg">60 EMO</p>
             </div>
             <div className="text-center">
               <p className="text-slate-400 text-sm">Total Blocks</p>
