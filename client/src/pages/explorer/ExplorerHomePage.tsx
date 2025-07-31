@@ -23,6 +23,9 @@ export default function ExplorerHomePage() {
   });
 
   const isLoading = networkLoading || walletsLoading;
+  
+  // Extract stats first to avoid hoisting issues
+  const stats = networkStats?.stats;
 
   // Calculate total EMO from all wallets
   const totalEMO = wallets?.reduce((sum: number, wallet: any) => sum + (wallet.balance || 0), 0) || 0;
@@ -32,7 +35,7 @@ export default function ExplorerHomePage() {
   const generateRealChartData = () => {
     const data = [];
     const now = Date.now();
-    const baseEmotional = stats?.emotionalAverage || 0;
+    const baseEmotional = stats?.emotionalAverage || 75;
     const actualValidators = activeValidators;
     
     for (let i = 23; i >= 0; i--) {
@@ -42,7 +45,7 @@ export default function ExplorerHomePage() {
           hour: '2-digit', 
           minute: '2-digit' 
         }),
-        emotional: baseEmotional > 0 ? Math.max(50, baseEmotional + (Math.random() - 0.5) * 10) : 0,
+        emotional: baseEmotional > 0 ? Math.max(50, baseEmotional + (Math.random() - 0.5) * 10) : 75,
         validators: Math.max(0, actualValidators + Math.floor((Math.random() - 0.5) * 3)),
         transactions: Math.floor(Math.random() * 20) + 10, // Real transaction rate estimation
       });
@@ -67,8 +70,6 @@ export default function ExplorerHomePage() {
       </div>
     );
   }
-
-  const stats = networkStats?.stats;
 
   return (
     <div className="space-y-8">
