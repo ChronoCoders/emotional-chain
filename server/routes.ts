@@ -5,8 +5,12 @@ import { storage } from "./storage";
 import { emotionalChainService } from "./services/emotionalchain";
 import { advancedFeaturesService } from "./services/advanced-features";
 import { dataIntegrityAudit } from "./services/data-integrity-audit";
+import configRouter from "./routes/config";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Internal configuration management API (admin-only)
+  app.use("/internal", configRouter);
+
   // EmotionalChain API routes
   app.get("/api/network/status", async (req, res) => {
     try {

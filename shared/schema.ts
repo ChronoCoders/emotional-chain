@@ -354,3 +354,22 @@ export type NetworkStats = {
 };
 
 export type InsertNetworkStats = Omit<NetworkStats, "id" | "timestamp">;
+
+// Configuration snapshots table for audit trail
+export const configSnapshots = pgTable("config_snapshots", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  blockHeight: integer("block_height").notNull(),
+  config: jsonb("config").notNull(),
+  changeReason: text("change_reason"),
+  adminId: text("admin_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Configuration snapshot schema
+export const insertConfigSnapshotSchema = createInsertSchema(configSnapshots).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type ConfigSnapshot = typeof configSnapshots.$inferSelect;
+export type InsertConfigSnapshot = z.infer<typeof insertConfigSnapshotSchema>;
