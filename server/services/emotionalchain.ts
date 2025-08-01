@@ -2,6 +2,7 @@ import { storage } from '../storage';
 import { type Block, type Transaction, type Validator, type BiometricData, type NetworkStats } from '@shared/schema';
 import { BootstrapNode } from '../blockchain/BootstrapNode';
 import { EmotionalWallet } from '../blockchain/EmotionalWallet';
+import { persistentTokenEconomics } from './token-economics-persistent';
 export class EmotionalChainService {
   private isRunning: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
@@ -10,6 +11,16 @@ export class EmotionalChainService {
   constructor() {
     this.initializeBlockchain();
     this.startHeartbeat();
+    this.initializePersistentTokenEconomics();
+  }
+
+  private async initializePersistentTokenEconomics() {
+    try {
+      await persistentTokenEconomics.initialize();
+      console.log('✅ Persistent token economics initialized');
+    } catch (error) {
+      console.error('❌ Failed to initialize persistent token economics:', error);
+    }
   }
   private async initializeRealBlockchain() {
     try {
@@ -407,16 +418,57 @@ Emotional Profile:
   }
   private startHeartbeat() {
     this.isRunning = true;
-    this.heartbeatInterval = setInterval(async () => {
-      // Heartbeat for blockchain connection - no data simulation
-      if (this.blockchain && this.network) {
-        try {
-          // When real blockchain is connected, sync data here
-          // For now, just maintain connection
-        } catch (error) {
-        }
-      }
+    
+    // Run initial sync immediately
+    setTimeout(async () => {
+      await this.syncTokenEconomics();
     }, 5000);
+    
+    this.heartbeatInterval = setInterval(async () => {
+      await this.syncTokenEconomics();
+    }, 15000); // Sync every 15 seconds for better responsiveness
+  }
+
+  private async syncTokenEconomics(): Promise<void> {
+    // Heartbeat for blockchain connection and token economics sync
+    if (this.blockchain && this.network && this.bootstrapNode) {
+      try {
+        // Get actual network status from bootstrap node
+        const networkStatus = await this.bootstrapNode.getNetworkStatus();
+        const blockHeight = networkStatus?.stats?.blockHeight || 0;
+        
+        if (blockHeight > 0 && networkStatus?.validators) {
+          // Calculate total EMO in circulation from validator balances
+          let totalCirculating = 0;
+          for (const validator of networkStatus.validators) {
+            totalCirculating += validator.balance || 0;
+          }
+          
+          if (totalCirculating > 0) {
+            // Update persistent token economics with current circulation
+            const currentEconomics = await persistentTokenEconomics.getTokenEconomics();
+            if (Math.abs(totalCirculating - currentEconomics.totalSupply) > 0.01) {
+              console.log(`🔄 Syncing token economics: ${currentEconomics.totalSupply} → ${totalCirculating.toFixed(2)} EMO`);
+              await this.updatePersistentTokenSupply(totalCirculating, blockHeight);
+            }
+          }
+        }
+      } catch (error) {
+        // Suppress sync errors in heartbeat
+      }
+    }
+  }
+
+  /**
+   * Update persistent token supply based on actual blockchain state
+   */  
+  private async updatePersistentTokenSupply(totalCirculating: number, blockHeight: number): Promise<void> {
+    try {
+      // Update the database directly with current circulation
+      await persistentTokenEconomics.updateTokenSupplyFromBlockchain(totalCirculating, blockHeight);
+    } catch (error) {
+      console.error('❌ Failed to update persistent token supply:', error);
+    }
   }
   public async startMining(): Promise<any> {
     if (this.bootstrapNode && this.isRunning) {
@@ -437,10 +489,19 @@ Emotional Profile:
     return { error: 'Bootstrap node not running' };
   }
   public async getTokenEconomics(): Promise<any> {
-    if (this.bootstrapNode && this.isRunning) {
-      return this.bootstrapNode.getBlockchain().getTokenEconomics();
+    try {
+      // Always use persistent token economics from database
+      return await persistentTokenEconomics.getTokenEconomics();  
+    } catch (error) {
+      console.error('❌ Failed to get persistent token economics:', error);
+      
+      // Fallback to bootstrap node only if persistent storage fails
+      if (this.bootstrapNode && this.isRunning) {
+        return this.bootstrapNode.getBlockchain().getTokenEconomics();
+      }
+      
+      return { error: 'Token economics not available' };
     }
-    return { error: 'Bootstrap node not running' };
   }
   public shutdown() {
     this.isRunning = false;

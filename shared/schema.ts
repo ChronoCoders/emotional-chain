@@ -49,6 +49,29 @@ export const validatorStates = pgTable("validator_states", {
   totalValidations: integer("total_validations").default(0),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Token economics table for persistent state
+export const tokenEconomics = pgTable("token_economics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  totalSupply: decimal("total_supply", { precision: 18, scale: 8 }).notNull().default("0"),
+  maxSupply: decimal("max_supply", { precision: 18, scale: 8 }).notNull().default("1000000000"),
+  circulatingSupply: decimal("circulating_supply", { precision: 18, scale: 8 }).notNull().default("0"),
+  stakingPoolAllocated: decimal("staking_pool_allocated", { precision: 18, scale: 8 }).notNull().default("400000000"),
+  stakingPoolRemaining: decimal("staking_pool_remaining", { precision: 18, scale: 8 }).notNull().default("400000000"),
+  stakingPoolUtilized: decimal("staking_pool_utilized", { precision: 18, scale: 8 }).notNull().default("0"),
+  wellnessPoolAllocated: decimal("wellness_pool_allocated", { precision: 18, scale: 8 }).notNull().default("200000000"),
+  wellnessPoolRemaining: decimal("wellness_pool_remaining", { precision: 18, scale: 8 }).notNull().default("200000000"),
+  wellnessPoolUtilized: decimal("wellness_pool_utilized", { precision: 18, scale: 8 }).notNull().default("0"),
+  ecosystemPoolAllocated: decimal("ecosystem_pool_allocated", { precision: 18, scale: 8 }).notNull().default("250000000"),
+  ecosystemPoolRemaining: decimal("ecosystem_pool_remaining", { precision: 18, scale: 8 }).notNull().default("250000000"),
+  ecosystemPoolUtilized: decimal("ecosystem_pool_utilized", { precision: 18, scale: 8 }).notNull().default("0"),
+  baseBlockReward: decimal("base_block_reward", { precision: 18, scale: 8 }).notNull().default("50"),
+  baseValidationReward: decimal("base_validation_reward", { precision: 18, scale: 8 }).notNull().default("5"),
+  emotionalConsensusBonus: decimal("emotional_consensus_bonus", { precision: 18, scale: 8 }).notNull().default("25"),
+  minimumValidatorStake: decimal("minimum_validator_stake", { precision: 18, scale: 8 }).notNull().default("10000"),
+  lastBlockHeight: integer("last_block_height").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
 export const biometricData = pgTable("biometric_data", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   validatorId: text("validator_id").references(() => validatorStates.validatorId).notNull(),
@@ -251,6 +274,11 @@ export const insertBiometricDeviceSchema = createInsertSchema(biometricDevices).
 export const insertConsensusRoundSchema = createInsertSchema(consensusRounds).omit({
   createdAt: true,
 });
+
+export const insertTokenEconomicsSchema = createInsertSchema(tokenEconomics).omit({
+  id: true,
+  updatedAt: true,
+});
 export const insertPeerReputationSchema = createInsertSchema(peerReputation).omit({
   updatedAt: true,
 });
@@ -289,6 +317,10 @@ export type PeerReputation = typeof peerReputation.$inferSelect;
 export type InsertPeerReputation = z.infer<typeof insertPeerReputationSchema>;
 export type StorageMetrics = typeof storageMetrics.$inferSelect;
 export type InsertStorageMetrics = z.infer<typeof insertStorageMetricsSchema>;
+
+// Token Economics types
+export type TokenEconomics = typeof tokenEconomics.$inferSelect;
+export type InsertTokenEconomics = z.infer<typeof insertTokenEconomicsSchema>;
 // Legacy type aliases for backward compatibility
 export type Validator = ValidatorState;
 export type InsertValidator = InsertValidatorState;
