@@ -64,8 +64,8 @@ export class BootstrapNode {
     const authenticatedValidators = biometricDeviceManager.getAuthenticatedValidators();
     
     if (authenticatedValidators.length === 0) {
-      console.log('⚠️  No biometric devices connected. Mining requires real validators with biometric authentication.');
-      console.log('📱 Please connect heart rate monitors, stress sensors, or EEG devices to participate in consensus.');
+      console.log('No biometric devices connected. Mining requires real validators with biometric authentication.');
+      console.log('Please connect heart rate monitors, stress sensors, or EEG devices to participate in consensus.');
       
       return {
         status: 'waiting_for_biometric_devices',
@@ -77,7 +77,7 @@ export class BootstrapNode {
     
     // Start blockchain mining with authenticated validators
     const result = this.blockchain.startMining();
-    console.log(`🔄 Mining started with ${authenticatedValidators.length} biometrically authenticated validators`);
+    console.log(`Mining started with ${authenticatedValidators.length} biometrically authenticated validators`);
     return result;
   }
   public stopMining(): any {

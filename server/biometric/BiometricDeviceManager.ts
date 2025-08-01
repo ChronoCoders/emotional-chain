@@ -80,10 +80,10 @@ export class BiometricDeviceManager extends EventEmitter {
 
       this.devices.set(deviceId, device);
       this.emit('deviceConnected', device);
-      console.log(`✅ Biometric device ${deviceId} connected for validator ${validatorId}`);
+      console.log(`Biometric device ${deviceId} connected for validator ${validatorId}`);
       return true;
     } catch (error) {
-      console.error(`❌ Failed to connect device ${deviceId}:`, error);
+      console.error(`Failed to connect device ${deviceId}:`, error);
       return false;
     }
   }
@@ -94,7 +94,7 @@ export class BiometricDeviceManager extends EventEmitter {
       device.isConnected = false;
       this.devices.delete(deviceId);
       this.emit('deviceDisconnected', device);
-      console.log(`📱 Biometric device ${deviceId} disconnected`);
+      console.log(`Biometric device ${deviceId} disconnected`);
     }
   }
 

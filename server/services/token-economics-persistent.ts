@@ -337,9 +337,9 @@ export class PersistentTokenEconomics {
         }
       });
 
-      console.log(`🔄 Synced blockchain state: Block ${currentBlockHeight}, ${validatorBalances.size} validators`);
+      console.log(`Synced blockchain state: Block ${currentBlockHeight}, ${validatorBalances.size} validators`);
     } catch (error) {
-      console.error('❌ Failed to sync with blockchain:', error);
+      console.error('Failed to sync with blockchain:', error);
     }
   }
 
@@ -351,9 +351,9 @@ export class PersistentTokenEconomics {
       await db.delete(tokenEconomics);
       await db.delete(validatorStates);
       this.initialized = false;
-      console.log('🔄 Reset token economics state');
+      console.log('Reset token economics state');
     } catch (error) {
-      console.error('❌ Failed to reset token economics:', error);
+      console.error('Failed to reset token economics:', error);
     }
   }
 

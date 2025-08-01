@@ -63,14 +63,14 @@ export class EmotionalChain extends EventEmitter {
         .map(block => ({
           index: block.height,
           timestamp: new Date(block.timestamp).getTime(),
-          transactions: typeof block.transactions === 'string' ? JSON.parse(block.transactions) : (block.transactions || []),
+          transactions: typeof block.blockData === 'string' ? JSON.parse(block.blockData) : (block.blockData || []),
           previousHash: block.previousHash,
           hash: block.hash,
           nonce: block.nonce || 0,
           emotionalScore: block.emotionalScore || "0.00",
-          consensusScore: block.consensusScore || "0.00",
-          authenticity: block.authenticity || "0.00",
-          validator: block.validator || "unknown"
+          consensusScore: "0.00",
+          authenticity: "0.00", 
+          validator: block.validatorId || "unknown"
         }));
     } catch (error) {
       return [];
@@ -245,7 +245,7 @@ export class EmotionalChain extends EventEmitter {
           nonce: newBlock.nonce,
           difficulty: this.difficulty,
           validatorId: selectedValidator.id,
-          emotionalScore: parseFloat(newBlock.emotionalScore),
+          emotionalScore: newBlock.emotionalScore,
           emotionalProof: {
             consensusScore: newBlock.consensusScore,
             authenticity: newBlock.authenticity,
@@ -281,7 +281,7 @@ export class EmotionalChain extends EventEmitter {
             blockHash: newBlock.hash,
             fromAddress: 'stakingPool',
             toAddress: selectedValidator.id,
-            amount: miningReward,
+            amount: miningReward.toString(),
             fee: 0,
             timestamp: Date.now(),
             signature: { type: 'mining_reward', authenticated: true },
@@ -304,7 +304,7 @@ export class EmotionalChain extends EventEmitter {
             blockHash: newBlock.hash,
             fromAddress: 'stakingPool',
             toAddress: selectedValidator.id,
-            amount: validationReward,
+            amount: validationReward.toString(),
             fee: 0,
             timestamp: Date.now(),
             signature: { type: 'validation_reward', authenticated: true },
