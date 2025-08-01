@@ -167,8 +167,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.get('/api/token/economics', async (req, res) => {
     try {
-      // FORCE SYNC: Always sync with database before returning token economics
-      await emotionalChainService.forceSyncTokenEconomics();
       const economics = await emotionalChainService.getTokenEconomics();
       res.json(economics);
     } catch (error) {

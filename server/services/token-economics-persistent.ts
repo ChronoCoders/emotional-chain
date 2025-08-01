@@ -1,4 +1,4 @@
-import { db } from '../db';
+import { db, pool } from '../db';
 import { tokenEconomics, validatorStates } from '@shared/schema';
 import { eq, sql } from 'drizzle-orm';
 
@@ -67,6 +67,9 @@ export class PersistentTokenEconomics {
     await this.initialize();
 
     try {
+      // REAL-TIME SYNC: Always sync with database transactions first
+      await this.recalculateFromTransactions();
+      
       const [economics] = await db.select().from(tokenEconomics).limit(1);
       
       if (!economics) {
@@ -395,12 +398,12 @@ export class PersistentTokenEconomics {
   }
 
   /**
-   * FORCE SYNC: Recalculate from actual database transactions  
+   * WORKING SYNC: Recalculate from actual database transactions using pool connection
    */
   public async recalculateFromTransactions(): Promise<void> {
     try {
-      // Direct SQL query for actual rewards
-      const result = await db.raw(`
+      // Get rewards sum using Neon pool connection (db.raw doesn't exist in Drizzle)
+      const result = await pool.query(`
         SELECT 
           COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total_rewards,
           COUNT(*) as reward_count
@@ -408,27 +411,27 @@ export class PersistentTokenEconomics {
         WHERE from_address = 'stakingPool'
       `);
       
-      const blockResult = await db.raw(`SELECT MAX(height) as max_height FROM blocks`);
+      const blockResult = await pool.query(`SELECT MAX(height) as max_height FROM blocks`);
       
       const totalRewards = parseFloat(result.rows[0].total_rewards || '0');
       const currentBlockHeight = parseInt(blockResult.rows[0].max_height || '0');
       
       if (totalRewards > 0) {
-        // Direct update to token economics table
-        await db.raw(`
+        // Direct SQL update using pool connection
+        await pool.query(`
           UPDATE token_economics SET 
-            total_supply = '${totalRewards}',
-            circulating_supply = '${totalRewards}',
-            staking_pool_utilized = '${totalRewards}',
-            staking_pool_remaining = '${400000000 - totalRewards}',
-            last_block_height = ${currentBlockHeight},
+            total_supply = $1,
+            circulating_supply = $1,
+            staking_pool_utilized = $1,
+            staking_pool_remaining = $2,
+            last_block_height = $3,
             updated_at = NOW()
-        `);
+        `, [totalRewards.toString(), (400000000 - totalRewards).toString(), currentBlockHeight]);
         
-        console.log(`FORCE SYNC COMPLETE: ${totalRewards.toFixed(2)} EMO at block ${currentBlockHeight}`);
+        console.log(`SYNC SUCCESS: ${totalRewards.toFixed(2)} EMO at block ${currentBlockHeight}`);
       }
     } catch (error) {
-      console.error('Force sync failed:', error);
+      console.error('Sync failed:', error);
     }
   }
 }
