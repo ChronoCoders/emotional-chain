@@ -426,7 +426,7 @@ Emotional Profile:
     
     this.heartbeatInterval = setInterval(async () => {
       await this.syncTokenEconomics();
-    }, 15000); // Sync every 15 seconds for better responsiveness
+    }, 10000); // Sync every 10 seconds for immediate updates
   }
 
   private async syncTokenEconomics(): Promise<void> {
@@ -490,12 +490,36 @@ Emotional Profile:
   }
   public async getTokenEconomics(): Promise<any> {
     try {
-      // Always use persistent token economics from database
+      // Get real blockchain data first 
+      let blockchainData = null;
+      if (this.bootstrapNode && this.isRunning) {
+        blockchainData = this.bootstrapNode.getBlockchain().getTokenEconomics();
+      }
+      
+      // If blockchain has more recent data, update persistent storage immediately
+      if (blockchainData && blockchainData.totalSupply > 0) {
+        const persistentData = await persistentTokenEconomics.getTokenEconomics();
+        
+        // Sync if blockchain has more EMO than database
+        if (blockchainData.totalSupply > persistentData.totalSupply) {
+          console.log(`🔄 Syncing: Database ${persistentData.totalSupply} → Blockchain ${blockchainData.totalSupply} EMO`);
+          
+          const networkStats = this.network?.getNetworkStats();
+          const blockHeight = networkStats?.blockHeight || 0;
+          
+          await persistentTokenEconomics.updateTokenSupplyFromBlockchain(
+            blockchainData.totalSupply, 
+            blockHeight
+          );
+        }
+      }
+      
+      // Return updated persistent data
       return await persistentTokenEconomics.getTokenEconomics();  
     } catch (error) {
-      console.error('❌ Failed to get persistent token economics:', error);
+      console.error('❌ Failed to get token economics:', error);
       
-      // Fallback to bootstrap node only if persistent storage fails
+      // Fallback to blockchain data if available
       if (this.bootstrapNode && this.isRunning) {
         return this.bootstrapNode.getBlockchain().getTokenEconomics();
       }
