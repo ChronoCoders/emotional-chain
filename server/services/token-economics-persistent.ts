@@ -371,14 +371,9 @@ export class PersistentTokenEconomics {
         const stakingPoolUtilized = totalCirculating;
         const stakingPoolRemaining = parseFloat(economics.stakingPoolAllocated) - stakingPoolUtilized;
 
-        // Calculate historical mining data
-        const genesisBlock = parseInt(economics.genesisBlockHeight || '0');
-        const totalBlocksMined = Math.max(0, blockHeight - genesisBlock);
+        // Calculate mining history from genesis (block 1)
+        const totalBlocksMined = Math.max(0, blockHeight);
         const totalMiningRewards = totalCirculating; // All EMO comes from mining rewards
-
-        // Set genesis block height if not already set
-        const genesisHeight = genesisBlock === 0 ? Math.max(1, blockHeight - 100) : genesisBlock;
-        const miningStartTime = economics.miningStartTimestamp || new Date();
 
         // Update token economics with complete historical data
         await tx.update(tokenEconomics)
@@ -388,10 +383,6 @@ export class PersistentTokenEconomics {
             stakingPoolUtilized: stakingPoolUtilized.toString(),
             stakingPoolRemaining: Math.max(0, stakingPoolRemaining).toString(),
             lastBlockHeight: blockHeight,
-            genesisBlockHeight: genesisHeight,
-            totalBlocksMined: totalBlocksMined,
-            totalMiningRewards: totalMiningRewards.toString(),
-            miningStartTimestamp: miningStartTime,
             updatedAt: new Date()
           });
       });

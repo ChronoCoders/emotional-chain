@@ -426,7 +426,7 @@ Emotional Profile:
     
     this.heartbeatInterval = setInterval(async () => {
       await this.syncTokenEconomics();
-    }, 10000); // Sync every 10 seconds for immediate updates
+    }, 5000); // Sync every 5 seconds for real-time updates
   }
 
   private async syncTokenEconomics(): Promise<void> {
@@ -437,20 +437,12 @@ Emotional Profile:
         const networkStatus = await this.bootstrapNode.getNetworkStatus();
         const blockHeight = networkStatus?.stats?.blockHeight || 0;
         
-        if (blockHeight > 0 && networkStatus?.validators) {
-          // Calculate total EMO in circulation from validator balances
-          let totalCirculating = 0;
-          for (const validator of networkStatus.validators) {
-            totalCirculating += validator.balance || 0;
-          }
-          
-          if (totalCirculating > 0) {
-            // Update persistent token economics with current circulation
-            const currentEconomics = await persistentTokenEconomics.getTokenEconomics();
-            if (Math.abs(totalCirculating - currentEconomics.totalSupply) > 0.01) {
-              console.log(`Syncing token economics: ${currentEconomics.totalSupply} → ${totalCirculating.toFixed(2)} EMO`);
-              await this.updatePersistentTokenSupply(totalCirculating, blockHeight);
-            }
+        if (blockHeight > 0) {
+          // Force recalculation from actual database transactions instead of blockchain economics
+          const currentEconomics = await persistentTokenEconomics.getTokenEconomics();
+          if (blockHeight > currentEconomics.lastBlockHeight) {
+            console.log(`Syncing: Block ${currentEconomics.lastBlockHeight} → ${blockHeight}, recalculating from transactions`);
+            await persistentTokenEconomics.recalculateFromTransactions();
           }
         }
       } catch (error) {
