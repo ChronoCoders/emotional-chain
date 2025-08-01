@@ -59,9 +59,10 @@ export class BootstrapNode {
     return this.network;
   }
   public startMining(): any {
-    // Add test validators with biometric data for mining
-    this.addTestValidators();
-    // Start blockchain mining
+    // DISABLED: No mock validators - system will only work with real biometric devices
+    // this.addTestValidators();
+    
+    // Start blockchain mining - will only work when real validators connect
     const result = this.blockchain.startMining();
     return result;
   }
@@ -69,82 +70,9 @@ export class BootstrapNode {
     const result = this.blockchain.stopMining();
     return result;
   }
-  private addTestValidators(): void {
-    // Add 21 validators with diverse emotional/biometric profiles for real mining
-    const testValidators = [
-      // Cosmic / Sci-Fi Themed - Elite Performance
-      { id: 'StellarNode', biometricData: { heartRate: 65, stressLevel: 0.12, focusLevel: 0.95, authenticity: 0.98 }},
-      { id: 'NebulaForge', biometricData: { heartRate: 68, stressLevel: 0.15, focusLevel: 0.92, authenticity: 0.97 }},
-      { id: 'QuantumReach', biometricData: { heartRate: 70, stressLevel: 0.18, focusLevel: 0.88, authenticity: 0.93 }},
-      { id: 'OrionPulse', biometricData: { heartRate: 72, stressLevel: 0.2, focusLevel: 0.9, authenticity: 0.95 }},
-      { id: 'DarkMatterLabs', biometricData: { heartRate: 74, stressLevel: 0.22, focusLevel: 0.89, authenticity: 0.96 }},
-      { id: 'GravityCore', biometricData: { heartRate: 69, stressLevel: 0.16, focusLevel: 0.91, authenticity: 0.94 }},
-      { id: 'AstroSentinel', biometricData: { heartRate: 75, stressLevel: 0.25, focusLevel: 0.85, authenticity: 0.92 }},
-      // Tech / Futuristic Vibes - Advanced Performance
-      { id: 'ByteGuardians', biometricData: { heartRate: 73, stressLevel: 0.23, focusLevel: 0.87, authenticity: 0.91 }},
-      { id: 'ZeroLagOps', biometricData: { heartRate: 76, stressLevel: 0.27, focusLevel: 0.84, authenticity: 0.89 }},
-      { id: 'ChainFlux', biometricData: { heartRate: 71, stressLevel: 0.24, focusLevel: 0.86, authenticity: 0.90 }},
-      { id: 'BlockNerve', biometricData: { heartRate: 77, stressLevel: 0.26, focusLevel: 0.83, authenticity: 0.88 }},
-      { id: 'ValidatorX', biometricData: { heartRate: 78, stressLevel: 0.30, focusLevel: 0.82, authenticity: 0.87 }},
-      { id: 'NovaSync', biometricData: { heartRate: 79, stressLevel: 0.32, focusLevel: 0.80, authenticity: 0.85 }},
-      // Security / Trust Focused - Reliable Performance
-      { id: 'IronNode', biometricData: { heartRate: 80, stressLevel: 0.29, focusLevel: 0.81, authenticity: 0.86 }},
-      { id: 'SentinelTrust', biometricData: { heartRate: 82, stressLevel: 0.31, focusLevel: 0.79, authenticity: 0.84 }},
-      { id: 'VaultProof', biometricData: { heartRate: 81, stressLevel: 0.33, focusLevel: 0.78, authenticity: 0.83 }},
-      { id: 'SecureMesh', biometricData: { heartRate: 83, stressLevel: 0.35, focusLevel: 0.77, authenticity: 0.82 }},
-      { id: 'WatchtowerOne', biometricData: { heartRate: 84, stressLevel: 0.37, focusLevel: 0.76, authenticity: 0.81 }},
-      // Creative / Myth-Inspired - Emerging Performance
-      { id: 'AetherRunes', biometricData: { heartRate: 85, stressLevel: 0.36, focusLevel: 0.75, authenticity: 0.80 }},
-      { id: 'ChronoKeep', biometricData: { heartRate: 86, stressLevel: 0.38, focusLevel: 0.74, authenticity: 0.79 }},
-      { id: 'SolForge', biometricData: { heartRate: 87, stressLevel: 0.39, focusLevel: 0.73, authenticity: 0.78 }}
-    ];
-    testValidators.forEach(validator => {
-      this.blockchain.addValidator(validator.id, validator.biometricData);
-      this.network.addValidator(validator);
-    });
-    // Add some test transactions for mining
-    this.addTestTransactions();
-  }
-  private addTestTransactions(): void {
-    // Create transactions between different validators from our themed list
-    const validatorIds = [
-      'StellarNode', 'NebulaForge', 'QuantumReach', 'OrionPulse', 'DarkMatterLabs',
-      'ByteGuardians', 'ZeroLagOps', 'ChainFlux', 'IronNode', 'SentinelTrust'
-    ];
-    const testTransactions = [
-      {
-        from: validatorIds[0], // StellarNode
-        to: validatorIds[1], // NebulaForge
-        amount: 50,
-        type: 'transfer',
-        timestamp: Date.now()
-      },
-      {
-        from: validatorIds[2], // QuantumReach
-        to: validatorIds[3], // OrionPulse
-        amount: 25,
-        type: 'transfer', 
-        timestamp: Date.now()
-      },
-      {
-        from: validatorIds[4], // DarkMatterLabs
-        to: validatorIds[5], // ByteGuardians
-        amount: 75,
-        type: 'transfer',
-        timestamp: Date.now()
-      },
-      {
-        from: validatorIds[6], // ZeroLagOps
-        to: validatorIds[7], // ChainFlux
-        amount: 100,
-        type: 'transfer',
-        timestamp: Date.now()
-      }
-    ];
-    testTransactions.forEach(tx => {
-      this.blockchain.addTransaction(tx);
-    });
-  }
+  // REMOVED: All test validators are fake data - system now requires real biometric devices
+  // Real validators must connect with actual biometric devices to participate in consensus
+  // REMOVED: Test transactions are fake data - real transactions will come from authentic biometric validators
   public getMiningStatus(): any {
     return this.blockchain.getMiningStatus();
   }
