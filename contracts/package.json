@@ -1,0 +1,44 @@
+{
+  "name": "emotionalchain-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for EmotionalChain native token and cross-chain bridges",
+  "main": "index.js",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network emotionalchain_testnet",
+    "deploy:ethereum": "hardhat run scripts/deploy.js --network ethereum",
+    "deploy:polygon": "hardhat run scripts/deploy.js --network polygon",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "deploy:mumbai": "hardhat run scripts/deploy.js --network mumbai",
+    "verify:sepolia": "hardhat verify --network sepolia",
+    "verify:mumbai": "hardhat verify --network mumbai",
+    "coverage": "hardhat coverage",
+    "gas-report": "REPORT_GAS=true hardhat test",
+    "flatten": "hardhat flatten",
+    "clean": "hardhat clean"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "polygon",
+    "emotionalchain",
+    "biometric",
+    "defi",
+    "bridge"
+  ],
+  "author": "EmotionalChain Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^3.0.2",
+    "@openzeppelin/hardhat-upgrades": "^1.28.0",
+    "hardhat": "^2.17.1",
+    "dotenv": "^16.3.1"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.3",
+    "@layerzerolabs/solidity-examples": "^1.1.0",
+    "@axelar-network/axelar-gmp-sdk-solidity": "^5.6.4",
+    "ethers": "^6.7.1"
+  }
+}

@@ -52,6 +52,27 @@ Preferred communication style: Simple, everyday language.
 - **Runtime Validation**: Type-safe configuration with bounds checking
 - **Audit Logging**: Configuration changes tracked for compliance
 
+## Smart Contract Implementation
+
+### Native EMO Token
+- **Location**: `contracts/EMOToken.sol`
+- **Standard**: ERC-20 with biometric validation extensions
+- **Language**: Solidity 0.8.19
+- **Features**: Emotional score authentication, staking, wellness rewards, cross-chain compatibility
+- **Max Supply**: 1 billion EMO tokens with controlled distribution pools
+
+### Cross-Chain Bridge Infrastructure
+- **Bridge Contract**: `contracts/bridge/EMOBridge.sol`
+- **Wrapped Tokens**: `contracts/wrappers/WrappedEMO.sol` for Ethereum/Polygon
+- **Protocols**: LayerZero, Axelar, Wormhole, custom relayer network
+- **Security**: Multi-signature validation, biometric authentication requirements
+
+### Deployment State
+- **Current Status**: Smart contracts developed, not yet deployed
+- **Target Chains**: Ethereum, Polygon, BSC, Avalanche, Arbitrum, Optimism  
+- **Development Tools**: Hardhat, OpenZeppelin, comprehensive test suite
+- **Deployment Config**: Multi-network configuration with testnet and mainnet support
+
 ## External Dependencies
 
 ### Cloud Infrastructure
