@@ -49,9 +49,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/config/websocket", async (req, res) => {
     try {
       const { CONFIG } = await import('../shared/config');
-      res.json(CONFIG.network.protocols.websocket);
+      res.json({
+        heartbeatInterval: CONFIG.network.protocols.websocket.heartbeatInterval || 30000,
+        reconnectAttempts: CONFIG.network.protocols.websocket.reconnectAttempts || 5,
+        reconnectDelay: CONFIG.network.protocols.websocket.reconnectDelay || 2000,
+        fallbackHost: 'localhost',
+        fallbackPort: CONFIG.network.ports.websocket || 8080,
+        retryLimit: CONFIG.network.protocols.websocket.retryLimit || 10,
+        exponentialBackoffEnabled: true,
+        maxBackoffDelay: 30000,
+      });
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch WebSocket configuration' });
+      console.error('WebSocket config error:', error);
+      res.json({
+        heartbeatInterval: 30000,
+        reconnectAttempts: 5,
+        reconnectDelay: 2000,
+        fallbackHost: 'localhost',
+        fallbackPort: 8080,
+        retryLimit: 10,
+        exponentialBackoffEnabled: true,
+        maxBackoffDelay: 30000,
+      });
     }
   });
   // EmotionalChain API routes

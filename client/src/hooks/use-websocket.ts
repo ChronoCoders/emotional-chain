@@ -99,11 +99,12 @@ export function useWebSocket(): UseWebSocketReturn {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         let wsUrl: string;
         if (useFallback) {
-          wsUrl = `${protocol}//${config.fallbackHost}:${config.fallbackPort}/ws`;
+          const fallbackPort = config.fallbackPort || 8080;
+          wsUrl = `${protocol}//${config.fallbackHost || 'localhost'}:${fallbackPort}/ws`;
         } else {
           const hostname = window.location.hostname;
-          const port = window.location.port;
-          wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}/ws`;
+          const port = window.location.port || '5000';  // Default to main server port
+          wsUrl = `${protocol}//${hostname}:${port}/ws`;
         }
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;

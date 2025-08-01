@@ -51,7 +51,7 @@ export default function TerminalInterface({ className = "" }: TerminalInterfaceP
 
   const addLine = (type: 'input' | 'output' | 'error', content: string) => {
     const newLine: TerminalLine = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
       content,
       timestamp: new Date()
