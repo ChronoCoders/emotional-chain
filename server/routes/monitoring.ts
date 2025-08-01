@@ -175,10 +175,22 @@ router.get('/alerts', async (req, res) => {
 
 /**
  * GET /api/monitoring/metrics/prometheus
- * Get Prometheus-compatible metrics
+ * Get comprehensive Prometheus-compatible metrics
  */
 router.get('/metrics/prometheus', async (req, res) => {
   try {
+    // Import the production Prometheus integration
+    const { prometheusIntegration } = await import('../monitoring/prometheus-integration');
+    
+    // Get comprehensive metrics from the production system
+    const metricsOutput = await prometheusIntegration.getMetrics();
+    
+    res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
+    res.send(metricsOutput);
+  } catch (error) {
+    console.error('Prometheus metrics error:', error);
+    
+    // Fallback to basic metrics if production system fails
     const [
       consensusHealth,
       validatorParticipation,
@@ -189,49 +201,34 @@ router.get('/metrics/prometheus', async (req, res) => {
       systemMetrics.getSystemPerformance()
     ]);
 
-    // Generate Prometheus format metrics
-    const metrics = [
-      `# HELP emotionalchain_consensus_success_rate Consensus success rate percentage`,
+    // Generate basic Prometheus format metrics as fallback
+    const basicMetrics = [
+      `# HELP emotionalchain_consensus_success_rate Consensus success rate (0-1)`,
       `# TYPE emotionalchain_consensus_success_rate gauge`,
-      `emotionalchain_consensus_success_rate ${consensusHealth.metrics.consensusSuccessRate}`,
+      `emotionalchain_consensus_success_rate{status="${consensusHealth.status}"} ${consensusHealth.metrics.consensusSuccessRate}`,
       ``,
-      `# HELP emotionalchain_active_validators Number of active validators`,
-      `# TYPE emotionalchain_active_validators gauge`,
-      `emotionalchain_active_validators ${validatorParticipation.activeValidators}`,
-      ``,
-      `# HELP emotionalchain_participation_rate Validator participation rate`,
-      `# TYPE emotionalchain_participation_rate gauge`,
-      `emotionalchain_participation_rate ${consensusHealth.metrics.participationRate}`,
+      `# HELP emotionalchain_active_validators_total Number of active validators`,
+      `# TYPE emotionalchain_active_validators_total gauge`,
+      `emotionalchain_active_validators_total{region="global",status="active"} ${validatorParticipation.activeValidators}`,
+      `emotionalchain_active_validators_total{region="global",status="total"} ${validatorParticipation.totalValidators}`,
       ``,
       `# HELP emotionalchain_block_height Current block height`,
-      `# TYPE emotionalchain_block_height counter`,
+      `# TYPE emotionalchain_block_height gauge`,
       `emotionalchain_block_height ${consensusHealth.metrics.blockHeight}`,
       ``,
-      `# HELP emotionalchain_average_block_time Average block time in seconds`,
-      `# TYPE emotionalchain_average_block_time gauge`,
-      `emotionalchain_average_block_time ${consensusHealth.metrics.averageBlockTime}`,
+      `# HELP emotionalchain_system_uptime_seconds System uptime in seconds`,
+      `# TYPE emotionalchain_system_uptime_seconds gauge`,
+      `emotionalchain_system_uptime_seconds ${systemPerformance.uptime}`,
       ``,
-      `# HELP emotionalchain_system_uptime System uptime in seconds`,
-      `# TYPE emotionalchain_system_uptime counter`,
-      `emotionalchain_system_uptime ${systemPerformance.uptime}`,
-      ``,
-      `# HELP emotionalchain_cpu_usage CPU usage percentage`,
-      `# TYPE emotionalchain_cpu_usage gauge`,
-      `emotionalchain_cpu_usage ${systemPerformance.cpuUsage}`,
-      ``,
-      `# HELP emotionalchain_memory_usage Memory usage percentage`,
-      `# TYPE emotionalchain_memory_usage gauge`,
-      `emotionalchain_memory_usage ${systemPerformance.memoryUsage}`,
+      `# HELP emotionalchain_memory_usage_bytes Memory usage in bytes`,
+      `# TYPE emotionalchain_memory_usage_bytes gauge`,
+      `emotionalchain_memory_usage_bytes{component="heap_used"} ${process.memoryUsage().heapUsed}`,
+      `emotionalchain_memory_usage_bytes{component="heap_total"} ${process.memoryUsage().heapTotal}`,
       ``
     ].join('\n');
 
-    res.set('Content-Type', 'text/plain');
-    res.send(metrics);
-  } catch (error) {
-    res.status(500).json({ 
-      error: 'Failed to generate Prometheus metrics', 
-      details: error instanceof Error ? error.message : 'Unknown error' 
-    });
+    res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
+    res.send(basicMetrics);
   }
 });
 

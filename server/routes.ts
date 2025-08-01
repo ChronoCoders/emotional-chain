@@ -26,6 +26,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Monitoring Dashboard API
   const monitoringRouter = await import("./routes/monitoring");
   app.use("/api/monitoring", monitoringRouter.default);
+  
+  // Production Prometheus metrics endpoint
+  app.get('/metrics', async (req, res) => {
+    try {
+      // Import the production Prometheus integration directly
+      const { prometheusIntegration } = await import("./monitoring/prometheus-integration");
+      const metricsOutput = await prometheusIntegration.getMetrics();
+      
+      res.set('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
+      res.send(metricsOutput);
+    } catch (error) {
+      console.error('Production metrics endpoint error:', error);
+      res.status(500).send('# Metrics temporarily unavailable\n');
+    }
+  });
   // WebSocket configuration endpoint for client
   app.get("/api/config/websocket", async (req, res) => {
     try {
