@@ -117,6 +117,7 @@ export function useWebSocket(): UseWebSocketReturn {
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
         socket.onopen = () => {
+          console.log('🔌 WebSocket connected successfully to:', wsUrl);
           setIsConnected(true);
           retryCountRef.current = 0; // Reset retry count on successful connection
           startHeartbeat();
@@ -134,6 +135,7 @@ export function useWebSocket(): UseWebSocketReturn {
         socket.onclose = (event) => {
           setIsConnected(false);
           stopHeartbeat();
+          console.log('🔌 WebSocket closed:', event.code, event.reason);
           if (isCleaningUp || event.code === 1000) {
             return; // Intentional close, don't reconnect
           }
@@ -141,10 +143,11 @@ export function useWebSocket(): UseWebSocketReturn {
           if (retryCountRef.current < config.retryLimit) {
             const delay = calculateBackoffDelay(retryCountRef.current);
             retryCountRef.current++;
+            console.log(`🔌 Reconnecting in ${delay}ms (attempt ${retryCountRef.current}/${config.retryLimit})`);
             setTimeout(() => {
               if (!isCleaningUp && (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED)) {
-                // Try fallback if primary connection fails repeatedly
-                const shouldUseFallback = retryCountRef.current > Math.floor(config.retryLimit / 2);
+                // Only use fallback if we're in localhost development mode
+                const shouldUseFallback = useFallback || (window.location.hostname === 'localhost' && retryCountRef.current > 3);
                 connectWithFallback(shouldUseFallback);
               }
             }, delay);
@@ -153,6 +156,7 @@ export function useWebSocket(): UseWebSocketReturn {
           }
         };
         socket.onerror = (error) => {
+          console.error('🚨 WebSocket error:', error);
           setIsConnected(false);
           stopHeartbeat();
         };
