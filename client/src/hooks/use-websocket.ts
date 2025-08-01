@@ -113,6 +113,7 @@ export function useWebSocket(): UseWebSocketReturn {
             wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}:5000/ws`;
           }
         }
+        console.log('🔌 Attempting WebSocket connection to:', wsUrl);
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
         socket.onopen = () => {
