@@ -26,6 +26,11 @@ const NetworkSchema = z.object({
       heartbeatInterval: z.number().int().min(1000).max(300000), // 1s to 5min
       reconnectAttempts: z.number().int().min(1).max(50),
       reconnectDelay: z.number().int().min(100).max(30000), // 100ms to 30s
+      fallbackHost: z.string().min(1),
+      fallbackPort: z.number().int().min(1024).max(65535),
+      retryLimit: z.number().int().min(1).max(20),
+      exponentialBackoffEnabled: z.boolean(),
+      maxBackoffDelay: z.number().int().min(1000).max(300000), // 1s to 5min
     }),
   }),
   timeouts: z.object({

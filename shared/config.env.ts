@@ -47,6 +47,11 @@ export const rawConfig = {
         heartbeatInterval: parseInt(process.env.WS_HEARTBEAT_INTERVAL, 30000),
         reconnectAttempts: parseInt(process.env.WS_RECONNECT_ATTEMPTS, 5),
         reconnectDelay: parseInt(process.env.WS_RECONNECT_DELAY, 2000),
+        fallbackHost: parseString(process.env.WS_FALLBACK_HOST, 'localhost'),
+        fallbackPort: parseInt(process.env.WS_FALLBACK_PORT, 8080),
+        retryLimit: parseInt(process.env.WS_RETRY_LIMIT, 10),
+        exponentialBackoffEnabled: parseBoolean(process.env.WS_EXPONENTIAL_BACKOFF, true),
+        maxBackoffDelay: parseInt(process.env.WS_MAX_BACKOFF_DELAY, 30000),
       },
     },
     timeouts: {

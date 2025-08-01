@@ -6,10 +6,22 @@ import { emotionalChainService } from "./services/emotionalchain";
 import { advancedFeaturesService } from "./services/advanced-features";
 import { dataIntegrityAudit } from "./services/data-integrity-audit";
 import configRouter from "./routes/config";
+import { CONFIG } from "../shared/config";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Internal configuration management API (admin-only)
   app.use("/internal", configRouter);
+  
+  // WebSocket configuration endpoint for client
+  app.get("/api/config/websocket", async (req, res) => {
+    try {
+      const { CONFIG } = await import('../shared/config');
+      res.json(CONFIG.network.protocols.websocket);
+    } catch (error) {
+      console.error('Error fetching WebSocket config:', error);
+      res.status(500).json({ error: 'Failed to fetch WebSocket configuration' });
+    }
+  });
 
   // EmotionalChain API routes
   app.get("/api/network/status", async (req, res) => {
@@ -74,8 +86,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/wallets/database", async (req, res) => {
     try {
-      const wallets = await storage.getWalletsFromDatabase();
-      res.json(wallets);
+      const wallets = await emotionalChainService.getAllWallets();
+      const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
+        validatorId,
+        balance,
+        currency: 'EMO'
+      }));
+      res.json(walletsArray);
     } catch (error) {
       res.status(500).json({ error: (error as Error).message });
     }
@@ -420,7 +437,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check 2: No mocks present (check for authentic blockchain data)
       const recentBlocks = blocks.filter(b => new Date(b.timestamp).getTime() > Date.now() - (60 * 60 * 1000)); // Last hour
-      const noMocks = recentBlocks.length > 0 && !recentBlocks.some(b => b.hash.includes('mock' || 'test'));
+      const noMocks = recentBlocks.length > 0 && !recentBlocks.some(b => b.hash.includes('mock') || b.hash.includes('test'));
       
       // Check 3: Biometric data integrity (check for emotional scores in validators)
       const validatorsWithScores = validators.filter(v => parseFloat(v.emotionalScore) > 0 && parseFloat(v.emotionalScore) < 100);
@@ -505,8 +522,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
 
-  // WebSocket server for real-time updates
-  const wss = new WebSocketServer({ server: httpServer, path: '/ws' });
+  // WebSocket server for real-time updates - using centralized CONFIG
+  const wss = new WebSocketServer({ 
+    server: httpServer, 
+    path: '/ws'
+  });
   
   wss.on('connection', (ws: WebSocket) => {
     console.log('New WebSocket connection established');
@@ -543,13 +563,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.error('Error sending WebSocket update:', error);
         }
       }
-    }, 2000); // Send updates every 2 seconds
+    }, CONFIG.network.protocols.websocket.heartbeatInterval); // Use CONFIG for interval
 
     ws.on('message', async (message: string) => {
       try {
         const data = JSON.parse(message);
         
-        if (data.type === 'command') {
+        if (data.type === 'ping') {
+          // Respond to heartbeat ping with pong
+          ws.send(JSON.stringify({
+            type: 'pong',
+            timestamp: new Date().toISOString()
+          }));
+        } else if (data.type === 'command') {
           const result = await emotionalChainService.executeCommand(data.command, data.args);
           ws.send(JSON.stringify({
             type: 'command_result',

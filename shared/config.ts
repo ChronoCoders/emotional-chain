@@ -75,6 +75,21 @@ function validateStartupConfiguration(): void {
     validateConfig(CONFIG);
     console.log('✅ Configuration validation passed');
     
+    // Additional WebSocket configuration validation
+    if (!CONFIG.network.protocols.websocket.fallbackHost || CONFIG.network.protocols.websocket.fallbackHost === 'undefined') {
+      throw new Error('WebSocket fallback host cannot be undefined or empty');
+    }
+    
+    if (!CONFIG.network.protocols.websocket.fallbackPort || CONFIG.network.protocols.websocket.fallbackPort < 1024) {
+      throw new Error('WebSocket fallback port must be a valid port number (>= 1024)');
+    }
+    
+    if (CONFIG.network.protocols.websocket.retryLimit <= 0) {
+      throw new Error('WebSocket retry limit must be greater than 0');
+    }
+    
+    console.log('✅ WebSocket configuration validated');
+    
     // Log key configuration values
     console.log(`📊 Key Configuration:`);
     console.log(`   Consensus Quorum: ${CONFIG.consensus.quorum.ratio * 100}%`);
@@ -83,6 +98,8 @@ function validateStartupConfiguration(): void {
     console.log(`   AI Model Threshold: ${CONFIG.ai.models.emotionalPredictor.threshold}`);
     console.log(`   TLS Required: ${CONFIG.network.protocols.tls.required}`);
     console.log(`   Ports: HTTP=${CONFIG.network.ports.http}, P2P=${CONFIG.network.ports.p2p}, WS=${CONFIG.network.ports.websocket}`);
+    console.log(`   WebSocket Fallback: ${CONFIG.network.protocols.websocket.fallbackHost}:${CONFIG.network.protocols.websocket.fallbackPort}`);
+    console.log(`   WebSocket Retry Limit: ${CONFIG.network.protocols.websocket.retryLimit}`);
     
   } catch (error) {
     console.error('❌ Configuration validation failed:', error);
