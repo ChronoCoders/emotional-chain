@@ -72,31 +72,28 @@ export default function VisualBlocks() {
         </div>
       ) : (
         <div className="relative min-h-96 perspective-1000">
-          <div className="flex justify-center items-center space-x-6 h-80">
+          <div className="flex justify-center items-center space-x-4 h-80">
             {blocks.slice().reverse().slice(0, 6).map((block, index) => (
               <div
                 key={block.id}
                 className="block-3d-container"
                 style={{
-                  transform: `translateZ(${index * -30}px) rotateY(${index * 5}deg)`,
+                  transform: `rotateX(-15deg) rotateY(${25 + index * 5}deg) translateZ(${index * -20}px)`,
                   animationDelay: `${index * 0.2}s`
                 }}
               >
                 {/* 3D Block Structure */}
-                <div className={`block-3d ${getBlockColor(block.height)} hover:rotate-y-15`}>
+                <div className={`block-3d ${getBlockColor(block.height)}`}>
                   {/* Front Face */}
-                  <div className="block-face block-face-front">
-                    <div className="p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="text-terminal-success font-bold text-sm">
-                          #{block.height}
-                        </div>
-                        <div className="w-2 h-2 bg-terminal-success rounded-full animate-pulse"></div>
+                  <div className={`block-face block-face-front ${getBlockColor(block.height)}`}>
+                    <div className="text-center">
+                      <div className="text-terminal-success font-bold text-sm mb-1">
+                        #{block.height}
                       </div>
-                      <div className="text-xs text-terminal-cyan font-mono">
+                      <div className="text-xs text-terminal-cyan font-mono mb-1">
                         {formatHash(block.hash)}
                       </div>
-                      <div className="mt-2 text-xs">
+                      <div className="text-xs">
                         <div className="text-terminal-warning">EMOTION</div>
                         <div className="text-terminal-cyan font-bold">
                           {parseFloat(block.emotionalScore || '0').toFixed(1)}%
@@ -105,28 +102,56 @@ export default function VisualBlocks() {
                     </div>
                   </div>
 
+                  {/* Back Face */}
+                  <div className={`block-face block-face-back ${getBlockColor(block.height)}`}>
+                    <div className="text-center">
+                      <div className="text-terminal-warning text-xs mb-1">VALIDATOR</div>
+                      <div className="text-terminal-cyan font-mono text-xs">
+                        {block.validatorId ? `${block.validatorId.substring(0, 8)}...` : 'Unknown'}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Right Face */}
-                  <div className="block-face block-face-right">
-                    <div className="p-3">
-                      <div className="text-xs">
-                        <div className="text-terminal-warning mb-1">TXN</div>
-                        <div className="text-terminal-cyan font-bold">
-                          {block.transactionCount || 0}
-                        </div>
-                        <div className="text-terminal-warning mt-2 mb-1">REWARD</div>
-                        <div className="text-terminal-success font-bold">
-                          {calculateReward(block).toFixed(1)}
-                        </div>
+                  <div className={`block-face block-face-right ${getBlockColor(block.height)}`}>
+                    <div className="text-center">
+                      <div className="text-terminal-warning text-xs mb-1">TXN</div>
+                      <div className="text-terminal-cyan font-bold mb-2">
+                        {block.transactionCount || 0}
+                      </div>
+                      <div className="text-terminal-warning text-xs mb-1">REWARD</div>
+                      <div className="text-terminal-success font-bold text-xs">
+                        {calculateReward(block).toFixed(1)}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Left Face */}
+                  <div className={`block-face block-face-left ${getBlockColor(block.height)}`}>
+                    <div className="text-center">
+                      <div className="text-terminal-warning text-xs mb-1">DIFFICULTY</div>
+                      <div className="text-terminal-cyan font-bold">
+                        {block.difficulty}
                       </div>
                     </div>
                   </div>
 
                   {/* Top Face */}
-                  <div className="block-face block-face-top">
-                    <div className="p-3 text-center">
-                      <div className="text-terminal-warning text-xs">CONSENSUS</div>
+                  <div className={`block-face block-face-top ${getBlockColor(block.height)}`}>
+                    <div className="text-center">
+                      <div className="text-terminal-warning text-xs mb-1">CONSENSUS</div>
                       <div className="text-terminal-success font-bold">
                         {parseFloat(block.emotionalScore || '0').toFixed(1)}%
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Face */}
+                  <div className={`block-face block-face-bottom ${getBlockColor(block.height)}`}>
+                    <div className="text-center">
+                      <div className="text-terminal-warning text-xs mb-1">NONCE</div>
+                      <div className="text-terminal-cyan font-bold text-xs">
+                        {block.nonce}
                       </div>
                     </div>
                   </div>
@@ -143,7 +168,7 @@ export default function VisualBlocks() {
                 </div>
 
                 {/* Block Info Below */}
-                <div className="mt-4 text-center">
+                <div className="mt-6 text-center">
                   <div className="text-xs text-terminal-dim">
                     {formatTimeAgo(new Date(block.timestamp))}
                   </div>
