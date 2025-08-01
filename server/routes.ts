@@ -19,6 +19,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const aiLearningRouter = await import("./routes/ai-learning-simple");
   app.use("/api/ai/learning", aiLearningRouter.default);
   
+  // Biometric Device Management API
+  const biometricRouter = await import("./routes/biometric");
+  app.use("/api/biometric", biometricRouter.default);
+  
   // Privacy Layer API
   const privacyRouter = await import("./routes/privacy");
   app.use("/api/privacy", privacyRouter.default);

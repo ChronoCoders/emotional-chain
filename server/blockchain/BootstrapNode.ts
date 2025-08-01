@@ -1,6 +1,7 @@
 // EmotionalChain Bootstrap Node Implementation
 import { EmotionalChain } from './EmotionalChain';
 import { EmotionalNetwork } from './EmotionalNetwork';
+import { biometricDeviceManager } from '../biometric/BiometricDeviceManager';
 export class BootstrapNode {
   private blockchain: EmotionalChain;
   private network: EmotionalNetwork;
@@ -59,11 +60,24 @@ export class BootstrapNode {
     return this.network;
   }
   public startMining(): any {
-    // DISABLED: No mock validators - system will only work with real biometric devices
-    // this.addTestValidators();
+    // Check for connected biometric devices
+    const authenticatedValidators = biometricDeviceManager.getAuthenticatedValidators();
     
-    // Start blockchain mining - will only work when real validators connect
+    if (authenticatedValidators.length === 0) {
+      console.log('⚠️  No biometric devices connected. Mining requires real validators with biometric authentication.');
+      console.log('📱 Please connect heart rate monitors, stress sensors, or EEG devices to participate in consensus.');
+      
+      return {
+        status: 'waiting_for_biometric_devices',
+        message: 'Mining requires authenticated biometric validators',
+        connectedDevices: 0,
+        requiredDevices: 1
+      };
+    }
+    
+    // Start blockchain mining with authenticated validators
     const result = this.blockchain.startMining();
+    console.log(`🔄 Mining started with ${authenticatedValidators.length} biometrically authenticated validators`);
     return result;
   }
   public stopMining(): any {
