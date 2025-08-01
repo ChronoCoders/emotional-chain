@@ -393,6 +393,44 @@ export class PersistentTokenEconomics {
       throw error;
     }
   }
+
+  /**
+   * FORCE SYNC: Recalculate from actual database transactions  
+   */
+  public async recalculateFromTransactions(): Promise<void> {
+    try {
+      // Direct SQL query for actual rewards
+      const result = await db.raw(`
+        SELECT 
+          COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total_rewards,
+          COUNT(*) as reward_count
+        FROM transactions 
+        WHERE from_address = 'stakingPool'
+      `);
+      
+      const blockResult = await db.raw(`SELECT MAX(height) as max_height FROM blocks`);
+      
+      const totalRewards = parseFloat(result.rows[0].total_rewards || '0');
+      const currentBlockHeight = parseInt(blockResult.rows[0].max_height || '0');
+      
+      if (totalRewards > 0) {
+        // Direct update to token economics table
+        await db.raw(`
+          UPDATE token_economics SET 
+            total_supply = '${totalRewards}',
+            circulating_supply = '${totalRewards}',
+            staking_pool_utilized = '${totalRewards}',
+            staking_pool_remaining = '${400000000 - totalRewards}',
+            last_block_height = ${currentBlockHeight},
+            updated_at = NOW()
+        `);
+        
+        console.log(`FORCE SYNC COMPLETE: ${totalRewards.toFixed(2)} EMO at block ${currentBlockHeight}`);
+      }
+    } catch (error) {
+      console.error('Force sync failed:', error);
+    }
+  }
 }
 
 export const persistentTokenEconomics = PersistentTokenEconomics.getInstance();

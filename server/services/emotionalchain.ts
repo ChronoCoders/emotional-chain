@@ -454,6 +454,18 @@ Emotional Profile:
   }
 
   /**
+   * Force immediate synchronization with database transactions
+   */
+  public async forceSyncTokenEconomics(): Promise<void> {
+    try {
+      // Direct database sync - no blockchain dependency
+      await persistentTokenEconomics.recalculateFromTransactions();
+    } catch (error) {
+      console.error('Failed to force sync token economics:', error);
+    }
+  }
+
+  /**
    * Update persistent token supply based on actual blockchain state
    */  
   private async updatePersistentTokenSupply(totalCirculating: number, blockHeight: number): Promise<void> {
