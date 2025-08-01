@@ -309,3 +309,60 @@
     transform: scale(1.1);
   }
 }
+
+/* Enhanced 3D Block Features */
+.auto-rotate {
+  animation: autoRotate 10s linear infinite;
+}
+
+.auto-rotate:hover {
+  animation-play-state: paused;
+}
+
+.selected {
+  z-index: 10;
+  transform: scale(1.2) !important;
+}
+
+.selected-glow .block-face {
+  box-shadow: 0 0 20px var(--terminal-cyan), inset 0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.block-3d-container:hover {
+  z-index: 5;
+}
+
+.block-3d {
+  transform-origin: center center;
+}
+
+/* Block Health Indicators */
+.block-health-excellent { border-color: var(--terminal-success) !important; }
+.block-health-good { border-color: var(--terminal-cyan) !important; }
+.block-health-warning { border-color: var(--terminal-warning) !important; }
+.block-health-critical { border-color: var(--terminal-error) !important; }
+
+/* Interactive Effects */
+.block-face:hover {
+  background: rgba(0, 255, 0, 0.1);
+  border-color: var(--terminal-success);
+}
+
+/* Pulse Animation for Latest Block */
+.latest-block {
+  animation: latestBlockPulse 2s ease-in-out infinite;
+}
+
+@keyframes autoRotate {
+  from { transform: rotateX(-15deg) rotateY(25deg); }
+  to { transform: rotateX(-15deg) rotateY(385deg); }
+}
+
+@keyframes latestBlockPulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px var(--terminal-success);
+  }
+  50% { 
+    box-shadow: 0 0 40px var(--terminal-success), 0 0 60px var(--terminal-success);
+  }
+}

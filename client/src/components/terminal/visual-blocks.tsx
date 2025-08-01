@@ -5,6 +5,9 @@ import type { Block } from '@shared/schema';
 
 export default function VisualBlocks() {
   const [realtimeBlocks, setRealtimeBlocks] = useState<Block[]>([]);
+  const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
+  const [autoRotate, setAutoRotate] = useState(true);
+  const [viewMode, setViewMode] = useState<'chain' | 'stack' | 'circle'>('chain');
   const { lastMessage } = useWebSocket();
 
   const { data: initialBlocks = [] } = useQuery<Block[]>({
@@ -59,11 +62,70 @@ export default function VisualBlocks() {
     return miningReward + validationReward;
   };
 
+  const getLayoutTransform = (index: number, total: number) => {
+    switch (viewMode) {
+      case 'stack':
+        return `rotateX(-15deg) rotateY(25deg) translateY(${index * -30}px) translateZ(${index * 10}px)`;
+      case 'circle':
+        const angle = (index / total) * 360;
+        const radius = 150;
+        return `rotateX(-15deg) rotateY(${angle}deg) translateZ(${radius}px)`;
+      default: // chain
+        return `rotateX(-15deg) rotateY(${25 + index * 5}deg) translateZ(${index * -20}px)`;
+    }
+  };
+
   return (
     <div className="terminal-window rounded-lg p-6">
-      <h2 className="text-terminal-cyan text-lg font-bold mb-4">
-        ┌── VISUAL_BLOCK_EXPLORER ──┐
-      </h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-terminal-cyan text-lg font-bold">
+          ┌── VISUAL_BLOCK_EXPLORER ──┐
+        </h2>
+        
+        {/* View Controls */}
+        <div className="flex space-x-2 text-xs">
+          <button
+            onClick={() => setViewMode('chain')}
+            className={`px-2 py-1 border transition-colors ${
+              viewMode === 'chain' 
+                ? 'border-terminal-success text-terminal-success bg-terminal-success/20' 
+                : 'border-terminal-border text-terminal-dim hover:text-terminal-cyan'
+            }`}
+          >
+            CHAIN
+          </button>
+          <button
+            onClick={() => setViewMode('stack')}
+            className={`px-2 py-1 border transition-colors ${
+              viewMode === 'stack' 
+                ? 'border-terminal-success text-terminal-success bg-terminal-success/20' 
+                : 'border-terminal-border text-terminal-dim hover:text-terminal-cyan'
+            }`}
+          >
+            STACK
+          </button>
+          <button
+            onClick={() => setViewMode('circle')}
+            className={`px-2 py-1 border transition-colors ${
+              viewMode === 'circle' 
+                ? 'border-terminal-success text-terminal-success bg-terminal-success/20' 
+                : 'border-terminal-border text-terminal-dim hover:text-terminal-cyan'
+            }`}
+          >
+            CIRCLE
+          </button>
+          <button
+            onClick={() => setAutoRotate(!autoRotate)}
+            className={`px-2 py-1 border transition-colors ${
+              autoRotate 
+                ? 'border-terminal-warning text-terminal-warning bg-terminal-warning/20' 
+                : 'border-terminal-border text-terminal-dim hover:text-terminal-cyan'
+            }`}
+          >
+            AUTO-ROTATE
+          </button>
+        </div>
+      </div>
       
       {blocks.length === 0 ? (
         <div className="text-terminal-dim text-center py-8">
@@ -72,18 +134,20 @@ export default function VisualBlocks() {
         </div>
       ) : (
         <div className="relative min-h-96 perspective-1000">
-          <div className="flex justify-center items-center space-x-4 h-80">
+          <div className={`flex justify-center items-center h-80 ${viewMode === 'circle' ? 'relative' : 'space-x-4'}`}>
             {blocks.slice().reverse().slice(0, 6).map((block, index) => (
               <div
                 key={block.id}
-                className="block-3d-container"
+                className={`block-3d-container ${autoRotate ? 'auto-rotate' : ''} ${selectedBlock?.id === block.id ? 'selected' : ''}`}
                 style={{
-                  transform: `rotateX(-15deg) rotateY(${25 + index * 5}deg) translateZ(${index * -20}px)`,
-                  animationDelay: `${index * 0.2}s`
+                  transform: getLayoutTransform(index, Math.min(blocks.length, 6)),
+                  animationDelay: `${index * 0.2}s`,
+                  position: viewMode === 'circle' ? 'absolute' : 'relative'
                 }}
+                onClick={() => setSelectedBlock(selectedBlock?.id === block.id ? null : block)}
               >
                 {/* 3D Block Structure */}
-                <div className={`block-3d ${getBlockColor(block.height)}`}>
+                <div className={`block-3d ${getBlockColor(block.height)} ${selectedBlock?.id === block.id ? 'selected-glow' : ''}`}>
                   {/* Front Face */}
                   <div className={`block-face block-face-front ${getBlockColor(block.height)}`}>
                     <div className="text-center">
@@ -163,8 +227,15 @@ export default function VisualBlocks() {
 
                   {/* Mining Glow for Latest Block */}
                   {index === 0 && (
-                    <div className="mining-glow"></div>
+                    <div className="mining-glow latest-block"></div>
                   )}
+                  
+                  {/* Block Health Indicator */}
+                  <div className={`absolute -top-2 -right-2 w-4 h-4 rounded-full ${
+                    parseFloat(block.emotionalScore || '0') > 90 ? 'bg-terminal-success' :
+                    parseFloat(block.emotionalScore || '0') > 75 ? 'bg-terminal-cyan' :
+                    parseFloat(block.emotionalScore || '0') > 50 ? 'bg-terminal-warning' : 'bg-terminal-error'
+                  } animate-pulse`}></div>
                 </div>
 
                 {/* Block Info Below */}
@@ -203,6 +274,45 @@ export default function VisualBlocks() {
           </div>
         </div>
       </div>
+
+      {/* Selected Block Details */}
+      {selectedBlock && (
+        <div className="mt-6 p-4 border border-terminal-cyan bg-terminal-cyan/10 rounded-lg">
+          <h3 className="text-terminal-cyan font-bold mb-3">BLOCK #{selectedBlock.height} DETAILS</h3>
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <div className="text-terminal-warning">FULL HASH</div>
+              <div className="text-terminal-cyan font-mono text-xs break-all">{selectedBlock.hash}</div>
+            </div>
+            <div>
+              <div className="text-terminal-warning">PREVIOUS HASH</div>
+              <div className="text-terminal-cyan font-mono text-xs break-all">{selectedBlock.previousHash}</div>
+            </div>
+            <div>
+              <div className="text-terminal-warning">MERKLE ROOT</div>
+              <div className="text-terminal-cyan font-mono text-xs break-all">{selectedBlock.merkleRoot}</div>
+            </div>
+            <div>
+              <div className="text-terminal-warning">VALIDATOR</div>
+              <div className="text-terminal-cyan font-mono text-xs break-all">{selectedBlock.validatorId}</div>
+            </div>
+            <div>
+              <div className="text-terminal-warning">EMOTIONAL SCORE</div>
+              <div className="text-terminal-success font-bold">{parseFloat(selectedBlock.emotionalScore || '0').toFixed(2)}%</div>
+            </div>
+            <div>
+              <div className="text-terminal-warning">TIMESTAMP</div>
+              <div className="text-terminal-cyan">{new Date(selectedBlock.timestamp).toLocaleString()}</div>
+            </div>
+          </div>
+          <button 
+            onClick={() => setSelectedBlock(null)}
+            className="mt-3 px-3 py-1 border border-terminal-border text-terminal-dim hover:text-terminal-cyan text-xs"
+          >
+            CLOSE
+          </button>
+        </div>
+      )}
 
       {/* Live Mining Indicator */}
       <div className="mt-4 text-center">
