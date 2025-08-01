@@ -80,6 +80,7 @@ Preferred communication style: Simple, everyday language.
 - **Smart Contracts**: EVM-compatible contracts with biometric triggers
 
 ### Configuration System
+- **Location**: All configuration files moved to `shared/` directory for centralized access
 - **Centralized Config**: Comprehensive configuration with Zod schema validation
 - **Environment Overrides**: All parameters configurable via environment variables
 - **Runtime Validation**: Type-safe configuration with bounds checking
