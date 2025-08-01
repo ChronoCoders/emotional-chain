@@ -90,14 +90,11 @@ export function useWebSocket(): UseWebSocketReturn {
     };
     const connectWithFallback = (useFallback = false) => {
       if (isCleaningUp) return;
-      // Validate configuration before attempting connection
       if (!config.fallbackHost || !config.fallbackPort) {
-        console.error('🚨 WebSocket Configuration Error: Missing required fallback parameters');
         return;
       }
       try {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-        console.log('🔌 WebSocket connection attempt:', { protocol, hostname: window.location.hostname, port: window.location.port, useFallback });
         let wsUrl: string;
         if (useFallback) {
           const fallbackPort = config.fallbackPort || 8080;
@@ -113,13 +110,11 @@ export function useWebSocket(): UseWebSocketReturn {
             wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}:5000/ws`;
           }
         }
-        console.log('🔌 Attempting WebSocket connection to:', wsUrl);
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
         socket.onopen = () => {
-          console.log('🔌 WebSocket connected successfully to:', wsUrl);
           setIsConnected(true);
-          retryCountRef.current = 0; // Reset retry count on successful connection
+          retryCountRef.current = 0;
           startHeartbeat();
         };
         socket.onmessage = (event) => {
@@ -135,33 +130,26 @@ export function useWebSocket(): UseWebSocketReturn {
         socket.onclose = (event) => {
           setIsConnected(false);
           stopHeartbeat();
-          console.log('🔌 WebSocket closed:', event.code, event.reason);
           if (isCleaningUp || event.code === 1000) {
-            return; // Intentional close, don't reconnect
+            return;
           }
           // Attempt reconnection with exponential backoff
           if (retryCountRef.current < config.retryLimit) {
             const delay = calculateBackoffDelay(retryCountRef.current);
             retryCountRef.current++;
-            console.log(`🔌 Reconnecting in ${delay}ms (attempt ${retryCountRef.current}/${config.retryLimit})`);
             setTimeout(() => {
               if (!isCleaningUp && (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED)) {
-                // Only use fallback if we're in localhost development mode
                 const shouldUseFallback = useFallback || (window.location.hostname === 'localhost' && retryCountRef.current > 3);
                 connectWithFallback(shouldUseFallback);
               }
             }, delay);
-          } else {
-            console.error('🚨 WebSocket: Maximum retry attempts reached. Connection abandoned.');
           }
         };
         socket.onerror = (error) => {
-          console.error('🚨 WebSocket error:', error);
           setIsConnected(false);
           stopHeartbeat();
         };
       } catch (error) {
-        console.error('🚨 Error creating WebSocket connection:', error);
         if (retryCountRef.current < config.retryLimit) {
           const delay = calculateBackoffDelay(retryCountRef.current);
           retryCountRef.current++;
@@ -182,8 +170,6 @@ export function useWebSocket(): UseWebSocketReturn {
   const sendMessage = (message: any) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
-    } else {
-      console.warn('WebSocket is not connected - message queued');
     }
   };
   const sendCommand = (command: string, args: string[] = []) => {

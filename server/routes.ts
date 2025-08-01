@@ -497,11 +497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     path: '/ws'
   });
   
-  console.log('🔌 WebSocket server initialized on path: /ws');
-  
   wss.on('connection', (ws: WebSocket, req) => {
-    console.log('🔌 New WebSocket connection established from:', req.socket.remoteAddress);
-    console.log('🔌 Connection headers:', req.headers.host, req.url);
     // Send initial data
     ws.send(JSON.stringify({ 
       type: 'connection', 

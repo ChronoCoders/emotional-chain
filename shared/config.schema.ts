@@ -297,7 +297,7 @@ export function validateConfig(config: unknown): EmotionalChainConfig {
     return ConfigSchema.parse(config);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('🚨 CONFIGURATION VALIDATION FAILED:');
+      console.error('CONFIGURATION VALIDATION FAILED:');
       error.errors.forEach(err => {
         console.error(`  ❌ ${err.path.join('.')}: ${err.message}`);
       });

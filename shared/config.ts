@@ -78,7 +78,7 @@ function validateStartupConfiguration(): void {
     console.log(`   WebSocket Fallback: ${CONFIG.network.protocols.websocket.fallbackHost}:${CONFIG.network.protocols.websocket.fallbackPort}`);
     console.log(`   WebSocket Retry Limit: ${CONFIG.network.protocols.websocket.retryLimit}`);
   } catch (error) {
-    console.error('🚨 EmotionalChain cannot start with invalid configuration');
+    console.error('EmotionalChain cannot start with invalid configuration');
     process.exit(1);
   }
 }
