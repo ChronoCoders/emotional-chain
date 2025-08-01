@@ -1,7 +1,6 @@
 import { BiometricReading } from './BiometricDevice';
 import { AuthenticityProof, AuthenticityProofGenerator } from './AuthenticityProof';
 import { CONFIG, configHelpers } from '../shared/config';
-
 export interface EmotionalProfile {
   validatorId: string;
   heartRate: number;
@@ -12,7 +11,6 @@ export interface EmotionalProfile {
   deviceCount: number;
   qualityScore: number;
 }
-
 export interface ConsensusScore {
   validatorId: string;
   emotionalScore: number;
@@ -23,7 +21,6 @@ export interface ConsensusScore {
   eligible: boolean;
   rank: number;
 }
-
 export interface ConsensusResult {
   selectedValidator: string;
   scores: ConsensusScore[];
@@ -32,14 +29,12 @@ export interface ConsensusResult {
   antiGamingScore: number;
   timestamp: number;
 }
-
 export class EmotionalConsensusEngine {
   private readonly MIN_CONSENSUS_SCORE: number;
   private readonly MIN_AUTHENTICITY: number;
   private readonly MIN_DEVICES: number;
   private readonly MAX_STRESS_LEVEL: number;
   private readonly MIN_FOCUS_LEVEL: number;
-
   constructor() {
     // All thresholds now configurable via centralized config
     this.MIN_CONSENSUS_SCORE = CONFIG.consensus.thresholds.emotionalScore;
@@ -48,7 +43,6 @@ export class EmotionalConsensusEngine {
     this.MAX_STRESS_LEVEL = CONFIG.biometric.thresholds.stressLevel.alertThreshold;
     this.MIN_FOCUS_LEVEL = CONFIG.biometric.thresholds.focusScore.requiredMinimum;
   }
-
   /**
    * Calculate comprehensive emotional score from multiple biometric readings
    */
@@ -59,25 +53,19 @@ export class EmotionalConsensusEngine {
     if (readings.length === 0) {
       throw new Error('No biometric readings provided');
     }
-
     const validatorId = readings[0].deviceId.split('-')[0]; // Extract validator ID
-    
     // Group readings by type
     const heartRateReadings = readings.filter(r => r.type === 'heartRate');
     const stressReadings = readings.filter(r => r.type === 'stress');
     const focusReadings = readings.filter(r => r.type === 'focus');
-    
     // Calculate weighted averages
     const heartRate = this.calculateWeightedAverage(heartRateReadings);
     const stressLevel = this.calculateWeightedAverage(stressReadings);
     const focusLevel = this.calculateWeightedAverage(focusReadings);
-    
     // Calculate authenticity from proofs
     const authenticity = this.calculateAuthenticityScore(authenticityProofs);
-    
     // Calculate overall quality score
     const qualityScore = this.calculateQualityScore(readings);
-    
     return {
       validatorId,
       heartRate: Math.round(heartRate * 100) / 100,
@@ -89,34 +77,27 @@ export class EmotionalConsensusEngine {
       qualityScore: Math.round(qualityScore * 100) / 100
     };
   }
-
   /**
    * Calculate consensus scores for all validators
    */
   public calculateConsensusScores(profiles: EmotionalProfile[]): ConsensusResult {
     const scores: ConsensusScore[] = [];
-    
     for (const profile of profiles) {
       const score = this.calculateValidatorConsensusScore(profile, profiles);
       scores.push(score);
     }
-    
     // Sort by final score (descending)
     scores.sort((a, b) => b.finalScore - a.finalScore);
-    
     // Assign ranks
     scores.forEach((score, index) => {
       score.rank = index + 1;
     });
-    
     // Select validator using fair rotation with emotional weighting
     const eligibleValidators = scores.filter(s => s.eligible);
     const selectedValidator = this.selectValidatorWithFairRotation(eligibleValidators);
-    
     // Calculate consensus strength
     const consensusStrength = this.calculateConsensusStrength(scores);
     const antiGamingScore = this.calculateAntiGamingScore(profiles);
-    
     return {
       selectedValidator: selectedValidator?.validatorId || '',
       scores,
@@ -126,7 +107,6 @@ export class EmotionalConsensusEngine {
       timestamp: Date.now()
     };
   }
-
   /**
    * Calculate individual validator consensus score
    */
@@ -136,16 +116,12 @@ export class EmotionalConsensusEngine {
   ): ConsensusScore {
     // Base emotional score (weighted combination)
     const emotionalScore = this.calculateBaseEmotionalScore(profile);
-    
     // Authenticity score (critical for consensus)
     const authenticityScore = profile.authenticity * 100;
-    
     // Stability score (consistency over time)
     const stabilityScore = this.calculateStabilityScore(profile, allProfiles);
-    
     // Diversity score (multiple sensor modalities)
     const diversityScore = this.calculateDiversityScore(profile);
-    
     // Combine scores with weights
     const weights = {
       emotional: 0.40,     // 40% - Core emotional fitness
@@ -153,16 +129,13 @@ export class EmotionalConsensusEngine {
       stability: 0.20,     // 20% - Consistency over time
       diversity: 0.10      // 10% - Multiple sensor bonus
     };
-    
     const finalScore = 
       emotionalScore * weights.emotional +
       authenticityScore * weights.authenticity +
       stabilityScore * weights.stability +
       diversityScore * weights.diversity;
-    
     // Determine eligibility
     const eligible = this.isEligibleForConsensus(profile, finalScore);
-    
     return {
       validatorId: profile.validatorId,
       emotionalScore: Math.round(emotionalScore * 100) / 100,
@@ -174,33 +147,26 @@ export class EmotionalConsensusEngine {
       rank: 0 // Will be set later
     };
   }
-
   /**
    * Calculate base emotional score from biometric data
    */
   private calculateBaseEmotionalScore(profile: EmotionalProfile): number {
     // Heart rate optimization (60-100 BPM is optimal)
     const heartRateScore = this.calculateHeartRateScore(profile.heartRate);
-    
     // Stress level (lower is better, max 70%)
     const stressScore = Math.max(0, (100 - profile.stressLevel) / 100 * 100);
-    
     // Focus level (higher is better, min 60%)
     const focusScore = Math.min(100, profile.focusLevel);
-    
     // Quality bonus
     const qualityBonus = profile.qualityScore * 10; // Up to 10% bonus
-    
     // Weighted combination
     const baseScore = (
       heartRateScore * 0.30 +
       stressScore * 0.35 +
       focusScore * 0.35
     ) + qualityBonus;
-    
     return Math.max(0, Math.min(100, baseScore));
   }
-
   /**
    * Calculate heart rate fitness score
    */
@@ -215,7 +181,6 @@ export class EmotionalConsensusEngine {
       return 30; // Poor range
     }
   }
-
   /**
    * Calculate stability score (consistency over time)
    */
@@ -224,38 +189,30 @@ export class EmotionalConsensusEngine {
     allProfiles: EmotionalProfile[]
   ): number {
     const validatorProfiles = allProfiles.filter(p => p.validatorId === profile.validatorId);
-    
     if (validatorProfiles.length < 3) {
       return 70; // Default for new validators
     }
-    
     // Calculate coefficient of variation for each metric
     const heartRates = validatorProfiles.map(p => p.heartRate);
     const stressLevels = validatorProfiles.map(p => p.stressLevel);
     const focusLevels = validatorProfiles.map(p => p.focusLevel);
-    
     const heartRateCV = this.calculateCoefficientOfVariation(heartRates);
     const stressCV = this.calculateCoefficientOfVariation(stressLevels);
     const focusCV = this.calculateCoefficientOfVariation(focusLevels);
-    
     // Lower CV = higher stability = higher score
     const stabilityScore = 100 - (heartRateCV + stressCV + focusCV) / 3;
-    
     return Math.max(30, Math.min(100, stabilityScore));
   }
-
   /**
    * Calculate diversity score based on number of sensor modalities
    */
   private calculateDiversityScore(profile: EmotionalProfile): number {
     const deviceCount = profile.deviceCount;
-    
     if (deviceCount >= 4) return 100; // All modalities
     if (deviceCount >= 3) return 85;  // Most modalities
     if (deviceCount >= 2) return 70;  // Minimum required
     return 30; // Single device (low security)
   }
-
   /**
    * Check if validator is eligible for consensus participation
    */
@@ -264,35 +221,28 @@ export class EmotionalConsensusEngine {
     if (finalScore < this.MIN_CONSENSUS_SCORE) {
       return false;
     }
-    
     // Authenticity threshold
     if (profile.authenticity < this.MIN_AUTHENTICITY) {
       return false;
     }
-    
     // Minimum device count
     if (profile.deviceCount < this.MIN_DEVICES) {
       return false;
     }
-    
     // Maximum stress level
     if (profile.stressLevel > this.MAX_STRESS_LEVEL) {
       return false;
     }
-    
     // Minimum focus level
     if (profile.focusLevel < this.MIN_FOCUS_LEVEL) {
       return false;
     }
-    
     // Quality threshold
     if (profile.qualityScore < 0.5) {
       return false;
     }
-    
     return true;
   }
-
   /**
    * Select validator using fair rotation with emotional weighting
    */
@@ -300,64 +250,50 @@ export class EmotionalConsensusEngine {
     if (eligibleValidators.length === 0) {
       return null;
     }
-    
     // Use block height for rotation (simulated)
     const blockHeight = Math.floor(Date.now() / 10000); // New block every 10 seconds for demo
-    
     // Fair rotation: give each validator equal chances over time
     const rotationIndex = blockHeight % eligibleValidators.length;
-    
     return eligibleValidators[rotationIndex];
   }
-
   /**
    * Calculate overall consensus strength
    */
   private calculateConsensusStrength(scores: ConsensusScore[]): number {
     const eligibleScores = scores.filter(s => s.eligible).map(s => s.finalScore);
-    
     if (eligibleScores.length === 0) {
       return 0;
     }
-    
     const averageScore = eligibleScores.reduce((a, b) => a + b, 0) / eligibleScores.length;
     const participationRate = eligibleScores.length / scores.length;
-    
     // Strength combines average quality and participation
     return (averageScore * 0.7 + participationRate * 100 * 0.3);
   }
-
   /**
    * Calculate anti-gaming score (resistance to manipulation)
    */
   private calculateAntiGamingScore(profiles: EmotionalProfile[]): number {
     let score = 100;
-    
     // Check for suspicious patterns
     const authenticityLevels = profiles.map(p => p.authenticity);
     const avgAuthenticity = authenticityLevels.reduce((a, b) => a + b, 0) / authenticityLevels.length;
-    
     // Penalize if too many validators have suspiciously high authenticity
     if (avgAuthenticity > 0.95) {
       score -= 10;
     }
-    
     // Check for device diversity
     const avgDeviceCount = profiles.reduce((sum, p) => sum + p.deviceCount, 0) / profiles.length;
     if (avgDeviceCount < 2.5) {
       score -= 15; // Penalize low device diversity
     }
-    
     // Check for temporal clustering (all readings too close in time)
     const timestamps = profiles.map(p => p.timestamp);
     const timeSpread = Math.max(...timestamps) - Math.min(...timestamps);
     if (timeSpread < 30000) { // Less than 30 seconds spread
       score -= 10;
     }
-    
     return Math.max(0, Math.min(100, score));
   }
-
   /**
    * Calculate weighted average of biometric readings
    */
@@ -365,19 +301,15 @@ export class EmotionalConsensusEngine {
     if (readings.length === 0) {
       return 0;
     }
-    
     let weightedSum = 0;
     let totalWeight = 0;
-    
     for (const reading of readings) {
       const weight = reading.quality;
       weightedSum += reading.value * weight;
       totalWeight += weight;
     }
-    
     return totalWeight > 0 ? weightedSum / totalWeight : 0;
   }
-
   /**
    * Calculate authenticity score from proofs
    */
@@ -385,10 +317,8 @@ export class EmotionalConsensusEngine {
     if (proofs.length === 0) {
       return 0;
     }
-    
     let totalScore = 0;
     let validProofs = 0;
-    
     for (const proof of proofs) {
       if (AuthenticityProofGenerator.verifyAuthenticityProof(proof, proof.biometricHash.deviceId)) {
         // Extract liveness score from proof
@@ -397,10 +327,8 @@ export class EmotionalConsensusEngine {
         validProofs++;
       }
     }
-    
     return validProofs > 0 ? totalScore / validProofs : 0;
   }
-
   /**
    * Calculate quality score from readings
    */
@@ -408,11 +336,9 @@ export class EmotionalConsensusEngine {
     if (readings.length === 0) {
       return 0;
     }
-    
     const totalQuality = readings.reduce((sum, reading) => sum + reading.quality, 0);
     return totalQuality / readings.length;
   }
-
   /**
    * Get count of unique devices in readings
    */
@@ -420,7 +346,6 @@ export class EmotionalConsensusEngine {
     const uniqueDevices = new Set(readings.map(r => r.deviceId));
     return uniqueDevices.size;
   }
-
   /**
    * Calculate coefficient of variation
    */
@@ -428,18 +353,14 @@ export class EmotionalConsensusEngine {
     if (values.length === 0) {
       return 0;
     }
-    
     const mean = values.reduce((a, b) => a + b, 0) / values.length;
     if (mean === 0) {
       return 0;
     }
-    
     const variance = values.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / values.length;
     const standardDeviation = Math.sqrt(variance);
-    
     return (standardDeviation / mean) * 100;
   }
-
   /**
    * Get consensus thresholds for configuration
    */
@@ -452,7 +373,6 @@ export class EmotionalConsensusEngine {
       minFocusLevel: this.MIN_FOCUS_LEVEL
     };
   }
-
   /**
    * Update consensus thresholds (for network governance)
    * All validation ranges now use configurable bounds
@@ -463,44 +383,36 @@ export class EmotionalConsensusEngine {
       const maxBound = 95;
       (this as any).MIN_CONSENSUS_SCORE = Math.max(minBound, Math.min(maxBound, thresholds.minConsensusScore));
     }
-    
     if (thresholds.minAuthenticity !== undefined) {
       const minBound = CONFIG.biometric.thresholds.authenticity.minimumScore * 0.62; // 62% of configured minimum
       const maxBound = 1.0;
       (this as any).MIN_AUTHENTICITY = Math.max(minBound, Math.min(maxBound, thresholds.minAuthenticity));
     }
-    
     if (thresholds.minDevices !== undefined) {
       const minBound = CONFIG.biometric.validation.minimumDevices;
       const maxBound = CONFIG.biometric.validation.maximumDevices;
       (this as any).MIN_DEVICES = Math.max(minBound, Math.min(maxBound, thresholds.minDevices));
     }
-    
     if (thresholds.maxStressLevel !== undefined) {
       const minBound = CONFIG.biometric.thresholds.stressLevel.min + 30;
       const maxBound = CONFIG.biometric.thresholds.stressLevel.alertThreshold;
       (this as any).MAX_STRESS_LEVEL = Math.max(minBound, Math.min(maxBound, thresholds.maxStressLevel));
     }
-    
     if (thresholds.minFocusLevel !== undefined) {
       const minBound = CONFIG.biometric.thresholds.focusScore.requiredMinimum * 0.5;
       const maxBound = CONFIG.biometric.thresholds.focusScore.max;
       (this as any).MIN_FOCUS_LEVEL = Math.max(minBound, Math.min(maxBound, thresholds.minFocusLevel));
     }
-    
-    console.log('🎯 Consensus thresholds updated:', this.getConsensusThresholds());
+    console.log(' Consensus thresholds updated:', this.getConsensusThresholds());
   }
-
   /**
    * Simulate network consensus with multiple validators
    */
   public simulateNetworkConsensus(validatorCount: number = 10): ConsensusResult {
     const profiles: EmotionalProfile[] = [];
-    
     // Generate simulated validator profiles
     for (let i = 0; i < validatorCount; i++) {
       const validatorId = `Validator${i + 1}`;
-      
       profiles.push({
         validatorId,
         heartRate: 60 + Math.random() * 40, // 60-100 BPM
@@ -512,7 +424,6 @@ export class EmotionalConsensusEngine {
         qualityScore: 0.6 + Math.random() * 0.4 // 60-100%
       });
     }
-    
     return this.calculateConsensusScores(profiles);
   }
 }

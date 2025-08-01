@@ -1,6 +1,5 @@
 import * as crypto from 'crypto';
 import { KeyPair } from './KeyPair';
-
 export interface BiometricData {
   heartRate: number;
   stressLevel: number;
@@ -8,7 +7,6 @@ export interface BiometricData {
   authenticity: number;
   timestamp: number;
 }
-
 export interface TransactionData {
   from: string;
   to: string;
@@ -25,7 +23,6 @@ export interface TransactionData {
     transactionFees?: number;
   };
 }
-
 export class Transaction {
   public id: string;
   public from: string;
@@ -44,7 +41,6 @@ export class Transaction {
   };
   public signature?: string;
   public publicKey?: string;
-
   constructor(data: TransactionData) {
     this.from = data.from;
     this.to = data.to;
@@ -56,11 +52,9 @@ export class Transaction {
     this.emotionalScore = data.emotionalScore;
     this.consensusScore = data.consensusScore;
     this.breakdown = data.breakdown;
-    
     // Generate transaction ID from hash
     this.id = this.calculateHash();
   }
-
   /**
    * Calculate cryptographic hash of the transaction
    */
@@ -77,11 +71,9 @@ export class Transaction {
       consensusScore: this.consensusScore,
       breakdown: this.breakdown
     };
-    
     const dataString = JSON.stringify(data);
     return crypto.createHash('sha256').update(dataString).digest('hex');
   }
-
   /**
    * Sign the transaction with a private key
    */
@@ -90,12 +82,10 @@ export class Transaction {
     if (this.from !== 'stakingPool' && this.from !== keyPair.getAddress()) {
       throw new Error('Cannot sign transaction: from address does not match keypair address');
     }
-
     const hash = this.calculateHash();
     this.signature = keyPair.sign(hash);
     this.publicKey = keyPair.getPublicKey();
   }
-
   /**
    * Verify the transaction signature
    */
@@ -107,11 +97,9 @@ export class Transaction {
       }
       return false;
     }
-
     const hash = this.calculateHash();
     return KeyPair.verify(hash, this.signature, this.publicKey);
   }
-
   /**
    * Validate the transaction structure and signature
    */
@@ -120,22 +108,18 @@ export class Transaction {
     if (!this.from || !this.to || this.amount < 0) {
       return false;
     }
-
     // Check signature for user transactions
     if (!this.verifySignature()) {
       return false;
     }
-
     // Validate biometric data if present (for emotional consensus)
     if (this.biometricData) {
       if (!this.isValidBiometricData(this.biometricData)) {
         return false;
       }
     }
-
     return true;
   }
-
   /**
    * Validate biometric data for emotional consensus
    */
@@ -144,31 +128,25 @@ export class Transaction {
     if (data.heartRate < 40 || data.heartRate > 200) {
       return false;
     }
-
     // Stress level should be 0-100%
     if (data.stressLevel < 0 || data.stressLevel > 100) {
       return false;
     }
-
     // Focus level should be 0-100%
     if (data.focusLevel < 0 || data.focusLevel > 100) {
       return false;
     }
-
     // Authenticity should be 0-1 (0-100%)
     if (data.authenticity < 0 || data.authenticity > 1) {
       return false;
     }
-
     // Timestamp should be recent (within last hour)
     const oneHour = 60 * 60 * 1000;
     if (Math.abs(Date.now() - data.timestamp) > oneHour) {
       return false;
     }
-
     return true;
   }
-
   /**
    * Create a transfer transaction
    */
@@ -189,7 +167,6 @@ export class Transaction {
       biometricData
     });
   }
-
   /**
    * Create a mining reward transaction
    */
@@ -207,7 +184,6 @@ export class Transaction {
       breakdown
     });
   }
-
   /**
    * Create a validation reward transaction
    */
@@ -227,7 +203,6 @@ export class Transaction {
       consensusScore
     });
   }
-
   /**
    * Convert transaction to JSON for storage/transmission
    */
@@ -248,7 +223,6 @@ export class Transaction {
       publicKey: this.publicKey
     };
   }
-
   /**
    * Create transaction from JSON data
    */
@@ -265,7 +239,6 @@ export class Transaction {
       consensusScore: data.consensusScore,
       breakdown: data.breakdown
     });
-
     tx.signature = data.signature;
     tx.publicKey = data.publicKey;
     return tx;

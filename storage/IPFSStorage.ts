@@ -2,11 +2,9 @@
  * IPFS Distributed Storage for EmotionalChain
  * Decentralized content storage with content addressing
  */
-
 import { EventEmitter } from 'events';
 import crypto from 'crypto';
 import { CONFIG } from '../shared/config';
-
 export interface IPFSNode {
   id: string;
   multiaddr: string;
@@ -17,7 +15,6 @@ export interface IPFSNode {
   storageUsed: number;
   lastSeen: number;
 }
-
 export interface IPFSFile {
   hash: string;
   size: number;
@@ -34,7 +31,6 @@ export interface IPFSFile {
     tags?: string[];
   };
 }
-
 export interface ReplicationStatus {
   hash: string;
   targetReplicas: number;
@@ -43,7 +39,6 @@ export interface ReplicationStatus {
   replicationHealth: 'healthy' | 'degraded' | 'critical';
   lastReplication: number;
 }
-
 export interface StorageMetrics {
   totalFiles: number;
   totalSize: number;
@@ -54,7 +49,6 @@ export interface StorageMetrics {
   retrievalLatency: number;
   dataIntegrity: number;
 }
-
 export interface PinningStrategy {
   type: 'permanent' | 'temporary' | 'conditional';
   duration?: number; // milliseconds for temporary
@@ -64,7 +58,6 @@ export interface PinningStrategy {
     importance: 'critical' | 'high' | 'medium' | 'low';
   };
 }
-
 export class IPFSStorage extends EventEmitter {
   private nodes: Map<string, IPFSNode> = new Map();
   private files: Map<string, IPFSFile> = new Map();
@@ -73,10 +66,8 @@ export class IPFSStorage extends EventEmitter {
   private isInitialized = false;
   private defaultReplicationFactor = 3;
   private maxRetries = 3;
-
   constructor() {
     super();
-    
     this.metrics = {
       totalFiles: 0,
       totalSize: 0,
@@ -87,37 +78,25 @@ export class IPFSStorage extends EventEmitter {
       retrievalLatency: 0,
       dataIntegrity: 100
     };
-
     this.initializeIPFS();
   }
-
   private async initializeIPFS(): Promise<void> {
     try {
-      console.log(`🌐 Initializing IPFS distributed storage`);
-
       // Initialize bootstrap nodes
       await this.initializeBootstrapNodes();
-
       // Start network discovery
       this.startNetworkDiscovery();
-
       // Start replication monitoring
       this.startReplicationMonitoring();
-
       // Start garbage collection
       this.startGarbageCollection();
-
       this.isInitialized = true;
-      console.log(`✅ IPFS storage initialized successfully`);
       this.emit('ready');
-
     } catch (error) {
-      console.error(`❌ Failed to initialize IPFS storage:`, error);
       this.emit('error', error);
       throw error;
     }
   }
-
   public async add(
     data: Buffer | string | any,
     options: {
@@ -133,13 +112,10 @@ export class IPFSStorage extends EventEmitter {
     if (!this.isInitialized) {
       throw new Error('IPFS storage not initialized');
     }
-
     const startTime = Date.now();
-
     try {
       // Prepare data
       let processedData: Buffer;
-      
       if (typeof data === 'string') {
         processedData = Buffer.from(data, 'utf8');
       } else if (Buffer.isBuffer(data)) {
@@ -147,20 +123,16 @@ export class IPFSStorage extends EventEmitter {
       } else {
         processedData = Buffer.from(JSON.stringify(data), 'utf8');
       }
-
       // Apply compression if requested
       if (options.compression) {
         processedData = await this.compressData(processedData);
       }
-
       // Apply encryption if requested
       if (options.encryption) {
         processedData = await this.encryptData(processedData);
       }
-
       // Generate content hash
       const hash = this.generateContentHash(processedData);
-
       // Check if content already exists
       if (this.files.has(hash)) {
         const existingFile = this.files.get(hash)!;
@@ -168,7 +140,6 @@ export class IPFSStorage extends EventEmitter {
         console.log(`📄 Content already exists: ${hash}`);
         return { hash, size: existingFile.size };
       }
-
       // Create file metadata
       const file: IPFSFile = {
         hash,
@@ -186,141 +157,103 @@ export class IPFSStorage extends EventEmitter {
           tags: options.tags || []
         }
       };
-
       // Store in network
       await this.storeInNetwork(hash, processedData, file);
-
       // Apply pinning strategy
       if (options.pin) {
         await this.applyPinningStrategy(hash, options.pin);
       }
-
       // Update metrics
       this.updateStorageMetrics(file);
-
       const addTime = Date.now() - startTime;
-      console.log(`✅ Added to IPFS: ${hash} (${file.size} bytes, ${addTime}ms)`);
       this.emit('fileAdded', { hash, size: file.size, addTime });
-
       return { hash, size: file.size };
-
     } catch (error) {
       const addTime = Date.now() - startTime;
-      console.error(`❌ Failed to add to IPFS:`, error);
       this.emit('addError', { error: error.message, addTime });
       throw error;
     }
   }
-
   public async get(hash: string, options: { decrypt?: boolean; decompress?: boolean } = {}): Promise<Buffer> {
     if (!this.isInitialized) {
       throw new Error('IPFS storage not initialized');
     }
-
     const startTime = Date.now();
-
     try {
       const file = this.files.get(hash);
       if (!file) {
         throw new Error(`File not found: ${hash}`);
       }
-
       // Update access time
       file.accessed = Date.now();
-
       // Retrieve from network
       const data = await this.retrieveFromNetwork(hash);
-
       let processedData = data;
-
       // Apply decryption if needed
       if (options.decrypt && file.metadata.encryption) {
         processedData = await this.decryptData(processedData);
       }
-
       // Apply decompression if needed
       if (options.decompress && file.metadata.compression) {
         processedData = await this.decompressData(processedData);
       }
-
       const retrievalTime = Date.now() - startTime;
       this.updateRetrievalMetrics(retrievalTime);
-
       console.log(`📥 Retrieved from IPFS: ${hash} (${processedData.length} bytes, ${retrievalTime}ms)`);
       this.emit('fileRetrieved', { hash, size: processedData.length, retrievalTime });
-
       return processedData;
-
     } catch (error) {
       const retrievalTime = Date.now() - startTime;
-      console.error(`❌ Failed to retrieve from IPFS: ${hash}`, error);
       this.emit('retrievalError', { hash, error: error.message, retrievalTime });
       throw error;
     }
   }
-
   public async pin(hash: string, strategy: PinningStrategy): Promise<void> {
     if (!this.isInitialized) {
       throw new Error('IPFS storage not initialized');
     }
-
     try {
       const file = this.files.get(hash);
       if (!file) {
         throw new Error(`File not found: ${hash}`);
       }
-
       await this.applyPinningStrategy(hash, strategy);
       file.pinned = true;
-
       console.log(`📌 Pinned file: ${hash} (${strategy.type})`);
       this.emit('filePinned', { hash, strategy });
-
     } catch (error) {
-      console.error(`❌ Failed to pin file: ${hash}`, error);
       this.emit('pinError', { hash, error: error.message });
       throw error;
     }
   }
-
   public async unpin(hash: string): Promise<void> {
     if (!this.isInitialized) {
       throw new Error('IPFS storage not initialized');
     }
-
     try {
       const file = this.files.get(hash);
       if (!file) {
         throw new Error(`File not found: ${hash}`);
       }
-
       // Remove from pinning
       await this.removePinning(hash);
       file.pinned = false;
-
       console.log(`📌 Unpinned file: ${hash}`);
       this.emit('fileUnpinned', { hash });
-
     } catch (error) {
-      console.error(`❌ Failed to unpin file: ${hash}`, error);
       this.emit('unpinError', { hash, error: error.message });
       throw error;
     }
   }
-
   public async ensureReplication(hash: string, targetReplicas: number = this.defaultReplicationFactor): Promise<ReplicationStatus> {
     if (!this.isInitialized) {
       throw new Error('IPFS storage not initialized');
     }
-
     try {
       const file = this.files.get(hash);
       if (!file) {
         throw new Error(`File not found: ${hash}`);
       }
-
-      console.log(`🔄 Ensuring replication for ${hash}: target ${targetReplicas} replicas`);
-
       // Get current replication status
       let status = this.replicationStatus.get(hash);
       if (!status) {
@@ -334,11 +267,9 @@ export class IPFSStorage extends EventEmitter {
         };
         this.replicationStatus.set(hash, status);
       }
-
       // Find suitable nodes for replication
       const availableNodes = this.getAvailableNodes();
       const replicationNodes = this.selectReplicationNodes(availableNodes, targetReplicas, status.replicatedNodes);
-
       // Replicate to additional nodes if needed
       for (const nodeId of replicationNodes) {
         await this.replicateToNode(hash, nodeId);
@@ -346,50 +277,36 @@ export class IPFSStorage extends EventEmitter {
           status.replicatedNodes.push(nodeId);
         }
       }
-
       // Update replication status
       status.currentReplicas = status.replicatedNodes.length;
       status.targetReplicas = targetReplicas;
       status.lastReplication = Date.now();
       status.replicationHealth = this.calculateReplicationHealth(status);
-
       file.replicas = status.currentReplicas;
-
-      console.log(`✅ Replication ensured for ${hash}: ${status.currentReplicas}/${targetReplicas} replicas`);
       this.emit('replicationEnsured', status);
-
       return status;
-
     } catch (error) {
-      console.error(`❌ Failed to ensure replication for ${hash}:`, error);
       this.emit('replicationError', { hash, error: error.message });
       throw error;
     }
   }
-
   public async garbageCollect(): Promise<{ removedFiles: number; freedSpace: number }> {
     if (!this.isInitialized) {
       throw new Error('IPFS storage not initialized');
     }
-
-    console.log(`🗑️ Starting garbage collection`);
     const startTime = Date.now();
-
     try {
       let removedFiles = 0;
       let freedSpace = 0;
       const now = Date.now();
       const filesToRemove: string[] = [];
-
       // Identify files for removal
       for (const [hash, file] of this.files.entries()) {
         let shouldRemove = false;
-
         // Remove unpinned files not accessed in 7 days
         if (!file.pinned && now - file.accessed > 7 * 24 * 60 * 60 * 1000) {
           shouldRemove = true;
         }
-
         // Remove temporary pins that have expired
         if (file.pinned) {
           // Check if temporary pin has expired (simplified)
@@ -398,32 +315,24 @@ export class IPFSStorage extends EventEmitter {
             shouldRemove = true;
           }
         }
-
         if (shouldRemove) {
           filesToRemove.push(hash);
           freedSpace += file.size;
         }
       }
-
       // Remove identified files
       for (const hash of filesToRemove) {
         await this.removeFile(hash);
         removedFiles++;
       }
-
       const gcTime = Date.now() - startTime;
-      console.log(`✅ Garbage collection completed: removed ${removedFiles} files, freed ${(freedSpace / 1024 / 1024).toFixed(2)} MB in ${gcTime}ms`);
-      
       this.emit('garbageCollected', { removedFiles, freedSpace, gcTime });
       return { removedFiles, freedSpace };
-
     } catch (error) {
-      console.error(`❌ Garbage collection failed:`, error);
       this.emit('gcError', { error: error.message });
       throw error;
     }
   }
-
   private async initializeBootstrapNodes(): Promise<void> {
     // Initialize with some bootstrap nodes
     const bootstrapNodes = [
@@ -448,40 +357,33 @@ export class IPFSStorage extends EventEmitter {
         lastSeen: Date.now()
       }
     ];
-
     for (const node of bootstrapNodes) {
       this.nodes.set(node.id, node);
     }
-
     this.updateNetworkMetrics();
     console.log(`🌱 Initialized ${bootstrapNodes.length} bootstrap nodes`);
   }
-
   private startNetworkDiscovery(): void {
     // Discover new nodes every 30 seconds
     setInterval(() => {
       this.discoverNodes();
     }, 30000);
   }
-
   private startReplicationMonitoring(): void {
     // Monitor replication health every 5 minutes
     setInterval(() => {
       this.monitorReplicationHealth();
     }, 5 * 60 * 1000);
   }
-
   private startGarbageCollection(): void {
     // Run garbage collection every hour
     setInterval(() => {
       this.garbageCollect();
     }, 60 * 60 * 1000);
   }
-
   private async discoverNodes(): Promise<void> {
     // Simulate node discovery
     const discoveredNodes = Math.floor(Math.random() * 3);
-    
     for (let i = 0; i < discoveredNodes; i++) {
       const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
       const node: IPFSNode = {
@@ -494,86 +396,68 @@ export class IPFSStorage extends EventEmitter {
         storageUsed: 0,
         lastSeen: Date.now()
       };
-
       this.nodes.set(nodeId, node);
     }
-
     if (discoveredNodes > 0) {
       this.updateNetworkMetrics();
       console.log(`🔍 Discovered ${discoveredNodes} new nodes`);
     }
   }
-
   private async monitorReplicationHealth(): Promise<void> {
     console.log(`💊 Monitoring replication health for ${this.replicationStatus.size} files`);
-
     for (const [hash, status] of this.replicationStatus.entries()) {
       // Check if replication is healthy
       const onlineReplicas = status.replicatedNodes.filter(nodeId => {
         const node = this.nodes.get(nodeId);
         return node && node.online;
       }).length;
-
       const replicationThreshold = CONFIG.storage.replication.minimumReplicas / CONFIG.storage.replication.targetReplicas; // Dynamic threshold
       if (onlineReplicas < status.targetReplicas * replicationThreshold) { // Based on configured replication policy
-        console.warn(`⚠️ Replication degraded for ${hash}: ${onlineReplicas}/${status.targetReplicas}`);
         await this.ensureReplication(hash, status.targetReplicas);
       }
     }
   }
-
   private generateContentHash(data: Buffer): string {
     return crypto.createHash('sha256').update(data).digest('hex');
   }
-
   private async compressData(data: Buffer): Promise<Buffer> {
     // Simplified compression (would use actual compression library)
     return Buffer.from(data.toString('base64'));
   }
-
   private async decompressData(data: Buffer): Promise<Buffer> {
     // Simplified decompression
     return Buffer.from(data.toString(), 'base64');
   }
-
   private async encryptData(data: Buffer): Promise<Buffer> {
     // Simplified encryption (would use proper encryption)
     const cipher = crypto.createCipher('aes-256-cbc', 'ipfs-encryption-key');
     return Buffer.concat([cipher.update(data), cipher.final()]);
   }
-
   private async decryptData(data: Buffer): Promise<Buffer> {
     // Simplified decryption
     const decipher = crypto.createDecipher('aes-256-cbc', 'ipfs-encryption-key');
     return Buffer.concat([decipher.update(data), decipher.final()]);
   }
-
   private async storeInNetwork(hash: string, data: Buffer, file: IPFSFile): Promise<void> {
     // Store file metadata
     this.files.set(hash, file);
-
     // Simulate network storage
     console.log(`💾 Stored in network: ${hash} (${data.length} bytes)`);
-
     // Initialize replication
     await this.ensureReplication(hash);
   }
-
   private async retrieveFromNetwork(hash: string): Promise<Buffer> {
     // Simulate network retrieval
     const file = this.files.get(hash);
     if (!file) {
       throw new Error(`File not found in network: ${hash}`);
     }
-
     // Simulate data retrieval (would actually retrieve from network)
     const simulatedData = Buffer.from(`simulated-data-for-${hash}`);
     return simulatedData;
   }
-
   private async applyPinningStrategy(hash: string, strategy: PinningStrategy): Promise<void> {
     console.log(`📌 Applying pinning strategy for ${hash}: ${strategy.type}`);
-
     switch (strategy.type) {
       case 'permanent':
         // Pin permanently
@@ -594,59 +478,46 @@ export class IPFSStorage extends EventEmitter {
         break;
     }
   }
-
   private async removePinning(hash: string): Promise<void> {
     console.log(`📌 Removing pinning for ${hash}`);
     // Remove from pinning (simplified)
   }
-
   private getAvailableNodes(): IPFSNode[] {
     return Array.from(this.nodes.values()).filter(node => node.online);
   }
-
   private selectReplicationNodes(availableNodes: IPFSNode[], targetReplicas: number, excludeNodes: string[]): string[] {
     const candidateNodes = availableNodes.filter(node => !excludeNodes.includes(node.id));
-    
     // Sort by reliability and available storage
     candidateNodes.sort((a, b) => {
       const aScore = a.reliability * (1 - a.storageUsed / a.storageCapacity);
       const bScore = b.reliability * (1 - b.storageUsed / b.storageCapacity);
       return bScore - aScore;
     });
-
     const needed = Math.max(0, targetReplicas - excludeNodes.length);
     return candidateNodes.slice(0, needed).map(node => node.id);
   }
-
   private async replicateToNode(hash: string, nodeId: string): Promise<void> {
     const node = this.nodes.get(nodeId);
     if (!node) {
       throw new Error(`Node not found: ${nodeId}`);
     }
-
-    console.log(`🔄 Replicating ${hash} to ${nodeId}`);
-    
     // Simulate replication
     const file = this.files.get(hash);
     if (file) {
       node.storageUsed += file.size;
     }
   }
-
   private calculateReplicationHealth(status: ReplicationStatus): 'healthy' | 'degraded' | 'critical' {
     const ratio = status.currentReplicas / status.targetReplicas;
-    
     if (ratio >= 1.0) return 'healthy';
     if (ratio >= 0.7) return 'degraded';
     return 'critical';
   }
-
   private async removeFile(hash: string): Promise<void> {
     const file = this.files.get(hash);
     if (file) {
       this.files.delete(hash);
       this.replicationStatus.delete(hash);
-
       // Update node storage usage
       const status = this.replicationStatus.get(hash);
       if (status) {
@@ -659,58 +530,46 @@ export class IPFSStorage extends EventEmitter {
       }
     }
   }
-
   private updateStorageMetrics(file: IPFSFile): void {
     this.metrics.totalFiles++;
     this.metrics.totalSize += file.size;
     this.calculateAverageReplicationFactor();
     this.updateNetworkMetrics();
   }
-
   private updateRetrievalMetrics(retrievalTime: number): void {
     this.metrics.retrievalLatency = (this.metrics.retrievalLatency + retrievalTime) / 2;
   }
-
   private calculateAverageReplicationFactor(): void {
     if (this.files.size === 0) {
       this.metrics.averageReplicationFactor = 0;
       return;
     }
-
     const totalReplicas = Array.from(this.files.values()).reduce((sum, file) => sum + file.replicas, 0);
     this.metrics.averageReplicationFactor = totalReplicas / this.files.size;
   }
-
   private updateNetworkMetrics(): void {
     this.metrics.networkNodes = this.nodes.size;
     this.metrics.onlineNodes = Array.from(this.nodes.values()).filter(node => node.online).length;
-    
     if (this.metrics.networkNodes > 0) {
       this.metrics.storageEfficiency = (this.metrics.onlineNodes / this.metrics.networkNodes) * 100;
     }
   }
-
   // Public getters
   public getMetrics(): StorageMetrics {
     return { ...this.metrics };
   }
-
   public getFiles(): IPFSFile[] {
     return Array.from(this.files.values());
   }
-
   public getNodes(): IPFSNode[] {
     return Array.from(this.nodes.values());
   }
-
   public getReplicationStatus(): ReplicationStatus[] {
     return Array.from(this.replicationStatus.values());
   }
-
   public getFileInfo(hash: string): IPFSFile | undefined {
     return this.files.get(hash);
   }
-
   public isOnline(): boolean {
     return this.isInitialized && this.metrics.onlineNodes > 0;
   }

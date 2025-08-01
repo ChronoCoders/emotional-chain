@@ -2,29 +2,24 @@
  * Environment Variable Override System
  * Supports all configuration parameters via environment variables
  */
-
 // Helper functions for environment variable parsing
 function parseFloat(value: string | undefined, defaultValue: number): number {
   if (!value) return defaultValue;
   const parsed = Number.parseFloat(value);
   return isNaN(parsed) ? defaultValue : parsed;
 }
-
 function parseInt(value: string | undefined, defaultValue: number): number {
   if (!value) return defaultValue;
   const parsed = Number.parseInt(value, 10);
   return isNaN(parsed) ? defaultValue : parsed;
 }
-
 function parseBoolean(value: string | undefined, defaultValue: boolean): boolean {
   if (!value) return defaultValue;
   return value.toLowerCase() === 'true' || value === '1';
 }
-
 function parseString(value: string | undefined, defaultValue: string): string {
   return value || defaultValue;
 }
-
 // Raw configuration with environment variable overrides
 export const rawConfig = {
   network: {
@@ -61,7 +56,6 @@ export const rawConfig = {
       p2pHandshake: parseInt(process.env.P2P_HANDSHAKE_TIMEOUT, 10000),
     },
   },
-
   consensus: {
     algorithm: parseString(process.env.CONSENSUS_ALGORITHM, 'ProofOfEmotion') as 'ProofOfEmotion' | 'HybridPoE',
     quorum: {
@@ -96,7 +90,6 @@ export const rawConfig = {
       targetTime: parseInt(process.env.DIFFICULTY_TARGET_TIME, 30),
     },
   },
-
   biometric: {
     devices: {
       maxConcurrentDevices: parseInt(process.env.MAX_CONCURRENT_DEVICES, 5),
@@ -131,7 +124,6 @@ export const rawConfig = {
       },
     },
   },
-
   security: {
     authentication: {
       sessionTimeout: parseInt(process.env.SESSION_TIMEOUT, 3600000), // 1 hour
@@ -155,7 +147,6 @@ export const rawConfig = {
       verificationTimeout: parseInt(process.env.ZKP_VERIFICATION_TIMEOUT, 5000),
     },
   },
-
   ai: {
     models: {
       emotionalPredictor: {
@@ -180,7 +171,6 @@ export const rawConfig = {
       gpuAcceleration: parseBoolean(process.env.AI_GPU_ACCELERATION, false),
     },
   },
-
   infrastructure: {
     kubernetes: {
       minNodes: parseInt(process.env.K8S_MIN_NODES, 3),
@@ -203,7 +193,6 @@ export const rawConfig = {
       replicationFactor: parseInt(process.env.REPLICATION_FACTOR, 3),
     },
   },
-
   storage: {
     database: {
       connectionPoolSize: parseInt(process.env.DB_POOL_SIZE, 20),
@@ -221,7 +210,6 @@ export const rawConfig = {
       enabled: parseBoolean(process.env.CACHE_ENABLED, true),
     },
   },
-
   performance: {
     optimization: {
       backgroundProcessing: parseBoolean(process.env.BACKGROUND_PROCESSING, true),
@@ -239,7 +227,6 @@ export const rawConfig = {
       latencyMonitoring: parseBoolean(process.env.LATENCY_MONITORING, true),
     },
   },
-
   // SDK Configuration
   sdk: {
     timeout: parseInt(process.env.SDK_TIMEOUT, 60000),
@@ -250,7 +237,6 @@ export const rawConfig = {
     emotionalThresholdDefault: parseFloat(process.env.SDK_EMOTIONAL_THRESHOLD_DEFAULT, 75),
     websocketHeartbeatInterval: parseInt(process.env.SDK_WEBSOCKET_HEARTBEAT_INTERVAL, 30000),
   },
-
   // Audit Configuration
   audit: {
     enabled: parseBoolean(process.env.AUDIT_ENABLED, true),
@@ -263,7 +249,6 @@ export const rawConfig = {
     intervalMs: parseInt(process.env.AUDIT_INTERVAL_MS, 3600000), // 1 hour
     maxRetries: parseInt(process.env.AUDIT_MAX_RETRIES, 3),
   },
-
   // Smart Contract Configuration
   smartContracts: {
     execution: {

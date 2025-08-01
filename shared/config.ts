@@ -9,27 +9,21 @@
  * - Fuzz testing capabilities for parameter validation
  * - Zero hardcoded values enforcement
  */
-
 import { validateConfig, type EmotionalChainConfig } from './config.schema';
 import { rawConfig } from './config.env';
-
 // Validate and export the final configuration
 export const CONFIG: EmotionalChainConfig = validateConfig(rawConfig);
-
 // Export helper functions for dynamic configuration access
 export const configHelpers = {
   getRequiredValidators: (totalValidators: number): number => {
     return Math.ceil(totalValidators * CONFIG.consensus.quorum.ratio);
   },
-  
   getDynamicTimeout: (baseTimeout: number, networkLoad: number = 1.0): number => {
     return Math.min(baseTimeout * networkLoad, baseTimeout * 3); // Max 3x base timeout
   },
-  
   getScaledThreshold: (threshold: number, scaleFactor: number = 1.0): number => {
     return Math.max(threshold * scaleFactor, threshold * 0.5); // Min 50% of base threshold
   },
-  
   validateConfigChange: (newConfig: Partial<EmotionalChainConfig>): boolean => {
     try {
       const mergedConfig = { ...rawConfig, ...newConfig };
@@ -40,10 +34,8 @@ export const configHelpers = {
     }
   },
 };
-
 // Re-export types for convenience
 export type { EmotionalChainConfig } from './config.schema';
-
 // Configuration enforcement policy
 export const CONFIG_ENFORCEMENT = {
   POLICY: "If it can't be set through CONFIG, it doesn't exist.",
@@ -52,46 +44,31 @@ export const CONFIG_ENFORCEMENT = {
   AUDIT_ENABLED: true,
   FUZZ_TESTING_ENABLED: true,
 } as const;
-
 // Configuration change validation helper
 export function enforceConfigValidation(operation: string, newConfig?: Partial<EmotionalChainConfig>): void {
   if (!CONFIG_ENFORCEMENT.VALIDATION_REQUIRED) return;
-  
-  console.log(`🔒 CONFIG ENFORCEMENT: Validating ${operation}`);
-  
+  console.log(` CONFIG ENFORCEMENT: Validating ${operation}`);
   if (newConfig && !configHelpers.validateConfigChange(newConfig)) {
     throw new Error(`Configuration validation failed for operation: ${operation}`);
   }
-  
-  console.log(`✅ CONFIG ENFORCEMENT: ${operation} validated successfully`);
 }
-
 // Configuration validation and startup checks
 function validateStartupConfiguration(): void {
-  console.log('🔧 Validating EmotionalChain configuration...');
-  
+  console.log(' Validating EmotionalChain configuration...');
   try {
     // Validate the configuration on startup
     validateConfig(CONFIG);
-    console.log('✅ Configuration validation passed');
-    
     // Additional WebSocket configuration validation
     if (!CONFIG.network.protocols.websocket.fallbackHost || CONFIG.network.protocols.websocket.fallbackHost === 'undefined') {
       throw new Error('WebSocket fallback host cannot be undefined or empty');
     }
-    
     if (!CONFIG.network.protocols.websocket.fallbackPort || CONFIG.network.protocols.websocket.fallbackPort < 1024) {
       throw new Error('WebSocket fallback port must be a valid port number (>= 1024)');
     }
-    
     if (CONFIG.network.protocols.websocket.retryLimit <= 0) {
       throw new Error('WebSocket retry limit must be greater than 0');
     }
-    
-    console.log('✅ WebSocket configuration validated');
-    
     // Log key configuration values
-    console.log(`📊 Key Configuration:`);
     console.log(`   Consensus Quorum: ${CONFIG.consensus.quorum.ratio * 100}%`);
     console.log(`   Block Time: ${CONFIG.consensus.timing.blockTime}s`);
     console.log(`   Emotional Threshold: ${CONFIG.consensus.thresholds.emotionalScore}`);
@@ -100,17 +77,13 @@ function validateStartupConfiguration(): void {
     console.log(`   Ports: HTTP=${CONFIG.network.ports.http}, P2P=${CONFIG.network.ports.p2p}, WS=${CONFIG.network.ports.websocket}`);
     console.log(`   WebSocket Fallback: ${CONFIG.network.protocols.websocket.fallbackHost}:${CONFIG.network.protocols.websocket.fallbackPort}`);
     console.log(`   WebSocket Retry Limit: ${CONFIG.network.protocols.websocket.retryLimit}`);
-    
   } catch (error) {
-    console.error('❌ Configuration validation failed:', error);
     console.error('🚨 EmotionalChain cannot start with invalid configuration');
     process.exit(1);
   }
 }
-
 // Run startup validation
 validateStartupConfiguration();
-
 // Export configuration sections for specific use cases
 export const consensusConfig = CONFIG.consensus;
 export const networkConfig = CONFIG.network;

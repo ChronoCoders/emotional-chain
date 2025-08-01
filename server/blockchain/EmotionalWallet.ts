@@ -3,13 +3,11 @@ export class EmotionalWallet {
   private blockchain: any;
   private network: any;
   private wallets: Map<string, any> = new Map(); // Multi-wallet support for all validators
-
   constructor(blockchain: any, network: any) {
     this.blockchain = blockchain;
     this.network = network;
     this.initializeWallets();
   }
-
   private initializeWallets() {
     // Initialize wallets for all validators when they're added
     if (this.blockchain && this.blockchain.getAllWallets) {
@@ -25,7 +23,6 @@ export class EmotionalWallet {
       });
     }
   }
-
   private generateAddress(validatorId: string): string {
     // Generate consistent address from validator ID using simple hash
     let hash = 0;
@@ -38,7 +35,6 @@ export class EmotionalWallet {
     const hexHash = Math.abs(hash).toString(16).padStart(8, '0').repeat(5).substring(0, 40);
     return '0x' + hexHash.toUpperCase();
   }
-
   public getStatus(validatorId?: string): any {
     if (validatorId) {
       const wallet = this.wallets.get(validatorId);
@@ -56,7 +52,6 @@ export class EmotionalWallet {
         };
       }
     }
-
     // Default wallet status - use StellarNode as primary
     const primaryWallet = this.wallets.get('StellarNode');
     if (primaryWallet) {
@@ -72,7 +67,6 @@ export class EmotionalWallet {
         reputation: '98.3'
       };
     }
-
     return {
       address: '0xA7B2C9E8F1D3456789ABCDEF0123456789ABCDEF',
       balance: '0.00 EMO',
@@ -85,22 +79,18 @@ export class EmotionalWallet {
       reputation: '0.0'
     };
   }
-
   public getBalance(validatorId?: string): number {
     if (validatorId) {
       const wallet = this.wallets.get(validatorId);
       return wallet ? wallet.balance : 0;
     }
-    
     // Return primary wallet balance
     const primaryWallet = this.wallets.get('StellarNode');
     return primaryWallet ? primaryWallet.balance : 0;
   }
-
   public getAllWallets(): Map<string, any> {
     return new Map(this.wallets);
   }
-
   public updateWalletBalance(validatorId: string, balance: number): void {
     if (this.wallets.has(validatorId)) {
       const wallet = this.wallets.get(validatorId)!;
@@ -117,17 +107,14 @@ export class EmotionalWallet {
       });
     }
   }
-
   public transfer(from: string, to: string, amount: number): boolean {
     const fromWallet = this.wallets.get(from);
     if (!fromWallet || fromWallet.balance < amount) {
       return false; // Insufficient balance
     }
-
     // Deduct from sender
     fromWallet.balance -= amount;
     this.wallets.set(from, fromWallet);
-
     // Add to recipient (create wallet if doesn't exist)
     let toWallet = this.wallets.get(to);
     if (!toWallet) {
@@ -141,20 +128,16 @@ export class EmotionalWallet {
     }
     toWallet.balance += amount;
     this.wallets.set(to, toWallet);
-
     return true;
   }
-
   public syncWithBlockchain(): void {
     // CRITICAL: Force sync all wallet balances with blockchain
     if (this.blockchain && this.blockchain.getAllWallets) {
       const blockchainWallets = this.blockchain.getAllWallets();
-      
       // Clear any cached balances that might be wrong
       blockchainWallets.forEach((balance: number, validatorId: string) => {
         // Always set the absolute balance from blockchain source
         this.updateWalletBalance(validatorId, balance);
-        console.log(`🔄 Synced ${validatorId}: ${balance} EMO from blockchain`);
       });
     }
   }

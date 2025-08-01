@@ -1,5 +1,4 @@
 import { BiometricDevice, BiometricReading, DeviceConfig } from './BiometricDevice';
-
 interface StressData {
   stressLevel: number; // 0-100%
   hrvScore: number; // Heart Rate Variability stress indicator
@@ -8,14 +7,12 @@ interface StressData {
   skinTemperature?: number; // Celsius
   confidence: number; // 0-1, confidence in stress measurement
 }
-
 interface HRVAnalysis {
   rmssd: number; // Root Mean Square of Successive Differences
   sdnn: number; // Standard Deviation of NN intervals
   pnn50: number; // Percentage of successive RR intervals > 50ms
   stressIndex: number; // Calculated stress index (0-100)
 }
-
 export class StressDetector extends BiometricDevice {
   private device: any = null;
   private rrIntervals: number[] = [];
@@ -24,15 +21,12 @@ export class StressDetector extends BiometricDevice {
   private lastStressLevel: number = 0;
   private baselineHRV: HRVAnalysis | null = null;
   private readonly maxRRBuffer = 120; // 2 minutes of data
-
   constructor(config: DeviceConfig) {
     super(config);
-    
     if (!config.type.includes('stress')) {
       config.type = 'stress';
     }
   }
-
   /**
    * Establish connection to stress detection devices
    */
@@ -40,18 +34,14 @@ export class StressDetector extends BiometricDevice {
     try {
       // In production: Connect to GSR sensor, temperature sensor, etc.
       await this.simulateDeviceConnection();
-      
       // Initialize baseline stress measurement
       await this.establishBaseline();
-      
       return true;
-      
     } catch (error) {
       console.error('Stress detector connection failed:', error);
       return false;
     }
   }
-
   /**
    * Simulate connection to stress detection hardware
    */
@@ -68,33 +58,25 @@ export class StressDetector extends BiometricDevice {
             hrv: true // HRV always available from heart rate
           }
         };
-        
         console.log(`🧘 Connected to ${this.device.name}`);
-        console.log(`   📊 Available sensors: ${Object.entries(this.device.sensors).filter(([,v]) => v).map(([k]) => k).join(', ')}`);
         resolve();
       }, 800 + Math.random() * 1200);
     });
   }
-
   /**
    * Establish stress baseline for personalized measurements
    */
   private async establishBaseline(): Promise<void> {
     console.log('📏 Establishing stress baseline...');
-    
     // Collect baseline data for 30 seconds
     const baselineData: number[] = [];
-    
     for (let i = 0; i < 30; i++) {
       const mockRR = 800 + Math.random() * 200; // Relaxed state RR intervals
       baselineData.push(mockRR);
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    
     this.baselineHRV = this.calculateHRVFromIntervals(baselineData);
-    console.log(`✅ Baseline established - Stress Index: ${this.baselineHRV.stressIndex.toFixed(1)}`);
   }
-
   /**
    * Close connection to stress detection devices
    */
@@ -105,7 +87,6 @@ export class StressDetector extends BiometricDevice {
       this.temperatureSensor = null;
     }
   }
-
   /**
    * Read comprehensive stress data
    */
@@ -113,10 +94,8 @@ export class StressDetector extends BiometricDevice {
     if (!this.device) {
       return null;
     }
-
     try {
       const stressData = await this.measureStress();
-      
       const reading: BiometricReading = {
         timestamp: Date.now(),
         deviceId: this.config.id,
@@ -134,36 +113,27 @@ export class StressDetector extends BiometricDevice {
           baseline: this.baselineHRV
         }
       };
-
       this.lastStressLevel = stressData.stressLevel;
-      
       return reading;
-      
     } catch (error) {
       console.error('Error reading stress data:', error);
       return null;
     }
   }
-
   /**
    * Comprehensive stress measurement using multiple modalities
    */
   private async measureStress(): Promise<StressData> {
     // Generate realistic HRV data for stress analysis
     const currentHRV = this.generateCurrentHRV();
-    
     // Calculate HRV-based stress score
     const hrvStressScore = this.calculateHRVStress(currentHRV);
-    
     // Galvanic Skin Response (if available)
     const gsrStress = this.device.sensors.gsr ? this.measureGSRStress() : null;
-    
     // Skin temperature (if available)
     const tempStress = this.device.sensors.temperature ? this.measureTemperatureStress() : null;
-    
     // Respiratory rate estimation
     const respStress = this.estimateRespiratoryStress();
-    
     // Combine multiple stress indicators
     const combinedStress = this.combineStressIndicators({
       hrv: hrvStressScore,
@@ -171,7 +141,6 @@ export class StressDetector extends BiometricDevice {
       temperature: tempStress,
       respiratory: respStress
     });
-    
     return {
       stressLevel: combinedStress.stressLevel,
       hrvScore: hrvStressScore,
@@ -181,7 +150,6 @@ export class StressDetector extends BiometricDevice {
       confidence: combinedStress.confidence
     };
   }
-
   /**
    * Generate realistic HRV data based on current stress state
    */
@@ -189,17 +157,14 @@ export class StressDetector extends BiometricDevice {
     // Simulate realistic HRV patterns
     const baseRR = 850 + Math.sin(Date.now() / 60000) * 100; // Slow breathing cycle
     const stressInfluence = Math.random() * 0.3; // 0-30% stress influence
-    
     const intervals: number[] = [];
     for (let i = 0; i < 60; i++) {
       const variation = (Math.random() - 0.5) * (100 - stressInfluence * 80); // Less variation = more stress
       const interval = Math.max(400, Math.min(1200, baseRR + variation));
       intervals.push(interval);
     }
-    
     return this.calculateHRVFromIntervals(intervals);
   }
-
   /**
    * Calculate HRV metrics from R-R intervals
    */
@@ -207,19 +172,16 @@ export class StressDetector extends BiometricDevice {
     if (intervals.length < 10) {
       return { rmssd: 0, sdnn: 0, pnn50: 0, stressIndex: 50 };
     }
-
     // RMSSD calculation
     const differences = [];
     for (let i = 1; i < intervals.length; i++) {
       differences.push(Math.pow(intervals[i] - intervals[i-1], 2));
     }
     const rmssd = Math.sqrt(differences.reduce((a, b) => a + b, 0) / differences.length);
-
     // SDNN calculation
     const mean = intervals.reduce((a, b) => a + b, 0) / intervals.length;
     const variance = intervals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / intervals.length;
     const sdnn = Math.sqrt(variance);
-
     // pNN50 calculation
     let nn50Count = 0;
     for (let i = 1; i < intervals.length; i++) {
@@ -228,13 +190,10 @@ export class StressDetector extends BiometricDevice {
       }
     }
     const pnn50 = (nn50Count / (intervals.length - 1)) * 100;
-
     // Calculate stress index (lower HRV = higher stress)
     const stressIndex = Math.max(0, Math.min(100, 100 - (rmssd / 100 * 100)));
-
     return { rmssd, sdnn, pnn50, stressIndex };
   }
-
   /**
    * Calculate stress level from HRV analysis
    */
@@ -242,21 +201,16 @@ export class StressDetector extends BiometricDevice {
     if (!this.baselineHRV) {
       return currentHRV.stressIndex;
     }
-    
     // Compare to personal baseline
     const rmssdRatio = this.baselineHRV.rmssd > 0 ? currentHRV.rmssd / this.baselineHRV.rmssd : 1;
     const sdnnRatio = this.baselineHRV.sdnn > 0 ? currentHRV.sdnn / this.baselineHRV.sdnn : 1;
-    
     // Lower ratios indicate higher stress
     const stressFromRMSSD = Math.max(0, (1 - rmssdRatio) * 100);
     const stressFromSDNN = Math.max(0, (1 - sdnnRatio) * 100);
-    
     // Weighted combination
     const hrvStress = (stressFromRMSSD * 0.6 + stressFromSDNN * 0.4);
-    
     return Math.min(100, Math.max(0, hrvStress));
   }
-
   /**
    * Measure stress from Galvanic Skin Response
    */
@@ -265,13 +219,10 @@ export class StressDetector extends BiometricDevice {
     const baseGSR = 2.0 + Math.random() * 3.0; // 2-5 μS typical range
     const stressMultiplier = 1 + Math.random() * 0.5; // Stress increases GSR
     const gsrValue = baseGSR * stressMultiplier;
-    
     // Convert GSR to stress level (higher GSR = higher stress)
     const stressLevel = Math.min(100, Math.max(0, (gsrValue - 2) / 4 * 100));
-    
     return Math.round(stressLevel);
   }
-
   /**
    * Measure stress from skin temperature
    */
@@ -280,20 +231,16 @@ export class StressDetector extends BiometricDevice {
     const baseTemp = 34 + Math.random() * 2; // 34-36°C
     const stressEffect = (Math.random() - 0.5) * 1.5; // Stress can raise or lower temp
     const skinTemp = baseTemp + stressEffect;
-    
     // Deviation from normal range indicates stress
     const normalRange = [33, 35];
     let tempStress = 0;
-    
     if (skinTemp < normalRange[0]) {
       tempStress = (normalRange[0] - skinTemp) / 2 * 100; // Cold stress
     } else if (skinTemp > normalRange[1]) {
       tempStress = (skinTemp - normalRange[1]) / 2 * 100; // Heat stress
     }
-    
     return Math.min(100, Math.max(0, Math.round(tempStress)));
   }
-
   /**
    * Estimate respiratory stress from HRV patterns
    */
@@ -302,7 +249,6 @@ export class StressDetector extends BiometricDevice {
     const baseRate = 16 + Math.random() * 4; // 16-20 BPM
     const stressInfluence = Math.random() * 0.3; // Stress increases breathing rate
     const respiratoryRate = baseRate * (1 + stressInfluence * 0.5);
-    
     // Calculate stress from deviation from normal
     let respStress = 0;
     if (respiratoryRate > 20) {
@@ -310,10 +256,8 @@ export class StressDetector extends BiometricDevice {
     } else if (respiratoryRate < 12) {
       respStress = (12 - respiratoryRate) / 4 * 100; // Very slow can also indicate stress
     }
-    
     return Math.min(100, Math.max(0, Math.round(respStress)));
   }
-
   /**
    * Combine multiple stress indicators into final score
    */
@@ -329,57 +273,46 @@ export class StressDetector extends BiometricDevice {
       temperature: 0.1, // Temperature is less reliable
       respiratory: 0.1  // Respiratory estimation is least reliable
     };
-    
     let totalWeight = weights.hrv; // HRV always available
     let weightedStress = indicators.hrv * weights.hrv;
-    
     if (indicators.gsr !== null) {
       weightedStress += indicators.gsr * weights.gsr;
       totalWeight += weights.gsr;
     }
-    
     if (indicators.temperature !== null) {
       weightedStress += indicators.temperature * weights.temperature;
       totalWeight += weights.temperature;
     }
-    
     if (indicators.respiratory !== null) {
       weightedStress += indicators.respiratory * weights.respiratory;
       totalWeight += weights.respiratory;
     }
-    
     const finalStress = weightedStress / totalWeight;
-    
     // Confidence based on number of available sensors
     const sensorCount = 1 + (indicators.gsr !== null ? 1 : 0) + 
                            (indicators.temperature !== null ? 1 : 0) + 
                            (indicators.respiratory !== null ? 1 : 0);
     const confidence = Math.min(1, 0.4 + (sensorCount - 1) * 0.2); // 40-100% based on sensors
-    
     return {
       stressLevel: Math.round(finalStress),
       confidence
     };
   }
-
   /**
    * Get reading interval for stress detection
    */
   protected getReadingInterval(): number {
     return 3000; // 3 seconds - slower than heart rate
   }
-
   /**
    * Validate stress level values
    */
   protected isValidBiometricValue(reading: BiometricReading): boolean {
     const stressLevel = reading.value;
-    
     // Valid stress range: 0-100%
     if (stressLevel < 0 || stressLevel > 100) {
       return false;
     }
-    
     // Check for reasonable change from previous reading
     if (this.lastStressLevel > 0) {
       const change = Math.abs(stressLevel - this.lastStressLevel);
@@ -387,16 +320,13 @@ export class StressDetector extends BiometricDevice {
         return false;
       }
     }
-    
     return true;
   }
-
   /**
    * Discover stress detection devices
    */
   public static async discoverDevices(): Promise<DeviceConfig[]> {
     const devices: DeviceConfig[] = [];
-    
     try {
       // Simulate discovery of stress detection hardware
       const simulatedDevices = [
@@ -415,18 +345,13 @@ export class StressDetector extends BiometricDevice {
           address: '00:AA:BB:CC:DD:FF'
         }
       ];
-      
       devices.push(...simulatedDevices);
-      
       console.log(`🔍 Discovered ${devices.length} stress detection devices`);
-      
     } catch (error) {
       console.error('Stress detector discovery failed:', error);
     }
-    
     return devices;
   }
-
   /**
    * Get comprehensive stress metrics
    */
@@ -439,13 +364,11 @@ export class StressDetector extends BiometricDevice {
       measurementConfidence: this.status.signalQuality * 100
     };
   }
-
   /**
    * Calibrate stress detector with personal baseline
    */
   public async recalibrateBaseline(): Promise<boolean> {
-    console.log('🎯 Recalibrating stress baseline...');
-    
+    console.log(' Recalibrating stress baseline...');
     try {
       await this.establishBaseline();
       return true;
@@ -454,7 +377,6 @@ export class StressDetector extends BiometricDevice {
       return false;
     }
   }
-
   /**
    * Set stress level thresholds for different states
    */
@@ -465,18 +387,14 @@ export class StressDetector extends BiometricDevice {
       high: Math.max(0, Math.min(100, high)),
       critical: 90 // Fixed critical threshold
     };
-    
     this.config = { ...this.config, stressThresholds: thresholds };
-    
-    console.log(`🎯 Stress thresholds configured:`, thresholds);
+    console.log(` Stress thresholds configured:`, thresholds);
   }
-
   /**
    * Get current stress state classification
    */
   public getStressState(): 'relaxed' | 'moderate' | 'high' | 'critical' {
     const thresholds = this.config.stressThresholds || { relaxed: 25, moderate: 50, high: 75 };
-    
     if (this.lastStressLevel >= 90) return 'critical';
     if (this.lastStressLevel >= thresholds.high) return 'high';
     if (this.lastStressLevel >= thresholds.moderate) return 'moderate';

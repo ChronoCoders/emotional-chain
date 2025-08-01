@@ -2,10 +2,8 @@
  * Cross-Chain Bridge Infrastructure for EmotionalChain
  * Multi-chain interoperability with emotional data preservation
  */
-
 import { EventEmitter } from 'events';
 import Web3 from 'web3';
-
 // Define BiometricData interface locally
 interface BiometricData {
   heartRate: number;
@@ -14,7 +12,6 @@ interface BiometricData {
   authenticity: number;
   timestamp: number;
 }
-
 export interface BridgeTransaction {
   bridgeId: string;
   sourceChain: 'EmotionalChain' | 'Ethereum' | 'Bitcoin' | 'Polkadot' | 'Cosmos';
@@ -37,7 +34,6 @@ export interface BridgeTransaction {
   createdAt: string;
   completedAt?: string;
 }
-
 export interface ChainConfig {
   chainId: string | number;
   name: string;
@@ -52,7 +48,6 @@ export interface ChainConfig {
   isActive: boolean;
   emotionalCompatible: boolean;
 }
-
 export interface LiquidityPool {
   chainPair: string;
   tokenSymbol: string;
@@ -69,7 +64,6 @@ export interface LiquidityPool {
     emotionalScore: number;
   }[];
 }
-
 export interface RelayerNode {
   id: string;
   address: string;
@@ -82,7 +76,6 @@ export interface RelayerNode {
   isActive: boolean;
   lastActivity: string;
 }
-
 export const SupportedChains: ChainConfig[] = [
   {
     chainId: 1,
@@ -138,14 +131,12 @@ export const SupportedChains: ChainConfig[] = [
     emotionalCompatible: true
   }
 ];
-
 export class CrossChainBridgeManager extends EventEmitter {
   private bridges: Map<string, BridgeTransaction> = new Map();
   private liquidityPools: Map<string, LiquidityPool> = new Map();
   private relayerNodes: Map<string, RelayerNode> = new Map();
   private chainConfigs: Map<string, ChainConfig> = new Map();
   private web3Instances: Map<string, Web3> = new Map();
-
   private bridgeStats = {
     totalTransactions: 0,
     totalVolume: 0,
@@ -153,7 +144,6 @@ export class CrossChainBridgeManager extends EventEmitter {
     averageTime: 0,
     activeBridges: 0
   };
-
   constructor() {
     super();
     this.initializeChains();
@@ -161,19 +151,15 @@ export class CrossChainBridgeManager extends EventEmitter {
     this.initializeRelayerNodes();
     this.startBridgeMonitoring();
   }
-
   private initializeChains(): void {
     SupportedChains.forEach(chain => {
       this.chainConfigs.set(chain.name, chain);
-      
       if (chain.rpcUrl.startsWith('http')) {
         this.web3Instances.set(chain.name, new Web3(chain.rpcUrl));
       }
     });
-    
     console.log(`🌉 Initialized ${this.chainConfigs.size} cross-chain bridges`);
   }
-
   private initializeLiquidityPools(): void {
     // Initialize liquidity pools for major trading pairs
     const pools = [
@@ -202,14 +188,11 @@ export class CrossChainBridgeManager extends EventEmitter {
         providers: []
       }
     ];
-
     pools.forEach(pool => {
       this.liquidityPools.set(pool.chainPair, pool as LiquidityPool);
     });
-
     console.log(`💧 Initialized ${this.liquidityPools.size} liquidity pools`);
   }
-
   private initializeRelayerNodes(): void {
     const relayers = [
       {
@@ -237,31 +220,25 @@ export class CrossChainBridgeManager extends EventEmitter {
         lastActivity: new Date().toISOString()
       }
     ];
-
     relayers.forEach(relayer => {
       this.relayerNodes.set(relayer.id, relayer);
     });
-
     console.log(`🤖 Initialized ${this.relayerNodes.size} relayer nodes`);
   }
-
   private startBridgeMonitoring(): void {
     // Monitor bridge transactions every 30 seconds
     setInterval(() => {
       this.processPendingBridges();
     }, 30000);
-
     // Update bridge statistics every 5 minutes
     setInterval(() => {
       this.updateBridgeStatistics();
     }, 5 * 60 * 1000);
-
     // Monitor relayer health every minute
     setInterval(() => {
       this.monitorRelayerHealth();
     }, 60000);
   }
-
   public async bridgeToEthereum(
     sender: string,
     recipient: string,
@@ -270,29 +247,23 @@ export class CrossChainBridgeManager extends EventEmitter {
   ): Promise<{ success: boolean; bridgeId?: string; message: string }> {
     try {
       console.log(`🌉 Initiating bridge to Ethereum: ${amount} EMO`);
-
       // Validate bridge capacity and limits
       const ethereumConfig = this.chainConfigs.get('Ethereum');
       if (!ethereumConfig || !ethereumConfig.isActive) {
         return { success: false, message: 'Ethereum bridge is not active' };
       }
-
       if (amount > ethereumConfig.dailyLimit) {
         return { success: false, message: 'Amount exceeds daily bridge limit' };
       }
-
       // Generate bridge transaction ID
       const bridgeId = `bridge-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
       // Lock EMO tokens on EmotionalChain (simplified)
       const lockTxHash = await this.lockEmotionalTokens(sender, amount);
-
       // Calculate emotional bonus if proof provided
       let emotionalBonus = 0;
       if (emotionalProof && emotionalProof.authenticity > 0.8) {
         emotionalBonus = Math.floor(amount * 0.01 * emotionalProof.authenticity); // Up to 1% bonus
       }
-
       const bridgeTransaction: BridgeTransaction = {
         bridgeId,
         sourceChain: 'EmotionalChain',
@@ -313,27 +284,20 @@ export class CrossChainBridgeManager extends EventEmitter {
         estimatedTime: 300, // 5 minutes
         createdAt: new Date().toISOString()
       };
-
       this.bridges.set(bridgeId, bridgeTransaction);
-
       // Queue for relayer processing
       await this.queueForRelayer(bridgeTransaction);
-
-      console.log(`✅ Bridge transaction created: ${bridgeId}`);
       this.emit('bridgeInitiated', bridgeTransaction);
-
       return {
         success: true,
         bridgeId,
         message: `Bridge transaction initiated. Estimated completion: 5 minutes`
       };
-
     } catch (error) {
       console.error('Ethereum bridge failed:', error);
       return { success: false, message: 'Bridge transaction failed' };
     }
   }
-
   public async bridgeFromBitcoin(
     btcTxHash: string,
     recipient: string,
@@ -341,26 +305,21 @@ export class CrossChainBridgeManager extends EventEmitter {
   ): Promise<{ success: boolean; bridgeId?: string; message: string }> {
     try {
       console.log(`🌉 Processing bridge from Bitcoin: ${btcTxHash}`);
-
       // Verify Bitcoin transaction (simplified)
       const btcVerification = await this.verifyBitcoinTransaction(btcTxHash);
       if (!btcVerification.valid) {
         return { success: false, message: 'Bitcoin transaction verification failed' };
       }
-
       // Calculate EMO amount based on exchange rate
       const btcAmount = btcVerification.amount;
       const pool = this.liquidityPools.get('EmotionalChain-Bitcoin');
       const emoAmount = pool ? btcAmount * pool.exchangeRate : btcAmount * 25000;
-
       // Apply emotional bonus if proof provided
       let emotionalBonus = 0;
       if (emotionalProof && emotionalProof.authenticity > 0.75) {
         emotionalBonus = Math.floor(emoAmount * 0.05 * emotionalProof.authenticity); // Up to 5% bonus
       }
-
       const bridgeId = `bridge-btc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
       const bridgeTransaction: BridgeTransaction = {
         bridgeId,
         sourceChain: 'Bitcoin',
@@ -381,30 +340,22 @@ export class CrossChainBridgeManager extends EventEmitter {
         estimatedTime: 600, // 10 minutes for Bitcoin confirmation
         createdAt: new Date().toISOString()
       };
-
       this.bridges.set(bridgeId, bridgeTransaction);
-
       // Mint EMO tokens on EmotionalChain
       await this.mintEmotionalTokens(recipient, emoAmount + emotionalBonus);
-
       bridgeTransaction.status = 'completed';
       bridgeTransaction.completedAt = new Date().toISOString();
-
-      console.log(`✅ Bitcoin bridge completed: ${bridgeId} - ${emoAmount + emotionalBonus} EMO minted`);
       this.emit('bridgeCompleted', bridgeTransaction);
-
       return {
         success: true,
         bridgeId,
         message: `Successfully bridged ${btcAmount} BTC to ${emoAmount + emotionalBonus} EMO${emotionalBonus > 0 ? ` (${emotionalBonus} emotional bonus)` : ''}`
       };
-
     } catch (error) {
       console.error('Bitcoin bridge failed:', error);
       return { success: false, message: 'Bitcoin bridge failed' };
     }
   }
-
   public async bridgeToPolkadot(
     sender: string,
     recipient: string,
@@ -413,17 +364,13 @@ export class CrossChainBridgeManager extends EventEmitter {
   ): Promise<{ success: boolean; bridgeId?: string; message: string }> {
     try {
       console.log(`🌉 Initiating bridge to Polkadot: ${amount} EMO`);
-
       const polkadotConfig = this.chainConfigs.get('Polkadot');
       if (!polkadotConfig || !polkadotConfig.isActive) {
         return { success: false, message: 'Polkadot bridge is not active' };
       }
-
       const bridgeId = `bridge-dot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
       // Lock EMO tokens
       const lockTxHash = await this.lockEmotionalTokens(sender, amount);
-
       const bridgeTransaction: BridgeTransaction = {
         bridgeId,
         sourceChain: 'EmotionalChain',
@@ -438,27 +385,20 @@ export class CrossChainBridgeManager extends EventEmitter {
         estimatedTime: 30, // 30 seconds for Polkadot
         createdAt: new Date().toISOString()
       };
-
       this.bridges.set(bridgeId, bridgeTransaction);
-
       // Use XCM (Cross-Consensus Message Passing) for Polkadot
       await this.sendXCMMessage(bridgeTransaction, parachain);
-
-      console.log(`✅ Polkadot bridge initiated: ${bridgeId}`);
       this.emit('bridgeInitiated', bridgeTransaction);
-
       return {
         success: true,
         bridgeId,
         message: `Bridge to Polkadot initiated. Estimated completion: 30 seconds`
       };
-
     } catch (error) {
       console.error('Polkadot bridge failed:', error);
       return { success: false, message: 'Polkadot bridge failed' };
     }
   }
-
   public async provideLiquidity(
     chainPair: string,
     tokenAmount: number,
@@ -469,21 +409,17 @@ export class CrossChainBridgeManager extends EventEmitter {
     if (!pool) {
       return { success: false, message: 'Liquidity pool not found' };
     }
-
     try {
       console.log(`💧 Adding liquidity to ${chainPair}: ${tokenAmount} tokens`);
-
       // Calculate LP tokens to mint
       const lpTokensToMint = pool.lpTokenSupply === 0 ? 
         tokenAmount : 
         (tokenAmount / pool.totalLiquidity) * pool.lpTokenSupply;
-
       // Update pool reserves
       pool.totalLiquidity += tokenAmount;
       pool.emotionalChainReserve += tokenAmount / 2;
       pool.externalChainReserve += tokenAmount / 2;
       pool.lpTokenSupply += lpTokensToMint;
-
       // Add provider
       const existingProvider = pool.providers.find(p => p.address === provider);
       if (existingProvider) {
@@ -498,22 +434,17 @@ export class CrossChainBridgeManager extends EventEmitter {
           emotionalScore: emotionalScore || 70
         });
       }
-
-      console.log(`✅ Liquidity added: ${lpTokensToMint} LP tokens minted`);
       this.emit('liquidityAdded', { chainPair, provider, amount: tokenAmount, lpTokens: lpTokensToMint });
-
       return {
         success: true,
         lpTokens: lpTokensToMint,
         message: `Successfully added liquidity. Received ${lpTokensToMint.toFixed(2)} LP tokens`
       };
-
     } catch (error) {
       console.error('Liquidity provision failed:', error);
       return { success: false, message: 'Liquidity provision failed' };
     }
   }
-
   public async removeLiquidity(
     chainPair: string,
     lpTokens: number,
@@ -523,20 +454,16 @@ export class CrossChainBridgeManager extends EventEmitter {
     if (!pool) {
       return { success: false, message: 'Liquidity pool not found' };
     }
-
     try {
       console.log(`💧 Removing liquidity from ${chainPair}: ${lpTokens} LP tokens`);
-
       // Calculate tokens to return
       const sharePercentage = lpTokens / pool.lpTokenSupply;
       const tokensToReturn = pool.totalLiquidity * sharePercentage;
-
       // Update pool reserves
       pool.totalLiquidity -= tokensToReturn;
       pool.emotionalChainReserve -= tokensToReturn / 2;
       pool.externalChainReserve -= tokensToReturn / 2;
       pool.lpTokenSupply -= lpTokens;
-
       // Update provider
       const providerIndex = pool.providers.findIndex(p => p.address === provider);
       if (providerIndex !== -1) {
@@ -545,36 +472,29 @@ export class CrossChainBridgeManager extends EventEmitter {
           pool.providers.splice(providerIndex, 1);
         }
       }
-
-      console.log(`✅ Liquidity removed: ${tokensToReturn} tokens returned`);
       this.emit('liquidityRemoved', { chainPair, provider, lpTokens, tokensReturned: tokensToReturn });
-
       return {
         success: true,
         tokensReturned: tokensToReturn,
         message: `Successfully removed liquidity. Returned ${tokensToReturn.toFixed(2)} tokens`
       };
-
     } catch (error) {
       console.error('Liquidity removal failed:', error);
       return { success: false, message: 'Liquidity removal failed' };
     }
   }
-
   private async lockEmotionalTokens(sender: string, amount: number): Promise<string> {
     // Simulate locking EMO tokens on EmotionalChain
     const txHash = `0x${crypto.randomBytes(32).toString('hex')}`;
-    console.log(`🔒 Locked ${amount} EMO from ${sender} - TX: ${txHash}`);
+    console.log(` Locked ${amount} EMO from ${sender} - TX: ${txHash}`);
     return txHash;
   }
-
   private async mintEmotionalTokens(recipient: string, amount: number): Promise<string> {
     // Simulate minting EMO tokens on EmotionalChain
     const txHash = `0x${crypto.randomBytes(32).toString('hex')}`;
     console.log(`🪙 Minted ${amount} EMO to ${recipient} - TX: ${txHash}`);
     return txHash;
   }
-
   private async verifyBitcoinTransaction(txHash: string): Promise<{
     valid: boolean;
     amount: number;
@@ -589,62 +509,46 @@ export class CrossChainBridgeManager extends EventEmitter {
       confirmations: 6
     };
   }
-
   private async queueForRelayer(bridgeTransaction: BridgeTransaction): Promise<void> {
     // Select best relayer based on reputation and emotional score
     const availableRelayers = Array.from(this.relayerNodes.values())
       .filter(r => r.isActive && r.supportedChains.includes(bridgeTransaction.targetChain))
       .sort((a, b) => (b.reputation + b.emotionalScore) - (a.reputation + a.emotionalScore));
-
     if (availableRelayers.length > 0) {
       const selectedRelayer = availableRelayers[0];
       console.log(`🤖 Assigned to relayer: ${selectedRelayer.id}`);
-      
       // Simulate relayer processing
       setTimeout(() => {
         this.processRelayerTransaction(bridgeTransaction.bridgeId, selectedRelayer.id);
       }, selectedRelayer.averageProcessingTime * 1000);
     }
   }
-
   private async processRelayerTransaction(bridgeId: string, relayerId: string): Promise<void> {
     const transaction = this.bridges.get(bridgeId);
     const relayer = this.relayerNodes.get(relayerId);
-    
     if (!transaction || !relayer) return;
-
     try {
-      console.log(`🔄 Processing bridge transaction ${bridgeId} via ${relayerId}`);
-
       // Simulate external chain transaction
       const targetTxHash = `0x${crypto.randomBytes(32).toString('hex')}`;
-      
       transaction.targetTxHash = targetTxHash;
       transaction.status = 'completed';
       transaction.completedAt = new Date().toISOString();
-
       // Update relayer statistics
       relayer.lastActivity = new Date().toISOString();
-      
-      console.log(`✅ Bridge completed: ${bridgeId} - Target TX: ${targetTxHash}`);
       this.emit('bridgeCompleted', transaction);
-
     } catch (error) {
       console.error(`Bridge processing failed for ${bridgeId}:`, error);
       transaction.status = 'failed';
       this.emit('bridgeFailed', transaction);
     }
   }
-
   private async sendXCMMessage(bridgeTransaction: BridgeTransaction, parachain?: string): Promise<void> {
     console.log(`📡 Sending XCM message for bridge ${bridgeTransaction.bridgeId}`);
-    
     // Simulate XCM message sending to Polkadot ecosystem
     setTimeout(() => {
       this.processRelayerTransaction(bridgeTransaction.bridgeId, 'relayer-beta');
     }, 30000); // 30 seconds for Polkadot
   }
-
   private calculateEmotionalScore(biometricData: BiometricData): number {
     return (
       (biometricData.heartRate > 50 && biometricData.heartRate < 100 ? 25 : 0) +
@@ -653,38 +557,29 @@ export class CrossChainBridgeManager extends EventEmitter {
       (biometricData.authenticity * 25)
     );
   }
-
   private processPendingBridges(): void {
     let pendingCount = 0;
-    
     for (const [bridgeId, transaction] of this.bridges.entries()) {
       if (transaction.status === 'pending') {
         pendingCount++;
-        
         // Check for timeout (30 minutes)
         const age = Date.now() - new Date(transaction.createdAt).getTime();
         if (age > 30 * 60 * 1000) {
           transaction.status = 'failed';
-          console.warn(`⚠️ Bridge transaction timed out: ${bridgeId}`);
           this.emit('bridgeTimeout', transaction);
         }
       }
     }
-    
     if (pendingCount > 0) {
-      console.log(`🔄 Processing ${pendingCount} pending bridge transactions`);
     }
   }
-
   private updateBridgeStatistics(): void {
     const transactions = Array.from(this.bridges.values());
     const completed = transactions.filter(t => t.status === 'completed');
-    
     this.bridgeStats.totalTransactions = transactions.length;
     this.bridgeStats.totalVolume = transactions.reduce((sum, t) => sum + t.amount, 0);
     this.bridgeStats.successRate = transactions.length > 0 ? (completed.length / transactions.length) * 100 : 0;
     this.bridgeStats.activeBridges = transactions.filter(t => t.status === 'pending').length;
-    
     if (completed.length > 0) {
       const totalTime = completed.reduce((sum, t) => {
         if (t.completedAt) {
@@ -695,50 +590,39 @@ export class CrossChainBridgeManager extends EventEmitter {
       this.bridgeStats.averageTime = totalTime / completed.length / 1000; // seconds
     }
   }
-
   private monitorRelayerHealth(): void {
     for (const [id, relayer] of this.relayerNodes.entries()) {
       const lastActivity = new Date(relayer.lastActivity).getTime();
       const timeSinceActivity = Date.now() - lastActivity;
-      
       // Mark as inactive if no activity for 1 hour
       if (timeSinceActivity > 60 * 60 * 1000) {
         relayer.isActive = false;
-        console.warn(`⚠️ Relayer ${id} marked as inactive`);
         this.emit('relayerInactive', relayer);
       }
     }
   }
-
   // Public getters and utilities
   public getBridgeTransactions(): BridgeTransaction[] {
     return Array.from(this.bridges.values());
   }
-
   public getBridgeTransaction(bridgeId: string): BridgeTransaction | undefined {
     return this.bridges.get(bridgeId);
   }
-
   public getLiquidityPools(): LiquidityPool[] {
     return Array.from(this.liquidityPools.values());
   }
-
   public getLiquidityPool(chainPair: string): LiquidityPool | undefined {
     return this.liquidityPools.get(chainPair);
   }
-
   public getRelayerNodes(): RelayerNode[] {
     return Array.from(this.relayerNodes.values());
   }
-
   public getSupportedChains(): ChainConfig[] {
     return Array.from(this.chainConfigs.values());
   }
-
   public getBridgeStatistics(): typeof this.bridgeStats {
     return { ...this.bridgeStats };
   }
-
   public getChainStatus(chainName: string): {
     isActive: boolean;
     currentLoad: number;
@@ -750,20 +634,16 @@ export class CrossChainBridgeManager extends EventEmitter {
     if (!config) {
       throw new Error(`Chain ${chainName} not found`);
     }
-
     const chainTransactions = Array.from(this.bridges.values())
       .filter(t => t.sourceChain === chainName || t.targetChain === chainName);
-    
     const today = new Date().toDateString();
     const todayTransactions = chainTransactions.filter(t => 
       new Date(t.createdAt).toDateString() === today
     );
-    
     const dailyVolumeUsed = todayTransactions.reduce((sum, t) => sum + t.amount, 0);
     const bridgeCapacityUsed = chainTransactions
       .filter(t => t.status === 'pending' || t.status === 'confirmed')
       .reduce((sum, t) => sum + t.amount, 0);
-
     return {
       isActive: config.isActive,
       currentLoad: Math.min(100, (bridgeCapacityUsed / config.bridgeCapacity) * 100),
@@ -772,49 +652,38 @@ export class CrossChainBridgeManager extends EventEmitter {
       bridgeCapacityUsed
     };
   }
-
   public estimateBridgeTime(sourceChain: string, targetChain: string): number {
     const sourceConfig = this.chainConfigs.get(sourceChain);
     const targetConfig = this.chainConfigs.get(targetChain);
-    
     if (!sourceConfig || !targetConfig) return 600; // Default 10 minutes
-    
     return (sourceConfig.confirmations * sourceConfig.blockTime) + 
            (targetConfig.confirmations * targetConfig.blockTime) + 
            60; // Processing time
   }
-
   public calculateBridgeFee(amount: number, sourceChain: string, targetChain: string): number {
     const baseFee = amount * 0.001; // 0.1% base fee
-    
     // Higher fees for non-emotional compatible chains
     const sourceConfig = this.chainConfigs.get(sourceChain);
     const targetConfig = this.chainConfigs.get(targetChain);
-    
     let multiplier = 1;
     if (!sourceConfig?.emotionalCompatible || !targetConfig?.emotionalCompatible) {
       multiplier = 2; // Double fee for non-emotional chains
     }
-    
     return baseFee * multiplier;
   }
-
   public pauseBridge(chainName: string): boolean {
     const config = this.chainConfigs.get(chainName);
     if (config) {
       config.isActive = false;
-      console.log(`⏸️ Bridge paused for ${chainName}`);
       this.emit('bridgePaused', chainName);
       return true;
     }
     return false;
   }
-
   public resumeBridge(chainName: string): boolean {
     const config = this.chainConfigs.get(chainName);
     if (config) {
       config.isActive = true;
-      console.log(`▶️ Bridge resumed for ${chainName}`);
       this.emit('bridgeResumed', chainName);
       return true;
     }

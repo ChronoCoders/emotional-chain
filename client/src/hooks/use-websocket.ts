@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-
 interface WebSocketMessage {
   type: string;
   data?: any;
@@ -8,14 +7,12 @@ interface WebSocketMessage {
   result?: string;
   timestamp: string;
 }
-
 interface UseWebSocketReturn {
   isConnected: boolean;
   lastMessage: WebSocketMessage | null;
   sendMessage: (message: any) => void;
   sendCommand: (command: string, args?: string[]) => void;
 }
-
 interface WebSocketConfig {
   heartbeatInterval: number;
   reconnectAttempts: number;
@@ -26,7 +23,6 @@ interface WebSocketConfig {
   exponentialBackoffEnabled: boolean;
   maxBackoffDelay: number;
 }
-
 // Get WebSocket configuration from API
 async function getWebSocketConfig(): Promise<WebSocketConfig> {
   try {
@@ -50,7 +46,6 @@ async function getWebSocketConfig(): Promise<WebSocketConfig> {
     };
   }
 }
-
 export function useWebSocket(): UseWebSocketReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
@@ -58,84 +53,65 @@ export function useWebSocket(): UseWebSocketReturn {
   const wsRef = useRef<WebSocket | null>(null);
   const retryCountRef = useRef(0);
   const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
-
   // Load configuration on mount
   useEffect(() => {
     getWebSocketConfig().then(setConfig);
   }, []);
-
   useEffect(() => {
     if (!config) return;
-
     let isCleaningUp = false;
-
     const calculateBackoffDelay = (attempt: number): number => {
       if (!config.exponentialBackoffEnabled) {
         return config.reconnectDelay;
       }
-      
       const exponentialDelay = Math.min(
         config.reconnectDelay * Math.pow(2, attempt),
         config.maxBackoffDelay
       );
-      
       // Add jitter (±25%)
       const jitter = exponentialDelay * 0.25 * (Math.random() - 0.5);
       return Math.floor(exponentialDelay + jitter);
     };
-
     const startHeartbeat = () => {
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
       }
-      
       heartbeatRef.current = setInterval(() => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
           wsRef.current.send(JSON.stringify({ type: 'ping', timestamp: Date.now() }));
         }
       }, config.heartbeatInterval);
     };
-
     const stopHeartbeat = () => {
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
         heartbeatRef.current = null;
       }
     };
-
     const connectWithFallback = (useFallback = false) => {
       if (isCleaningUp) return;
-      
       // Validate configuration before attempting connection
       if (!config.fallbackHost || !config.fallbackPort) {
         console.error('🚨 WebSocket Configuration Error: Missing required fallback parameters');
         return;
       }
-
       try {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         let wsUrl: string;
-        
         if (useFallback) {
           wsUrl = `${protocol}//${config.fallbackHost}:${config.fallbackPort}/ws`;
-          console.warn(`⚠️ Using WebSocket fallback: ${wsUrl}`);
         } else {
           const hostname = window.location.hostname;
           const port = window.location.port;
           wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}/ws`;
         }
-        
-        console.log(`🔗 Attempting WebSocket connection to: ${wsUrl}`);
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
-
         socket.onopen = () => {
-          console.log('✅ WebSocket connected to EmotionalChain');
           setIsConnected(true);
           retryCountRef.current = 0; // Reset retry count on successful connection
           startHeartbeat();
         };
-
         socket.onmessage = (event) => {
           try {
             const message = JSON.parse(event.data);
@@ -146,23 +122,16 @@ export function useWebSocket(): UseWebSocketReturn {
             console.error('Error parsing WebSocket message:', error);
           }
         };
-
         socket.onclose = (event) => {
-          console.log(`🔌 WebSocket disconnected: ${event.code} - ${event.reason}`);
           setIsConnected(false);
           stopHeartbeat();
-          
           if (isCleaningUp || event.code === 1000) {
             return; // Intentional close, don't reconnect
           }
-
           // Attempt reconnection with exponential backoff
           if (retryCountRef.current < config.retryLimit) {
             const delay = calculateBackoffDelay(retryCountRef.current);
             retryCountRef.current++;
-            
-            console.log(`🔄 Reconnecting in ${delay}ms (attempt ${retryCountRef.current}/${config.retryLimit})`);
-            
             setTimeout(() => {
               if (!isCleaningUp && (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED)) {
                 // Try fallback if primary connection fails repeatedly
@@ -174,13 +143,10 @@ export function useWebSocket(): UseWebSocketReturn {
             console.error('🚨 WebSocket: Maximum retry attempts reached. Connection abandoned.');
           }
         };
-
         socket.onerror = (error) => {
-          console.error('❌ WebSocket error:', error);
           setIsConnected(false);
           stopHeartbeat();
         };
-
       } catch (error) {
         console.error('🚨 Error creating WebSocket connection:', error);
         if (retryCountRef.current < config.retryLimit) {
@@ -190,10 +156,8 @@ export function useWebSocket(): UseWebSocketReturn {
         }
       }
     };
-
     // Initial connection attempt
     connectWithFallback();
-
     return () => {
       isCleaningUp = true;
       stopHeartbeat();
@@ -202,7 +166,6 @@ export function useWebSocket(): UseWebSocketReturn {
       }
     };
   }, [config]);
-
   const sendMessage = (message: any) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
@@ -210,7 +173,6 @@ export function useWebSocket(): UseWebSocketReturn {
       console.warn('WebSocket is not connected - message queued');
     }
   };
-
   const sendCommand = (command: string, args: string[] = []) => {
     sendMessage({
       type: 'command',
@@ -219,7 +181,6 @@ export function useWebSocket(): UseWebSocketReturn {
       timestamp: new Date().toISOString()
     });
   };
-
   return {
     isConnected,
     lastMessage,

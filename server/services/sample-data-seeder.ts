@@ -2,44 +2,28 @@
  * Sample Data Seeder for Advanced Features
  * Creates authentic database records to replace all fake/mock data
  */
-
 import { advancedFeaturesService } from "./advanced-features";
-
 export class SampleDataSeeder {
-
   async seedAdvancedFeatures(): Promise<void> {
-    console.log("🌱 Seeding authentic advanced features data...");
-
     try {
       // Seed Smart Contracts
       await this.seedSmartContracts();
-      
       // Seed Wellness Goals
       await this.seedWellnessGoals();
-      
       // Seed Quantum Key Pairs
       await this.seedQuantumKeyPairs();
-      
       // Seed Privacy Proofs
       await this.seedPrivacyProofs();
-      
       // Seed Bridge Transactions
       await this.seedBridgeTransactions();
-      
       // Seed AI Model Data
       await this.seedAiModelData();
-      
       // Seed Biometric Devices
       await this.seedBiometricDevices();
-
-      console.log("✅ Advanced features seeding completed successfully!");
-
     } catch (error) {
-      console.error("❌ Error seeding advanced features:", error);
       throw error;
     }
   }
-
   private async seedSmartContracts(): Promise<void> {
     const contracts = [
       {
@@ -73,12 +57,10 @@ export class SampleDataSeeder {
         })
       }
     ];
-
     for (const contract of contracts) {
       await advancedFeaturesService.deploySmartContract(contract);
     }
   }
-
   private async seedWellnessGoals(): Promise<void> {
     const goals = [
       {
@@ -108,12 +90,10 @@ export class SampleDataSeeder {
         })
       }
     ];
-
     for (const goal of goals) {
       await advancedFeaturesService.createWellnessGoal(goal);
     }
   }
-
   private async seedQuantumKeyPairs(): Promise<void> {
     const keyPairs = [
       {
@@ -137,12 +117,10 @@ export class SampleDataSeeder {
         expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000)
       }
     ];
-
     for (const keyPair of keyPairs) {
       await advancedFeaturesService.storeQuantumKeyPair(keyPair);
     }
   }
-
   private async seedPrivacyProofs(): Promise<void> {
     const proofs = [
       {
@@ -173,12 +151,10 @@ export class SampleDataSeeder {
         isValid: true
       }
     ];
-
     for (const proof of proofs) {
       await advancedFeaturesService.storePrivacyProof(proof);
     }
   }
-
   private async seedBridgeTransactions(): Promise<void> {
     const bridgeTxs = [
       {
@@ -222,12 +198,10 @@ export class SampleDataSeeder {
         completedAt: null
       }
     ];
-
     for (const bridgeTx of bridgeTxs) {
       await advancedFeaturesService.createBridgeTransaction(bridgeTx);
     }
   }
-
   private async seedAiModelData(): Promise<void> {
     const models = [
       {
@@ -269,12 +243,10 @@ export class SampleDataSeeder {
         isActive: true
       }
     ];
-
     for (const model of models) {
       await advancedFeaturesService.storeAiModelData(model);
     }
   }
-
   private async seedBiometricDevices(): Promise<void> {
     const devices = [
       {
@@ -316,11 +288,9 @@ export class SampleDataSeeder {
         authenticityVerified: true
       }
     ];
-
     for (const device of devices) {
       await advancedFeaturesService.registerBiometricDevice(device);
     }
   }
 }
-
 export const sampleDataSeeder = new SampleDataSeeder();

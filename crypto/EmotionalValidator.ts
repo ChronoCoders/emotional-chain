@@ -1,5 +1,4 @@
 import { BiometricData } from './Transaction';
-
 export interface EmotionalValidator {
   id: string;
   address: string;
@@ -9,28 +8,21 @@ export interface EmotionalValidator {
   blocksValidated: number;
   authenticity: number;
 }
-
 export class EmotionalValidatorUtils {
-  
   /**
    * Calculate emotional score from biometric data
    * This is the core of the Proof of Emotion consensus
    */
   public static calculateEmotionalScore(biometricData: BiometricData): number {
     const { heartRate, stressLevel, focusLevel, authenticity } = biometricData;
-    
     // Optimal heart rate zone (60-100 BPM gets higher score)
     const heartRateScore = EmotionalValidatorUtils.calculateHeartRateScore(heartRate);
-    
     // Lower stress is better for validation
     const stressScore = (100 - stressLevel) / 100;
-    
     // Higher focus is better for validation
     const focusScore = focusLevel / 100;
-    
     // Authenticity is crucial for preventing gaming
     const authenticityScore = authenticity;
-    
     // Weighted combination of all factors
     const rawScore = (
       heartRateScore * 0.25 +      // 25% heart rate
@@ -38,13 +30,10 @@ export class EmotionalValidatorUtils {
       focusScore * 0.25 +          // 25% focus
       authenticityScore * 0.20     // 20% authenticity
     );
-    
     // Scale to 0-100 and add some randomness for fairness
     const emotionalScore = rawScore * 85 + Math.random() * 15;
-    
     return Math.round(emotionalScore * 100) / 100; // Round to 2 decimal places
   }
-
   /**
    * Calculate heart rate score with optimal zones
    */
@@ -60,39 +49,32 @@ export class EmotionalValidatorUtils {
       return 0.3; // Low score for extreme values
     }
   }
-
   /**
    * Verify biometric authenticity (anti-gaming measures)
    */
   public static verifyAuthenticity(biometricData: BiometricData): boolean {
     // Check for realistic biometric patterns
     const { heartRate, stressLevel, focusLevel, authenticity, timestamp } = biometricData;
-    
     // Timestamp must be recent (within 10 minutes)
     const tenMinutes = 10 * 60 * 1000;
     if (Math.abs(Date.now() - timestamp) > tenMinutes) {
       return false;
     }
-    
     // Physiological consistency checks
     if (heartRate > 180 && stressLevel < 20) {
       // Very high heart rate with very low stress is suspicious
       return false;
     }
-    
     if (heartRate < 50 && focusLevel > 90) {
       // Very low heart rate with very high focus is suspicious
       return false;
     }
-    
     // Authenticity threshold (minimum 70%)
     if (authenticity < 0.7) {
       return false;
     }
-    
     return true;
   }
-
   /**
    * Check if validator has valid emotional proof for consensus
    */
@@ -101,7 +83,6 @@ export class EmotionalValidatorUtils {
     const MINIMUM_EMOTIONAL_SCORE = 60.0;
     return emotionalScore >= MINIMUM_EMOTIONAL_SCORE;
   }
-
   /**
    * Select validator based on emotional consensus
    * This implements fair rotation with emotional weighting
@@ -115,16 +96,13 @@ export class EmotionalValidatorUtils {
       EmotionalValidatorUtils.isValidEmotionalProof(v.emotionalScore) &&
       EmotionalValidatorUtils.verifyAuthenticity(v.biometricData)
     );
-    
     if (validValidators.length === 0) {
       return null;
     }
-    
     // Fair rotation based on block height (ensures all validators get turns)
     const validatorIndex = blockHeight % validValidators.length;
     return validValidators[validatorIndex];
   }
-
   /**
    * Calculate consensus bonus based on emotional score
    */
@@ -133,7 +111,6 @@ export class EmotionalValidatorUtils {
     const bonusPercentage = Math.max(0, (emotionalScore - 80) / 100); // Above 80 score gets bonus
     return baseReward * bonusPercentage;
   }
-
   /**
    * Generate realistic biometric data for testing
    */
@@ -141,7 +118,6 @@ export class EmotionalValidatorUtils {
     // Generate deterministic but varied data based on validator ID
     const seed = EmotionalValidatorUtils.hashString(validatorId);
     const random = () => (seed * 9301 + 49297) % 233280 / 233280;
-    
     return {
       heartRate: 60 + Math.floor(random() * 40), // 60-100 BPM
       stressLevel: Math.floor(random() * 50), // 0-50% stress
@@ -150,7 +126,6 @@ export class EmotionalValidatorUtils {
       timestamp: Date.now()
     };
   }
-
   /**
    * Simple hash function for deterministic randomness
    */
@@ -163,7 +138,6 @@ export class EmotionalValidatorUtils {
     }
     return Math.abs(hash);
   }
-
   /**
    * Create a new emotional validator
    */
@@ -173,7 +147,6 @@ export class EmotionalValidatorUtils {
     biometricData?: BiometricData
   ): EmotionalValidator {
     const biometrics = biometricData || EmotionalValidatorUtils.generateTestBiometricData(id);
-    
     return {
       id,
       address,
@@ -184,7 +157,6 @@ export class EmotionalValidatorUtils {
       authenticity: biometrics.authenticity
     };
   }
-
   /**
    * Update validator's biometric data and recalculate emotional score
    */
@@ -200,7 +172,6 @@ export class EmotionalValidatorUtils {
       authenticity: newBiometricData.authenticity
     };
   }
-
   /**
    * Get validator performance metrics
    */
@@ -214,11 +185,9 @@ export class EmotionalValidatorUtils {
     const now = Date.now();
     const lastActiveAgo = now - validator.lastActive;
     const isActive = lastActiveAgo < 60000; // Active if seen within 1 minute
-    
     // Calculate uptime based on activity pattern
     const dayInMs = 24 * 60 * 60 * 1000;
     const uptime = Math.max(0, 100 - (lastActiveAgo / dayInMs) * 100);
-    
     return {
       emotionalScore: validator.emotionalScore,
       uptime: Math.round(uptime * 100) / 100,

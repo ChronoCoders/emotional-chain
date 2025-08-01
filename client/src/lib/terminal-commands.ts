@@ -4,7 +4,6 @@ export interface TerminalCommand {
   usage: string;
   examples: string[];
 }
-
 export const TERMINAL_COMMANDS: TerminalCommand[] = [
   {
     name: 'wallet',
@@ -49,40 +48,30 @@ export const TERMINAL_COMMANDS: TerminalCommand[] = [
     examples: ['clear']
   }
 ];
-
 export function getCommandHelp(command?: string): string {
   if (!command) {
-    return `🧠 EmotionalChain Terminal Commands:
-
+    return ` EmotionalChain Terminal Commands:
 ${TERMINAL_COMMANDS.map(cmd => 
   `   ${cmd.name.padEnd(12)} - ${cmd.description}`
 ).join('\n')}
-
 Type 'help <command>' for detailed usage information.`;
   }
-
   const cmd = TERMINAL_COMMANDS.find(c => c.name === command.toLowerCase());
   if (!cmd) {
     return `Unknown command: ${command}. Type 'help' for available commands.`;
   }
-
-  return `🧠 ${cmd.name.toUpperCase()} Command Help:
-
+  return ` ${cmd.name.toUpperCase()} Command Help:
 Description: ${cmd.description}
 Usage: ${cmd.usage}
-
 Examples:
 ${cmd.examples.map(ex => `   $ ${ex}`).join('\n')}`;
 }
-
 export function parseCommand(input: string): { command: string; args: string[] } {
   const parts = input.trim().split(/\s+/);
   const command = parts[0] || '';
   const args = parts.slice(1);
-  
   return { command, args };
 }
-
 export function formatTerminalOutput(text: string): string {
   return text.replace(/\n/g, '\n');
 }

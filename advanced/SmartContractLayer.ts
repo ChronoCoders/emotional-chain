@@ -2,10 +2,8 @@
  * Smart Contract Layer for EmotionalChain
  * EVM-compatible emotion-aware smart contracts with biometric triggers
  */
-
 import { EventEmitter } from 'events';
 import Web3 from 'web3';
-
 // Define BiometricData interface locally
 interface BiometricData {
   heartRate: number;
@@ -14,7 +12,6 @@ interface BiometricData {
   authenticity: number;
   timestamp: number;
 }
-
 export interface EmotionalContract {
   address: string;
   name: string;
@@ -31,7 +28,6 @@ export interface EmotionalContract {
     rewards: string[];
   };
 }
-
 export interface ContractExecution {
   contractAddress: string;
   participant: string;
@@ -47,7 +43,6 @@ export interface ContractExecution {
   timestamp: string;
   blockHeight: number;
 }
-
 export interface WellnessGoal {
   participant: string;
   targetScore: number;
@@ -59,7 +54,6 @@ export interface WellnessGoal {
   endDate: string;
   biometricHistory: BiometricData[];
 }
-
 export interface BiometricTrigger {
   id: string;
   contractAddress: string;
@@ -76,7 +70,6 @@ export interface BiometricTrigger {
   executionCount: number;
   lastExecuted?: string;
 }
-
 // Solidity contract interfaces (compiled bytecode would be stored separately)
 export const WellnessIncentiveABI = [
   {
@@ -124,7 +117,6 @@ export const WellnessIncentiveABI = [
     "type": "event"
   }
 ];
-
 export const BiometricTriggerABI = [
   {
     "inputs": [
@@ -151,7 +143,6 @@ export const BiometricTriggerABI = [
     "type": "function"
   }
 ];
-
 export class SmartContractEngine extends EventEmitter {
   private web3: Web3;
   private contracts: Map<string, EmotionalContract> = new Map();
@@ -159,7 +150,6 @@ export class SmartContractEngine extends EventEmitter {
   private biometricTriggers: Map<string, BiometricTrigger> = new Map();
   private executionHistory: ContractExecution[] = [];
   private gasPrice: number;
-
   constructor(providerUrl: string) {
     super();
     this.web3 = new Web3(new Web3.providers.HttpProvider(providerUrl));
@@ -167,19 +157,16 @@ export class SmartContractEngine extends EventEmitter {
     this.gasPrice = 20; // Will be replaced with CONFIG.smartContracts.execution.gasPrice when imported
     this.startContractMonitoring();
   }
-
   private startContractMonitoring(): void {
     // Monitor biometric data for trigger conditions
     setInterval(() => {
       this.processBiometricTriggers();
     }, 30000); // CONFIG.smartContracts.execution.monitoringInterval
-
     // Update wellness goal progress
     setInterval(() => {
       this.updateWellnessGoals();
     }, 60000); // CONFIG.smartContracts.wellness.updateInterval
   }
-
   public async deployWellnessContract(
     creator: string,
     metadata: {
@@ -189,11 +176,9 @@ export class SmartContractEngine extends EventEmitter {
     }
   ): Promise<{ success: boolean; contractAddress?: string; message: string }> {
     try {
-      console.log(`🚀 Deploying wellness contract for ${creator}`);
-
+      console.log(` Deploying wellness contract for ${creator}`);
       // Generate contract address (simplified - in reality would deploy to EVM)
       const contractAddress = `0x${Array.from(crypto.getRandomValues(new Uint8Array(20))).map(b => b.toString(16).padStart(2, '0')).join('')}`;
-
       const contract: EmotionalContract = {
         address: contractAddress,
         name: metadata.name,
@@ -210,24 +195,18 @@ export class SmartContractEngine extends EventEmitter {
           rewards: ['EMO token rewards', 'Wellness NFT badges', 'Premium health insights']
         }
       };
-
       this.contracts.set(contractAddress, contract);
-
-      console.log(`✅ Wellness contract deployed: ${contractAddress}`);
       this.emit('contractDeployed', contract);
-
       return {
         success: true,
         contractAddress,
         message: `Wellness contract "${metadata.name}" deployed successfully`
       };
-
     } catch (error) {
       console.error('Contract deployment failed:', error);
       return { success: false, message: 'Contract deployment failed' };
     }
   }
-
   public async createWellnessGoal(
     contractAddress: string,
     participant: string,
@@ -239,19 +218,16 @@ export class SmartContractEngine extends EventEmitter {
     if (!contract) {
       return { success: false, message: 'Contract not found' };
     }
-
     if (targetScore < contract.emotionalThreshold) {
       return {
         success: false,
         message: `Target score must be at least ${contract.emotionalThreshold}%`
       };
     }
-
     try {
       const goalId = `${contractAddress}-${participant}-${Date.now()}`;
       const now = new Date();
       const endDate = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000);
-
       const wellnessGoal: WellnessGoal = {
         participant,
         targetScore,
@@ -263,37 +239,30 @@ export class SmartContractEngine extends EventEmitter {
         endDate: endDate.toISOString(),
         biometricHistory: []
       };
-
       this.wellnessGoals.set(goalId, wellnessGoal);
-
       // Add participant to contract
       if (!contract.participants.includes(participant)) {
         contract.participants.push(participant);
       }
       contract.totalValue += rewardAmount;
-
-      console.log(`🎯 Wellness goal created: ${goalId}`);
+      console.log(` Wellness goal created: ${goalId}`);
       this.emit('wellnessGoalCreated', { goalId, goal: wellnessGoal, contract });
-
       return {
         success: true,
         goalId,
         message: `Wellness goal created with ${rewardAmount} EMO reward`
       };
-
     } catch (error) {
       console.error('Wellness goal creation failed:', error);
       return { success: false, message: 'Goal creation failed' };
     }
   }
-
   public async submitBiometricData(
     participant: string,
     biometricData: BiometricData
   ): Promise<{ triggeredContracts: string[]; goalUpdates: string[] }> {
     const triggeredContracts: string[] = [];
     const goalUpdates: string[] = [];
-
     // Check biometric triggers
     for (const [triggerId, trigger] of this.biometricTriggers.entries()) {
       if (this.evaluateTriggerCondition(trigger, biometricData)) {
@@ -301,18 +270,14 @@ export class SmartContractEngine extends EventEmitter {
         triggeredContracts.push(trigger.contractAddress);
       }
     }
-
     // Update wellness goals
     for (const [goalId, goal] of this.wellnessGoals.entries()) {
       if (goal.participant === participant && !goal.completed) {
         goal.biometricHistory.push(biometricData);
-        
         // Calculate emotional score from biometric data
         const emotionalScore = this.calculateEmotionalScore(biometricData);
-        
         if (emotionalScore >= goal.targetScore) {
           goal.currentProgress = Math.min(100, goal.currentProgress + 10); // 10% progress per qualifying reading
-          
           // Check if goal is completed (need consistent high scores)
           if (goal.currentProgress >= 100) {
             await this.completeWellnessGoal(goalId);
@@ -321,10 +286,8 @@ export class SmartContractEngine extends EventEmitter {
         }
       }
     }
-
     return { triggeredContracts, goalUpdates };
   }
-
   public async createBiometricTrigger(
     contractAddress: string,
     triggerCondition: BiometricTrigger['triggerCondition'],
@@ -335,10 +298,8 @@ export class SmartContractEngine extends EventEmitter {
     if (!contract) {
       return { success: false, message: 'Contract not found' };
     }
-
     try {
       const triggerId = `trigger-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
       const trigger: BiometricTrigger = {
         id: triggerId,
         contractAddress,
@@ -348,46 +309,35 @@ export class SmartContractEngine extends EventEmitter {
         isActive: true,
         executionCount: 0
       };
-
       this.biometricTriggers.set(triggerId, trigger);
-
-      console.log(`⚡ Biometric trigger created: ${triggerId}`);
+      console.log(` Biometric trigger created: ${triggerId}`);
       this.emit('biometricTriggerCreated', trigger);
-
       return {
         success: true,
         triggerId,
         message: 'Biometric trigger created successfully'
       };
-
     } catch (error) {
       console.error('Trigger creation failed:', error);
       return { success: false, message: 'Trigger creation failed' };
     }
   }
-
   private evaluateTriggerCondition(
     trigger: BiometricTrigger,
     biometricData: BiometricData
   ): boolean {
     const condition = trigger.triggerCondition;
-
     // Check heart rate range
     if (condition.heartRateMin && biometricData.heartRate < condition.heartRateMin) return false;
     if (condition.heartRateMax && biometricData.heartRate > condition.heartRateMax) return false;
-
     // Check stress level
     if (condition.stressLevelMax && biometricData.stressLevel > condition.stressLevelMax) return false;
-
     // Check focus level
     if (condition.focusLevelMin && biometricData.focusLevel < condition.focusLevelMin) return false;
-
     // Check authenticity
     if (condition.authenticityMin && biometricData.authenticity < condition.authenticityMin) return false;
-
     return true;
   }
-
   private async executeBiometricTrigger(
     triggerId: string,
     participant: string,
@@ -395,10 +345,8 @@ export class SmartContractEngine extends EventEmitter {
   ): Promise<void> {
     const trigger = this.biometricTriggers.get(triggerId);
     if (!trigger || !trigger.isActive) return;
-
     try {
-      console.log(`⚡ Executing biometric trigger: ${triggerId}`);
-
+      console.log(` Executing biometric trigger: ${triggerId}`);
       let executionResult = {
         success: false,
         gasUsed: 21000, // Base gas cost
@@ -406,7 +354,6 @@ export class SmartContractEngine extends EventEmitter {
         penalty: 0,
         outputData: null
       };
-
       switch (trigger.action) {
         case 'transfer_tokens':
           executionResult = await this.executeTokenTransfer(trigger.actionData, participant);
@@ -421,7 +368,6 @@ export class SmartContractEngine extends EventEmitter {
           executionResult = await this.executeCustomFunction(trigger.actionData, participant, biometricData);
           break;
       }
-
       // Record execution
       const execution: ContractExecution = {
         contractAddress: trigger.contractAddress,
@@ -432,25 +378,18 @@ export class SmartContractEngine extends EventEmitter {
         timestamp: new Date().toISOString(),
         blockHeight: Math.floor(Math.random() * 1000000) // Simplified
       };
-
       this.executionHistory.push(execution);
       trigger.executionCount++;
       trigger.lastExecuted = new Date().toISOString();
-
-      console.log(`✅ Trigger executed successfully: ${triggerId}`);
       this.emit('triggerExecuted', { trigger, execution });
-
     } catch (error) {
       console.error(`Trigger execution failed: ${triggerId}`, error);
     }
   }
-
   private async executeTokenTransfer(actionData: any, participant: string): Promise<any> {
     const { amount, recipient } = actionData;
-    
     // Simulate token transfer
-    console.log(`💸 Transferring ${amount} EMO from ${participant} to ${recipient}`);
-    
+    console.log(` Transferring ${amount} EMO from ${participant} to ${recipient}`);
     return {
       success: true,
       gasUsed: 25000,
@@ -459,12 +398,9 @@ export class SmartContractEngine extends EventEmitter {
       outputData: { transferAmount: amount, recipient }
     };
   }
-
   private async executeMintNFT(actionData: any, participant: string): Promise<any> {
     const { tokenId, metadata } = actionData;
-    
-    console.log(`🎨 Minting NFT ${tokenId} for ${participant}`);
-    
+    console.log(` Minting NFT ${tokenId} for ${participant}`);
     return {
       success: true,
       gasUsed: 50000,
@@ -473,12 +409,9 @@ export class SmartContractEngine extends EventEmitter {
       outputData: { tokenId, owner: participant, metadata }
     };
   }
-
   private async executeUnlockFunds(actionData: any, participant: string): Promise<any> {
     const { amount, lockId } = actionData;
-    
     console.log(`🔓 Unlocking ${amount} EMO for ${participant} (lock: ${lockId})`);
-    
     return {
       success: true,
       gasUsed: 30000,
@@ -487,15 +420,10 @@ export class SmartContractEngine extends EventEmitter {
       outputData: { unlockedAmount: amount, lockId }
     };
   }
-
   private async executeCustomFunction(actionData: any, participant: string, biometricData: BiometricData): Promise<any> {
     const { functionName, parameters } = actionData;
-    
-    console.log(`⚙️ Executing custom function: ${functionName} for ${participant}`);
-    
     // Simplified custom function execution
     let result = { success: true, gasUsed: 35000, reward: 0, penalty: 0, outputData: null };
-    
     switch (functionName) {
       case 'calculateWellnessBonus':
         const bonus = Math.floor(biometricData.authenticity * 10);
@@ -511,19 +439,14 @@ export class SmartContractEngine extends EventEmitter {
       default:
         result.outputData = { executed: functionName, parameters };
     }
-    
     return result;
   }
-
   private async completeWellnessGoal(goalId: string): Promise<void> {
     const goal = this.wellnessGoals.get(goalId);
     if (!goal || goal.completed) return;
-
     goal.completed = true;
-    
     console.log(`🏆 Wellness goal completed: ${goalId} - Reward: ${goal.reward} EMO`);
     this.emit('wellnessGoalCompleted', goal);
-
     // Execute reward distribution (simplified)
     const execution: ContractExecution = {
       contractAddress: 'wellness-contract',
@@ -539,72 +462,57 @@ export class SmartContractEngine extends EventEmitter {
       timestamp: new Date().toISOString(),
       blockHeight: Math.floor(Math.random() * 1000000)
     };
-
     this.executionHistory.push(execution);
   }
-
   private calculateEmotionalScore(biometricData: BiometricData): number {
     // Sophisticated emotional score calculation
     const heartRateScore = Math.max(0, 100 - Math.abs(biometricData.heartRate - 75) * 2);
     const stressScore = Math.max(0, 100 - biometricData.stressLevel * 100);
     const focusScore = biometricData.focusLevel * 100;
     const authenticityScore = biometricData.authenticity * 100;
-
     return (heartRateScore * 0.25 + stressScore * 0.25 + focusScore * 0.25 + authenticityScore * 0.25);
   }
-
   private processBiometricTriggers(): void {
     // Simulate periodic biometric data checking
     console.log('🔍 Processing biometric triggers...');
-    
     // In a real implementation, this would check recent biometric data
     // and evaluate all active triggers
   }
-
   private updateWellnessGoals(): void {
     let activeGoals = 0;
-    
     for (const [goalId, goal] of this.wellnessGoals.entries()) {
       if (!goal.completed && new Date() < new Date(goal.endDate)) {
         activeGoals++;
-        
         // Add some simulated progress for demo
         if (Math.random() < 0.1) { // 10% chance of progress update
           goal.currentProgress = Math.min(100, goal.currentProgress + Math.random() * 5);
         }
       }
     }
-    
     if (activeGoals > 0) {
       console.log(`💪 Monitoring ${activeGoals} active wellness goals`);
     }
   }
-
   // Public getters and utilities
   public getContracts(): EmotionalContract[] {
     return Array.from(this.contracts.values());
   }
-
   public getContract(address: string): EmotionalContract | undefined {
     return this.contracts.get(address);
   }
-
   public getWellnessGoals(participant?: string): WellnessGoal[] {
     const goals = Array.from(this.wellnessGoals.values());
     return participant ? goals.filter(g => g.participant === participant) : goals;
   }
-
   public getBiometricTriggers(contractAddress?: string): BiometricTrigger[] {
     const triggers = Array.from(this.biometricTriggers.values());
     return contractAddress ? triggers.filter(t => t.contractAddress === contractAddress) : triggers;
   }
-
   public getExecutionHistory(participant?: string): ContractExecution[] {
     return participant ? 
       this.executionHistory.filter(e => e.participant === participant) :
       this.executionHistory;
   }
-
   public getContractStats(): {
     totalContracts: number;
     activeContracts: number;
@@ -617,18 +525,14 @@ export class SmartContractEngine extends EventEmitter {
     const activeContracts = contracts.filter(c => c.isActive).length;
     const allParticipants = new Set();
     const totalValueLocked = contracts.reduce((sum, c) => sum + c.totalValue, 0);
-
     contracts.forEach(c => c.participants.forEach(p => allParticipants.add(p)));
-
     const today = new Date().toDateString();
     const executionsToday = this.executionHistory.filter(e => 
       new Date(e.timestamp).toDateString() === today
     ).length;
-
     const avgGasUsed = this.executionHistory.length > 0 ?
       this.executionHistory.reduce((sum, e) => sum + e.executionResult.gasUsed, 0) / this.executionHistory.length :
       0;
-
     return {
       totalContracts: contracts.length,
       activeContracts,
@@ -638,23 +542,19 @@ export class SmartContractEngine extends EventEmitter {
       avgGasUsed: Math.round(avgGasUsed)
     };
   }
-
   public pauseContract(contractAddress: string): boolean {
     const contract = this.contracts.get(contractAddress);
     if (contract) {
       contract.isActive = false;
-      console.log(`⏸️ Contract paused: ${contractAddress}`);
       this.emit('contractPaused', contract);
       return true;
     }
     return false;
   }
-
   public resumeContract(contractAddress: string): boolean {
     const contract = this.contracts.get(contractAddress);
     if (contract) {
       contract.isActive = true;
-      console.log(`▶️ Contract resumed: ${contractAddress}`);
       this.emit('contractResumed', contract);
       return true;
     }

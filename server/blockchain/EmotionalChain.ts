@@ -3,7 +3,6 @@
 import { EventEmitter } from 'events';
 import * as crypto from 'crypto';
 import { storage } from '../storage';
-
 export class EmotionalChain extends EventEmitter {
   private chain: any[] = [];
   private pendingTransactions: any[] = [];
@@ -12,7 +11,6 @@ export class EmotionalChain extends EventEmitter {
   private miningInterval: NodeJS.Timeout | null = null;
   private validators: Map<string, any> = new Map();
   private wallets: Map<string, number> = new Map(); // Validator wallets for EMO storage
-  
   // Token Economics from attached specification
   private tokenEconomics = {
     maxSupply: 1000000000, // 1 billion EMO hard cap
@@ -37,41 +35,28 @@ export class EmotionalChain extends EventEmitter {
       maxAPY: 0.15 // 15% maximum APY
     }
   };
-
   constructor() {
     super();
     // Note: initializeBlockchain is async but we can't await in constructor
     // This will be called immediately but blockchain might not be fully loaded initially
     this.initializeBlockchain().catch(console.error);
   }
-
   private async initializeBlockchain() {
-    console.log('[INIT] Initializing EmotionalChain blockchain...');
-    
     try {
       // Try to load existing blockchain from database
       const existingBlocks = await this.loadBlockchainFromDatabase();
-      
       if (existingBlocks.length > 0) {
-        console.log(`[RESTORE] Loading ${existingBlocks.length} blocks from database...`);
         this.chain = existingBlocks;
-        console.log(`[RESTORE] Blockchain restored to block ${this.chain.length - 1}`);
-        console.log(`[RESTORE] Latest block hash: ${this.chain[this.chain.length - 1].hash.substring(0, 12)}...`);
       } else {
-        console.log('[GENESIS] Creating genesis block...');
         this.createGenesisBlock();
       }
     } catch (error) {
-      console.error('[ERROR] Failed to load blockchain from database:', error);
-      console.log('[FALLBACK] Creating genesis block...');
       this.createGenesisBlock();
     }
   }
-
   private async loadBlockchainFromDatabase(): Promise<any[]> {
     try {
       const blocks = await storage.getAllBlocks();
-      
       // Convert database blocks to blockchain format
       return blocks
         .sort((a, b) => a.height - b.height) // Sort by height
@@ -88,11 +73,9 @@ export class EmotionalChain extends EventEmitter {
           validator: block.validator || "unknown"
         }));
     } catch (error) {
-      console.error('Error loading blockchain from database:', error);
       return [];
     }
   }
-
   private createGenesisBlock() {
     const genesisBlock = {
       index: 0,
@@ -108,19 +91,16 @@ export class EmotionalChain extends EventEmitter {
     };
     this.chain.push(genesisBlock);
   }
-
   private calculateHash(index: number, timestamp: number, transactions: any[], previousHash: string, nonce: number): string {
     const data = index + timestamp + JSON.stringify(transactions) + previousHash + nonce;
     return crypto.createHash('sha256').update(data).digest('hex');
   }
-
   private calculateEmotionalScore(biometricData: any): number {
     // Proof of Emotion calculation based on biometric validation
     const heartRate = biometricData?.heartRate || 70;
     const stressLevel = biometricData?.stressLevel || 0.3;
     const focusLevel = biometricData?.focusLevel || 0.8;
     const authenticity = biometricData?.authenticity || 0.9;
-    
     // Calculate emotional consensus score
     const normalizedHR = Math.max(0, Math.min(1, (heartRate - 60) / 40)); // 60-100 BPM range
     const emotionalScore = (
@@ -128,10 +108,8 @@ export class EmotionalChain extends EventEmitter {
       focusLevel * 0.3 + 
       authenticity * 0.4
     ) * 100;
-    
     return Math.round(emotionalScore * 100) / 100;
   }
-
   private calculateWellnessMultiplier(emotionalScore: number): number {
     // Wellness multiplier for staking rewards (up to 1.5x for score > 80%)
     if (emotionalScore >= 80) {
@@ -139,7 +117,6 @@ export class EmotionalChain extends EventEmitter {
     }
     return 1.0;
   }
-
   private calculateAuthenticityMultiplier(authenticity: number): number {
     // Authenticity multiplier for staking rewards (up to 2.0x for authenticity > 90%)
     if (authenticity >= 0.9) {
@@ -147,43 +124,33 @@ export class EmotionalChain extends EventEmitter {
     }
     return authenticity * 1.11; // Scale from 0-2.0x based on authenticity
   }
-
   private calculateValidationReward(validator: any, consensusScore: number): number {
     const baseReward = this.tokenEconomics.rewards.baseValidationReward;
     const consensusMultiplier = Math.max(0.6, consensusScore / 100); // 0.6-1.0 based on consensus
     const authenticityMultiplier = Math.max(0.7, validator.biometricData?.authenticity || 0.7);
-    
     return Math.round(baseReward * consensusMultiplier * authenticityMultiplier * 100) / 100;
   }
-
   private calculateMiningReward(validator: any, transactionFees: number = 0): number {
     const baseReward = this.tokenEconomics.rewards.baseBlockReward;
     const consensusBonus = this.calculateConsensusBonus(validator.emotionalScore);
-    
     return baseReward + transactionFees + consensusBonus;
   }
-
   private calculateConsensusBonus(emotionalScore: number): number {
     // Emotional consensus bonus up to 25 EMO based on validator performance
     const maxBonus = this.tokenEconomics.rewards.emotionalConsensusBonus;
     const bonusMultiplier = Math.max(0, (emotionalScore - 75) / 25); // Bonus starts at 75% score
-    
     return Math.round(maxBonus * bonusMultiplier * 100) / 100;
   }
-
   private isValidEmotionalProof(emotionalScore: number): boolean {
     // PoE validation: emotional score must be above threshold
     return emotionalScore >= 75.0; // 75% minimum emotional consensus
   }
-
   public getChain(): any[] {
     return this.chain;
   }
-
   public getLatestBlock(): any {
     return this.chain[this.chain.length - 1];
   }
-
   public getChainStats(): any {
     return {
       totalBlocks: this.chain.length,
@@ -194,12 +161,10 @@ export class EmotionalChain extends EventEmitter {
       avgAuthenticity: 0.93
     };
   }
-
   public addTransaction(transaction: any): boolean {
     this.pendingTransactions.push(transaction);
     return true;
   }
-
   public addValidator(validatorId: string, biometricData: any): boolean {
     this.validators.set(validatorId, {
       id: validatorId,
@@ -208,50 +173,35 @@ export class EmotionalChain extends EventEmitter {
       blocksValidated: 0,
       emotionalScore: this.calculateEmotionalScore(biometricData)
     });
-    
     // Initialize validator wallet with 0 EMO balance
     this.wallets.set(validatorId, 0);
-    
-    console.log(`✅ Validator ${validatorId.substring(0, 8)}... added with emotional score: ${this.calculateEmotionalScore(biometricData)}%`);
     return true;
   }
-
   public removeValidator(validatorId: string): void {
     this.validators.delete(validatorId);
-    console.log(`❌ Validator ${validatorId.substring(0, 8)}... removed`);
   }
-
   public getValidators(): any[] {
     return Array.from(this.validators.values());
   }
-
   private selectValidator(): any | null {
     const allValidators = Array.from(this.validators.values())
       .filter(v => this.isValidEmotionalProof(v.emotionalScore));
-    
     if (allValidators.length === 0) return null;
-    
     // Rotate through ALL validators for fair distribution (removed lastActive filter)
     // This ensures all 21 validators get mining opportunities
     const blockCount = this.chain.length;
     const validatorIndex = blockCount % allValidators.length;
     const selectedValidator = allValidators[validatorIndex];
-    
     // Update lastActive when selected
     selectedValidator.lastActive = Date.now();
-    
     return selectedValidator;
   }
-
   private async mineBlock(): Promise<boolean> {
     if (this.pendingTransactions.length === 0) return false;
-    
     const selectedValidator = this.selectValidator();
     if (!selectedValidator) {
-      console.log('⏸️ Mining paused: No valid validators with sufficient emotional proof');
       return false;
     }
-
     const previousBlock = this.getLatestBlock();
     const newBlock = {
       index: previousBlock.index + 1,
@@ -265,14 +215,10 @@ export class EmotionalChain extends EventEmitter {
       consensusScore: this.calculateConsensusScore().toString(),
       authenticity: selectedValidator.biometricData?.authenticity ? (selectedValidator.biometricData.authenticity * 100).toFixed(2) : "90.00"
     };
-
     // Proof of Emotion mining process
     let nonce = 0;
     let hash = '';
     const target = '0'.repeat(this.difficulty);
-    
-    console.log(`⛏️ Mining block ${newBlock.index} with validator ${selectedValidator.id.substring(0, 8)}... (emotional score: ${selectedValidator.emotionalScore}%)`);
-    
     do {
       nonce++;
       hash = this.calculateHash(
@@ -283,14 +229,11 @@ export class EmotionalChain extends EventEmitter {
         nonce
       );
     } while (!hash.startsWith(target) && nonce < 1000000);
-
     if (hash.startsWith(target)) {
       newBlock.nonce = nonce;
       newBlock.hash = hash;
-      
       // Add block to chain
       this.chain.push(newBlock);
-      
       // CRITICAL: Save block to database
       try {
         await storage.createBlock({
@@ -314,29 +257,22 @@ export class EmotionalChain extends EventEmitter {
           },
           transactionCount: newBlock.transactions.length
         });
-        console.log(`📦 Block ${newBlock.index} saved to database: ${newBlock.hash.substring(0, 16)}...`);
       } catch (error) {
-        console.error(`❌ Failed to save block ${newBlock.index} to database:`, error);
       }
-      
       // Clear pending transactions
       this.pendingTransactions = [];
-      
       // Calculate transaction fees from block
       const transactionFees = newBlock.transactions.reduce((total: number, tx: any) => 
         total + (tx.fee || 0), 0);
-      
       // Calculate authentic mining reward based on token economics
       const miningReward = this.calculateMiningReward(selectedValidator, transactionFees);
       const validationReward = this.calculateValidationReward(selectedValidator, this.calculateConsensusScore());
       const totalReward = miningReward + validationReward;
-      
       // Deduct from staking pool
       if (this.tokenEconomics.pools.stakingPool.remaining >= totalReward) {
         this.tokenEconomics.pools.stakingPool.remaining -= totalReward;
         this.tokenEconomics.totalSupply += totalReward;
         this.tokenEconomics.circulatingSupply += totalReward;
-        
         // CRITICAL: Save mining reward transaction to database
         try {
           const miningTxHash = crypto.createHash('sha256').update(`mining_${newBlock.hash}_${selectedValidator.id}`).digest('hex');
@@ -358,12 +294,8 @@ export class EmotionalChain extends EventEmitter {
             },
             status: 'confirmed'
           });
-          console.log(`💳 Mining reward transaction saved: ${miningReward} EMO to ${selectedValidator.id.substring(0, 8)}...`);
-          console.log(`   💳 TX ID: ${miningTransaction.id} | Hash: ${miningTxHash.substring(0, 12)}...`);
         } catch (error) {
-          console.error(`❌ Failed to save mining reward transaction:`, error);
         }
-        
         // CRITICAL: Save validation reward transaction to database
         try {
           const validationTxHash = crypto.createHash('sha256').update(`validation_${newBlock.hash}_${selectedValidator.id}`).digest('hex');
@@ -384,12 +316,8 @@ export class EmotionalChain extends EventEmitter {
             },
             status: 'confirmed'
           });
-          console.log(`💳 Validation reward transaction saved: ${validationReward.toFixed(2)} EMO to ${selectedValidator.id.substring(0, 8)}...`);
-          console.log(`   💳 TX ID: ${validationTransaction.id} | Hash: ${validationTxHash.substring(0, 12)}...`);
         } catch (error) {
-          console.error(`❌ Failed to save validation reward transaction:`, error);
         }
-        
         // Legacy: Add to pending transactions for in-memory tracking
         this.addTransaction({
           from: 'stakingPool',
@@ -403,46 +331,29 @@ export class EmotionalChain extends EventEmitter {
             transactionFees: transactionFees
           }
         });
-
         // CRITICAL: Update actual wallet balance with the total reward
         const currentBalance = this.wallets.get(selectedValidator.id) || 0;
         const newBalance = currentBalance + totalReward;
         this.wallets.set(selectedValidator.id, newBalance);
-        
         // Debug logging for balance updates
-        console.log(`💳 Wallet Update: ${selectedValidator.id} balance: ${currentBalance} → ${newBalance} EMO`);
       }
-      
       // Update validator stats
       selectedValidator.blocksValidated++;
       selectedValidator.lastActive = Date.now();
-      
-      console.log(`✅ Block ${newBlock.index} mined successfully! Hash: ${hash.substring(0, 16)}...`);
-      console.log(`💰 Validator ${selectedValidator.id.substring(0, 8)}... earned ${totalReward} EMO total`);
-      console.log(`   ⛏️  Mining: ${miningReward} EMO (${this.tokenEconomics.rewards.baseBlockReward} base + ${this.calculateConsensusBonus(selectedValidator.emotionalScore)} bonus)`);
-      console.log(`   ✅ Validation: ${validationReward} EMO (emotional consensus reward)`);
-      console.log(`   📊 Pool Status: ${this.tokenEconomics.pools.stakingPool.remaining.toLocaleString()} EMO remaining`);
-      
       // Emit mining event
       this.emit('blockMined', newBlock);
-      
       return true;
     } else {
-      console.log(`❌ Mining failed for block ${newBlock.index} - max nonce reached`);
       return false;
     }
   }
-
   private calculateConsensusScore(): number {
     if (this.validators.size === 0) return 95.0;
-    
     const validatorScores = Array.from(this.validators.values())
       .map(v => v.emotionalScore);
-    
     const averageScore = validatorScores.reduce((sum, score) => sum + score, 0) / validatorScores.length;
     return Math.round(averageScore * 100) / 100;
   }
-
   public startMining(): any {
     if (this.isMining) {
       return {
@@ -452,18 +363,13 @@ export class EmotionalChain extends EventEmitter {
         difficulty: this.difficulty
       };
     }
-
     this.isMining = true;
-    
     // Start mining loop
     this.miningInterval = setInterval(async () => {
       if (this.isMining && this.pendingTransactions.length > 0) {
         await this.mineBlock();
       }
     }, 10000); // Attempt mining every 10 seconds
-
-    console.log('🚀 EmotionalChain mining started with Proof of Emotion consensus');
-    
     return {
       status: "started",
       message: "Mining started with Proof of Emotion consensus",
@@ -473,7 +379,6 @@ export class EmotionalChain extends EventEmitter {
       miningInterval: "10 seconds"
     };
   }
-
   public stopMining(): any {
     if (!this.isMining) {
       return {
@@ -481,16 +386,11 @@ export class EmotionalChain extends EventEmitter {
         message: "Mining is not currently active"
       };
     }
-
     this.isMining = false;
-    
     if (this.miningInterval) {
       clearInterval(this.miningInterval);
       this.miningInterval = null;
     }
-
-    console.log('🛑 EmotionalChain mining stopped');
-    
     return {
       status: "stopped",
       message: "Mining stopped",
@@ -498,18 +398,15 @@ export class EmotionalChain extends EventEmitter {
       validators: this.validators.size
     };
   }
-
   public getTokenEconomics(): any {
     // Calculate real circulating supply from actual validator balances
     let realCirculatingSupply = 0;
     const allBalances = this.getAllWallets();
     realCirculatingSupply = Array.from(allBalances.values()).reduce((sum, balance) => sum + balance, 0);
-    
     // Update token economics with real values
     const realTotalSupply = realCirculatingSupply;
     // Calculate percentage with higher precision to avoid floating point issues
     const percentageIssued = Number(((realTotalSupply / this.tokenEconomics.maxSupply) * 100).toFixed(8));
-    
     return {
       totalSupply: realTotalSupply,
       maxSupply: this.tokenEconomics.maxSupply,
@@ -536,21 +433,16 @@ export class EmotionalChain extends EventEmitter {
       contractStatus: "AUTHENTIC_DISTRIBUTION_ACTIVE"
     };
   }
-
   public transferEMO(from: string, to: string, amount: number): boolean {
     const fromBalance = this.wallets.get(from) || 0;
-    
     if (fromBalance < amount) {
       return false; // Insufficient balance
     }
-    
     // Deduct from sender
     this.wallets.set(from, fromBalance - amount);
-    
     // Add to recipient (create wallet if doesn't exist)
     const toBalance = this.wallets.get(to) || 0;
     this.wallets.set(to, toBalance + amount);
-    
     // Record transaction
     this.addTransaction({
       id: crypto.randomUUID(),
@@ -561,18 +453,14 @@ export class EmotionalChain extends EventEmitter {
       timestamp: Date.now(),
       fee: 0.1 // Small transaction fee
     });
-    
     return true;
   }
-
   public getWalletBalance(validatorId: string): number {
     return this.wallets.get(validatorId) || 0;
   }
-
   public getAllWallets(): Map<string, number> {
     return new Map(this.wallets);
   }
-
   public getMiningStatus(): any {
     return {
       isActive: this.isMining,

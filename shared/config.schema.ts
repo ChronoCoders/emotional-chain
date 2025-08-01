@@ -2,9 +2,7 @@
  * Production Configuration Schema with Strict Validation
  * Runtime type safety and bounds checking for all parameters
  */
-
 import { z } from 'zod';
-
 // Network Configuration Schema
 const NetworkSchema = z.object({
   ports: z.object({
@@ -40,7 +38,6 @@ const NetworkSchema = z.object({
     p2pHandshake: z.number().int().min(1000).max(60000), // 1s to 1min
   }),
 });
-
 // Consensus Configuration Schema
 const ConsensusSchema = z.object({
   algorithm: z.enum(['ProofOfEmotion', 'HybridPoE']),
@@ -76,7 +73,6 @@ const ConsensusSchema = z.object({
     targetTime: z.number().int().min(5).max(300),
   }),
 });
-
 // Biometric Configuration Schema
 const BiometricSchema = z.object({
   devices: z.object({
@@ -112,7 +108,6 @@ const BiometricSchema = z.object({
     }),
   }),
 });
-
 // Security Configuration Schema
 const SecuritySchema = z.object({
   authentication: z.object({
@@ -137,7 +132,6 @@ const SecuritySchema = z.object({
     verificationTimeout: z.number().int().min(1000).max(30000),
   }),
 });
-
 // AI/ML Configuration Schema
 const AISchema = z.object({
   models: z.object({
@@ -163,7 +157,6 @@ const AISchema = z.object({
     gpuAcceleration: z.boolean(),
   }),
 });
-
 // Infrastructure Configuration Schema
 const InfrastructureSchema = z.object({
   kubernetes: z.object({
@@ -187,7 +180,6 @@ const InfrastructureSchema = z.object({
     replicationFactor: z.number().int().min(1).max(10),
   }),
 });
-
 // Storage Configuration Schema
 const StorageSchema = z.object({
   database: z.object({
@@ -206,7 +198,6 @@ const StorageSchema = z.object({
     enabled: z.boolean(),
   }),
 });
-
 // Performance Configuration Schema
 const PerformanceSchema = z.object({
   optimization: z.object({
@@ -225,7 +216,6 @@ const PerformanceSchema = z.object({
     latencyMonitoring: z.boolean(),
   }),
 });
-
 // SDK Configuration Schema
 const SdkSchema = z.object({
   timeout: z.number().int().min(1000).max(300000).default(60000),
@@ -236,7 +226,6 @@ const SdkSchema = z.object({
   emotionalThresholdDefault: z.number().min(0).max(100).default(75),
   websocketHeartbeatInterval: z.number().int().min(1000).max(60000).default(30000),
 });
-
 // Audit Configuration Schema  
 const AuditSchema = z.object({
   enabled: z.boolean().default(true),
@@ -249,7 +238,6 @@ const AuditSchema = z.object({
   intervalMs: z.number().int().min(60000).max(86400000).default(3600000), // 1 hour
   maxRetries: z.number().int().min(1).max(10).default(3),
 });
-
 // Smart Contract Configuration Schema
 const SmartContractSchema = z.object({
   execution: z.object({
@@ -268,7 +256,6 @@ const SmartContractSchema = z.object({
     maxGoalDuration: z.number().int().min(86400000).max(31536000000).default(2592000000), // 30 days
   }),
 });
-
 // Main Configuration Schema
 export const ConfigSchema = z.object({
   network: NetworkSchema,
@@ -283,9 +270,7 @@ export const ConfigSchema = z.object({
   audit: AuditSchema,
   smartContracts: SmartContractSchema,
 });
-
 export type EmotionalChainConfig = z.infer<typeof ConfigSchema>;
-
 // Schema-based validation function
 export function validateConfig(config: unknown): EmotionalChainConfig {
   try {
@@ -294,7 +279,6 @@ export function validateConfig(config: unknown): EmotionalChainConfig {
     if (error instanceof z.ZodError) {
       console.error('🚨 CONFIGURATION VALIDATION FAILED:');
       error.errors.forEach(err => {
-        console.error(`  ❌ ${err.path.join('.')}: ${err.message}`);
       });
       throw new Error(`Invalid configuration: ${error.errors.length} validation error(s)`);
     }

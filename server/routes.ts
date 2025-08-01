@@ -7,22 +7,18 @@ import { advancedFeaturesService } from "./services/advanced-features";
 import { dataIntegrityAudit } from "./services/data-integrity-audit";
 import configRouter from "./routes/config";
 import { CONFIG } from "../shared/config";
-
 export async function registerRoutes(app: Express): Promise<Server> {
   // Internal configuration management API (admin-only)
   app.use("/internal", configRouter);
-  
   // WebSocket configuration endpoint for client
   app.get("/api/config/websocket", async (req, res) => {
     try {
       const { CONFIG } = await import('../shared/config');
       res.json(CONFIG.network.protocols.websocket);
     } catch (error) {
-      console.error('Error fetching WebSocket config:', error);
       res.status(500).json({ error: 'Failed to fetch WebSocket configuration' });
     }
   });
-
   // EmotionalChain API routes
   app.get("/api/network/status", async (req, res) => {
     try {
@@ -32,7 +28,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.get("/api/blocks", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 10;
@@ -42,7 +37,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.get("/api/transactions", async (req, res) => {
     try {
       const limit = parseInt(req.query.limit as string) || 50;
@@ -52,7 +46,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.get("/api/transactions/stats", async (req, res) => {
     try {
       const totalCount = await storage.getTotalTransactionCount();
@@ -65,7 +58,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.get("/api/transactions/volume", async (req, res) => {
     try {
       const volumeData = await emotionalChainService.getTransactionVolume();
@@ -74,7 +66,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.get("/api/validators", async (req, res) => {
     try {
       const validators = await emotionalChainService.getValidators();
@@ -83,7 +74,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.get("/api/wallets/database", async (req, res) => {
     try {
       const wallets = await emotionalChainService.getAllWallets();
@@ -97,7 +87,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.get("/api/biometric/:validatorId", async (req, res) => {
     try {
       const { validatorId } = req.params;
@@ -107,7 +96,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   app.post("/api/commands", async (req, res) => {
     try {
       const { command, args = [] } = req.body;
@@ -117,7 +105,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: (error as Error).message });
     }
   });
-
   // Mining endpoints
   app.post('/api/mining/start', async (req, res) => {
     try {
@@ -127,7 +114,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to start mining' });
     }
   });
-
   app.post('/api/mining/stop', async (req, res) => {
     try {
       const result = await emotionalChainService.stopMining();
@@ -136,7 +122,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to stop mining' });
     }
   });
-
   app.get('/api/mining/status', async (req, res) => {
     try {
       const status = await emotionalChainService.getMiningStatus();
@@ -145,7 +130,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get mining status' });
     }
   });
-
   app.get('/api/token/economics', async (req, res) => {
     try {
       const economics = await emotionalChainService.getTokenEconomics();
@@ -154,30 +138,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get token economics' });
     }
   });
-
   // Wallet and transfer endpoints
   app.get('/api/wallet/:validatorId', async (req, res) => {
     try {
       const { validatorId } = req.params;
       const balance = await emotionalChainService.getWalletBalance(validatorId);
-      
       res.json({
         validatorId,
         balance,
         currency: 'EMO'
       });
     } catch (error) {
-      console.error('Error fetching wallet balance:', error);
       res.status(500).json({ error: 'Failed to fetch wallet balance' });
     }
   });
-
   app.post('/api/transfer', async (req, res) => {
     try {
       const { from, to, amount } = req.body;
-      
       const success = await emotionalChainService.transferEMO(from, to, amount);
-      
       if (success) {
         res.json({ 
           success: true, 
@@ -190,76 +168,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
     } catch (error) {
-      console.error('Error processing transfer:', error);
       res.status(500).json({ error: 'Failed to process transfer' });
     }
   });
-
   app.get('/api/wallets', async (req, res) => {
     try {
       // CRITICAL: Force sync with blockchain before returning data
       await emotionalChainService.syncWalletWithBlockchain();
-      
       const wallets = await emotionalChainService.getAllWallets();
-      
       const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
         validatorId,
         balance,
         currency: 'EMO'
       }));
-      
       res.json(walletsArray);
     } catch (error) {
-      console.error('Error fetching wallets:', error);
       res.status(500).json({ error: 'Failed to fetch wallets' });
     }
   });
-
   app.get('/api/wallet/status/:validatorId', async (req, res) => {
     try {
       const { validatorId } = req.params;
       const walletStatus = await emotionalChainService.getWalletStatus(validatorId);
       res.json(walletStatus);
     } catch (error) {
-      console.error('Error fetching wallet status:', error);
       res.status(500).json({ error: 'Failed to fetch wallet status' });
     }
   });
-
   // Sync wallet with blockchain
   app.post('/api/wallet/sync', async (req, res) => {
     try {
       await emotionalChainService.syncWalletWithBlockchain();
       res.json({ success: true, message: 'Wallet synced with blockchain' });
     } catch (error) {
-      console.error('Error syncing wallet:', error);
       res.status(500).json({ error: 'Failed to sync wallet' });
     }
   });
-
   app.get('/api/validators', async (req, res) => {
     try {
       const validators = await emotionalChainService.getValidators();
       res.json(validators);
     } catch (error) {
-      console.error('Error fetching validators:', error);
       res.status(500).json({ error: 'Failed to fetch validators' });
     }
   });
-
   // ===== ADVANCED FEATURES API ENDPOINTS =====
-  
   // Smart Contracts
   app.get('/api/smart-contracts', async (req, res) => {
     try {
       const contracts = await advancedFeaturesService.getAllSmartContracts();
       res.json(contracts);
     } catch (error) {
-      console.error('Error fetching smart contracts:', error);
       res.status(500).json({ error: 'Failed to fetch smart contracts' });
     }
   });
-
   app.get('/api/smart-contracts/:address', async (req, res) => {
     try {
       const contract = await advancedFeaturesService.getSmartContract(req.params.address);
@@ -268,33 +230,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(contract);
     } catch (error) {
-      console.error('Error fetching smart contract:', error);
       res.status(500).json({ error: 'Failed to fetch smart contract' });
     }
   });
-
   // Wellness Goals
   app.get('/api/wellness-goals/:participant', async (req, res) => {
     try {
       const goals = await advancedFeaturesService.getWellnessGoalsByParticipant(req.params.participant);
       res.json(goals);
     } catch (error) {
-      console.error('Error fetching wellness goals:', error);
       res.status(500).json({ error: 'Failed to fetch wellness goals' });
     }
   });
-
   // Quantum Key Pairs
   app.get('/api/quantum-keys', async (req, res) => {
     try {
       const keyPairs = await advancedFeaturesService.getAllQuantumKeyPairs();
       res.json(keyPairs);
     } catch (error) {
-      console.error('Error fetching quantum key pairs:', error);
       res.status(500).json({ error: 'Failed to fetch quantum key pairs' });
     }
   });
-
   app.get('/api/quantum-keys/:validatorId', async (req, res) => {
     try {
       const keyPair = await advancedFeaturesService.getQuantumKeyPair(req.params.validatorId);
@@ -303,11 +259,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(keyPair);
     } catch (error) {
-      console.error('Error fetching quantum key pair:', error);
       res.status(500).json({ error: 'Failed to fetch quantum key pair' });
     }
   });
-
   // Privacy Proofs
   app.get('/api/privacy-proofs', async (req, res) => {
     try {
@@ -316,22 +270,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const proofs = await advancedFeaturesService.getPrivacyProofs(proofType, validatorId);
       res.json(proofs);
     } catch (error) {
-      console.error('Error fetching privacy proofs:', error);
       res.status(500).json({ error: 'Failed to fetch privacy proofs' });
     }
   });
-
   // Cross-Chain Bridge Transactions
   app.get('/api/bridge-transactions', async (req, res) => {
     try {
       const transactions = await advancedFeaturesService.getAllBridgeTransactions();
       res.json(transactions);
     } catch (error) {
-      console.error('Error fetching bridge transactions:', error);
       res.status(500).json({ error: 'Failed to fetch bridge transactions' });
     }
   });
-
   app.get('/api/bridge-transactions/:bridgeId', async (req, res) => {
     try {
       const transaction = await advancedFeaturesService.getBridgeTransaction(req.params.bridgeId);
@@ -340,22 +290,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(transaction);
     } catch (error) {
-      console.error('Error fetching bridge transaction:', error);
       res.status(500).json({ error: 'Failed to fetch bridge transaction' });
     }
   });
-
   // AI Models
   app.get('/api/ai-models', async (req, res) => {
     try {
       const models = await advancedFeaturesService.getAllAiModels();
       res.json(models);
     } catch (error) {
-      console.error('Error fetching AI models:', error);
       res.status(500).json({ error: 'Failed to fetch AI models' });
     }
   });
-
   app.get('/api/ai-models/:modelType', async (req, res) => {
     try {
       const model = await advancedFeaturesService.getActiveAiModel(req.params.modelType);
@@ -364,22 +310,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json(model);
     } catch (error) {
-      console.error('Error fetching AI model:', error);
       res.status(500).json({ error: 'Failed to fetch AI model' });
     }
   });
-
   // Biometric Devices
   app.get('/api/biometric-devices/:validatorId', async (req, res) => {
     try {
       const devices = await advancedFeaturesService.getValidatorBiometricDevices(req.params.validatorId);
       res.json(devices);
     } catch (error) {
-      console.error('Error fetching biometric devices:', error);
       res.status(500).json({ error: 'Failed to fetch biometric devices' });
     }
   });
-
   // Data Integrity Verification Endpoint
   app.get('/api/data-integrity', async (req, res) => {
     try {
@@ -391,22 +333,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'All advanced features backed by authentic database data'
       });
     } catch (error) {
-      console.error('Error verifying data integrity:', error);
       res.status(500).json({ error: 'Failed to verify data integrity' });
     }
   });
-
   // Comprehensive data integrity audit endpoint
   app.get('/api/data-audit', async (req, res) => {
     try {
       const auditResults = await dataIntegrityAudit.performComprehensiveAudit();
       res.json(auditResults);
     } catch (error) {
-      console.error('Error performing data audit:', error);
       res.status(500).json({ error: 'Failed to perform data audit' });
     }
   });
-
   // Data integrity audit report endpoint
   app.get('/api/data-audit/report', async (req, res) => {
     try {
@@ -414,16 +352,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.set('Content-Type', 'text/plain');
       res.send(report);
     } catch (error) {
-      console.error('Error generating audit report:', error);
       res.status(500).json({ error: 'Failed to generate audit report' });
     }
   });
-
   // System proof endpoint for production validation
   app.get('/api/system-proof', async (req, res) => {
     try {
-      console.log('🔍 Running EmotionalChain System Proof...');
-      
       // Get system data for validation
       const [validators, blocks, transactions, networkStatus] = await Promise.all([
         storage.getValidators(),
@@ -431,62 +365,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
         storage.getTransactions(50),
         emotionalChainService.getNetworkStatus()
       ]);
-
       // Check 1: Config validated
       const configValidated = CONFIG && Object.keys(CONFIG).includes('consensus') && Object.keys(CONFIG).includes('network');
-      
       // Check 2: No mocks present (check for authentic blockchain data)
       const recentBlocks = blocks.filter(b => new Date(b.timestamp).getTime() > Date.now() - (60 * 60 * 1000)); // Last hour
       const noMocks = recentBlocks.length > 0 && !recentBlocks.some(b => b.hash.includes('mock') || b.hash.includes('test'));
-      
       // Check 3: Biometric data integrity (check for emotional scores in validators)
       const validatorsWithScores = validators.filter(v => parseFloat(v.emotionalScore) > 0 && parseFloat(v.emotionalScore) < 100);
       const biometricIntegrity = validatorsWithScores.length > 0;
-      
       // Check 4: Live validator data (active validators with recent activity)
       const recentValidators = validators.filter(v => v.lastActivity > Date.now() - (10 * 60 * 1000)); // Last 10 min
       const liveValidatorData = recentValidators.length > 0 || validators.length > 10; // Many validators = active network
-      
       // Check 5: Rewards engine active (check for recent transactions with varying amounts)
       const recentTxs = transactions.filter(tx => new Date(tx.timestamp).getTime() > Date.now() - (30 * 60 * 1000)); // Last 30 min
       const rewardTxs = recentTxs.filter(tx => parseFloat(tx.amount) > 0);
       const rewardsActive = rewardTxs.length > 0;
-      
       // Check 6: WebSocket live (network is running)
       const websocketLive = networkStatus.isRunning;
-
       const result = {
         timestamp: new Date().toISOString(),
         overallStatus: configValidated && noMocks && biometricIntegrity && liveValidatorData && rewardsActive && websocketLive ? 'PASS' : 'FAIL',
         checks: {
           configValidation: {
             status: configValidated ? 'PASS' : 'FAIL',
-            message: configValidated ? '✅ Config validated' : '❌ Config validation failed',
             evidence: `${Object.keys(CONFIG).length} config sections loaded`
           },
           noMocksPresent: {
             status: noMocks ? 'PASS' : 'FAIL', 
-            message: noMocks ? '✅ No mocks' : '❌ Mock data detected',
             evidence: `${recentBlocks.length} authentic blocks in last hour`
           },
           biometricDataIntegrity: {
             status: biometricIntegrity ? 'PASS' : 'FAIL',
-            message: biometricIntegrity ? '✅ Biometric data integrity OK' : '❌ No biometric data',
             evidence: `${validatorsWithScores.length} validators with emotional scores`
           },
           liveValidatorData: {
             status: liveValidatorData ? 'PASS' : 'FAIL',
-            message: liveValidatorData ? '✅ Live validator data present' : '❌ No live validator data',
             evidence: `${validators.length} total validators, ${recentValidators.length} recently active`
           },
           rewardsEngineActive: {
             status: rewardsActive ? 'PASS' : 'FAIL',
-            message: rewardsActive ? '✅ Rewards engine active' : '❌ No reward activity',
             evidence: `${rewardTxs.length} reward transactions in last 30 minutes`
           },
           websocketLive: {
             status: websocketLive ? 'PASS' : 'FAIL',
-            message: websocketLive ? '✅ WebSocket live' : '❌ WebSocket not running',
             evidence: `Network running: ${networkStatus.isRunning}`
           }
         },
@@ -505,12 +426,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           validatorHash: require('crypto').createHash('sha256').update(JSON.stringify(validators.slice(0, 5))).digest('hex').substring(0, 12)
         }
       };
-
-      console.log(`✅ System Proof completed: ${result.overallStatus}`);
       res.json(result);
-
     } catch (error) {
-      console.error('❌ System proof failed:', error);
       res.status(500).json({
         timestamp: new Date().toISOString(),
         overallStatus: 'FAIL',
@@ -519,25 +436,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
   const httpServer = createServer(app);
-
   // WebSocket server for real-time updates - using centralized CONFIG
   const wss = new WebSocketServer({ 
     server: httpServer, 
     path: '/ws'
   });
-  
   wss.on('connection', (ws: WebSocket) => {
-    console.log('New WebSocket connection established');
-    
     // Send initial data
     ws.send(JSON.stringify({ 
       type: 'connection', 
       message: 'Connected to EmotionalChain Terminal',
       timestamp: new Date().toISOString()
     }));
-
     // Periodic updates
     const updateInterval = setInterval(async () => {
       if (ws.readyState === WebSocket.OPEN) {
@@ -547,7 +458,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const latestTransactions = await emotionalChainService.getTransactions(5);
           const validators = await emotionalChainService.getValidators();
           const tokenEconomics = await emotionalChainService.getTokenEconomics();
-
           ws.send(JSON.stringify({
             type: 'update',
             data: {
@@ -560,15 +470,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }));
         } catch (error) {
-          console.error('Error sending WebSocket update:', error);
         }
       }
     }, CONFIG.network.protocols.websocket.heartbeatInterval); // Use CONFIG for interval
-
     ws.on('message', async (message: string) => {
       try {
         const data = JSON.parse(message);
-        
         if (data.type === 'ping') {
           // Respond to heartbeat ping with pong
           ws.send(JSON.stringify({
@@ -592,17 +499,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }));
       }
     });
-
     ws.on('close', () => {
-      console.log('WebSocket connection closed');
       clearInterval(updateInterval);
     });
-
     ws.on('error', (error) => {
-      console.error('WebSocket error:', error);
       clearInterval(updateInterval);
     });
   });
-
   return httpServer;
 }

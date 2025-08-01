@@ -1,8 +1,10 @@
-# EmotionalChain Blockchain Application
+# EmotionalChain
 
 ## Overview
 
-This project is a full-stack web application implementing **EmotionalChain**, the world's first emotion-powered blockchain using Proof of Emotion (PoE) consensus. The application features a terminal-style interface for interacting with blockchain operations, monitoring network status, and managing validators with biometric data integration. The vision is to create a secure, transparent, and user-centric blockchain network powered by human emotions, with potential applications in wellness, secure identity, and novel incentive structures.
+EmotionalChain is a revolutionary blockchain platform implementing "Proof of Emotion" consensus, where validators participate in consensus based on verified biometric and emotional data rather than traditional computational work or stake. The system combines real-time biometric monitoring, Byzantine fault-tolerant consensus, and a comprehensive full-stack architecture with React frontend, Express backend, and PostgreSQL database.
+
+The platform features advanced capabilities including quantum-resistant cryptography, cross-chain bridges, smart contracts with emotional triggers, privacy layers with zero-knowledge proofs, and AI-enhanced consensus optimization. It provides a complete SDK ecosystem for developers to build emotion-aware decentralized applications.
 
 ## User Preferences
 
@@ -10,57 +12,86 @@ Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Frontend
-- **Framework**: React with TypeScript
-- **Routing**: Wouter
-- **State Management**: TanStack Query
-- **UI Library**: shadcn/ui built on Radix UI primitives
-- **Styling**: Tailwind CSS with custom terminal theme
-- **Build Tool**: Vite
+### Frontend Architecture
+- **Framework**: React with TypeScript and Vite build system
+- **UI Components**: Shadcn/ui component library built on Radix UI primitives
+- **Styling**: Tailwind CSS with custom design tokens and dark mode support
+- **State Management**: React hooks with custom SDK integration
+- **Real-time Updates**: WebSocket connections for live consensus data
 
-### Backend
-- **Runtime**: Node.js with Express.js
-- **Language**: TypeScript with ES modules
-- **API Pattern**: RESTful endpoints with WebSocket support
-- **Configuration**: Centralized system with Zod schema validation and environment variable overrides, ensuring zero hardcoded values.
+### Backend Architecture
+- **Runtime**: Node.js with Express.js framework
+- **Language**: TypeScript with strict type checking
+- **API Design**: RESTful endpoints with WebSocket support for real-time features
+- **Consensus Engine**: Custom Proof of Emotion algorithm with Byzantine fault tolerance
+- **P2P Networking**: libp2p-based distributed networking with multiple transport protocols
 
-### Core Blockchain Components
-- **Blockchain Core**: EmotionalChain with PoE consensus.
-- **Cryptographic Foundation**: KeyPair (secp256k1), Transactions with biometric data, MerkleTree, Blocks with PoE mining, EmotionalValidator for biometric authenticity.
-- **Biometric Integration**: Multi-device support for heart rate, stress, and focus monitoring (e.g., Polar H10, Empatica E4, Muse 2) with cryptographic proof generation and hardware-secured BiometricWallet.
-- **P2P Network**: libp2p implementation with custom EmotionalProtocol (Protobuf), ConsensusEngine (Byzantine fault-tolerant, 30-second rounds), PeerManager, and NetworkSecurity.
-- **Persistent Storage**: PostgreSQL with Drizzle ORM replacing in-memory storage, featuring ACID transactions, replication, and caching.
-- **Consensus Engine**: ProofOfEmotionEngine coordinating a three-phase consensus (PROPOSE → VOTE → COMMIT), dynamic EmotionalCommittee selection, and Byzantine tolerance.
-- **Advanced Features**: EVM-compatible emotion-aware smart contracts, AI-enhanced consensus (TensorFlow.js), post-quantum cryptography, cross-chain bridges, and privacy layers (ZKPs).
+### Biometric Integration Layer
+- **Device Support**: Multi-device biometric monitoring (heart rate, stress, focus, EEG)
+- **Authentication**: Cryptographic proof generation from biometric data
+- **Real-time Processing**: Continuous emotional score calculation and validation
+- **Anti-gaming Measures**: Device fingerprinting and authenticity verification
 
-### Infrastructure
-- **Production Infrastructure**: NodeManager, LoadBalancer, Prometheus/Grafana monitoring, SecurityManager.
-- **Containerization**: Docker for multi-stage builds.
-- **Orchestration**: Kubernetes for deployment with auto-scaling and persistent storage.
-- **CI/CD**: Automated testing, building, and deployment with zero-downtime updates.
+### Consensus Mechanism
+- **Algorithm**: Proof of Emotion with dynamic validator selection
+- **Committee Management**: Rotating validator committees with anti-collusion mechanisms
+- **Voting System**: Three-phase consensus (PROPOSE → VOTE → COMMIT)
+- **Fork Resolution**: Automatic detection and resolution of chain forks
+- **Reward Distribution**: Emotional performance-based reward calculation
 
-### UI/UX Design
-- **Terminal Interface**: ASCII art banner, green color scheme, real-time data streaming via WebSocket, command-line interface.
-- **Public Explorer**: mempool.space-inspired public blockchain explorer (`/explorer`) with network overview, validator leaderboard, transaction/block browser, and wellness analytics.
-- **Validator Dashboard**: Real-time monitoring within the terminal.
+### Data Storage Solutions
+- **Primary Database**: PostgreSQL with Drizzle ORM for schema management
+- **Blockchain Storage**: Persistent block and transaction storage with ACID guarantees
+- **State Management**: Real-time validator state tracking and consensus snapshots
+- **Caching Layer**: In-memory caching for performance optimization
+- **Backup System**: Automated backup with cross-region replication
+
+### Cryptographic Layer
+- **Key Management**: Elliptic curve cryptography (secp256k1) with biometric-secured wallets
+- **Transaction Signing**: Digital signatures with biometric proof integration
+- **Merkle Trees**: Efficient transaction verification and block validation
+- **Quantum Resistance**: Post-quantum cryptographic algorithms for future security
+
+### Network Layer
+- **P2P Protocol**: Multi-transport networking (TCP, WebSockets, WebRTC)
+- **Peer Management**: Dynamic peer discovery and reputation tracking
+- **Block Propagation**: Efficient block distribution across the network
+- **Consensus Broadcasting**: Real-time emotional data sharing between validators
+
+### Configuration Management
+- **Centralized Config**: Single source of truth with strict Zod validation
+- **Environment Overrides**: All parameters configurable via environment variables
+- **Runtime Validation**: Fail-fast configuration validation with detailed error reporting
+- **Audit Logging**: Configuration change tracking and snapshot history
 
 ## External Dependencies
 
-### Core
-- **@neondatabase/serverless**: PostgreSQL serverless connection.
-- **drizzle-orm**: Type-safe database ORM.
-- **@tanstack/react-query**: Server state management.
-- **ws**: WebSocket server implementation.
-- **express**: Web server framework.
+### Cloud Infrastructure
+- **AWS Services**: EC2 for compute, ECS for containerization, S3 for object storage
+- **Google Cloud**: Compute Engine, Cloud Storage, and Monitoring services
+- **Neon Database**: Serverless PostgreSQL with automatic scaling
 
-### UI
-- **@radix-ui/***: Accessible UI primitives.
-- **tailwindcss**: Utility-first CSS framework.
-- **lucide-react**: Icon library.
-- **wouter**: Lightweight router.
+### Blockchain & Crypto
+- **Polkadot API**: Cross-chain interoperability and substrate integration
+- **Web3 Libraries**: Ethereum compatibility and multi-chain support
+- **Elliptic Cryptography**: ECDSA signature generation and verification
 
-### Development Tools
-- **vite**: Build tool and dev server.
-- **typescript**: Type checking.
-- **tsx**: TypeScript execution.
-- **esbuild**: Production bundling.
+### Biometric Hardware
+- **Bluetooth LE**: Heart rate monitors and fitness devices
+- **USB/Serial**: Medical-grade biometric sensors
+- **WebRTC**: Camera-based biometric capture for web applications
+
+### Development & Monitoring
+- **OpenTelemetry**: Distributed tracing and performance monitoring
+- **Microsoft API Extractor**: TypeScript API documentation generation
+- **Babel**: JavaScript/TypeScript compilation and optimization
+
+### UI & Frontend
+- **Radix UI**: Accessible component primitives
+- **React Hook Form**: Form validation with Joi schema integration
+- **Tailwind CSS**: Utility-first styling with custom design system
+
+### Networking & P2P
+- **libp2p**: Modular peer-to-peer networking stack
+- **Multiple Transports**: TCP, WebSockets, WebRTC for diverse connectivity
+- **DHT & PubSub**: Distributed hash table and publish-subscribe messaging

@@ -14,7 +14,6 @@ interface BlockData {
   emotionalData: any;
 }
 import { KeyPair } from '../crypto/KeyPair';
-
 export enum MessageType {
   BIOMETRIC_PROOF = 'BIOMETRIC_PROOF',
   EMOTIONAL_VOTE = 'EMOTIONAL_VOTE',
@@ -23,7 +22,6 @@ export enum MessageType {
   PEER_CHALLENGE = 'PEER_CHALLENGE',
   NETWORK_STATUS = 'NETWORK_STATUS'
 }
-
 export interface BiometricProofMessage {
   validatorId: string;
   biometricHash: Uint8Array;
@@ -31,7 +29,6 @@ export interface BiometricProofMessage {
   timestamp: number;
   signature: Uint8Array;
 }
-
 export interface EmotionalVoteMessage {
   validatorId: string;
   emotionalScore: number;
@@ -39,7 +36,6 @@ export interface EmotionalVoteMessage {
   consensusRound: number;
   signature: Uint8Array;
 }
-
 export interface BlockProposalMessage {
   block: any; // Serialized block
   proposerId: string;
@@ -48,7 +44,6 @@ export interface BlockProposalMessage {
   timestamp: number;
   signature: Uint8Array;
 }
-
 export interface ConsensusResultMessage {
   selectedValidator: string;
   consensusRound: number;
@@ -58,7 +53,6 @@ export interface ConsensusResultMessage {
   timestamp: number;
   signatures: Uint8Array[];
 }
-
 export interface PeerChallengeMessage {
   challengerId: string;
   targetId: string;
@@ -67,7 +61,6 @@ export interface PeerChallengeMessage {
   timestamp: number;
   signature: Uint8Array;
 }
-
 export interface NetworkStatusMessage {
   nodeId: string;
   networkHealth: number;
@@ -77,20 +70,17 @@ export interface NetworkStatusMessage {
   emotionalScore: number;
   timestamp: number;
 }
-
 export class EmotionalProtocol extends EventEmitter {
   private protocolVersion = '1.0.0';
   private messageSchema: protobuf.Root | null = null;
   private keyPair: KeyPair;
   private nodeId: string;
-
   constructor(nodeId: string, keyPair: KeyPair) {
     super();
     this.nodeId = nodeId;
     this.keyPair = keyPair;
     this.initializeProtobufSchema();
   }
-
   /**
    * Initialize Protocol Buffer schema for message serialization
    */
@@ -173,15 +163,12 @@ export class EmotionalProtocol extends EventEmitter {
           }
         }
       });
-
       console.log('📋 Protocol Buffer schema initialized successfully');
-
     } catch (error) {
       console.error('Failed to initialize protobuf schema:', error);
       throw error;
     }
   }
-
   /**
    * Create a biometric proof message
    */
@@ -204,15 +191,12 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: Date.now(),
         signature: new Uint8Array(0) // Will be set after serialization
       };
-
       return this.serializeMessage(MessageType.BIOMETRIC_PROOF, message);
-
     } catch (error) {
       console.error('Error creating biometric proof message:', error);
       throw error;
     }
   }
-
   /**
    * Create an emotional vote message
    */
@@ -230,15 +214,12 @@ export class EmotionalProtocol extends EventEmitter {
         consensusRound,
         signature: new Uint8Array(0)
       };
-
       return this.serializeMessage(MessageType.EMOTIONAL_VOTE, message);
-
     } catch (error) {
       console.error('Error creating emotional vote message:', error);
       throw error;
     }
   }
-
   /**
    * Create a block proposal message
    */
@@ -257,15 +238,12 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: Date.now(),
         signature: new Uint8Array(0)
       };
-
       return this.serializeMessage(MessageType.BLOCK_PROPOSAL, message);
-
     } catch (error) {
       console.error('Error creating block proposal message:', error);
       throw error;
     }
   }
-
   /**
    * Create a consensus result message
    */
@@ -287,15 +265,12 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: Date.now(),
         signatures
       };
-
       return this.serializeMessage(MessageType.CONSENSUS_RESULT, message);
-
     } catch (error) {
       console.error('Error creating consensus result message:', error);
       throw error;
     }
   }
-
   /**
    * Create a peer challenge message
    */
@@ -313,15 +288,12 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: Date.now(),
         signature: new Uint8Array(0)
       };
-
       return this.serializeMessage(MessageType.PEER_CHALLENGE, message);
-
     } catch (error) {
       console.error('Error creating peer challenge message:', error);
       throw error;
     }
   }
-
   /**
    * Create a network status message
    */
@@ -342,15 +314,12 @@ export class EmotionalProtocol extends EventEmitter {
         emotionalScore,
         timestamp: Date.now()
       };
-
       return this.serializeMessage(MessageType.NETWORK_STATUS, message);
-
     } catch (error) {
       console.error('Error creating network status message:', error);
       throw error;
     }
   }
-
   /**
    * Parse incoming message
    */
@@ -359,38 +328,31 @@ export class EmotionalProtocol extends EventEmitter {
       if (!this.messageSchema) {
         throw new Error('Protocol schema not initialized');
       }
-
       const ProtocolMessage = this.messageSchema.lookupType('emotionalchain.ProtocolMessage');
       const decoded = ProtocolMessage.decode(data) as any;
-
       // Verify protocol version
       if (decoded.version !== this.protocolVersion) {
         console.warn(`Protocol version mismatch: ${decoded.version} vs ${this.protocolVersion}`);
         return { type: decoded.type, payload: null, valid: false };
       }
-
       // Verify signature
       const signatureValid = this.verifyMessageSignature(decoded);
       if (!signatureValid) {
         console.warn('Invalid message signature');
         return { type: decoded.type, payload: null, valid: false };
       }
-
       // Parse payload based on message type
       const payload = this.parsePayload(decoded.type, decoded.payload);
-
       return {
         type: decoded.type as MessageType,
         payload,
         valid: true
       };
-
     } catch (error) {
       console.error('Error parsing message:', error);
       return { type: MessageType.NETWORK_STATUS, payload: null, valid: false };
     }
   }
-
   /**
    * Serialize message with protobuf
    */
@@ -399,45 +361,36 @@ export class EmotionalProtocol extends EventEmitter {
       if (!this.messageSchema) {
         throw new Error('Protocol schema not initialized');
       }
-
       // Serialize the specific payload
       let serializedPayload: Uint8Array;
-
       switch (type) {
         case MessageType.BIOMETRIC_PROOF:
           const BiometricProof = this.messageSchema.lookupType('emotionalchain.BiometricProof');
           serializedPayload = BiometricProof.encode(payload).finish();
           break;
-
         case MessageType.EMOTIONAL_VOTE:
           const EmotionalVote = this.messageSchema.lookupType('emotionalchain.EmotionalVote');
           serializedPayload = EmotionalVote.encode(payload).finish();
           break;
-
         case MessageType.BLOCK_PROPOSAL:
           const BlockProposal = this.messageSchema.lookupType('emotionalchain.BlockProposal');
           serializedPayload = BlockProposal.encode(payload).finish();
           break;
-
         case MessageType.CONSENSUS_RESULT:
           const ConsensusResult = this.messageSchema.lookupType('emotionalchain.ConsensusResult');
           serializedPayload = ConsensusResult.encode(payload).finish();
           break;
-
         case MessageType.PEER_CHALLENGE:
           const PeerChallenge = this.messageSchema.lookupType('emotionalchain.PeerChallenge');
           serializedPayload = PeerChallenge.encode(payload).finish();
           break;
-
         case MessageType.NETWORK_STATUS:
           const NetworkStatus = this.messageSchema.lookupType('emotionalchain.NetworkStatus');
           serializedPayload = NetworkStatus.encode(payload).finish();
           break;
-
         default:
           throw new Error(`Unknown message type: ${type}`);
       }
-
       // Create protocol message wrapper
       const protocolMessage = {
         version: this.protocolVersion,
@@ -446,21 +399,17 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: Date.now(),
         signature: new Uint8Array(0) // Will be set after creating message hash
       };
-
       // Sign the message
       const messageHash = this.createMessageHash(protocolMessage);
       protocolMessage.signature = this.signMessage(messageHash);
-
       // Serialize the final message
       const ProtocolMessage = this.messageSchema.lookupType('emotionalchain.ProtocolMessage');
       return ProtocolMessage.encode(protocolMessage).finish();
-
     } catch (error) {
       console.error('Error serializing message:', error);
       throw error;
     }
   }
-
   /**
    * Parse payload based on message type
    */
@@ -469,42 +418,33 @@ export class EmotionalProtocol extends EventEmitter {
       if (!this.messageSchema) {
         throw new Error('Protocol schema not initialized');
       }
-
       switch (type) {
         case MessageType.BIOMETRIC_PROOF:
           const BiometricProof = this.messageSchema.lookupType('emotionalchain.BiometricProof');
           return BiometricProof.decode(payloadBytes);
-
         case MessageType.EMOTIONAL_VOTE:
           const EmotionalVote = this.messageSchema.lookupType('emotionalchain.EmotionalVote');
           return EmotionalVote.decode(payloadBytes);
-
         case MessageType.BLOCK_PROPOSAL:
           const BlockProposal = this.messageSchema.lookupType('emotionalchain.BlockProposal');
           return BlockProposal.decode(payloadBytes);
-
         case MessageType.CONSENSUS_RESULT:
           const ConsensusResult = this.messageSchema.lookupType('emotionalchain.ConsensusResult');
           return ConsensusResult.decode(payloadBytes);
-
         case MessageType.PEER_CHALLENGE:
           const PeerChallenge = this.messageSchema.lookupType('emotionalchain.PeerChallenge');
           return PeerChallenge.decode(payloadBytes);
-
         case MessageType.NETWORK_STATUS:
           const NetworkStatus = this.messageSchema.lookupType('emotionalchain.NetworkStatus');
           return NetworkStatus.decode(payloadBytes);
-
         default:
           throw new Error(`Unknown message type: ${type}`);
       }
-
     } catch (error) {
       console.error(`Error parsing ${type} payload:`, error);
       return null;
     }
   }
-
   /**
    * Create message hash for signing
    */
@@ -514,7 +454,6 @@ export class EmotionalProtocol extends EventEmitter {
     const crypto = require('crypto');
     return crypto.createHash('sha256').update(hashData).digest('hex');
   }
-
   /**
    * Sign message hash
    */
@@ -522,7 +461,6 @@ export class EmotionalProtocol extends EventEmitter {
     const signature = this.keyPair.sign(messageHash);
     return new TextEncoder().encode(signature);
   }
-
   /**
    * Verify message signature
    */
@@ -530,28 +468,22 @@ export class EmotionalProtocol extends EventEmitter {
     try {
       // Recreate message hash
       const messageHash = this.createMessageHash(message);
-      
       // For now, return true - in production, we'd verify against sender's public key
       // This would require peer identity management
       return true;
-
     } catch (error) {
       console.error('Signature verification error:', error);
       return false;
     }
   }
-
   /**
    * Handle incoming biometric proof
    */
   public handleBiometricProof(payload: BiometricProofMessage, senderId: string): void {
     try {
-      console.log(`📊 Received biometric proof from ${senderId.substring(0, 12)}...`);
-      
       // Parse biometric data
       const biometricData = JSON.parse(new TextDecoder().decode(payload.biometricHash));
       const authenticityProof = JSON.parse(new TextDecoder().decode(payload.authenticityProof));
-      
       // Emit event for consensus engine
       this.emit('biometricProof', {
         validatorId: payload.validatorId,
@@ -560,41 +492,32 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: payload.timestamp,
         senderId
       });
-
     } catch (error) {
       console.error('Error handling biometric proof:', error);
     }
   }
-
   /**
    * Handle incoming emotional vote
    */
   public handleEmotionalVote(payload: EmotionalVoteMessage, senderId: string): void {
     try {
-      console.log(`🗳️  Received emotional vote from ${senderId.substring(0, 12)}... (score: ${payload.emotionalScore.toFixed(1)}%)`);
-      
       this.emit('emotionalVote', {
         validatorId: payload.validatorId,
         emotionalScore: payload.emotionalScore,
         consensusRound: payload.consensusRound,
         senderId
       });
-
     } catch (error) {
       console.error('Error handling emotional vote:', error);
     }
   }
-
   /**
    * Handle incoming block proposal
    */
   public handleBlockProposal(payload: BlockProposalMessage, senderId: string): void {
     try {
-      console.log(`📦 Received block proposal from ${senderId.substring(0, 12)}...`);
-      
       // Parse block data
       const blockData = JSON.parse(new TextDecoder().decode(payload.block));
-      
       this.emit('blockProposal', {
         block: blockData,
         proposerId: payload.proposerId,
@@ -603,21 +526,18 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: payload.timestamp,
         senderId
       });
-
     } catch (error) {
       console.error('Error handling block proposal:', error);
     }
   }
-
   /**
    * Handle incoming consensus result
    */
   public handleConsensusResult(payload: ConsensusResultMessage, senderId: string): void {
     try {
-      console.log(`🎯 Received consensus result from ${senderId.substring(0, 12)}...`);
+      console.log(` Received consensus result from ${senderId.substring(0, 12)}...`);
       console.log(`   Winner: ${payload.selectedValidator}`);
       console.log(`   Strength: ${payload.consensusStrength.toFixed(1)}%`);
-      
       this.emit('consensusResult', {
         selectedValidator: payload.selectedValidator,
         consensusRound: payload.consensusRound,
@@ -627,20 +547,16 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: payload.timestamp,
         senderId
       });
-
     } catch (error) {
       console.error('Error handling consensus result:', error);
     }
   }
-
   /**
    * Handle incoming peer challenge
    */
   public handlePeerChallenge(payload: PeerChallengeMessage, senderId: string): void {
     try {
       if (payload.targetId === this.nodeId) {
-        console.log(`⚔️  Received ${payload.challengeType} challenge from ${senderId.substring(0, 12)}...`);
-        
         this.emit('peerChallenge', {
           challengerId: payload.challengerId,
           challengeType: payload.challengeType,
@@ -649,12 +565,10 @@ export class EmotionalProtocol extends EventEmitter {
           senderId
         });
       }
-
     } catch (error) {
       console.error('Error handling peer challenge:', error);
     }
   }
-
   /**
    * Handle incoming network status
    */
@@ -670,12 +584,10 @@ export class EmotionalProtocol extends EventEmitter {
         timestamp: payload.timestamp,
         senderId
       });
-
     } catch (error) {
       console.error('Error handling network status:', error);
     }
   }
-
   /**
    * Get protocol statistics
    */
@@ -687,7 +599,6 @@ export class EmotionalProtocol extends EventEmitter {
       schemaInitialized: !!this.messageSchema
     };
   }
-
   /**
    * Validate message structure
    */
@@ -696,10 +607,8 @@ export class EmotionalProtocol extends EventEmitter {
       if (!this.messageSchema) {
         return false;
       }
-
       // Get the appropriate message type
       let MessageType: any;
-      
       switch (type) {
         case MessageType.BIOMETRIC_PROOF:
           MessageType = this.messageSchema.lookupType('emotionalchain.BiometricProof');
@@ -722,11 +631,9 @@ export class EmotionalProtocol extends EventEmitter {
         default:
           return false;
       }
-
       // Verify the message structure
       const error = MessageType.verify(payload);
       return !error;
-
     } catch (error) {
       console.error('Message validation error:', error);
       return false;

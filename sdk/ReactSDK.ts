@@ -3,7 +3,6 @@ import { EmotionalChain, EmotionalChainConfig } from './EmotionalChainSDK';
 import { Wallet } from './WalletSDK';
 import { EmotionalState, BiometricDevice } from './BiometricSDK';
 import { ValidatorInfo, ConsensusRound } from './ConsensusSDK';
-
 /**
  * React SDK for EmotionalChain integration
  * 
@@ -25,7 +24,6 @@ import { ValidatorInfo, ConsensusRound } from './ConsensusSDK';
  * }
  * ```
  */
-
 // Context for EmotionalChain client
 interface EmotionalChainContextType {
   client: EmotionalChain | null;
@@ -33,21 +31,18 @@ interface EmotionalChainContextType {
   connecting: boolean;
   error: Error | null;
 }
-
 const EmotionalChainContext = createContext<EmotionalChainContextType>({
   client: null,
   connected: false,
   connecting: false,
   error: null
 });
-
 // Provider component
 interface EmotionalChainProviderProps {
   config: EmotionalChainConfig;
   children: React.ReactNode;
   autoConnect?: boolean;
 }
-
 export const EmotionalChainProvider: React.FC<EmotionalChainProviderProps> = ({
   config,
   children,
@@ -57,28 +52,23 @@ export const EmotionalChainProvider: React.FC<EmotionalChainProviderProps> = ({
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
   useEffect(() => {
     const emotionalChain = new EmotionalChain(config);
     setClient(emotionalChain);
-
     // Setup event listeners
     emotionalChain.on('connected', () => {
       setConnected(true);
       setConnecting(false);
       setError(null);
     });
-
     emotionalChain.on('disconnected', () => {
       setConnected(false);
       setConnecting(false);
     });
-
     emotionalChain.on('error', (err) => {
       setError(err);
       setConnecting(false);
     });
-
     // Auto-connect if enabled
     if (autoConnect) {
       setConnecting(true);
@@ -87,26 +77,22 @@ export const EmotionalChainProvider: React.FC<EmotionalChainProviderProps> = ({
         setConnecting(false);
       });
     }
-
     return () => {
       emotionalChain.destroy();
     };
   }, [config, autoConnect]);
-
   const value = useMemo(() => ({
     client,
     connected,
     connecting,
     error
   }), [client, connected, connecting, error]);
-
   return (
     <EmotionalChainContext.Provider value={value}>
       {children}
     </EmotionalChainContext.Provider>
   );
 };
-
 // Hook to use EmotionalChain client
 export const useEmotionalChain = () => {
   const context = useContext(EmotionalChainContext);
@@ -115,7 +101,6 @@ export const useEmotionalChain = () => {
   }
   return context;
 };
-
 // Wallet management hook
 export const useEmotionalWallet = () => {
   const { client } = useEmotionalChain();
@@ -124,42 +109,33 @@ export const useEmotionalWallet = () => {
   const [emotionalScore, setEmotionalScore] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
   const connect = useCallback(async () => {
     if (!client) throw new Error('EmotionalChain client not available');
-    
     setLoading(true);
     setError(null);
-    
     try {
       const newWallet = await client.wallet.createWallet();
       setWallet(newWallet);
       setBalance(newWallet.balance);
-      
       // Get initial emotional score
       const score = await client.biometric.getCurrentEmotionalScore();
       setEmotionalScore(score);
-      
     } catch (err) {
       setError(err as Error);
     } finally {
       setLoading(false);
     }
   }, [client]);
-
   const disconnect = useCallback(() => {
     setWallet(null);
     setBalance(0);
     setEmotionalScore(0);
     setError(null);
   }, []);
-
   const sendTransaction = useCallback(async (to: string, amount: number, requireEmotionalAuth = false) => {
     if (!client || !wallet) throw new Error('Wallet not connected');
-    
     setLoading(true);
     setError(null);
-    
     try {
       const tx = await client.sendTransaction({
         from: wallet.address,
@@ -167,11 +143,9 @@ export const useEmotionalWallet = () => {
         amount,
         requireEmotionalAuth
       });
-      
       // Update balance
       const newBalance = await client.wallet.getBalance(wallet.address);
       setBalance(newBalance);
-      
       return tx;
     } catch (err) {
       setError(err as Error);
@@ -180,29 +154,22 @@ export const useEmotionalWallet = () => {
       setLoading(false);
     }
   }, [client, wallet]);
-
   // Listen for balance updates
   useEffect(() => {
     if (!client || !wallet) return;
-
     const unsubscribe = client.wallet.onBalanceUpdate(wallet.address, (newBalance) => {
       setBalance(newBalance);
     });
-
     return unsubscribe;
   }, [client, wallet]);
-
   // Listen for emotional score updates
   useEffect(() => {
     if (!client) return;
-
     const unsubscribe = client.onEmotionalScoreUpdate((data) => {
       setEmotionalScore(data.overall);
     });
-
     return unsubscribe;
   }, [client]);
-
   return {
     wallet,
     balance,
@@ -215,7 +182,6 @@ export const useEmotionalWallet = () => {
     isConnected: !!wallet
   };
 };
-
 // Biometric authentication hook
 export const useBiometricAuth = (config?: any) => {
   const { client } = useEmotionalChain();
@@ -224,13 +190,10 @@ export const useBiometricAuth = (config?: any) => {
   const [isMonitoring, setIsMonitoring] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
   const scanDevices = useCallback(async () => {
     if (!client) return;
-    
     setLoading(true);
     setError(null);
-    
     try {
       const foundDevices = await client.biometric.scanForDevices();
       setDevices(foundDevices);
@@ -240,10 +203,8 @@ export const useBiometricAuth = (config?: any) => {
       setLoading(false);
     }
   }, [client]);
-
   const connectDevice = useCallback(async (deviceId: string) => {
     if (!client) return;
-    
     try {
       await client.biometric.connectDevice(deviceId);
       await scanDevices(); // Refresh device list
@@ -251,10 +212,8 @@ export const useBiometricAuth = (config?: any) => {
       setError(err as Error);
     }
   }, [client, scanDevices]);
-
   const startMonitoring = useCallback(async () => {
     if (!client) return;
-    
     try {
       await client.biometric.startMonitoring();
       setIsMonitoring(true);
@@ -262,10 +221,8 @@ export const useBiometricAuth = (config?: any) => {
       setError(err as Error);
     }
   }, [client]);
-
   const stopMonitoring = useCallback(async () => {
     if (!client) return;
-    
     try {
       await client.biometric.stopMonitoring();
       setIsMonitoring(false);
@@ -273,13 +230,10 @@ export const useBiometricAuth = (config?: any) => {
       setError(err as Error);
     }
   }, [client]);
-
   const authenticate = useCallback(async () => {
     if (!client) throw new Error('EmotionalChain client not available');
-    
     setLoading(true);
     setError(null);
-    
     try {
       const result = await client.biometric.authenticate();
       setCurrentState(result);
@@ -291,34 +245,26 @@ export const useBiometricAuth = (config?: any) => {
       setLoading(false);
     }
   }, [client]);
-
   // Listen for emotional state updates
   useEffect(() => {
     if (!client) return;
-
     const unsubscribe = client.biometric.on('emotionalScoreUpdate', (state: EmotionalState) => {
       setCurrentState(state);
     });
-
     return () => unsubscribe();
   }, [client]);
-
   // Listen for device connection updates
   useEffect(() => {
     if (!client) return;
-
     const onDeviceConnected = () => scanDevices();
     const onDeviceDisconnected = () => scanDevices();
-
     client.biometric.on('deviceConnected', onDeviceConnected);
     client.biometric.on('deviceDisconnected', onDeviceDisconnected);
-
     return () => {
       client.biometric.off('deviceConnected', onDeviceConnected);
       client.biometric.off('deviceDisconnected', onDeviceDisconnected);
     };
   }, [client, scanDevices]);
-
   return {
     devices,
     currentState,
@@ -332,7 +278,6 @@ export const useBiometricAuth = (config?: any) => {
     authenticate
   };
 };
-
 // Consensus monitoring hook
 export const useConsensusMonitor = () => {
   const { client } = useEmotionalChain();
@@ -341,10 +286,8 @@ export const useConsensusMonitor = () => {
   const [networkStats, setNetworkStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
   const loadCurrentRound = useCallback(async () => {
     if (!client) return;
-    
     setLoading(true);
     try {
       const round = await client.consensus.getCurrentRound();
@@ -355,10 +298,8 @@ export const useConsensusMonitor = () => {
       setLoading(false);
     }
   }, [client]);
-
   const loadValidators = useCallback(async () => {
     if (!client) return;
-    
     try {
       const validatorList = await client.consensus.getValidators();
       setValidators(validatorList);
@@ -366,10 +307,8 @@ export const useConsensusMonitor = () => {
       setError(err as Error);
     }
   }, [client]);
-
   const loadNetworkStats = useCallback(async () => {
     if (!client) return;
-    
     try {
       const stats = await client.consensus.getNetworkStats();
       setNetworkStats(stats);
@@ -377,25 +316,20 @@ export const useConsensusMonitor = () => {
       setError(err as Error);
     }
   }, [client]);
-
   // Listen for consensus updates
   useEffect(() => {
     if (!client) return;
-
     const unsubscribeRound = client.onConsensusRound((round: ConsensusRound) => {
       setCurrentRound(round);
     });
-
     const unsubscribeValidator = client.onValidatorUpdate(() => {
       loadValidators();
     });
-
     return () => {
       unsubscribeRound();
       unsubscribeValidator();
     };
   }, [client, loadValidators]);
-
   // Initial data load
   useEffect(() => {
     if (client) {
@@ -404,7 +338,6 @@ export const useConsensusMonitor = () => {
       loadNetworkStats();
     }
   }, [client, loadCurrentRound, loadValidators, loadNetworkStats]);
-
   return {
     currentRound,
     validators,
@@ -418,20 +351,16 @@ export const useConsensusMonitor = () => {
     }
   };
 };
-
 // Transaction history hook
 export const useTransactionHistory = (address?: string) => {
   const { client } = useEmotionalChain();
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
-
   const loadTransactions = useCallback(async () => {
     if (!client || !address) return;
-    
     setLoading(true);
     setError(null);
-    
     try {
       const txHistory = await client.getTransactionHistory(address);
       setTransactions(txHistory);
@@ -441,24 +370,19 @@ export const useTransactionHistory = (address?: string) => {
       setLoading(false);
     }
   }, [client, address]);
-
   useEffect(() => {
     loadTransactions();
   }, [loadTransactions]);
-
   // Listen for new transactions
   useEffect(() => {
     if (!client || !address) return;
-
     const unsubscribe = client.onTransaction((tx) => {
       if (tx.from === address || tx.to === address) {
         setTransactions(prev => [tx, ...prev]);
       }
     });
-
     return unsubscribe;
   }, [client, address]);
-
   return {
     transactions,
     loading,
@@ -466,16 +390,13 @@ export const useTransactionHistory = (address?: string) => {
     refresh: loadTransactions
   };
 };
-
 // Network status hook
 export const useNetworkStatus = () => {
   const { client, connected, connecting, error } = useEmotionalChain();
   const [networkInfo, setNetworkInfo] = useState<any>(null);
   const [healthStatus, setHealthStatus] = useState<any>(null);
-
   const loadNetworkInfo = useCallback(async () => {
     if (!client) return;
-    
     try {
       const info = await client.getNetworkInfo();
       setNetworkInfo(info);
@@ -483,10 +404,8 @@ export const useNetworkStatus = () => {
       console.error('Failed to load network info:', err);
     }
   }, [client]);
-
   const checkHealth = useCallback(async () => {
     if (!client) return;
-    
     try {
       const health = await client.healthCheck();
       setHealthStatus(health);
@@ -494,22 +413,18 @@ export const useNetworkStatus = () => {
       console.error('Failed to check health:', err);
     }
   }, [client]);
-
   useEffect(() => {
     if (connected && client) {
       loadNetworkInfo();
       checkHealth();
-      
       // Refresh periodically
       const interval = setInterval(() => {
         loadNetworkInfo();
         checkHealth();
       }, 30000); // Every 30 seconds
-      
       return () => clearInterval(interval);
     }
   }, [connected, client, loadNetworkInfo, checkHealth]);
-
   return {
     networkInfo,
     healthStatus,
@@ -522,13 +437,11 @@ export const useNetworkStatus = () => {
     }
   };
 };
-
 // Error boundary for EmotionalChain components
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
 }
-
 export class EmotionalChainErrorBoundary extends React.Component<
   { children: React.ReactNode; fallback?: React.ComponentType<{ error: Error }> },
   ErrorBoundaryState
@@ -537,56 +450,45 @@ export class EmotionalChainErrorBoundary extends React.Component<
     super(props);
     this.state = { hasError: false, error: null };
   }
-
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
-
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('EmotionalChain Error:', error, errorInfo);
   }
-
   render() {
     if (this.state.hasError) {
       const FallbackComponent = this.props.fallback || DefaultErrorFallback;
       return <FallbackComponent error={this.state.error!} />;
     }
-
     return this.props.children;
   }
 }
-
 const DefaultErrorFallback: React.FC<{ error: Error }> = ({ error }) => (
   <div style={{ padding: '20px', border: '1px solid #ff6b6b', borderRadius: '4px', backgroundColor: '#fff5f5' }}>
     <h3 style={{ color: '#d63031', margin: '0 0 10px 0' }}>EmotionalChain Error</h3>
     <p style={{ margin: '0', color: '#2d3436' }}>{error.message}</p>
   </div>
 );
-
 // Utility hook for formatting
 export const useEmotionalChainFormatter = () => {
   const formatEmotionalScore = useCallback((score: number) => {
     return `${score.toFixed(1)}%`;
   }, []);
-
   const formatBalance = useCallback((balance: number, symbol = 'EMO') => {
     return `${balance.toLocaleString()} ${symbol}`;
   }, []);
-
   const formatAddress = useCallback((address: string, length = 8) => {
     if (!address) return '';
     return `${address.slice(0, length)}...${address.slice(-4)}`;
   }, []);
-
   const formatTimestamp = useCallback((timestamp: number) => {
     return new Date(timestamp).toLocaleString();
   }, []);
-
   const formatDuration = useCallback((ms: number) => {
     const seconds = Math.floor(ms / 1000);
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
-    
     if (hours > 0) {
       return `${hours}h ${minutes % 60}m`;
     } else if (minutes > 0) {
@@ -595,7 +497,6 @@ export const useEmotionalChainFormatter = () => {
       return `${seconds}s`;
     }
   }, []);
-
   return {
     formatEmotionalScore,
     formatBalance,

@@ -2,13 +2,11 @@ import { sql } from "drizzle-orm";
 import { pgTable, text, varchar, integer, decimal, timestamp, boolean, jsonb, bigint } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
 });
-
 export const blocks = pgTable("blocks", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   height: integer("height").notNull(),
@@ -25,7 +23,6 @@ export const blocks = pgTable("blocks", {
   transactionCount: integer("transaction_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 export const transactions = pgTable("transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   hash: text("hash").notNull().unique(),
@@ -41,7 +38,6 @@ export const transactions = pgTable("transactions", {
   status: text("status").notNull().default("confirmed"),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 export const validatorStates = pgTable("validator_states", {
   validatorId: text("validator_id").primaryKey(),
   balance: decimal("balance", { precision: 18, scale: 8 }).notNull().default("0"),
@@ -53,7 +49,6 @@ export const validatorStates = pgTable("validator_states", {
   totalValidations: integer("total_validations").default(0),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
 export const biometricData = pgTable("biometric_data", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   validatorId: text("validator_id").references(() => validatorStates.validatorId).notNull(),
@@ -66,7 +61,6 @@ export const biometricData = pgTable("biometric_data", {
   rawData: jsonb("raw_data"),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 // Smart contracts table
 export const smartContracts = pgTable("smart_contracts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -84,7 +78,6 @@ export const smartContracts = pgTable("smart_contracts", {
   deployedAt: timestamp("deployed_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
 // Wellness goals table
 export const wellnessGoals = pgTable("wellness_goals", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -100,7 +93,6 @@ export const wellnessGoals = pgTable("wellness_goals", {
   biometricHistory: jsonb("biometric_history").default(sql`'[]'::jsonb`),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 // Quantum key pairs table
 export const quantumKeyPairs = pgTable("quantum_key_pairs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -114,7 +106,6 @@ export const quantumKeyPairs = pgTable("quantum_key_pairs", {
   createdAt: timestamp("created_at").defaultNow(),
   expiresAt: timestamp("expires_at").notNull(),
 });
-
 // Privacy proofs table  
 export const privacyProofs = pgTable("privacy_proofs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -127,7 +118,6 @@ export const privacyProofs = pgTable("privacy_proofs", {
   isValid: boolean("is_valid").default(true),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 // Cross-chain bridge transactions table
 export const bridgeTransactions = pgTable("bridge_transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -147,7 +137,6 @@ export const bridgeTransactions = pgTable("bridge_transactions", {
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 // AI model training data table
 export const aiModelData = pgTable("ai_model_data", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -164,7 +153,6 @@ export const aiModelData = pgTable("ai_model_data", {
   lastTraining: timestamp("last_training").defaultNow(),
   isActive: boolean("is_active").default(true),
 });
-
 // Biometric device registry table
 export const biometricDevices = pgTable("biometric_devices", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -182,7 +170,6 @@ export const biometricDevices = pgTable("biometric_devices", {
   authenticityVerified: boolean("authenticity_verified").default(false),
   registeredAt: timestamp("registered_at").defaultNow(),
 });
-
 // Consensus rounds table
 export const consensusRounds = pgTable("consensus_rounds", {
   roundId: integer("round_id").primaryKey(),
@@ -193,7 +180,6 @@ export const consensusRounds = pgTable("consensus_rounds", {
   blockHash: text("block_hash").references(() => blocks.hash),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 // Peer reputation table
 export const peerReputation = pgTable("peer_reputation", {
   peerId: text("peer_id").primaryKey(),
@@ -205,7 +191,6 @@ export const peerReputation = pgTable("peer_reputation", {
   metadata: jsonb("metadata"),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
-
 // Storage metrics table
 export const storageMetrics = pgTable("storage_metrics", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -214,132 +199,100 @@ export const storageMetrics = pgTable("storage_metrics", {
   timestamp: bigint("timestamp", { mode: "number" }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 // Insert schemas for all tables
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
 });
-
 export const insertBlockSchema = createInsertSchema(blocks).omit({
   id: true,
   createdAt: true,
 });
-
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
   id: true,
   createdAt: true,
 });
-
 export const insertValidatorStateSchema = createInsertSchema(validatorStates).omit({
   updatedAt: true,
 });
-
 export const insertBiometricDataSchema = createInsertSchema(biometricData).omit({
   id: true,
   createdAt: true,
 });
-
 export const insertSmartContractSchema = createInsertSchema(smartContracts).omit({
   id: true,
   deployedAt: true,
   updatedAt: true,
 });
-
 export const insertWellnessGoalSchema = createInsertSchema(wellnessGoals).omit({
   id: true,
   createdAt: true,
 });
-
 export const insertQuantumKeyPairSchema = createInsertSchema(quantumKeyPairs).omit({
   id: true,
   createdAt: true,
 });
-
 export const insertPrivacyProofSchema = createInsertSchema(privacyProofs).omit({
   id: true,
   createdAt: true,
 });
-
 export const insertBridgeTransactionSchema = createInsertSchema(bridgeTransactions).omit({
   id: true,
   createdAt: true,
 });
-
 export const insertAiModelDataSchema = createInsertSchema(aiModelData).omit({
   id: true,
   lastTraining: true,
 });
-
 export const insertBiometricDeviceSchema = createInsertSchema(biometricDevices).omit({
   id: true,
   registeredAt: true,
 });
-
 export const insertConsensusRoundSchema = createInsertSchema(consensusRounds).omit({
   createdAt: true,
 });
-
 export const insertPeerReputationSchema = createInsertSchema(peerReputation).omit({
   updatedAt: true,
 });
-
 export const insertStorageMetricsSchema = createInsertSchema(storageMetrics).omit({
   id: true,
   createdAt: true,
 });
-
 // Type exports for all tables
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
-
 export type Block = typeof blocks.$inferSelect;
 export type InsertBlock = z.infer<typeof insertBlockSchema>;
-
 export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
-
 export type ValidatorState = typeof validatorStates.$inferSelect;
 export type InsertValidatorState = z.infer<typeof insertValidatorStateSchema>;
-
 export type BiometricDataRecord = typeof biometricData.$inferSelect;
 export type InsertBiometricData = z.infer<typeof insertBiometricDataSchema>;
-
 export type SmartContract = typeof smartContracts.$inferSelect;
 export type InsertSmartContract = z.infer<typeof insertSmartContractSchema>;
-
 export type WellnessGoal = typeof wellnessGoals.$inferSelect;
 export type InsertWellnessGoal = z.infer<typeof insertWellnessGoalSchema>;
-
 export type QuantumKeyPair = typeof quantumKeyPairs.$inferSelect;
 export type InsertQuantumKeyPair = z.infer<typeof insertQuantumKeyPairSchema>;
-
 export type PrivacyProof = typeof privacyProofs.$inferSelect;
 export type InsertPrivacyProof = z.infer<typeof insertPrivacyProofSchema>;
-
 export type BridgeTransaction = typeof bridgeTransactions.$inferSelect;
 export type InsertBridgeTransaction = z.infer<typeof insertBridgeTransactionSchema>;
-
 export type AiModelData = typeof aiModelData.$inferSelect;
 export type InsertAiModelData = z.infer<typeof insertAiModelDataSchema>;
-
 export type BiometricDevice = typeof biometricDevices.$inferSelect;
 export type InsertBiometricDevice = z.infer<typeof insertBiometricDeviceSchema>;
-
 export type ConsensusRound = typeof consensusRounds.$inferSelect;
 export type InsertConsensusRound = z.infer<typeof insertConsensusRoundSchema>;
-
 export type PeerReputation = typeof peerReputation.$inferSelect;
 export type InsertPeerReputation = z.infer<typeof insertPeerReputationSchema>;
-
 export type StorageMetrics = typeof storageMetrics.$inferSelect;
 export type InsertStorageMetrics = z.infer<typeof insertStorageMetricsSchema>;
-
 // Legacy type aliases for backward compatibility
 export type Validator = ValidatorState;
 export type InsertValidator = InsertValidatorState;
 export type BiometricData = BiometricDataRecord;
-
 // Runtime compatibility types
 export type NetworkStats = {
   id: string;
@@ -352,9 +305,7 @@ export type NetworkStats = {
   networkFocus: string;
   timestamp: Date;
 };
-
 export type InsertNetworkStats = Omit<NetworkStats, "id" | "timestamp">;
-
 // Configuration snapshots table for audit trail
 export const configSnapshots = pgTable("config_snapshots", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -364,12 +315,10 @@ export const configSnapshots = pgTable("config_snapshots", {
   adminId: text("admin_id"),
   createdAt: timestamp("created_at").defaultNow(),
 });
-
 // Configuration snapshot schema
 export const insertConfigSnapshotSchema = createInsertSchema(configSnapshots).omit({
   id: true,
   createdAt: true,
 });
-
 export type ConfigSnapshot = typeof configSnapshots.$inferSelect;
 export type InsertConfigSnapshot = z.infer<typeof insertConfigSnapshotSchema>;
