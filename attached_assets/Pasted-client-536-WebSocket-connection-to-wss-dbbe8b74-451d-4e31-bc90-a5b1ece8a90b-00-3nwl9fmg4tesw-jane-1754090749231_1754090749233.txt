@@ -1,0 +1,69 @@
+client:536 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev/?token=ZWEv7hOfLQ5h' failed: 
+setupWebSocket @ client:536
+client:536 Uncaught (in promise) SyntaxError: Failed to construct 'WebSocket': The URL 'wss://localhost:undefined/?token=ZWEv7hOfLQ5h' is invalid.
+    at setupWebSocket (client:536:19)
+    at fallback (client:509:16)
+    at WebSocket.<anonymous> (client:555:7)
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+WebSocket connection to '<URL>' failed: WebSocket is closed before the connection is established.
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+(anonymous) @ use-websocket.ts:140
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+(anonymous) @ use-websocket.ts:140
+use-websocket.ts:109 WebSocket connection to 'wss://dbbe8b74-451d-4e31-bc90-a5b1ece8a90b-00-3nwl9fmg4tesw.janeway.replit.dev:5000/ws' failed: 
+connectWithFallback @ use-websocket.ts:109
+(anonymous) @ use-websocket.ts:140

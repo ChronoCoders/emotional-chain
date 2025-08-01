@@ -97,14 +97,21 @@ export function useWebSocket(): UseWebSocketReturn {
       }
       try {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        console.log('🔌 WebSocket connection attempt:', { protocol, hostname: window.location.hostname, port: window.location.port, useFallback });
         let wsUrl: string;
         if (useFallback) {
           const fallbackPort = config.fallbackPort || 8080;
           wsUrl = `${protocol}//${config.fallbackHost || 'localhost'}:${fallbackPort}/ws`;
         } else {
           const hostname = window.location.hostname;
-          const port = window.location.port || '5000';  // Default to main server port
-          wsUrl = `${protocol}//${hostname}:${port}/ws`;
+          const port = window.location.port;
+          // For Replit domains, don't specify port - use same as current page
+          if (hostname.includes('.replit.dev') || hostname.includes('.repl.co')) {
+            wsUrl = `${protocol}//${hostname}/ws`;
+          } else {
+            // For localhost development
+            wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}:5000/ws`;
+          }
         }
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
