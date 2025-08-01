@@ -23,7 +23,7 @@ router.get('/devices', (req, res) => {
 });
 
 // Connect a biometric device
-router.post('/devices/connect', (req, res) => {
+router.post('/devices/connect', async (req, res) => {
   try {
     const { deviceId, validatorId, deviceType } = req.body;
     
@@ -34,7 +34,7 @@ router.post('/devices/connect', (req, res) => {
       });
     }
     
-    const success = biometricDeviceManager.connectDevice(deviceId, validatorId);
+    const success = await biometricDeviceManager.connectDevice(deviceId, validatorId);
     
     if (success) {
       res.json({

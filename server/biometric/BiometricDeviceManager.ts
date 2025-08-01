@@ -99,7 +99,13 @@ export class BiometricDeviceManager extends EventEmitter {
   }
 
   public getConnectedDevices(): BiometricDevice[] {
-    return Array.from(this.devices.values()).filter(d => d.isConnected);
+    const devices: BiometricDevice[] = [];
+    for (const device of this.devices.values()) {
+      if (device.isConnected) {
+        devices.push(device);
+      }
+    }
+    return devices;
   }
 
   public getDeviceReading(deviceId: string): BiometricData | null {
@@ -117,11 +123,11 @@ export class BiometricDeviceManager extends EventEmitter {
   public getAuthenticatedValidators(): string[] {
     const authenticatedValidators = new Set<string>();
     
-    for (const device of this.devices.values()) {
+    this.devices.forEach((device) => {
       if (device.isConnected && device.lastReading) {
         authenticatedValidators.add(device.validatorId);
       }
-    }
+    });
     
     return Array.from(authenticatedValidators);
   }
@@ -133,9 +139,14 @@ export class BiometricDeviceManager extends EventEmitter {
     }
     
     // Disconnect all devices
-    for (const deviceId of this.devices.keys()) {
+    const deviceIds: string[] = [];
+    this.devices.forEach((_, deviceId) => {
+      deviceIds.push(deviceId);
+    });
+    
+    deviceIds.forEach(deviceId => {
       this.disconnectDevice(deviceId);
-    }
+    });
   }
 }
 
