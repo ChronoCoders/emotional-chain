@@ -124,7 +124,7 @@ export const quantumKeyPairs = pgTable("quantum_key_pairs", {
   publicKey: text("public_key").notNull(),
   privateKey: text("private_key").notNull(), // Encrypted storage
   keySize: integer("key_size").notNull(),
-  securityLevel: integer("security_level").notNull(), // 128, 192, 256
+  securityLevel: text("security_level").notNull(), // '128', '192', '256'
   status: text("status").default("active"), // 'active', 'deprecated', 'compromised'
   createdAt: timestamp("created_at").defaultNow(),
   expiresAt: timestamp("expires_at").notNull(),
