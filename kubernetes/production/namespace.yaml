@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: emotionalchain-production
+  labels:
+    name: emotionalchain-production
+    environment: production
+    app.kubernetes.io/name: emotionalchain
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: blockchain
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: emotionalchain-monitoring
+  labels:
+    name: emotionalchain-monitoring
+    environment: production
+    app.kubernetes.io/name: emotionalchain-monitoring
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/component: monitoring

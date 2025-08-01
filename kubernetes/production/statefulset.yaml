@@ -1,0 +1,227 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: emotionalchain-validator
+  namespace: emotionalchain-production
+  labels:
+    app.kubernetes.io/name: emotionalchain
+    app.kubernetes.io/component: validator
+    app.kubernetes.io/version: "1.0.0"
+spec:
+  serviceName: emotionalchain-validator-headless
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: emotionalchain
+      app.kubernetes.io/component: validator
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: emotionalchain
+        app.kubernetes.io/component: validator
+        app.kubernetes.io/version: "1.0.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: emotionalchain-validator
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/component
+                  operator: In
+                  values:
+                  - validator
+              topologyKey: kubernetes.io/hostname
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - key: node.kubernetes.io/instance-type
+                operator: In
+                values:
+                - c5.xlarge
+                - c5.2xlarge
+                - m5.xlarge
+                - m5.2xlarge
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: validator
+        image: emotionalchain/validator:latest
+        imagePullPolicy: Always
+        ports:
+        - name: p2p-tcp
+          containerPort: 8000
+          protocol: TCP
+        - name: websocket
+          containerPort: 8001
+          protocol: TCP
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        - name: metrics
+          containerPort: 9090
+          protocol: TCP
+        env:
+        - name: NODE_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: REGION
+          valueFrom:
+            configMapKeyRef:
+              name: emotionalchain-config
+              key: REGION
+        envFrom:
+        - configMapRef:
+            name: emotionalchain-config
+        - secretRef:
+            name: emotionalchain-database
+        - secretRef:
+            name: emotionalchain-encryption
+        - secretRef:
+            name: emotionalchain-p2p
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+            ephemeral-storage: "5Gi"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+            ephemeral-storage: "10Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 12
+          successThreshold: 1
+        volumeMounts:
+        - name: blockchain-data
+          mountPath: /app/data
+        - name: bootstrap-config
+          mountPath: /app/config/bootstrap
+          readOnly: true
+        - name: temp-storage
+          mountPath: /tmp
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      volumes:
+      - name: bootstrap-config
+        configMap:
+          name: emotionalchain-bootstrap-us-west-2
+      - name: temp-storage
+        emptyDir:
+          sizeLimit: 1Gi
+      initContainers:
+      - name: wait-for-database
+        image: postgres:15-alpine
+        command:
+        - sh
+        - -c
+        - |
+          until pg_isready -h $PGHOST -p $PGPORT -U $PGUSER; do
+            echo "Waiting for database..."
+            sleep 2
+          done
+          echo "Database is ready!"
+        envFrom:
+        - secretRef:
+            name: emotionalchain-database
+  volumeClaimTemplates:
+  - metadata:
+      name: blockchain-data
+      labels:
+        app.kubernetes.io/name: emotionalchain
+        app.kubernetes.io/component: validator-storage
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: gp3-encrypted
+      resources:
+        requests:
+          storage: 100Gi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: emotionalchain-validator
+  namespace: emotionalchain-production
+  labels:
+    app.kubernetes.io/name: emotionalchain
+    app.kubernetes.io/component: validator
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: emotionalchain-validator
+  namespace: emotionalchain-production
+rules:
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: emotionalchain-validator
+  namespace: emotionalchain-production
+subjects:
+- kind: ServiceAccount
+  name: emotionalchain-validator
+  namespace: emotionalchain-production
+roleRef:
+  kind: Role
+  name: emotionalchain-validator
+  apiGroup: rbac.authorization.k8s.io

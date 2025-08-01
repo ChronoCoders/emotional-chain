@@ -1,0 +1,159 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: emotionalchain-validator-network-policy
+  namespace: emotionalchain-production
+  labels:
+    app.kubernetes.io/name: emotionalchain
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: emotionalchain
+      app.kubernetes.io/component: validator
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow P2P traffic from other validators
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: emotionalchain-production
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: validator
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+  # Allow external P2P connections for bootstrap
+  - from: []
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+  # Allow monitoring access
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: emotionalchain-monitoring
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: prometheus
+    ports:
+    - protocol: TCP
+      port: 9090
+  # Allow API access from ingress
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 3000
+  # Allow health checks
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  # Allow database connections
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 5432
+  # Allow DNS resolution
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+  # Allow P2P connections to other validators
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: emotionalchain-production
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: validator
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+  # Allow external P2P connections
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 8000
+    - protocol: TCP
+      port: 8001
+  # Allow STUN/TURN for WebRTC
+  - to: []
+    ports:
+    - protocol: UDP
+      port: 19302
+    - protocol: TCP
+      port: 3478
+  # Allow HTTPS for external services
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: emotionalchain-monitoring-network-policy
+  namespace: emotionalchain-monitoring
+  labels:
+    app.kubernetes.io/name: emotionalchain-monitoring
+    app.kubernetes.io/component: security
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: prometheus
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow Grafana to query Prometheus
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: grafana
+    ports:
+    - protocol: TCP
+      port: 9090
+  # Allow external access to Grafana
+  - from: []
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  # Allow scraping metrics from validators
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: emotionalchain-production
+    ports:
+    - protocol: TCP
+      port: 9090
+  # Allow DNS resolution
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53

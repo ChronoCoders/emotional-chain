@@ -1,0 +1,199 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "EmotionalChain Consensus Performance",
+    "tags": ["emotionalchain", "consensus", "blockchain"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Consensus Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(emotionalchain_consensus_success_total[5m]) / (rate(emotionalchain_consensus_success_total[5m]) + rate(emotionalchain_consensus_failure_total[5m])) * 100",
+            "legendFormat": "Success Rate %",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "percent",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 80},
+                {"color": "green", "value": 95}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Active Validators",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "emotionalchain_active_validators_total",
+            "legendFormat": "Active Validators",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 10},
+                {"color": "green", "value": 21}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Consensus Round Duration",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(emotionalchain_consensus_round_duration_seconds_bucket[5m]))",
+            "legendFormat": "95th Percentile",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 10},
+                {"color": "red", "value": 20}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Network Health",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "emotionalchain_p2p_connected_peers_total",
+            "legendFormat": "Connected Peers",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "unit": "short",
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "yellow", "value": 20},
+                {"color": "green", "value": 50}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "Validator Emotional Scores",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(emotionalchain_validator_emotional_score_bucket[5m]))",
+            "legendFormat": "95th Percentile",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(emotionalchain_validator_emotional_score_bucket[5m]))",
+            "legendFormat": "Median",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.05, rate(emotionalchain_validator_emotional_score_bucket[5m]))",
+            "legendFormat": "5th Percentile",
+            "refId": "C"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "Consensus Failures by Reason",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "increase(emotionalchain_consensus_failure_total[1h])",
+            "legendFormat": "{{failure_reason}}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 7,
+        "title": "Block Production Rate",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(emotionalchain_block_height[5m]) * 60",
+            "legendFormat": "Blocks per Minute",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 8,
+        "title": "Transaction Throughput",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(emotionalchain_transactions_total[5m])",
+            "legendFormat": "{{transaction_type}} - {{status}}",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "10s"
+  }
+}

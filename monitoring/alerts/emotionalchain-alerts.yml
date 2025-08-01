@@ -1,0 +1,201 @@
+groups:
+- name: emotionalchain.consensus
+  rules:
+  - alert: ConsensusFailureRate
+    expr: rate(emotionalchain_consensus_failure_total[5m]) / rate(emotionalchain_consensus_success_total[5m]) > 0.1
+    for: 2m
+    labels:
+      severity: critical
+      component: consensus
+    annotations:
+      summary: "High consensus failure rate detected"
+      description: "Consensus failure rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+      runbook_url: "https://docs.emotionalchain.com/runbooks/consensus-failures"
+
+  - alert: ConsensusRoundTimeout
+    expr: histogram_quantile(0.95, rate(emotionalchain_consensus_round_duration_seconds_bucket[5m])) > 20
+    for: 3m
+    labels:
+      severity: warning
+      component: consensus
+    annotations:
+      summary: "Consensus rounds taking too long"
+      description: "95th percentile consensus round duration is {{ $value }}s"
+
+  - alert: InsufficientActiveValidators
+    expr: emotionalchain_active_validators_total < 21
+    for: 1m
+    labels:
+      severity: critical
+      component: consensus
+    annotations:
+      summary: "Insufficient active validators for consensus"
+      description: "Only {{ $value }} active validators, minimum required is 21"
+
+  - alert: ValidatorParticipationLow
+    expr: avg(emotionalchain_validator_participation_rate) < 0.67
+    for: 5m
+    labels:
+      severity: warning
+      component: consensus
+    annotations:
+      summary: "Low validator participation rate"
+      description: "Average validator participation is {{ $value | humanizePercentage }}"
+
+- name: emotionalchain.biometric
+  rules:
+  - alert: BiometricDeviceFailure
+    expr: avg(emotionalchain_biometric_device_health) < 0.7
+    for: 2m
+    labels:
+      severity: warning
+      component: biometric
+    annotations:
+      summary: "Biometric device health degraded"
+      description: "Average biometric device health is {{ $value | humanizePercentage }}"
+
+  - alert: HighByzantineFailures
+    expr: rate(emotionalchain_byzantine_failures_total[5m]) > 0.01
+    for: 1m
+    labels:
+      severity: critical
+      component: security
+    annotations:
+      summary: "High rate of Byzantine failures detected"
+      description: "{{ $value }} Byzantine failures per second detected"
+
+  - alert: LowAuthenticityScores
+    expr: histogram_quantile(0.50, rate(emotionalchain_biometric_authenticity_score_bucket[5m])) < 0.7
+    for: 3m
+    labels:
+      severity: warning
+      component: biometric
+    annotations:
+      summary: "Low biometric authenticity scores"
+      description: "Median authenticity score is {{ $value | humanizePercentage }}"
+
+  - alert: SecurityAlert
+    expr: rate(emotionalchain_security_alerts_total{severity="critical"}[5m]) > 0
+    for: 0m
+    labels:
+      severity: critical
+      component: security
+    annotations:
+      summary: "Critical security alert triggered"
+      description: "{{ $labels.alert_type }} security alert detected"
+
+- name: emotionalchain.network
+  rules:
+  - alert: P2PConnectionsLow
+    expr: emotionalchain_p2p_connected_peers_total < 10
+    for: 2m
+    labels:
+      severity: warning
+      component: network
+    annotations:
+      summary: "Low P2P peer connections"
+      description: "Only {{ $value }} P2P connections, minimum recommended is 10"
+
+  - alert: HighNetworkLatency
+    expr: histogram_quantile(0.95, rate(emotionalchain_p2p_message_latency_seconds_bucket[5m])) > 1.0
+    for: 3m
+    labels:
+      severity: warning
+      component: network
+    annotations:
+      summary: "High P2P network latency"
+      description: "95th percentile message latency is {{ $value }}s"
+
+  - alert: NetworkPartition
+    expr: changes(emotionalchain_p2p_connected_peers_total[5m]) > 10
+    for: 1m
+    labels:
+      severity: critical
+      component: network
+    annotations:
+      summary: "Potential network partition detected"
+      description: "Large changes in peer connections detected"
+
+- name: emotionalchain.performance
+  rules:
+  - alert: HighDatabaseLatency
+    expr: histogram_quantile(0.95, rate(emotionalchain_database_query_duration_seconds_bucket[5m])) > 2.0
+    for: 2m
+    labels:
+      severity: warning
+      component: database
+    annotations:
+      summary: "High database query latency"
+      description: "95th percentile database query time is {{ $value }}s"
+
+  - alert: LowCacheHitRate
+    expr: emotionalchain_cache_hit_rate < 0.8
+    for: 5m
+    labels:
+      severity: warning
+      component: performance
+    annotations:
+      summary: "Low cache hit rate"
+      description: "{{ $labels.cache_type }} cache hit rate is {{ $value | humanizePercentage }}"
+
+  - alert: HighMemoryUsage
+    expr: emotionalchain_memory_usage_bytes{component="heap_used"} / emotionalchain_memory_usage_bytes{component="heap_total"} > 0.9
+    for: 3m
+    labels:
+      severity: warning
+      component: performance
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage is {{ $value | humanizePercentage }} of available heap"
+
+  - alert: BlockProductionStalled
+    expr: increase(emotionalchain_block_height[5m]) == 0
+    for: 2m
+    labels:
+      severity: critical
+      component: blockchain
+    annotations:
+      summary: "Block production has stalled"
+      description: "No new blocks produced in the last 5 minutes"
+
+- name: emotionalchain.system
+  rules:
+  - alert: HighCPUUsage
+    expr: (1 - rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100 > 80
+    for: 5m
+    labels:
+      severity: warning
+      component: system
+    annotations:
+      summary: "High CPU usage"
+      description: "CPU usage is {{ $value }}% on {{ $labels.instance }}"
+
+  - alert: HighMemoryUsage
+    expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+    for: 3m
+    labels:
+      severity: critical
+      component: system
+    annotations:
+      summary: "High memory usage"
+      description: "Memory usage is {{ $value }}% on {{ $labels.instance }}"
+
+  - alert: DiskSpaceLow
+    expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 10
+    for: 1m
+    labels:
+      severity: critical
+      component: system
+    annotations:
+      summary: "Low disk space"
+      description: "Disk space is {{ $value }}% full on {{ $labels.instance }}"
+
+  - alert: PodCrashLooping
+    expr: rate(kube_pod_container_status_restarts_total[15m]) > 0
+    for: 0m
+    labels:
+      severity: warning
+      component: kubernetes
+    annotations:
+      summary: "Pod is crash looping"
+      description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting frequently"

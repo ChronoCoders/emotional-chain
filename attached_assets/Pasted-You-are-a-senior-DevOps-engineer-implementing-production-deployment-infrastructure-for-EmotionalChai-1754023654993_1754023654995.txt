@@ -1,0 +1,115 @@
+You are a senior DevOps engineer implementing production deployment infrastructure for EmotionalChain, a distributed blockchain with Proof of Emotion consensus. This is NOT a demo, simulation, or mock implementation - this is REAL production infrastructure deployment.
+
+CRITICAL: Use only REAL production values, live data, actual metrics, and genuine operational configurations. No hardcoded demo values, no mock data, no simulation placeholders.
+
+## PRODUCTION DEPLOYMENT REQUIREMENTS
+
+### 1. DATABASE INDEX IMPLEMENTATION (30 minutes)
+- Analyze existing PostgreSQL database schema in shared/schema.ts
+- Identify high-traffic query patterns from consensus operations
+- Create PRODUCTION-GRADE indexes for:
+ * Consensus round lookups (blocks table with height, validator_id, emotional_score)
+ * Active validator queries (validator_states with is_active, emotional_score filters)
+ * Biometric data validation (biometric_data with validator_id, timestamp ranges)
+ * Transaction processing (transactions with block_hash, status, created_at)
+- Use CONCURRENT index creation to avoid blocking live operations
+- Include covering indexes for frequently accessed columns
+- Implement partial indexes for filtered queries (active validators only, recent timestamps)
+
+### 2. KUBERNETES DEPLOYMENT MANIFESTS (2 hours)
+- Create PRODUCTION Kubernetes manifests for multi-region deployment:
+ * StatefulSet for validator nodes (persistent storage, ordered deployment)
+ * Service definitions for P2P networking (TCP 8000, WebSocket 8001)
+ * ConfigMaps for environment-specific configuration
+ * Secrets for database credentials and encryption keys
+ * PersistentVolumeClaims for blockchain data storage
+ * NetworkPolicies for security isolation
+- Configure REAL resource limits based on actual performance benchmarks
+- Implement health checks using existing /health endpoints
+- Set up horizontal pod autoscaling based on consensus load
+- Configure anti-affinity rules for geographic distribution
+
+### 3. MULTI-REGION BOOTSTRAP CONFIGURATION (1 hour)
+- Implement automatic bootstrap peer discovery across AWS regions:
+ * us-west-2 (North America primary)
+ * eu-west-1 (Europe primary) 
+ * ap-southeast-1 (Asia Pacific primary)
+- Configure libp2p bootstrap nodes with REAL IP addresses and peer IDs
+- Implement DNS-based service discovery for dynamic peer resolution
+- Set up cross-region connectivity with proper firewall rules
+- Configure WebRTC STUN/TURN servers for NAT traversal
+- Implement regional failover and automatic peer rotation
+
+### 4. GRAFANA DASHBOARD SETUP (1 hour)
+- Create comprehensive Grafana dashboards using REAL Prometheus metrics from server/monitoring/system-metrics.ts:
+ * Consensus performance: success rates, round duration, validator participation
+ * Network health: connected peers, message throughput, regional distribution
+ * Biometric validation: device readings per second, authenticity scores, error rates
+ * Security monitoring: Byzantine detection alerts, rate limiting violations
+ * System performance: CPU, memory, database connections, disk I/O
+- Configure REAL alerting rules for production incidents
+- Set up notification channels (Slack, PagerDuty, email)
+- Implement SLA monitoring dashboards for uptime tracking
+
+### 5. CI/CD PIPELINE IMPLEMENTATION (3 hours)
+- Create GitHub Actions workflow for automated deployment:
+ * Multi-stage build process (test, security scan, build, deploy)
+ * Automated testing pipeline running the comprehensive test suite
+ * Security scanning with Snyk/Trivy for vulnerabilities
+ * Multi-region deployment with blue-green strategy
+ * Database migration automation with rollback capability
+ * Automated performance testing against production load
+- Implement GitOps deployment with ArgoCD or Flux
+- Set up staging environment for pre-production validation
+- Configure automated rollback triggers based on health metrics
+
+## TECHNICAL CONSTRAINTS
+
+### Database Requirements:
+- Use existing Neon PostgreSQL connection from server/db.ts
+- Query real blockchain data from blocks, transactions, validator_states tables
+- Implement connection pooling for high-throughput operations
+- Use prepared statements for performance optimization
+
+### Networking Requirements:
+- Integrate with existing libp2p P2P networking from network/P2PNode.ts
+- Support WebRTC, TCP, and WebSocket transports
+- Configure DHT-based peer discovery with Kademlia routing
+- Implement pubsub messaging for consensus coordination
+
+### Monitoring Integration:
+- Use existing PrometheusMetrics from server/monitoring/system-metrics.ts
+- Collect REAL metrics from consensus operations, not synthetic values
+- Implement distributed tracing with OpenTelemetry
+- Configure log aggregation with structured JSON logging
+
+### Security Requirements:
+- Implement TLS 1.3 for all network communications
+- Use HashiCorp Vault for secrets management in production
+- Configure RBAC for Kubernetes cluster access
+- Implement network segmentation with proper firewall rules
+
+## SUCCESS CRITERIA
+
+Each component must be:
+✅ Production-ready with real operational data
+✅ Scalable to 1000+ validators across multiple regions  
+✅ Fault-tolerant with automatic failover and recovery
+✅ Monitored with comprehensive observability
+✅ Secure with enterprise-grade authentication and encryption
+✅ Automated with zero-downtime deployment capability
+
+## DELIVERABLES
+
+1. SQL scripts for production database indexes
+2. Complete Kubernetes manifests for multi-region deployment
+3. Bootstrap configuration files with real peer discovery
+4. Grafana dashboard JSON exports with real metric queries
+5. GitHub Actions workflow files for automated CI/CD
+6. Documentation for production deployment procedures
+7. Monitoring and alerting configuration files
+8. Security hardening checklist and implementation
+
+Implement these as PRODUCTION-GRADE infrastructure suitable for processing real blockchain transactions, handling actual validator consensus, and supporting genuine economic activity. No shortcuts, no demo data, no mock implementations.
+
+Execute with the precision and reliability required for financial infrastructure handling millions of dollars in transaction volume.
