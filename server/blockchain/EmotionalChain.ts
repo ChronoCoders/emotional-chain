@@ -39,7 +39,7 @@ export class EmotionalChain extends EventEmitter {
     super();
     // Note: initializeBlockchain is async but we can't await in constructor
     // This will be called immediately but blockchain might not be fully loaded initially
-    this.initializeBlockchain().catch(console.error);
+    this.initializeBlockchain().catch(() => {});
   }
   private async initializeBlockchain() {
     try {

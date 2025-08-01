@@ -14,10 +14,7 @@ export class BootstrapNode {
   }
   public async start(): Promise<void> {
     try {
-      console.log(`EMOTIONALCHAIN BOOTSTRAP NODE
-Port: ${this.port}
-Consensus: Proof of Emotion
-Network: P2P WebSocket`);
+      // EmotionalChain Bootstrap Node started
       // Add a small delay to ensure network is fully initialized
       await new Promise(resolve => setTimeout(resolve, 1000));
       // Start mining with test validators
