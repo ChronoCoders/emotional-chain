@@ -426,7 +426,7 @@ Emotional Profile:
     
     this.heartbeatInterval = setInterval(async () => {
       await this.syncTokenEconomics();
-    }, 5000); // Sync every 5 seconds for real-time updates
+    }, 3000); // Sync every 3 seconds for real-time updates
   }
 
   private async syncTokenEconomics(): Promise<void> {
@@ -441,8 +441,10 @@ Emotional Profile:
           // Force recalculation from actual database transactions instead of blockchain economics
           const currentEconomics = await persistentTokenEconomics.getTokenEconomics();
           if (blockHeight > currentEconomics.lastBlockHeight) {
-            console.log(`Syncing: Block ${currentEconomics.lastBlockHeight} → ${blockHeight}, recalculating from transactions`);
+            console.log(`SYNC: Database block ${currentEconomics.lastBlockHeight} → Blockchain block ${blockHeight} (${blockHeight - currentEconomics.lastBlockHeight} behind)`);
             await persistentTokenEconomics.recalculateFromTransactions();
+            const updated = await persistentTokenEconomics.getTokenEconomics();
+            console.log(`SYNC COMPLETE: Total supply ${updated.totalSupply} EMO at block ${updated.lastBlockHeight}`);
           }
         }
       } catch (error) {
