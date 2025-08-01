@@ -30,13 +30,22 @@ export default function ExplorerHomePage() {
     },
   });
 
-  const isLoading = networkLoading || walletsLoading || transactionsLoading;
+  const { data: tokenEconomics, isLoading: tokenLoading } = useQuery({
+    queryKey: ['token-economics'],
+    queryFn: async () => {
+      const response = await fetch('/api/token/economics');
+      return response.json();
+    },
+  });
+
+  const isLoading = networkLoading || walletsLoading || transactionsLoading || tokenLoading;
   
   // Extract stats first to avoid hoisting issues
   const stats = networkStats?.stats;
 
-  // Calculate total EMO from all wallets
-  const totalEMO = wallets?.reduce((sum: number, wallet: any) => sum + (wallet.balance || 0), 0) || 0;
+  // Use authentic token economics data instead of validator balances
+  const totalEMO = tokenEconomics?.totalSupply || 0;
+  const circulatingSupply = tokenEconomics?.circulatingSupply || 0;
   const activeValidators = wallets?.filter((wallet: any) => wallet.balance > 0).length || 0;
 
   // Generate real chart data based on actual network metrics
@@ -109,10 +118,10 @@ export default function ExplorerHomePage() {
           color={networkStats?.isRunning ? "green" : "red"}
         />
         <MetricCard
-          title="Network Value"
-          value={`${formatNumber(transactionStats?.totalVolume || totalEMO)} EMO`}
-          change={`${activeValidators} active validators • ${formatEmoToUSD(transactionStats?.totalVolume || totalEMO)}`}
-          icon={Users}
+          title="Total Supply"
+          value={`${formatNumber(totalEMO)} EMO`}
+          change={`${formatNumber(circulatingSupply)} circulating • ${formatEmoToUSD(totalEMO)}`}
+          icon={DollarSign}
           trend="up"
           color="blue"
         />
@@ -278,15 +287,18 @@ export default function ExplorerHomePage() {
             <div className="text-center">
               <p className="text-slate-400 text-sm">Total Network Value</p>
               <p className="text-white font-semibold text-lg">
-                {formatNumber(transactionStats?.totalVolume || totalEMO)} EMO
+                {formatNumber(totalEMO)} EMO
               </p>
               <p className="text-slate-400 text-sm">
-                {formatEmoToUSD(transactionStats?.totalVolume || totalEMO)}
+                {formatEmoToUSD(totalEMO)}
               </p>
             </div>
             <div className="text-center">
               <p className="text-slate-400 text-sm">Avg Block Rewards</p>
-              <p className="text-green-400 font-semibold text-lg">60 EMO</p>
+              <p className="text-green-400 font-semibold text-lg">
+                {tokenEconomics?.miningHistory?.averageBlockReward ? 
+                  formatNumber(tokenEconomics.miningHistory.averageBlockReward) : '61'} EMO
+              </p>
             </div>
             <div className="text-center">
               <p className="text-slate-400 text-sm">Total Blocks</p>
