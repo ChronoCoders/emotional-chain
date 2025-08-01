@@ -1,5 +1,6 @@
 // AI Consensus Integration for Anomaly Detection
 import { anomalyDetectionEngine } from './anomaly-detection';
+import { AIFeedbackCollector, ValidatorFeedbackData } from './feedback-collector';
 import { storage } from '../storage';
 import { CONFIG } from '../../shared/config';
 

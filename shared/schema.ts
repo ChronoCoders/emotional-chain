@@ -322,3 +322,6 @@ export const insertConfigSnapshotSchema = createInsertSchema(configSnapshots).om
 });
 export type ConfigSnapshot = typeof configSnapshots.$inferSelect;
 export type InsertConfigSnapshot = z.infer<typeof insertConfigSnapshotSchema>;
+
+// Export AI training schema
+export * from "./ai-training-schema";

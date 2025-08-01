@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import TerminalInterface from "@/pages/terminal";
 import ExplorerApp from "@/pages/explorer/ExplorerApp";
 import AIConsensusPage from "@/pages/AIConsensusPage";
+import AILearningPage from "@/pages/AILearningPage";
 
 function Router() {
   return (
@@ -13,6 +14,7 @@ function Router() {
       <Route path="/explorer" component={ExplorerApp} />
       <Route path="/explorer/*" component={ExplorerApp} />
       <Route path="/ai-consensus" component={AIConsensusPage} />
+      <Route path="/ai-learning" component={AILearningPage} />
       <Route path="/" component={TerminalInterface} />
       <Route component={TerminalInterface} />
     </Switch>

@@ -134,6 +134,26 @@ const SecuritySchema = z.object({
 });
 // AI/ML Configuration Schema
 const AISchema = z.object({
+  enabled: z.boolean().default(true),
+  modelThreshold: z.number().min(0).max(1).default(0.85),
+  useGPU: z.boolean().default(false),
+  batchSize: z.number().positive().default(32),
+  maxPredictionAge: z.number().positive().default(300), // 5 minutes
+  
+  // Learning Configuration
+  enableAutoRetraining: z.boolean().default(true),
+  retrainInterval: z.number().positive().default(24), // hours
+  minTrainingDataSize: z.number().positive().default(100),
+  maxEpochs: z.number().positive().default(50),
+  learningRate: z.number().positive().default(0.001),
+  
+  // Retraining Thresholds
+  retrainThreshold: z.object({
+    fairnessScore: z.number().min(0).max(1).default(0.7),
+    maxBias: z.number().min(0).default(0.3),
+    minAccuracy: z.number().min(0).max(1).default(0.75)
+  }),
+  
   models: z.object({
     emotionalPredictor: z.object({
       threshold: z.number().min(0.0).max(1.0),
@@ -279,6 +299,7 @@ export function validateConfig(config: unknown): EmotionalChainConfig {
     if (error instanceof z.ZodError) {
       console.error('🚨 CONFIGURATION VALIDATION FAILED:');
       error.errors.forEach(err => {
+        console.error(`  ❌ ${err.path.join('.')}: ${err.message}`);
       });
       throw new Error(`Invalid configuration: ${error.errors.length} validation error(s)`);
     }

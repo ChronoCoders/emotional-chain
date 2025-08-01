@@ -148,10 +148,30 @@ export const rawConfig = {
     },
   },
   ai: {
+    enabled: parseBoolean(process.env.AI_ENABLED, true),
+    modelThreshold: parseFloat(process.env.AI_MODEL_THRESHOLD, 0.85),
+    useGPU: parseBoolean(process.env.AI_USE_GPU, false),
+    batchSize: parseInt(process.env.AI_BATCH_SIZE, 32),
+    maxPredictionAge: parseInt(process.env.AI_MAX_PREDICTION_AGE, 300), // 5 minutes
+    
+    // Learning Configuration
+    enableAutoRetraining: parseBoolean(process.env.AI_ENABLE_AUTO_RETRAINING, true),
+    retrainInterval: parseInt(process.env.AI_RETRAIN_INTERVAL, 24), // hours
+    minTrainingDataSize: parseInt(process.env.AI_MIN_TRAINING_DATA_SIZE, 100),
+    maxEpochs: parseInt(process.env.AI_MAX_EPOCHS, 50),
+    learningRate: parseFloat(process.env.AI_LEARNING_RATE, 0.001),
+    
+    // Retraining Thresholds
+    retrainThreshold: {
+      fairnessScore: parseFloat(process.env.AI_RETRAIN_FAIRNESS_THRESHOLD, 0.7),
+      maxBias: parseFloat(process.env.AI_RETRAIN_MAX_BIAS, 0.3),
+      minAccuracy: parseFloat(process.env.AI_RETRAIN_MIN_ACCURACY, 0.75)
+    },
+    
     models: {
       emotionalPredictor: {
         threshold: parseFloat(process.env.AI_EMOTIONAL_THRESHOLD, 0.85),
-        retrainInterval: parseInt(process.env.AI_RETRAIN_INTERVAL, 86400000), // 24 hours
+        retrainInterval: parseInt(process.env.AI_RETRAIN_INTERVAL_MS, 86400000), // 24 hours
         accuracy: parseFloat(process.env.AI_MODEL_ACCURACY, 0.92),
       },
       anomalyDetector: {
@@ -160,8 +180,8 @@ export const rawConfig = {
         modelUpdateFrequency: parseInt(process.env.AI_MODEL_UPDATE_FREQ, 43200000), // 12 hours
       },
       consensusOptimizer: {
-        learningRate: parseFloat(process.env.AI_LEARNING_RATE, 0.001),
-        batchSize: parseInt(process.env.AI_BATCH_SIZE, 64),
+        learningRate: parseFloat(process.env.AI_CONSENSUS_LEARNING_RATE, 0.001),
+        batchSize: parseInt(process.env.AI_CONSENSUS_BATCH_SIZE, 64),
         optimizationInterval: parseInt(process.env.AI_OPTIMIZATION_INTERVAL, 3600000), // 1 hour
       },
     },

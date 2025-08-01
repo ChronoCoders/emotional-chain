@@ -14,6 +14,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Anomaly Detection API
   const aiAnomalyRouter = await import("./routes/ai-anomaly");
   app.use("/api/ai", aiAnomalyRouter.default);
+  
+  // AI Learning and Feedback Loop API
+  const aiLearningRouter = await import("./routes/ai-learning");
+  app.use("/api/ai/learning", aiLearningRouter.default);
   // WebSocket configuration endpoint for client
   app.get("/api/config/websocket", async (req, res) => {
     try {
