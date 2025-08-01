@@ -17,9 +17,9 @@ export class EmotionalChainService {
   private async initializePersistentTokenEconomics() {
     try {
       await persistentTokenEconomics.initialize();
-      console.log('✅ Persistent token economics initialized');
+      console.log('Persistent token economics initialized');
     } catch (error) {
-      console.error('❌ Failed to initialize persistent token economics:', error);
+      console.error('Failed to initialize persistent token economics:', error);
     }
   }
   private async initializeRealBlockchain() {
@@ -448,7 +448,7 @@ Emotional Profile:
             // Update persistent token economics with current circulation
             const currentEconomics = await persistentTokenEconomics.getTokenEconomics();
             if (Math.abs(totalCirculating - currentEconomics.totalSupply) > 0.01) {
-              console.log(`🔄 Syncing token economics: ${currentEconomics.totalSupply} → ${totalCirculating.toFixed(2)} EMO`);
+              console.log(`Syncing token economics: ${currentEconomics.totalSupply} → ${totalCirculating.toFixed(2)} EMO`);
               await this.updatePersistentTokenSupply(totalCirculating, blockHeight);
             }
           }
@@ -467,7 +467,7 @@ Emotional Profile:
       // Update the database directly with current circulation
       await persistentTokenEconomics.updateTokenSupplyFromBlockchain(totalCirculating, blockHeight);
     } catch (error) {
-      console.error('❌ Failed to update persistent token supply:', error);
+      console.error('Failed to update persistent token supply:', error);
     }
   }
   public async startMining(): Promise<any> {
@@ -502,7 +502,7 @@ Emotional Profile:
         
         // Sync if blockchain has more EMO than database
         if (blockchainData.totalSupply > persistentData.totalSupply) {
-          console.log(`🔄 Syncing: Database ${persistentData.totalSupply} → Blockchain ${blockchainData.totalSupply} EMO`);
+          console.log(`Syncing: Database ${persistentData.totalSupply} → Blockchain ${blockchainData.totalSupply} EMO`);
           
           const networkStats = this.network?.getNetworkStats();
           const blockHeight = networkStats?.blockHeight || 0;
@@ -517,7 +517,7 @@ Emotional Profile:
       // Return updated persistent data
       return await persistentTokenEconomics.getTokenEconomics();  
     } catch (error) {
-      console.error('❌ Failed to get token economics:', error);
+      console.error('Failed to get token economics:', error);
       
       // Fallback to blockchain data if available
       if (this.bootstrapNode && this.isRunning) {

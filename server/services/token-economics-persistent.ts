@@ -48,14 +48,14 @@ export class PersistentTokenEconomics {
           minimumValidatorStake: "10000",
           lastBlockHeight: 0
         });
-        console.log('✅ Initialized fresh token economics state');
+        console.log('Initialized fresh token economics state');
       } else {
-        console.log('✅ Loaded existing token economics from database');
+        console.log('Loaded existing token economics from database');
       }
 
       this.initialized = true;
     } catch (error) {
-      console.error('❌ Failed to initialize token economics:', error);
+      console.error('Failed to initialize token economics:', error);
       throw error;
     }
   }
@@ -124,7 +124,7 @@ export class PersistentTokenEconomics {
         }
       };
     } catch (error) {
-      console.error('❌ Failed to get token economics:', error);
+      console.error('Failed to get token economics:', error);
       throw error;
     }
   }
@@ -186,9 +186,9 @@ export class PersistentTokenEconomics {
         }
       });
 
-      console.log(`💰 Issued ${rewardAmount} EMO to ${validatorId} for block ${blockHeight}`);
+      console.log(`Issued ${rewardAmount} EMO to ${validatorId} for block ${blockHeight}`);
     } catch (error) {
-      console.error('❌ Failed to issue block reward:', error);
+      console.error('Failed to issue block reward:', error);
       throw error;
     }
   }
@@ -205,7 +205,7 @@ export class PersistentTokenEconomics {
 
       return validator ? parseFloat(validator.balance) : 0;
     } catch (error) {
-      console.error(`❌ Failed to get balance for ${validatorId}:`, error);
+      console.error(`Failed to get balance for ${validatorId}:`, error);
       return 0;
     }
   }
@@ -224,7 +224,7 @@ export class PersistentTokenEconomics {
       
       return balances;
     } catch (error) {
-      console.error('❌ Failed to get all validator balances:', error);
+      console.error('Failed to get all validator balances:', error);
       return new Map();
     }
   }
@@ -287,7 +287,7 @@ export class PersistentTokenEconomics {
         return true;
       });
     } catch (error) {
-      console.error(`❌ Failed to transfer EMO from ${from} to ${to}:`, error);
+      console.error(`Failed to transfer EMO from ${from} to ${to}:`, error);
       return false;
     }
   }
@@ -396,9 +396,9 @@ export class PersistentTokenEconomics {
           });
       });
 
-      console.log(`💰 Updated token supply to ${totalCirculating.toFixed(2)} EMO at block ${blockHeight} (${blockHeight - parseInt((await this.getTokenEconomics()).genesisBlockHeight || '0')} blocks mined)`);
+      console.log(`Updated token supply to ${totalCirculating.toFixed(2)} EMO at block ${blockHeight} (${blockHeight - parseInt((await this.getTokenEconomics()).genesisBlockHeight || '0')} blocks mined)`);
     } catch (error) {
-      console.error('❌ Failed to update token supply from blockchain:', error);
+      console.error('Failed to update token supply from blockchain:', error);
       throw error;
     }
   }
