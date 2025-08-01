@@ -43,7 +43,7 @@ export class SystemMetrics {
       const [networkStatus, blockStats, transactionStats] = await Promise.all([
         emotionalChainService.getNetworkStatus(),
         pool.query('SELECT COUNT(*) as total_blocks, MAX(height) as current_height, MAX(timestamp) as last_timestamp FROM blocks WHERE created_at >= NOW() - INTERVAL \'24 hours\''),
-        pool.query('SELECT COUNT(*) as total_transactions FROM transactions WHERE status = \'confirmed\' AND "createdAt" >= NOW() - INTERVAL \'24 hours\'')
+        pool.query('SELECT COUNT(*) as total_transactions FROM transactions WHERE status = \'confirmed\' AND created_at >= NOW() - INTERVAL \'24 hours\'')
       ]);
 
       const blockData = blockStats.rows[0];
@@ -147,7 +147,7 @@ export class SystemMetrics {
   }> {
     try {
       const networkStatus = await emotionalChainService.getNetworkStatus();
-      const validators = networkStatus.validators;
+      const validators = networkStatus.validators || [];
       
       let activeCount = 0;
       
@@ -224,7 +224,7 @@ export class SystemMetrics {
   }> {
     try {
       // Get real block data to estimate consensus rounds
-      const blockQuery = 'SELECT height, timestamp, validator_id, emotional_score, consensus_score FROM blocks ORDER BY height DESC LIMIT 10';
+      const blockQuery = 'SELECT height, timestamp, validator_id, emotional_score FROM blocks ORDER BY height DESC LIMIT 10';
       const result = await pool.query(blockQuery);
       const recentBlocks = result.rows;
       
@@ -245,7 +245,7 @@ export class SystemMetrics {
         endTime: parseInt(block.timestamp),
         participants: networkStatus.validators.filter(v => v.isActive).length,
         success: true, // These are successful blocks, so consensus succeeded
-        consensusScore: parseFloat(block.consensus_score) || consensusPercentage * 100
+        consensusScore: parseFloat(block.emotional_score) || consensusPercentage * 100
       }));
       
       return {
@@ -275,7 +275,7 @@ export class SystemMetrics {
       const [networkStatus, blockResult, transactionResult] = await Promise.all([
         emotionalChainService.getNetworkStatus(),
         pool.query('SELECT MAX(height) as block_height, MAX(timestamp) as last_block_timestamp, COUNT(*) as blocks_today FROM blocks WHERE created_at >= NOW() - INTERVAL \'24 hours\''),
-        pool.query('SELECT COUNT(*) as transactions_today FROM transactions WHERE "createdAt" >= NOW() - INTERVAL \'24 hours\'')
+        pool.query('SELECT COUNT(*) as transactions_today FROM transactions WHERE created_at >= NOW() - INTERVAL \'24 hours\'')
       ]);
       
       const blockStats = blockResult.rows[0];
