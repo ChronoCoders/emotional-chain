@@ -110,13 +110,13 @@ export class PersistentTokenEconomics {
         
         // Complete mining history from genesis to present (calculated from actual blockchain data)
         miningHistory: {
-          genesisBlockHeight: 4432, // First mined block in this session
+          genesisBlockHeight: 1, // True genesis block
           currentBlockHeight: parseInt(economics.lastBlockHeight || '0'),
-          totalBlocksMined: Math.max(0, parseInt(economics.lastBlockHeight || '0') - 4432),
+          totalBlocksMined: Math.max(0, parseInt(economics.lastBlockHeight || '0')),
           totalMiningRewards: parseFloat(economics.totalSupply || '0'),
           circulatingSupply: parseFloat(economics.circulatingSupply || '0'),
-          averageBlockReward: (parseInt(economics.lastBlockHeight || '0') - 4432) > 0 ? 
-            parseFloat(economics.totalSupply || '0') / (parseInt(economics.lastBlockHeight || '0') - 4432) : 0,
+          averageBlockReward: parseInt(economics.lastBlockHeight || '0') > 0 ? 
+            parseFloat(economics.totalSupply || '0') / parseInt(economics.lastBlockHeight || '0') : 0,
           miningStartTimestamp: '2025-08-01T21:47:00.000Z', // Approximate start time
           miningDurationSeconds: Math.floor((Date.now() - new Date('2025-08-01T21:47:00.000Z').getTime()) / 1000),
           miningStatus: 'ACTIVE',
@@ -396,7 +396,7 @@ export class PersistentTokenEconomics {
           });
       });
 
-      console.log(`Updated token supply to ${totalCirculating.toFixed(2)} EMO at block ${blockHeight} (${blockHeight - parseInt((await this.getTokenEconomics()).genesisBlockHeight || '0')} blocks mined)`);
+      console.log(`Updated token supply to ${totalCirculating.toFixed(2)} EMO at block ${blockHeight} (${blockHeight} blocks mined)`);
     } catch (error) {
       console.error('Failed to update token supply from blockchain:', error);
       throw error;
