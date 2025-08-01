@@ -7,6 +7,8 @@ import TerminalInterface from "@/pages/terminal";
 import ExplorerApp from "@/pages/explorer/ExplorerApp";
 import AIConsensusPage from "@/pages/AIConsensusPage";
 import AILearningPage from "@/pages/AILearningPage";
+import MonitoringDashboard from "@/pages/MonitoringDashboard";
+import PrivacyDashboard from "@/pages/PrivacyDashboard";
 
 function Router() {
   return (
@@ -15,6 +17,8 @@ function Router() {
       <Route path="/explorer/*" component={ExplorerApp} />
       <Route path="/ai-consensus" component={AIConsensusPage} />
       <Route path="/ai-learning" component={AILearningPage} />
+      <Route path="/monitoring" component={MonitoringDashboard} />
+      <Route path="/privacy" component={PrivacyDashboard} />
       <Route path="/" component={TerminalInterface} />
       <Route component={TerminalInterface} />
     </Switch>

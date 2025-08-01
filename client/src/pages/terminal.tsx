@@ -47,12 +47,26 @@ export default function Terminal() {
         <div className="terminal-window rounded-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
             <AsciBanner className="flex-1" />
-            <Link href="/explorer">
-              <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-4 py-2 text-terminal-success font-mono text-sm transition-colors cursor-pointer flex items-center gap-2">
-                <ExternalLink size={16} />
-                PUBLIC EXPLORER
-              </div>
-            </Link>
+            <div className="flex gap-2">
+              <Link href="/privacy">
+                <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
+                  <ExternalLink size={14} />
+                  PRIVACY
+                </div>
+              </Link>
+              <Link href="/monitoring">
+                <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
+                  <ExternalLink size={14} />
+                  MONITORING
+                </div>
+              </Link>
+              <Link href="/explorer">
+                <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
+                  <ExternalLink size={14} />
+                  EXPLORER
+                </div>
+              </Link>
+            </div>
           </div>
           
           {/* System Status */}

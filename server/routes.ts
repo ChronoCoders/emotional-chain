@@ -18,6 +18,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // AI Learning and Feedback Loop API
   const aiLearningRouter = await import("./routes/ai-learning-simple");
   app.use("/api/ai/learning", aiLearningRouter.default);
+  
+  // Privacy Layer API
+  const privacyRouter = await import("./routes/privacy");
+  app.use("/api/privacy", privacyRouter.default);
+  
+  // Monitoring Dashboard API
+  const monitoringRouter = await import("./routes/monitoring");
+  app.use("/api/monitoring", monitoringRouter.default);
   // WebSocket configuration endpoint for client
   app.get("/api/config/websocket", async (req, res) => {
     try {

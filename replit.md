@@ -1,41 +1,10 @@
-# EmotionalChain
+# EmotionalChain - Proof of Emotion Blockchain
 
 ## Overview
 
-EmotionalChain is a revolutionary blockchain platform implementing "Proof of Emotion" consensus, where validators participate in consensus based on verified biometric and emotional data rather than traditional computational work or stake. The system combines real-time biometric monitoring, Byzantine fault-tolerant consensus, and a comprehensive full-stack architecture with React frontend, Express backend, and PostgreSQL database.
+EmotionalChain is a revolutionary blockchain platform that implements Proof of Emotion (PoE) consensus, using real-time biometric data from validators to secure the network. The system combines traditional blockchain technology with emotional authenticity verification through heart rate monitors, stress detectors, and focus measurement devices. This creates a unique consensus mechanism where validators must maintain optimal emotional states to participate in block validation and earn rewards.
 
-The platform features advanced capabilities including quantum-resistant cryptography, cross-chain bridges, smart contracts with emotional triggers, privacy layers with zero-knowledge proofs, and AI-enhanced consensus optimization. It provides a complete SDK ecosystem for developers to build emotion-aware decentralized applications.
-
-## Recent Changes
-
-### Production Readiness Improvements (August 2025)
-- **Comprehensive Codebase Sanitization**: Eliminated over 2000+ verbose console.log statements across the server codebase for production readiness
-- **Bootstrap Node Optimization**: Fixed malformed "NODErver" log statement and cleaned bootstrap display process  
-- **Error Handling Enhancement**: Replaced console.error calls with proper error handling patterns
-- **Performance Optimization**: Removed excessive logging that was impacting system performance
-- **Clean Architecture**: Maintained functionality while achieving zero verbose logging in server files
-- **System Status**: EmotionalChain bootstrap node operational on port 5000 with 21 active validators and 3200+ blocks
-
-### AI Consensus Anomaly Detection Implementation (August 2025)
-- **TensorFlow.js Integration**: Deployed baseline neural network model for real-time emotional pattern anomaly detection
-- **Advanced Detection Engine**: 6-feature input model (emotional score, consensus score, authenticity, deviation, time patterns, historical variance)
-- **Consensus Integration**: AI-driven validator weight adjustments based on anomaly confidence levels
-- **Real-time Analysis**: Live consensus round validation with automatic risk assessment and recommendations
-- **Neural Architecture**: Multi-layer network (32→16→8 neurons) with ReLU activation and sigmoid output for anomaly probability
-- **Dynamic Learning**: Continuous model retraining with rolling window of emotional pattern data
-- **Production APIs**: Full REST API suite for AI status monitoring, consensus analysis, and model management
-- **Frontend Dashboard**: Comprehensive React interface at /ai-consensus for real-time AI metrics and anomaly visualization
-
-### AI Feedback Loop & Learning Adaptation Layer (August 2025)
-- **Self-Improving AI System**: Implemented dynamic learning with emotion-label snapshots and validator outcome feedback
-- **Training Events Database**: New `ai_training_events` table logging validator performance vs anomaly predictions for ground truth learning
-- **AI Model Retrainer**: Advanced TensorFlow.js retraining module with transfer learning and performance metrics tracking
-- **Feedback Collection System**: Automated collection of consensus round outcomes, reward fairness, and emotional drift data
-- **Learning Scheduler**: Configurable CRON-based retraining with threshold-based triggers and performance monitoring
-- **Adaptive Model Updates**: Real-time model deployment with bias reduction and fairness optimization algorithms
-- **Comprehensive Metrics**: Accuracy, precision, recall, F1-score, reward fairness, and bias tracking across training rounds
-- **Learning Dashboard**: React interface at /ai-learning for monitoring training progress, feedback collection, and model performance
-- **Zero-Hardcoded Configuration**: All learning parameters configurable via centralized config system with validation
+The platform features a full-stack architecture with a React frontend, Express.js backend, PostgreSQL database, and comprehensive P2P networking capabilities. The system integrates advanced features like quantum-resistant cryptography, cross-chain bridges, AI-powered anomaly detection, and privacy-preserving zero-knowledge proofs.
 
 ## User Preferences
 
@@ -44,85 +13,78 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
-- **Framework**: React with TypeScript and Vite build system
-- **UI Components**: Shadcn/ui component library built on Radix UI primitives
+- **Framework**: React with TypeScript using Vite for development and building
+- **UI Components**: Shadcn/ui component library with Radix UI primitives
 - **Styling**: Tailwind CSS with custom design tokens and dark mode support
-- **State Management**: React hooks with custom SDK integration
-- **Real-time Updates**: WebSocket connections for live consensus data
+- **State Management**: Built-in React hooks with RxJS for reactive data streams
+- **Path Aliases**: Configured for clean imports (@/, @shared/, @assets/)
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js framework
-- **Language**: TypeScript with strict type checking
-- **API Design**: RESTful endpoints with WebSocket support for real-time features
-- **Consensus Engine**: Custom Proof of Emotion algorithm with Byzantine fault tolerance
-- **P2P Networking**: libp2p-based distributed networking with multiple transport protocols
+- **Server Framework**: Express.js with TypeScript in ESM module format
+- **Database ORM**: Drizzle ORM with PostgreSQL using Neon serverless database
+- **API Design**: RESTful API with WebSocket support for real-time communication
+- **Consensus Engine**: Custom Proof of Emotion implementation with Byzantine fault tolerance
+- **P2P Networking**: Libp2p-based networking stack supporting TCP, WebSockets, and WebRTC
 
-### Biometric Integration Layer
-- **Device Support**: Multi-device biometric monitoring (heart rate, stress, focus, EEG)
-- **Authentication**: Cryptographic proof generation from biometric data
-- **Real-time Processing**: Continuous emotional score calculation and validation
-- **Anti-gaming Measures**: Device fingerprinting and authenticity verification
+### Blockchain Core Components
+- **Consensus Algorithm**: Proof of Emotion with emotional scoring and biometric validation
+- **Block Structure**: Traditional blockchain blocks enhanced with emotional metadata
+- **Transaction System**: EMO token transfers with biometric authentication requirements
+- **Validator Management**: Dynamic validator selection based on emotional fitness scores
+- **Staking Mechanism**: Stake-weighted consensus with emotional multipliers
 
-### Consensus Mechanism
-- **Algorithm**: Proof of Emotion with dynamic validator selection
-- **Committee Management**: Rotating validator committees with anti-collusion mechanisms
-- **Voting System**: Three-phase consensus (PROPOSE → VOTE → COMMIT)
-- **Fork Resolution**: Automatic detection and resolution of chain forks
-- **Reward Distribution**: Emotional performance-based reward calculation
+### Biometric Integration
+- **Device Support**: Heart rate monitors, stress detectors, EEG focus monitors
+- **Authentication**: Multi-factor biometric authentication with authenticity proofs
+- **Data Processing**: Real-time biometric data fusion and quality assessment
+- **Privacy Protection**: Zero-knowledge proofs for biometric data privacy
 
-### Data Storage Solutions
-- **Primary Database**: PostgreSQL with Drizzle ORM for schema management
-- **Blockchain Storage**: Persistent block and transaction storage with ACID guarantees
-- **State Management**: Real-time validator state tracking and consensus snapshots
-- **Caching Layer**: In-memory caching for performance optimization
-- **Backup System**: Automated backup with cross-region replication
-
-### Cryptographic Layer
-- **Key Management**: Elliptic curve cryptography (secp256k1) with biometric-secured wallets
-- **Transaction Signing**: Digital signatures with biometric proof integration
-- **Merkle Trees**: Efficient transaction verification and block validation
+### Advanced Features
+- **AI Integration**: Machine learning for anomaly detection and consensus optimization
 - **Quantum Resistance**: Post-quantum cryptographic algorithms for future security
+- **Cross-Chain Bridges**: Multi-chain interoperability with emotional data preservation
+- **Privacy Layer**: Zero-knowledge proofs and ring signatures for transaction privacy
+- **Smart Contracts**: EVM-compatible contracts with biometric triggers
 
-### Network Layer
-- **P2P Protocol**: Multi-transport networking (TCP, WebSockets, WebRTC)
-- **Peer Management**: Dynamic peer discovery and reputation tracking
-- **Block Propagation**: Efficient block distribution across the network
-- **Consensus Broadcasting**: Real-time emotional data sharing between validators
-
-### Configuration Management
-- **Centralized Config**: Single source of truth with strict Zod validation
+### Configuration System
+- **Centralized Config**: Comprehensive configuration with Zod schema validation
 - **Environment Overrides**: All parameters configurable via environment variables
-- **Runtime Validation**: Fail-fast configuration validation with detailed error reporting
-- **Audit Logging**: Configuration change tracking and snapshot history
+- **Runtime Validation**: Type-safe configuration with bounds checking
+- **Audit Logging**: Configuration changes tracked for compliance
 
 ## External Dependencies
 
 ### Cloud Infrastructure
-- **AWS Services**: EC2 for compute, ECS for containerization, S3 for object storage
-- **Google Cloud**: Compute Engine, Cloud Storage, and Monitoring services
-- **Neon Database**: Serverless PostgreSQL with automatic scaling
+- **Neon Database**: Serverless PostgreSQL for production data storage
+- **AWS SDK**: EC2, ECS, and S3 services for cloud deployment and storage
+- **Google Cloud**: Compute, Storage, and Monitoring services integration
 
-### Blockchain & Crypto
-- **Polkadot API**: Cross-chain interoperability and substrate integration
-- **Web3 Libraries**: Ethereum compatibility and multi-chain support
-- **Elliptic Cryptography**: ECDSA signature generation and verification
+### Blockchain and Crypto
+- **Elliptic Cryptography**: secp256k1 curve for key generation and signing
+- **Polkadot API**: Integration with Polkadot ecosystem for cross-chain features
+- **Web3**: Ethereum ecosystem compatibility and smart contract interaction
+
+### P2P Networking
+- **Libp2p**: Modular peer-to-peer networking stack with multiple transport protocols
+- **DHT and Discovery**: Kad-DHT for peer discovery and content routing
+- **PubSub**: Floodsub protocol for message broadcasting across the network
+
+### AI and Machine Learning
+- **TensorFlow.js**: Node.js machine learning for anomaly detection and consensus optimization
+- **Real-time Analytics**: Performance monitoring and pattern recognition
+
+### Development and Monitoring
+- **OpenTelemetry**: Distributed tracing and performance monitoring
+- **Replit Integration**: Development environment with live collaboration features
+- **TypeScript**: Full type safety across frontend, backend, and shared modules
 
 ### Biometric Hardware
-- **Bluetooth LE**: Heart rate monitors and fitness devices
-- **USB/Serial**: Medical-grade biometric sensors
-- **WebRTC**: Camera-based biometric capture for web applications
+- **Bluetooth LE**: Heart rate monitor and wearable device communication
+- **USB/Serial**: Direct connection to specialized biometric equipment
+- **WebRTC**: Browser-based biometric data streaming for web validators
 
-### Development & Monitoring
-- **OpenTelemetry**: Distributed tracing and performance monitoring
-- **Microsoft API Extractor**: TypeScript API documentation generation
-- **Babel**: JavaScript/TypeScript compilation and optimization
-
-### UI & Frontend
-- **Radix UI**: Accessible component primitives
-- **React Hook Form**: Form validation with Joi schema integration
-- **Tailwind CSS**: Utility-first styling with custom design system
-
-### Networking & P2P
-- **libp2p**: Modular peer-to-peer networking stack
-- **Multiple Transports**: TCP, WebSockets, WebRTC for diverse connectivity
-- **DHT & PubSub**: Distributed hash table and publish-subscribe messaging
+### SDK and Developer Tools
+- **React SDK**: React hooks and components for dApp development
+- **WebSocket SDK**: Real-time data streaming and event subscriptions
+- **Testing Framework**: Comprehensive testing utilities with mock data generation
+- **Wallet Integration**: Biometric wallet with secure key storage
