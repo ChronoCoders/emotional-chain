@@ -136,9 +136,9 @@ router.get('/feedback', async (req, res) => {
     let query = db.select().from(aiTrainingEvents);
     
     if (processed === 'true') {
-      query = query.where(sql`feedback_processed = true`);
+      query = query.where(sql`processed = true`);
     } else if (processed === 'false') {
-      query = query.where(sql`feedback_processed = false`);
+      query = query.where(sql`processed = false`);
     }
     
     const events = await query
@@ -147,11 +147,10 @@ router.get('/feedback', async (req, res) => {
       .offset(parseInt(offset as string));
 
     // Get feedback statistics
-    const [totalEvents, processedEvents, avgFairness, avgDrift] = await Promise.all([
+    const [totalEvents, processedEvents, avgFairness] = await Promise.all([
       db.select({ count: count() }).from(aiTrainingEvents),
-      db.select({ count: count() }).from(aiTrainingEvents).where(sql`feedback_processed = true`),
-      db.select({ avg: sql<number>`avg(reward_fairness)` }).from(aiTrainingEvents).where(sql`reward_fairness IS NOT NULL`),
-      db.select({ avg: sql<number>`avg(emotion_drift)` }).from(aiTrainingEvents).where(sql`emotion_drift IS NOT NULL`)
+      db.select({ count: count() }).from(aiTrainingEvents).where(sql`processed = true`),
+      db.select({ avg: sql<number>`avg(fairness_score)` }).from(aiTrainingEvents).where(sql`fairness_score IS NOT NULL`)
     ]);
 
     res.json({

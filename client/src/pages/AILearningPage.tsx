@@ -113,7 +113,7 @@ export default function AILearningPage() {
           <CardContent>
             <div className="text-2xl font-bold">
               {learningStatus?.latestMetrics ? 
-                `${(learningStatus.latestMetrics.accuracy * 100).toFixed(1)}%` : 
+                `${(parseFloat(learningStatus.latestMetrics.accuracy) * 100).toFixed(1)}%` : 
                 'N/A'
               }
             </div>
@@ -158,7 +158,7 @@ export default function AILearningPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Average Accuracy</span>
                   <Badge variant="outline">
-                    {(metricsData.summary.averageAccuracy * 100).toFixed(1)}%
+                    {(parseFloat(metricsData.summary.averageAccuracy) * 100).toFixed(1)}%
                   </Badge>
                 </div>
               </div>
@@ -167,7 +167,7 @@ export default function AILearningPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Reward Fairness</span>
                   <Badge variant="outline">
-                    {(metricsData.summary.averageFairness * 100).toFixed(1)}%
+                    {(parseFloat(metricsData.summary.averageFairness) * 100).toFixed(1)}%
                   </Badge>
                 </div>
               </div>
@@ -175,8 +175,8 @@ export default function AILearningPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Bias Score</span>
-                  <Badge variant={metricsData.summary.averageBias > 0.3 ? 'destructive' : 'secondary'}>
-                    {metricsData.summary.averageBias.toFixed(3)}
+                  <Badge variant={parseFloat(metricsData.summary.averageBias) > 0.3 ? 'destructive' : 'secondary'}>
+                    {parseFloat(metricsData.summary.averageBias).toFixed(3)}
                   </Badge>
                 </div>
               </div>
@@ -239,7 +239,7 @@ export default function AILearningPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">Avg Fairness</span>
                   <Badge variant="outline">
-                    {(feedbackData.summary.averageFairness * 100).toFixed(1)}%
+                    {(parseFloat(feedbackData.summary.averageFairness) * 100).toFixed(1)}%
                   </Badge>
                 </div>
               </div>
@@ -271,24 +271,24 @@ export default function AILearningPage() {
               {metricsData.metrics.slice(0, 5).map((metric: any, index: number) => (
                 <div key={metric.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline">v{metric.modelVersion}</Badge>
-                    <span className="text-sm font-medium">Round {metric.trainingRound}</span>
+                    <Badge variant="outline">v{metric.model_version}</Badge>
+                    <span className="text-sm font-medium">Round {metric.training_round}</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <div className="text-sm font-medium">
-                        Accuracy: {(metric.accuracy * 100).toFixed(1)}%
+                        Accuracy: {(parseFloat(metric.accuracy) * 100).toFixed(1)}%
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {metric.epochs} epochs, {metric.trainingDataSize} samples
+                        {metric.epochs} epochs, {metric.training_data_size} samples
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-medium">
-                        Fairness: {(metric.rewardFairnessScore * 100).toFixed(1)}%
+                        Fairness: {(parseFloat(metric.reward_fairness_score) * 100).toFixed(1)}%
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Bias: {metric.biasScore.toFixed(3)}
+                        Bias: {parseFloat(metric.bias_score).toFixed(3)}
                       </div>
                     </div>
                   </div>
