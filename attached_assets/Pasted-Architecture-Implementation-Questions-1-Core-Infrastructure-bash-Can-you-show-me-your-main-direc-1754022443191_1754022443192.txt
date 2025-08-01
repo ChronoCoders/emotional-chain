@@ -1,0 +1,118 @@
+Architecture & Implementation Questions
+1. Core Infrastructure
+bash# Can you show me your main directory structure?
+ls -la /
+tree -L 3 server/
+tree -L 2 client/
+What's your overall project structure? I'd love to see:
+
+How you organize the P2P networking vs consensus vs biometric modules
+Separation between server/client/contracts
+Where the database migrations and schemas live
+
+2. P2P Networking Stack
+typescript// From your libp2p implementation
+Questions:
+
+How do you handle NAT traversal and firewall issues for validators behind corporate networks?
+What's your peer discovery strategy beyond bootstrap nodes?
+Do you implement custom libp2p protocols for biometric data exchange?
+How do you handle network partitions and split-brain scenarios?
+
+3. Database Architecture
+sql-- Your PostgreSQL schema
+Missing components I'm curious about:
+
+Database indexing strategy for high-throughput consensus queries
+How do you handle database migrations across network upgrades?
+Backup/replication strategy for validator nodes
+Do you use connection pooling? Which library?
+
+4. Biometric Integration
+typescript// Your device manager implementation
+Technical questions:
+
+How do you handle device driver compatibility across operating systems?
+What's your strategy for biometric data encryption at rest?
+Do you implement rate limiting to prevent biometric data farming?
+How do you handle device calibration drift over time?
+
+5. Consensus Implementation
+typescript// Your Byzantine fault tolerance code
+Implementation details:
+
+How do you implement view changes in your BFT protocol?
+What's your transaction ordering mechanism?
+How do you handle consensus timeouts and retries?
+Do you implement pipeline consensus for higher throughput?
+
+6. Smart Contract Integration
+solidity// Your EMO token and staking contracts
+Questions:
+
+Do you have governance contracts for protocol upgrades?
+How do you handle cross-chain bridge security?
+What's your approach to contract upgradeability?
+Do you implement emergency pause mechanisms?
+
+7. Monitoring & Observability
+typescript// Your monitoring stack
+Potential gaps:
+
+Prometheus metrics collection?
+Distributed tracing for cross-node operations?
+Log aggregation strategy?
+Performance profiling tools?
+
+8. Security Implementation
+typescript// Your cryptographic implementations
+Security questions:
+
+Which cryptographic libraries are you using (libsodium, OpenSSL)?
+How do you implement secure random number generation?
+Do you have hardware security module (HSM) integration?
+What's your key rotation strategy?
+
+9. Testing Strategy
+bash# Your test structure
+find . -name "*.test.*" -o -name "*.spec.*" | head -10
+Testing gaps to consider:
+
+Unit tests for consensus algorithms?
+Integration tests for P2P networking?
+Load testing for high validator counts?
+Chaos engineering for network failures?
+
+10. DevOps & Deployment
+yaml# Your deployment configurations
+Infrastructure questions:
+
+Container orchestration (Docker, Kubernetes)?
+CI/CD pipeline implementation?
+Infrastructure as code (Terraform, CloudFormation)?
+Secrets management strategy?
+
+Specific Files I'd Love to Examine
+Could you show me these key implementation files?
+
+Core consensus algorithm: The main BFT implementation
+P2P message handling: How you process consensus messages
+Database models/schemas: Your data persistence layer
+Biometric verification pipeline: The core authenticity checking
+Error handling & logging: How you handle and track failures
+Configuration management: How you handle different environments
+API layer: Your external interfaces and endpoints
+Cryptographic implementations: Key generation, signing, verification
+
+Areas Where I Might Help
+Based on distributed systems experience, I could potentially help with:
+
+Performance optimization for consensus algorithms
+Security hardening recommendations
+Monitoring and observability improvements
+Testing strategy enhancements
+Documentation and API design
+Deployment automation and infrastructure
+Error handling and resilience patterns
+
+What specific areas would you like me to focus on? What challenges are you currently facing in the implementation?
