@@ -2,6 +2,10 @@
 import * as tf from '@tensorflow/tfjs-node';
 import { CONFIG } from '../../shared/config';
 
+// Suppress TensorFlow.js optimization messages
+tf.env().set('WEBGL_CPU_FORWARD', false);
+tf.enableProdMode();
+
 interface EmotionalPattern {
   validatorId: string;
   emotionalScore: number;

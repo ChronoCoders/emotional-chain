@@ -1,3 +1,6 @@
+// Suppress TensorFlow.js verbose logging
+process.env.TF_CPP_MIN_LOG_LEVEL = '2';
+
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
