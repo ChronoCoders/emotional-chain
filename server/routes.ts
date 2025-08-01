@@ -10,6 +10,10 @@ import { CONFIG } from "../shared/config";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Internal configuration management API (admin-only)
   app.use("/internal", configRouter);
+
+  // AI Anomaly Detection API
+  const aiAnomalyRouter = await import("./routes/ai-anomaly");
+  app.use("/api/ai", aiAnomalyRouter.default);
   // WebSocket configuration endpoint for client
   app.get("/api/config/websocket", async (req, res) => {
     try {
