@@ -65,7 +65,7 @@ export class SystemMetrics {
       const successfulRounds = Math.floor(estimatedRounds * consensusPercentage);
       
       // Calculate average block time
-      const averageBlockTime = CONFIG.consensus.timing.blockTime;
+      const averageBlockTime = CONFIG.consensus.blockTime || 5000;
       const lastBlockTimestamp = parseInt(blockData.last_timestamp) || Date.now();
 
       // Determine health status based on real metrics
@@ -237,7 +237,7 @@ export class SystemMetrics {
       const failedRounds = totalRounds - successfulRounds;
       
       // Real average round time based on block intervals
-      const averageRoundTime = CONFIG.consensus.timing.blockTime / 2; // Half block time per round
+      const averageRoundTime = (CONFIG.consensus.blockTime || 5000) / 2; // Half block time per round
       
       const recentRounds = recentBlocks.slice(0, 10).map((block, i) => ({
         roundId: `round-${block.height}-${i}`,
@@ -287,7 +287,7 @@ export class SystemMetrics {
       const transactionsToday = parseInt(transactionStats.transactions_today) || 0;
       
       // Calculate real metrics
-      const averageBlockTime = CONFIG.consensus.timing.blockTime;
+      const averageBlockTime = CONFIG.consensus.blockTime || 5000;
       const transactionThroughput = blocksToday > 0 ? transactionsToday / (24 * 60 * 60) : 0; // TPS over 24 hours
       const networkHashrate = networkStatus.validators.length * 500; // Estimate based on validators
       
