@@ -37,8 +37,8 @@ export class P2PNode extends EventEmitter {
   constructor(config: P2PConfig) {
     super();
     this.config = {
-      maxConnections: 12,
-      minConnections: 8,
+      maxConnections: 50, // Increased for production scale
+      minConnections: 20, // Higher minimum for resilience
       enableWebRTC: true,
       enableTCP: true,
       enableWebSockets: true,
@@ -91,6 +91,13 @@ export class P2PNode extends EventEmitter {
         }),
         pubsub: floodsub(),
         connectionManager: {
+          maxConnections: this.config.maxConnections,
+          minConnections: this.config.minConnections,
+          autoDial: true,
+          autoDialInterval: 10000, // Auto-dial every 10 seconds
+          dialTimeout: 30000 // 30 second dial timeout
+        },
+        connectionGater: {
           maxConnections: this.config.maxConnections,
           minConnections: this.config.minConnections,
           autoDialInterval: 10000, // Try to maintain connections every 10s
