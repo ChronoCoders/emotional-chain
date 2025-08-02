@@ -2,12 +2,37 @@
 process.env.TF_CPP_MIN_LOG_LEVEL = '2';
 
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { CONFIG } from "../shared/config";
+import security from "./middleware/security";
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// Configure Express to trust proxy (required for rate limiting in Replit)
+app.set('trust proxy', 1);
+
+// Apply CORS first for development compatibility
+app.use(cors({
+  origin: true, // Allow all origins in development
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Signature', 'X-Nonce']
+}));
+
+// Apply security headers (development-safe configuration)
+app.use(security.securityHeaders);
+
+// Security middleware
+app.use(security.securityLogger);
+app.use(security.sanitizeQuery);
+
+// Rate limiting for API routes (more lenient for development)
+app.use('/api/', security.apiRateLimit);
+
+// Standard middleware
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
