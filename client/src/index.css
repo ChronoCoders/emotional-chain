@@ -208,7 +208,6 @@
 .block-3d-container {
   transform-style: preserve-3d;
   animation: blockFloat 4s ease-in-out infinite;
-  transform: rotateX(-15deg) rotateY(25deg);
 }
 
 .block-3d {
@@ -292,10 +291,10 @@
 
 @keyframes blockFloat {
   0%, 100% { 
-    transform: rotateX(-15deg) rotateY(25deg) translateY(0px);
+    transform: translateY(0px);
   }
   50% { 
-    transform: rotateX(-12deg) rotateY(28deg) translateY(-10px);
+    transform: translateY(-10px);
   }
 }
 
@@ -354,8 +353,8 @@
 }
 
 @keyframes autoRotate {
-  from { transform: rotateX(-15deg) rotateY(25deg); }
-  to { transform: rotateX(-15deg) rotateY(385deg); }
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
 }
 
 @keyframes latestBlockPulse {

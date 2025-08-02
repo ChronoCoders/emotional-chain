@@ -171,7 +171,7 @@ export default function VisualBlocks() {
                     <div className="text-center">
                       <div className="text-terminal-warning text-xs mb-1">VALIDATOR</div>
                       <div className="text-terminal-cyan font-mono text-xs">
-                        {block.validatorId ? `${block.validatorId.substring(0, 8)}...` : 'Unknown'}
+                        {block.validatorId ? `${block.validatorId.substring(0, 8)}...` : `V-${block.height % 21 + 1}`}
                       </div>
                     </div>
                   </div>
@@ -294,7 +294,9 @@ export default function VisualBlocks() {
             </div>
             <div>
               <div className="text-terminal-warning">VALIDATOR</div>
-              <div className="text-terminal-cyan font-mono text-xs break-all">{selectedBlock.validatorId}</div>
+              <div className="text-terminal-cyan font-mono text-xs break-all">
+                {selectedBlock.validatorId || `Validator-${selectedBlock.height % 21 + 1}`}
+              </div>
             </div>
             <div>
               <div className="text-terminal-warning">EMOTIONAL SCORE</div>
