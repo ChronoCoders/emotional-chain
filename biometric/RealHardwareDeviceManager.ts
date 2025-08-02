@@ -28,10 +28,10 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
   /**
    * Discover real biometric devices using Web Bluetooth and USB APIs
    */
-  async discoverDevices(): Promise<void> {
+  async discoverDevices(): Promise<DeviceConfig[]> {
     if (this.deviceDiscoveryActive) {
       console.log('Device discovery already in progress...');
-      return;
+      return [];
     }
 
     this.deviceDiscoveryActive = true;
@@ -49,6 +49,9 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
     } finally {
       this.deviceDiscoveryActive = false;
     }
+    
+    // Return discovered device configs
+    return Array.from(super.getDevices().values()).map(device => device.getConfig());
   }
 
   /**
@@ -163,6 +166,7 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
         id: `usb-${deviceId}`,
         name: `USB ${deviceType} Device`,
         type: deviceType,
+        connectionType: 'usb',
         address: deviceId
       };
 
@@ -191,7 +195,10 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
     ];
 
     for (const deviceConfig of mockDevices) {
-      await this.createRealDevice(deviceConfig);
+      await this.createRealDevice({
+        ...deviceConfig,
+        connectionType: 'usb'
+      });
     }
   }
 
@@ -226,6 +233,7 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
       id: `webrtc-${mediaDevice.deviceId}`,
       name: `Camera ${type} Detection`,
       type,
+      connectionType: 'webcam',
       address: mediaDevice.deviceId
     };
 
@@ -241,6 +249,7 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
         id: device.id,
         name: device.name || `${type} Device`,
         type,
+        connectionType: 'bluetooth',
         address: device.id
       };
 

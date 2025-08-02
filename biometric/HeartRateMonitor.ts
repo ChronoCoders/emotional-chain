@@ -12,9 +12,10 @@ export class HeartRateMonitor extends BiometricDevice {
   private lastHeartRate: number = 0;
   private rrBuffer: number[] = [];
   private maxRRBuffer = 100;
-  private heartRateService: BluetoothRemoteGATTService | null = null;
-  private measurementCharacteristic: BluetoothRemoteGATTCharacteristic | null = null;
-  private batteryService: BluetoothRemoteGATTService | null = null;
+  private heartRateService: any = null;
+  private measurementCharacteristic: any = null;
+  private batteryService: any = null;
+  protected device: any = null;
 
   constructor(config: DeviceConfig) {
     super(config);
@@ -24,6 +25,10 @@ export class HeartRateMonitor extends BiometricDevice {
    * Connect to real Bluetooth LE heart rate monitor
    */
   public async connect(): Promise<boolean> {
+    return this.establishConnection();
+  }
+
+  public async establishConnection(): Promise<boolean> {
     if (this.config.connectionType === 'bluetooth') {
       return this.connectBluetooth();
     } else if (this.config.connectionType === 'usb') {
@@ -32,8 +37,20 @@ export class HeartRateMonitor extends BiometricDevice {
     return false;
   }
 
+  public async closeConnection(): Promise<void> {
+    if (this.device && this.device.gatt && this.device.gatt.connected) {
+      this.device.gatt.disconnect();
+    }
+    this.status.connected = false;
+  }
+
   private async connectBluetooth(): Promise<boolean> {
     try {
+      if (!navigator?.bluetooth) {
+        console.error('Web Bluetooth not supported');
+        return false;
+      }
+
       // Connect to real Bluetooth LE heart rate service
       const device = await navigator.bluetooth.requestDevice({
         filters: [{ services: ['heart_rate'] }],
@@ -74,7 +91,7 @@ export class HeartRateMonitor extends BiometricDevice {
   }
 
   private handleHeartRateChange(event: Event): void {
-    const characteristic = event.target as BluetoothRemoteGATTCharacteristic;
+    const characteristic = event.target as any;
     const value = characteristic.value!;
     const heartRateData = this.parseHeartRateData(value);
     this.processRealHeartRateData(heartRateData.heartRate, heartRateData.rrIntervals);

@@ -324,33 +324,7 @@ export class FocusMonitor extends BiometricDevice {
     this.device = null;
   }
 
-  /**
-   * Read focus data from device
-   */
-  protected async readData(): Promise<BiometricReading> {
-    if (!this.device || !this.device.connected) {
-      throw new Error('EEG device not connected');
-    }
 
-    // Return the last processed EEG data
-    const rawEEG = this.generateRealisticEEGData();
-    const eegData = this.processRealEEGSignal(rawEEG);
-    
-    return {
-      value: eegData.focusScore,
-      quality: this.calculateEEGQuality(rawEEG),
-      timestamp: Date.now(),
-      metadata: {
-        alpha: eegData.alpha,
-        beta: eegData.beta,
-        theta: eegData.theta,
-        gamma: eegData.gamma,
-        delta: eegData.delta,
-        meditation: eegData.meditationScore,
-        attention: eegData.attention
-      }
-    };
-  }
   /**
    * Calibrate baseline brain activity using real EEG data
    */

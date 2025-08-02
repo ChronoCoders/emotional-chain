@@ -63,7 +63,7 @@ export class StressDetector extends BiometricDevice {
    * Connect to Empatica E4 wristband via Web Bluetooth
    */
   private async connectEmpaticaE4(): Promise<void> {
-    const device = await navigator.bluetooth.requestDevice({
+    const device = await navigator.bluetooth!.requestDevice({
       filters: [{ namePrefix: 'Empatica' }],
       optionalServices: ['0000180f-0000-1000-8000-00805f9b34fb'] // Battery service
     });
@@ -249,28 +249,7 @@ export class StressDetector extends BiometricDevice {
     this.temperatureSensor = null;
   }
 
-  /**
-   * Read stress data from devices
-   */
-  protected async readData(): Promise<BiometricReading> {
-    if (!this.device || !this.device.connected) {
-      throw new Error('Stress detection device not connected');
-    }
 
-    const stressData = this.measureRealStressLevels();
-    
-    return {
-      value: stressData.stressLevel,
-      quality: stressData.confidence,
-      timestamp: Date.now(),
-      metadata: {
-        hrv: stressData.hrvScore,
-        gsr: stressData.gsrValue,
-        temperature: stressData.skinTemperature,
-        respiratoryRate: stressData.respiratoryRate
-      }
-    };
-  }
 
   /**
    * Establish stress baseline for personalized measurements using real sensor data
@@ -615,14 +594,15 @@ export class StressDetector extends BiometricDevice {
       high: Math.max(0, Math.min(100, high)),
       critical: 90 // Fixed critical threshold
     };
-    this.config = { ...this.config, stressThresholds: thresholds };
+    // Store thresholds in device config (extended)
+    (this.config as any).stressThresholds = thresholds;
     console.log(` Stress thresholds configured:`, thresholds);
   }
   /**
    * Get current stress state classification
    */
   public getStressState(): 'relaxed' | 'moderate' | 'high' | 'critical' {
-    const thresholds = this.config.stressThresholds || { relaxed: 25, moderate: 50, high: 75 };
+    const thresholds = (this.config as any).stressThresholds || { relaxed: 25, moderate: 50, high: 75 };
     if (this.lastStressLevel >= 90) return 'critical';
     if (this.lastStressLevel >= thresholds.high) return 'high';
     if (this.lastStressLevel >= thresholds.moderate) return 'moderate';
