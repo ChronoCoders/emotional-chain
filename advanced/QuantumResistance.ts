@@ -97,11 +97,11 @@ export class QuantumResistanceManager extends EventEmitter {
 
   public async generateQuantumKeyPair(
     validatorId: string,
-    algorithm: string = 'CRYSTALS-Dilithium',
+    algorithm: string = 'ECDSA-secp256k1',
     securityLevel: number = 256
   ): Promise<{ success: boolean; keyPair?: QuantumKeyPair; message: string }> {
     try {
-      console.log(`Generating quantum-resistant key pair for ${validatorId}`);
+      console.log(`Generating cryptographic key pair using ${algorithm} for ${validatorId}`);
       
       // Generate real cryptographic key pair using Node.js crypto
       const keyPair = crypto.generateKeyPairSync('ec', {
@@ -129,7 +129,7 @@ export class QuantumResistanceManager extends EventEmitter {
       return {
         success: true,
         keyPair: storedKeyPair,
-        message: `Quantum-resistant key pair generated with ${algorithm}`
+        message: `Cryptographic key pair generated with ${algorithm}`
       };
     } catch (error) {
       console.error('Quantum key generation failed:', error);
