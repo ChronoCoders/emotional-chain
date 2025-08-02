@@ -55,7 +55,7 @@ app.use((req, res, next) => {
   const port = parseInt(process.env.PORT || CONFIG.network.ports.http.toString(), 10);
   server.listen({
     port,
-    host: CONFIG.network.hosts.http,
+    host: '0.0.0.0',
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);

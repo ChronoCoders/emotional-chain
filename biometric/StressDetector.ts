@@ -70,6 +70,14 @@ export class StressDetector extends BiometricDevice {
 
     const server = await device.gatt!.connect();
     
+    // Connect to GSR service and characteristic  
+    const gsrService = await server.getPrimaryService('0x2A56'); // GSR Service UUID
+    this.gsrSensor = await gsrService.getCharacteristic('0x2A57'); // GSR Characteristic UUID
+    
+    // Connect to temperature service and characteristic
+    const tempService = await server.getPrimaryService('0x1809'); // Health Thermometer Service
+    this.temperatureSensor = await tempService.getCharacteristic('0x2A1C'); // Temperature Measurement Characteristic
+    
     this.device = {
       id: device.id,
       name: device.name || 'Empatica E4 Wristband',

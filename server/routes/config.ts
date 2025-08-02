@@ -3,7 +3,7 @@
  * Admin-only endpoints for configuration inspection and management
  */
 import { Router } from 'express';
-import { CONFIG, configHelpers } from '../../shared/config';
+import { CONFIG } from '../../shared/config';
 // Config audit and fuzzer removed for production
 const router = Router();
 // Middleware for admin authentication (simplified for demo)

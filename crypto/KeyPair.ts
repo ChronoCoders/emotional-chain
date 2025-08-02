@@ -1,76 +1,192 @@
-import elliptic from 'elliptic';
-import * as crypto from 'crypto';
-const { ec: EC } = elliptic;
-export class KeyPair {
-  private ec: elliptic.ec;
-  private keyPair: elliptic.ec.KeyPair;
-  constructor(privateKey?: string) {
+import { randomBytes, createHash, createSign, createVerify } from 'crypto';
+import { ec as EC } from 'elliptic';
+
+export interface KeyPair {
+  publicKey: string;
+  privateKey: string;
+}
+
+export interface Signature {
+  r: string;
+  s: string;
+  recoveryParam?: number;
+}
+
+/**
+ * Cryptographic key pair management for biometric wallet
+ * Uses secp256k1 elliptic curve for blockchain compatibility
+ */
+export class BiometricKeyPair {
+  private ec: EC;
+  private keyPair: EC.KeyPair | null = null;
+
+  constructor() {
     this.ec = new EC('secp256k1');
-    if (privateKey) {
-      this.keyPair = this.ec.keyFromPrivate(privateKey, 'hex');
-    } else {
-      this.keyPair = this.ec.genKeyPair();
+  }
+
+  /**
+   * Generate new key pair from secure random entropy
+   */
+  generateKeyPair(): KeyPair {
+    const entropy = randomBytes(32);
+    this.keyPair = this.ec.genKeyPair({ entropy });
+
+    return {
+      publicKey: this.keyPair.getPublic('hex'),
+      privateKey: this.keyPair.getPrivate('hex')
+    };
+  }
+
+  /**
+   * Generate deterministic key pair from biometric seed
+   */
+  generateFromBiometric(biometricSeed: Buffer): KeyPair {
+    // Hash biometric data to create deterministic seed
+    const hash = createHash('sha256').update(biometricSeed).digest();
+    this.keyPair = this.ec.keyFromPrivate(hash);
+
+    return {
+      publicKey: this.keyPair.getPublic('hex'),
+      privateKey: this.keyPair.getPrivate('hex')
+    };
+  }
+
+  /**
+   * Load existing key pair
+   */
+  loadKeyPair(privateKey: string): KeyPair {
+    this.keyPair = this.ec.keyFromPrivate(privateKey, 'hex');
+
+    return {
+      publicKey: this.keyPair.getPublic('hex'),
+      privateKey: this.keyPair.getPrivate('hex')
+    };
+  }
+
+  /**
+   * Sign data with private key
+   */
+  sign(data: Buffer): Signature {
+    if (!this.keyPair) {
+      throw new Error('Key pair not initialized');
     }
+
+    const hash = createHash('sha256').update(data).digest();
+    const signature = this.keyPair.sign(hash);
+
+    return {
+      r: signature.r.toString('hex'),
+      s: signature.s.toString('hex'),
+      recoveryParam: signature.recoveryParam
+    };
   }
+
   /**
-   * Get the private key as hex string
+   * Verify signature with public key
    */
-  public getPrivateKey(): string {
-    return this.keyPair.getPrivate('hex');
-  }
-  /**
-   * Get the public key as hex string
-   */
-  public getPublicKey(): string {
-    return this.keyPair.getPublic('hex');
-  }
-  /**
-   * Generate wallet address from public key (Ethereum-style)
-   * Format: 0x[40-char-hex]
-   */
-  public getAddress(): string {
-    const publicKey = this.keyPair.getPublic().encode('hex', false);
-    // Remove '04' prefix and take last 40 chars after keccak256
-    const publicKeyWithoutPrefix = publicKey.slice(2);
-    const hash = crypto.createHash('sha256').update(Buffer.from(publicKeyWithoutPrefix, 'hex')).digest('hex');
-    return '0x' + hash.slice(-40);
-  }
-  /**
-   * Sign a message or transaction hash
-   */
-  public sign(messageHash: string): string {
-    const signature = this.keyPair.sign(messageHash, 'hex');
-    return signature.toDER('hex');
-  }
-  /**
-   * Verify a signature against a message hash and public key
-   */
-  public static verify(messageHash: string, signature: string, publicKey: string): boolean {
+  verify(data: Buffer, signature: Signature, publicKey?: string): boolean {
     try {
-      const ec = new EC('secp256k1');
-      const key = ec.keyFromPublic(publicKey, 'hex');
-      return key.verify(messageHash, signature);
+      const pubKey = publicKey ? this.ec.keyFromPublic(publicKey, 'hex') : this.keyPair;
+      if (!pubKey) {
+        throw new Error('Public key not available');
+      }
+
+      const hash = createHash('sha256').update(data).digest();
+      return pubKey.verify(hash, {
+        r: signature.r,
+        s: signature.s,
+        recoveryParam: signature.recoveryParam
+      });
     } catch (error) {
       console.error('Signature verification failed:', error);
       return false;
     }
   }
+
   /**
-   * Verify signature using this keypair's public key
+   * Get blockchain address from public key
    */
-  public verifySignature(messageHash: string, signature: string): boolean {
-    return KeyPair.verify(messageHash, signature, this.getPublicKey());
+  getAddress(): string {
+    if (!this.keyPair) {
+      throw new Error('Key pair not initialized');
+    }
+
+    const publicKey = this.keyPair.getPublic('hex');
+    const hash = createHash('sha256').update(Buffer.from(publicKey, 'hex')).digest();
+    const ripemd = createHash('ripemd160').update(hash).digest();
+    
+    return '0x' + ripemd.toString('hex').slice(0, 40);
   }
+
   /**
-   * Create KeyPair from existing private key
+   * Export public key in multiple formats
    */
-  public static fromPrivateKey(privateKey: string): KeyPair {
-    return new KeyPair(privateKey);
+  exportPublicKey(format: 'hex' | 'pem' | 'compressed' = 'hex'): string {
+    if (!this.keyPair) {
+      throw new Error('Key pair not initialized');
+    }
+
+    switch (format) {
+      case 'hex':
+        return this.keyPair.getPublic('hex');
+      case 'compressed':
+        return this.keyPair.getPublic(true, 'hex');
+      case 'pem':
+        // Convert to PEM format for compatibility
+        const publicKeyHex = this.keyPair.getPublic('hex');
+        return `-----BEGIN PUBLIC KEY-----\n${Buffer.from(publicKeyHex, 'hex').toString('base64')}\n-----END PUBLIC KEY-----`;
+      default:
+        throw new Error(`Unsupported format: ${format}`);
+    }
   }
+
   /**
-   * Generate a random KeyPair
+   * Create shared secret for ECDH key exchange
    */
-  public static generate(): KeyPair {
-    return new KeyPair();
+  createSharedSecret(otherPublicKey: string): Buffer {
+    if (!this.keyPair) {
+      throw new Error('Key pair not initialized');
+    }
+
+    const otherKey = this.ec.keyFromPublic(otherPublicKey, 'hex');
+    const shared = this.keyPair.derive(otherKey.getPublic());
+    
+    return Buffer.from(shared.toString(16).padStart(64, '0'), 'hex');
+  }
+
+  /**
+   * Validate key pair integrity
+   */
+  validateKeyPair(): boolean {
+    if (!this.keyPair) {
+      return false;
+    }
+
+    try {
+      // Test signing and verification
+      const testData = Buffer.from('test-validation-data', 'utf8');
+      const signature = this.sign(testData);
+      return this.verify(testData, signature);
+    } catch (error) {
+      console.error('Key pair validation failed:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Clear sensitive key material from memory
+   */
+  destroy(): void {
+    if (this.keyPair) {
+      // Zero out private key in memory (best effort)
+      const privKey = this.keyPair.getPrivate();
+      if (privKey) {
+        // @ts-ignore - Accessing internal structure to clear
+        privKey.words?.fill(0);
+      }
+      this.keyPair = null;
+    }
   }
 }
+
+export default BiometricKeyPair;

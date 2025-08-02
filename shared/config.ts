@@ -1,98 +1,247 @@
 /**
- * EmotionalChain Production Configuration System
- * Enterprise-grade centralized configuration with validation and auditability
- * 
- * Features:
- * - Strict Zod schema validation with runtime type safety
- * - Environment variable override support for all parameters
- * - Audit logging and historical config snapshots
- * - Fuzz testing capabilities for parameter validation
- * - Zero hardcoded values enforcement
+ * EmotionalChain Configuration
+ * Centralized configuration for biometric validation, consensus, and security
  */
-import { validateConfig, type EmotionalChainConfig } from './config.schema';
-import { rawConfig } from './config.env';
-// Validate and export the final configuration
-export const CONFIG: EmotionalChainConfig = validateConfig(rawConfig);
-// Export helper functions for dynamic configuration access
-export const configHelpers = {
-  getRequiredValidators: (totalValidators: number): number => {
-    return Math.ceil(totalValidators * CONFIG.consensus.quorum.ratio);
-  },
-  getDynamicTimeout: (baseTimeout: number, networkLoad: number = 1.0): number => {
-    return Math.min(baseTimeout * networkLoad, baseTimeout * 3); // Max 3x base timeout
-  },
-  getScaledThreshold: (threshold: number, scaleFactor: number = 1.0): number => {
-    return Math.max(threshold * scaleFactor, threshold * 0.5); // Min 50% of base threshold
-  },
-  validateConfigChange: (newConfig: Partial<EmotionalChainConfig>): boolean => {
-    try {
-      const mergedConfig = { ...rawConfig, ...newConfig };
-      validateConfig(mergedConfig);
-      return true;
-    } catch {
-      return false;
+
+export interface BiometricConfig {
+  validation: {
+    minimumDevices: number;
+    maximumDevices: number;
+    requiredAccuracy: number;
+    dataRetentionDays: number;
+  };
+  thresholds: {
+    heartRate: {
+      min: number;
+      max: number;
+      optimalMin: number;
+      optimalMax: number;
+    };
+    stressLevel: {
+      min: number;
+      max: number;
+      alertThreshold: number;
+    };
+    focusScore: {
+      min: number;
+      max: number;
+      requiredMinimum: number;
+    };
+    authenticity: {
+      minimumScore: number;
+      livenessThreshold: number;
+    };
+  };
+  devices: {
+    bluetooth: {
+      connectionTimeout: number;
+      maxRetries: number;
+      scanDuration: number;
+    };
+    usb: {
+      pollInterval: number;
+      connectionTimeout: number;
+    };
+  };
+}
+
+export interface ConsensusConfig {
+  algorithm: 'proof-of-emotion';
+  blockTime: number; // seconds
+  validators: {
+    minimum: number;
+    maximum: number;
+    rotationInterval: number;
+  };
+  thresholds: {
+    emotionalScore: number;
+    participationRate: number;
+    consensusQuorum: number;
+  };
+  rewards: {
+    baseReward: number;
+    emotionalBonus: number;
+    stabilityBonus: number;
+  };
+}
+
+export interface SecurityConfig {
+  encryption: {
+    algorithm: string;
+    keyLength: number;
+    ivLength: number;
+  };
+  attestation: {
+    maxFailedAttempts: number;
+    attestationInterval: number;
+    requiredSecurityLevel: 'basic' | 'enhanced' | 'hardware_backed';
+  };
+  rateLimit: {
+    maxReadingsPerMinute: number;
+    maxAttemptsPerHour: number;
+  };
+}
+
+export interface NetworkConfig {
+  p2p: {
+    port: number;
+    maxPeers: number;
+    bootstrapNodes: string[];
+  };
+  api: {
+    port: number;
+    corsOrigins: string[];
+    rateLimit: number;
+  };
+  websocket: {
+    port: number;
+    heartbeatInterval: number;
+    maxConnections: number;
+  };
+}
+
+export interface AIConfig {
+  models: {
+    anomalyDetector: {
+      sensitivity: number;
+      threshold: number;
+      learningRate: number;
+    };
+    emotionalAnalyzer: {
+      windowSize: number;
+      confidence: number;
+    };
+  };
+  tensorflow: {
+    backend: 'cpu' | 'webgl' | 'nodejs';
+    precision: 'float32' | 'float16';
+  };
+}
+
+export interface EmotionalChainConfig {
+  biometric: BiometricConfig;
+  consensus: ConsensusConfig;
+  security: SecurityConfig;
+  network: NetworkConfig;
+  ai: AIConfig;
+  environment: 'development' | 'staging' | 'production';
+}
+
+export const CONFIG: EmotionalChainConfig = {
+  biometric: {
+    validation: {
+      minimumDevices: 2,
+      maximumDevices: 6,
+      requiredAccuracy: 0.85,
+      dataRetentionDays: 30
+    },
+    thresholds: {
+      heartRate: {
+        min: 40,
+        max: 200,
+        optimalMin: 60,
+        optimalMax: 100
+      },
+      stressLevel: {
+        min: 0,
+        max: 100,
+        alertThreshold: 80
+      },
+      focusScore: {
+        min: 0,
+        max: 100,
+        requiredMinimum: 40
+      },
+      authenticity: {
+        minimumScore: 0.7,
+        livenessThreshold: 0.8
+      }
+    },
+    devices: {
+      bluetooth: {
+        connectionTimeout: 10000,
+        maxRetries: 3,
+        scanDuration: 5000
+      },
+      usb: {
+        pollInterval: 1000,
+        connectionTimeout: 5000
+      }
     }
   },
+  consensus: {
+    algorithm: 'proof-of-emotion',
+    blockTime: 30,
+    validators: {
+      minimum: 3,
+      maximum: 21,
+      rotationInterval: 300 // 5 minutes
+    },
+    thresholds: {
+      emotionalScore: 75,
+      participationRate: 0.67,
+      consensusQuorum: 0.67
+    },
+    rewards: {
+      baseReward: 10,
+      emotionalBonus: 5,
+      stabilityBonus: 3
+    }
+  },
+  security: {
+    encryption: {
+      algorithm: 'aes-256-gcm',
+      keyLength: 32,
+      ivLength: 16
+    },
+    attestation: {
+      maxFailedAttempts: 3,
+      attestationInterval: 3600000, // 1 hour
+      requiredSecurityLevel: 'enhanced'
+    },
+    rateLimit: {
+      maxReadingsPerMinute: 60,
+      maxAttemptsPerHour: 100
+    }
+  },
+  network: {
+    p2p: {
+      port: 8000,
+      maxPeers: 50,
+      bootstrapNodes: [
+        '/ip4/127.0.0.1/tcp/8001/p2p/12D3KooWBootstrap1',
+        '/ip4/127.0.0.1/tcp/8002/p2p/12D3KooWBootstrap2'
+      ]
+    },
+    api: {
+      port: 5000,
+      corsOrigins: ['http://localhost:3000', 'https://*.replit.app'],
+      rateLimit: 100
+    },
+    websocket: {
+      port: 8080,
+      heartbeatInterval: 30000,
+      maxConnections: 1000
+    }
+  },
+  ai: {
+    models: {
+      anomalyDetector: {
+        sensitivity: 0.75,
+        threshold: 0.8,
+        learningRate: 0.01
+      },
+      emotionalAnalyzer: {
+        windowSize: 10,
+        confidence: 0.85
+      }
+    },
+    tensorflow: {
+      backend: 'nodejs',
+      precision: 'float32'
+    }
+  },
+  environment: (process.env.NODE_ENV as any) || 'development'
 };
-// Re-export types for convenience
-export type { EmotionalChainConfig } from './config.schema';
-// Configuration enforcement policy
-export const CONFIG_ENFORCEMENT = {
-  POLICY: "If it can't be set through CONFIG, it doesn't exist.",
-  VERSION: "2.0.0",
-  VALIDATION_REQUIRED: true,
-  AUDIT_ENABLED: true,
-  FUZZ_TESTING_ENABLED: true,
-} as const;
-// Configuration change validation helper
-export function enforceConfigValidation(operation: string, newConfig?: Partial<EmotionalChainConfig>): void {
-  if (!CONFIG_ENFORCEMENT.VALIDATION_REQUIRED) return;
-  console.log(` CONFIG ENFORCEMENT: Validating ${operation}`);
-  if (newConfig && !configHelpers.validateConfigChange(newConfig)) {
-    throw new Error(`Configuration validation failed for operation: ${operation}`);
-  }
-}
-// Configuration validation and startup checks
-function validateStartupConfiguration(): void {
-  console.log(' Validating EmotionalChain configuration...');
-  try {
-    // Validate the configuration on startup
-    validateConfig(CONFIG);
-    // Additional WebSocket configuration validation
-    if (!CONFIG.network.protocols.websocket.fallbackHost || CONFIG.network.protocols.websocket.fallbackHost === 'undefined') {
-      throw new Error('WebSocket fallback host cannot be undefined or empty');
-    }
-    if (!CONFIG.network.protocols.websocket.fallbackPort || CONFIG.network.protocols.websocket.fallbackPort < 1024) {
-      throw new Error('WebSocket fallback port must be a valid port number (>= 1024)');
-    }
-    if (CONFIG.network.protocols.websocket.retryLimit <= 0) {
-      throw new Error('WebSocket retry limit must be greater than 0');
-    }
-    // Log key configuration values
-    console.log(`   Consensus Quorum: ${CONFIG.consensus.quorum.ratio * 100}%`);
-    console.log(`   Block Time: ${CONFIG.consensus.timing.blockTime}s`);
-    console.log(`   Emotional Threshold: ${CONFIG.consensus.thresholds.emotionalScore}`);
-    console.log(`   AI Model Threshold: ${CONFIG.ai.models.emotionalPredictor.threshold}`);
-    console.log(`   TLS Required: ${CONFIG.network.protocols.tls.required}`);
-    console.log(`   Ports: HTTP=${CONFIG.network.ports.http}, P2P=${CONFIG.network.ports.p2p}, WS=${CONFIG.network.ports.websocket}`);
-    console.log(`   WebSocket Fallback: ${CONFIG.network.protocols.websocket.fallbackHost}:${CONFIG.network.protocols.websocket.fallbackPort}`);
-    console.log(`   WebSocket Retry Limit: ${CONFIG.network.protocols.websocket.retryLimit}`);
-  } catch (error) {
-    console.error('EmotionalChain cannot start with invalid configuration');
-    process.exit(1);
-  }
-}
-// Run startup validation
-validateStartupConfiguration();
-// Export configuration sections for specific use cases
-export const consensusConfig = CONFIG.consensus;
-export const networkConfig = CONFIG.network;
-export const biometricConfig = CONFIG.biometric;
-export const securityConfig = CONFIG.security;
-export const aiConfig = CONFIG.ai;
-export const infrastructureConfig = CONFIG.infrastructure;
-export const storageConfig = CONFIG.storage;
-export const performanceConfig = CONFIG.performance;
-export const sdkConfig = CONFIG.sdk;
-export const auditConfig = CONFIG.audit;
-export const smartContractsConfig = CONFIG.smartContracts;
+
+export default CONFIG;
