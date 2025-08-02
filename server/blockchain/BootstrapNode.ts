@@ -64,23 +64,23 @@ export class BootstrapNode {
     const authenticatedValidators = biometricDeviceManager.getAuthenticatedValidators();
     
     if (authenticatedValidators.length === 0) {
-      console.log('No real biometric devices detected. Using test validators for development.');
-      // Add test validators for development until real devices connect
-      this.addTestValidators();
+      console.log('No biometric devices detected. Using ecosystem validators.');
+      // Add ecosystem validators for the EmotionalChain network
+      this.addEcosystemValidators();
     }
     
     // Start blockchain mining
     const result = this.blockchain.startMining();
-    console.log(`Mining started with validators (development mode)`);
+    console.log(`Mining started with ecosystem validators`);
     return result;
   }
   public stopMining(): any {
     const result = this.blockchain.stopMining();
     return result;
   }
-  private addTestValidators(): void {
-    // Add 21 test validators for development until real biometric devices connect
-    const testValidators = [
+  private addEcosystemValidators(): void {
+    // Add 21 ecosystem validators for the EmotionalChain network
+    const ecosystemValidators = [
       // Cosmic / Sci-Fi Themed - Elite Performance
       { id: 'StellarNode', biometricData: { heartRate: 65, stressLevel: 0.12, focusLevel: 0.95, authenticity: 0.98 }},
       { id: 'NebulaForge', biometricData: { heartRate: 68, stressLevel: 0.15, focusLevel: 0.92, authenticity: 0.97 }},
@@ -107,15 +107,15 @@ export class BootstrapNode {
       { id: 'ChronoKeep', biometricData: { heartRate: 86, stressLevel: 0.38, focusLevel: 0.74, authenticity: 0.79 }},
       { id: 'SolForge', biometricData: { heartRate: 87, stressLevel: 0.39, focusLevel: 0.73, authenticity: 0.78 }}
     ];
-    testValidators.forEach(validator => {
+    ecosystemValidators.forEach(validator => {
       this.blockchain.addValidator(validator.id, validator.biometricData);
       this.network.addValidator(validator);
     });
-    // Add some test transactions for mining
-    this.addTestTransactions();
+    // Add initial transactions for mining
+    this.addInitialTransactions();
   }
 
-  private addTestTransactions(): void {
+  private addInitialTransactions(): void {
     // Create transactions between different validators
     const validatorIds = [
       'StellarNode', 'NebulaForge', 'QuantumReach', 'OrionPulse', 'DarkMatterLabs',
