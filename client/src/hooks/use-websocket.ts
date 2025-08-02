@@ -39,7 +39,7 @@ async function getWebSocketConfig(): Promise<WebSocketConfig> {
       reconnectAttempts: 5,
       reconnectDelay: 2000,
       fallbackHost: 'localhost',
-      fallbackPort: 8080,
+      fallbackPort: 5000,
       retryLimit: 10,
       exponentialBackoffEnabled: true,
       maxBackoffDelay: 30000,
@@ -97,17 +97,16 @@ export function useWebSocket(): UseWebSocketReturn {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         let wsUrl: string;
         if (useFallback) {
-          const fallbackPort = config.fallbackPort || 8080;
-          wsUrl = `${protocol}//${config.fallbackHost || 'localhost'}:${fallbackPort}/ws`;
+          wsUrl = `${protocol}//${config.fallbackHost || 'localhost'}:5000/ws`;
         } else {
           const hostname = window.location.hostname;
           const port = window.location.port;
-          // For Replit domains, don't specify port - use same as current page
-          if (hostname.includes('.replit.dev') || hostname.includes('.repl.co')) {
+          // For Replit domains, don't specify port - use same as current page  
+          if (hostname.includes('.replit.dev') || hostname.includes('.repl.co') || hostname.includes('.replit.app')) {
             wsUrl = `${protocol}//${hostname}/ws`;
           } else {
-            // For localhost development
-            wsUrl = port ? `${protocol}//${hostname}:${port}/ws` : `${protocol}//${hostname}:5000/ws`;
+            // For localhost development - use port 5000 (same as HTTP server)
+            wsUrl = `${protocol}//${hostname}:5000/ws`;
           }
         }
         const socket = new WebSocket(wsUrl);
@@ -125,6 +124,7 @@ export function useWebSocket(): UseWebSocketReturn {
             }
           } catch (error) {
             console.error('Error parsing WebSocket message:', error);
+            // Don't treat parsing errors as connection failures
           }
         };
         socket.onclose = (event) => {
@@ -146,10 +146,12 @@ export function useWebSocket(): UseWebSocketReturn {
           }
         };
         socket.onerror = (error) => {
+          console.warn('WebSocket error occurred:', error);
           setIsConnected(false);
           stopHeartbeat();
         };
       } catch (error) {
+        console.warn('WebSocket connection failed:', error);
         if (retryCountRef.current < config.retryLimit) {
           const delay = calculateBackoffDelay(retryCountRef.current);
           retryCountRef.current++;

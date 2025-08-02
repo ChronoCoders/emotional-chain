@@ -249,7 +249,7 @@ export const CONFIG: EmotionalChainConfig = {
     },
     ports: {
       http: 5000,
-      websocket: 8080
+      websocket: 5000 // Same port as HTTP server with /ws path
     }
   },
   ai: {
