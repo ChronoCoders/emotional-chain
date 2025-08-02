@@ -103,16 +103,32 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
   private async scanForDeviceType(filters: any[]): Promise<any[]> {
     const devices: any[] = [];
     
+    if (!navigator.bluetooth) {
+      throw new Error('Web Bluetooth not supported in this browser');
+    }
+    
     for (const filter of filters) {
       try {
-        // Note: Web Bluetooth requires user gesture to request devices
-        // In production, this would be triggered by user interaction
-        console.log('Bluetooth scanning requires user interaction in browser');
+        // Scan for devices matching the filter criteria
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [filter],
+          optionalServices: ['heart_rate', '0x180F', '0x180A'] // HR, Battery, Device Info
+        });
+        
+        if (device) {
+          devices.push({
+            id: device.id,
+            name: device.name || 'Unknown Device',
+            bluetoothDevice: device,
+            filter: filter
+          });
+        }
       } catch (error) {
-        console.log('Bluetooth scan filter failed:', filter);
+        console.warn('Bluetooth scan filter failed:', filter, error);
+        // Continue scanning with other filters
       }
     }
-
+    
     return devices;
   }
 

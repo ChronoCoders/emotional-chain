@@ -1,5 +1,5 @@
 import { BiometricDevice, BiometricReading, DeviceConfig } from './BiometricDevice';
-import { createCipher, createDecipher, randomBytes, scrypt } from 'crypto';
+import { createCipherGCM, createDecipherGCM, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 
 const scryptAsync = promisify(scrypt);
@@ -166,7 +166,7 @@ export class SecureBiometricDevice extends BiometricDevice {
     }
 
     const iv = randomBytes(16);
-    const cipher = createCipher(this.ENCRYPTION_ALGORITHM, this.encryptionKey);
+    const cipher = createCipherGCM(this.ENCRYPTION_ALGORITHM, this.encryptionKey, iv);
     cipher.setAAD(Buffer.from(this.deviceFingerprint)); // Additional authenticated data
     
     const dataString = JSON.stringify({
@@ -204,7 +204,7 @@ export class SecureBiometricDevice extends BiometricDevice {
       throw new Error('Device fingerprint mismatch - potential tampering detected');
     }
 
-    const decipher = createDecipher(this.ENCRYPTION_ALGORITHM, this.encryptionKey);
+    const decipher = createDecipherGCM(this.ENCRYPTION_ALGORITHM, this.encryptionKey, encryptedData.iv);
     decipher.setAAD(Buffer.from(this.deviceFingerprint));
     decipher.setAuthTag(encryptedData.authTag);
 

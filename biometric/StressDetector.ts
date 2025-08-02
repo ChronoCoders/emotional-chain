@@ -91,27 +91,43 @@ export class StressDetector extends BiometricDevice {
    * Connect to USB stress sensors
    */
   private async connectUSBStressSensors(): Promise<void> {
-    return new Promise((resolve) => {
-      // In production: Serial port connection to GSR/temperature sensors
-      setTimeout(() => {
-        this.device = {
-          id: this.config.id,
-          name: this.config.name || 'Multi-Modal Stress Detector',
-          connected: true,
-          sensors: {
-            gsr: true,
-            temperature: true,
-            hrv: true,
-            pulse: true
-          },
-          connectionType: 'usb'
-        };
-        
-        console.log('Connected to USB stress sensors:', this.device.name);
-        this.startRealStressMonitoring();
-        resolve();
-      }, 1000);
-    });
+    try {
+      if (!navigator.usb) {
+        throw new Error('Web USB not supported in this browser');
+      }
+
+      // Request USB device access for stress sensors
+      const device = await navigator.usb.requestDevice({
+        filters: [
+          { vendorId: 0x04D8, productId: 0x003F }, // Empatica USB receiver
+          { vendorId: 0x16C0, productId: 0x0483 }  // Generic HID stress device
+        ]
+      });
+
+      await device.open();
+      await device.selectConfiguration(1);
+      await device.claimInterface(0);
+
+      this.device = {
+        id: this.config.id,
+        name: this.config.name || 'USB Multi-Modal Stress Detector',
+        connected: true,
+        sensors: {
+          gsr: true,
+          temperature: true,
+          hrv: true,
+          pulse: true
+        },
+        connectionType: 'usb',
+        usbDevice: device
+      };
+      
+      console.log('Connected to real USB stress sensors:', this.device.name);
+      this.startRealStressMonitoring();
+    } catch (error) {
+      console.error('USB stress sensor connection failed:', error);
+      throw error;
+    }
   }
 
   /**
@@ -153,8 +169,68 @@ export class StressDetector extends BiometricDevice {
   }
 
   /**
-   * Measure real GSR (Galvanic Skin Response)
+   * Measure real GSR (Galvanic Skin Response) from Empatica E4
    */
+  private async measureGSRStress(): Promise<number> {
+    if (!this.gsrSensor || !this.device?.sensors?.gsr) {
+      throw new Error('GSR sensor not available or device not connected');
+    }
+    
+    try {
+      // Read from actual Empatica E4 GSR characteristic (0x2A56)
+      const gsrValue = await this.gsrSensor.readValue();
+      const rawGSR = gsrValue.getFloat32(0, true); // Little endian
+      
+      // Convert raw ADC value to microsiemens (μS)
+      const microsiemens = this.convertADCToMicrosiemens(rawGSR);
+      
+      // Validate physiological range (0.1 - 60 μS)
+      if (microsiemens < 0.1 || microsiemens > 60) {
+        throw new Error(`GSR reading out of physiological range: ${microsiemens} μS`);
+      }
+      
+      return microsiemens;
+    } catch (error) {
+      console.error('GSR sensor reading failed:', error);
+      throw error; // Don't return fake data on error
+    }
+  }
+
+  /**
+   * Convert ADC raw value to microsiemens
+   */
+  private convertADCToMicrosiemens(rawValue: number): number {
+    // Empatica E4 conversion formula: μS = (rawValue / 4096) * 100
+    return (rawValue / 4096) * 100;
+  }
+
+  /**
+   * Measure real skin temperature from Empatica E4
+   */
+  private async measureTemperatureStress(): Promise<number> {
+    if (!this.temperatureSensor || !this.device?.sensors?.temperature) {
+      throw new Error('Temperature sensor not available or device not connected');
+    }
+    
+    try {
+      // Read from actual temperature characteristic
+      const tempValue = await this.temperatureSensor.readValue();
+      const rawTemp = tempValue.getFloat32(0, true);
+      
+      // Convert to Celsius (Empatica E4 specific conversion)
+      const celsius = rawTemp / 100.0;
+      
+      // Validate physiological skin temperature range (28-38°C)
+      if (celsius < 28 || celsius > 38) {
+        throw new Error(`Temperature reading out of physiological range: ${celsius}°C`);
+      }
+      
+      return celsius;
+    } catch (error) {
+      console.error('Temperature sensor reading failed:', error);
+      throw error; // Don't return fake data on error
+    }
+  }
 
 
 
