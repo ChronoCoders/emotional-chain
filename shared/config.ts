@@ -98,6 +98,20 @@ export interface NetworkConfig {
     heartbeatInterval: number;
     maxConnections: number;
   };
+  protocols: {
+    websocket: {
+      heartbeatInterval: number;
+      connectionTimeout: number;
+      maxPayloadSize: number;
+      reconnectAttempts: number;
+      reconnectDelay: number;
+      retryLimit: number;
+    };
+  };
+  ports: {
+    http: number;
+    websocket: number;
+  };
 }
 
 export interface AIConfig {
@@ -222,6 +236,20 @@ export const CONFIG: EmotionalChainConfig = {
       port: 8080,
       heartbeatInterval: 30000,
       maxConnections: 1000
+    },
+    protocols: {
+      websocket: {
+        heartbeatInterval: 30000,
+        connectionTimeout: 10000,
+        maxPayloadSize: 1048576, // 1MB
+        reconnectAttempts: 5,
+        reconnectDelay: 2000,
+        retryLimit: 10
+      }
+    },
+    ports: {
+      http: 5000,
+      websocket: 8080
     }
   },
   ai: {
