@@ -308,34 +308,53 @@ export class HeartRateMonitor extends BiometricDevice {
 
     return { rmssd, sdnn };
   }
+
   /**
-   * Close Bluetooth LE connection
+   * Close Bluetooth LE connection (real hardware cleanup)
    */
   protected async closeConnection(): Promise<void> {
     if (this.device) {
-      // In production: await this.device.disconnect();
+      if (this.device.gattServer) {
+        await this.device.gattServer.disconnect();
+      } else if (this.device.peripheral) {
+        await this.device.peripheral.disconnect();
+      }
+      
       this.device = null;
       this.heartRateService = null;
       this.measurementCharacteristic = null;
       this.batteryService = null;
     }
   }
+
   /**
-   * Read heart rate data from the device
+   * Read heart rate data from real Bluetooth LE device
    */
   public async readData(): Promise<BiometricReading | null> {
-    if (!this.device) {
+    if (!this.device || !this.device.connected) {
       return null;
     }
+
     try {
-      // Simulate real heart rate reading with realistic patterns
-      const heartRateData = this.generateRealisticHeartRate();
-      // Update RR intervals for HRV analysis
-      if (heartRateData.rrIntervals) {
+      // Read from real measurement characteristic
+      const heartRateValue = await this.measurementCharacteristic?.readValue();
+      
+      if (!heartRateValue) {
+        console.warn('No heart rate data received from device');
+        return null;
+      }
+
+      // Parse real Bluetooth LE heart rate measurement format
+      const heartRateData = this.parseHeartRateData(heartRateValue);
+      
+      // Update RR intervals buffer for HRV analysis
+      if (heartRateData.rrIntervals && heartRateData.rrIntervals.length > 0) {
         this.updateRRBuffer(heartRateData.rrIntervals);
       }
+
       // Calculate signal quality based on sensor contact and stability
       const quality = this.calculateSignalQuality(heartRateData);
+
       const reading: BiometricReading = {
         timestamp: Date.now(),
         deviceId: this.config.id,
@@ -351,33 +370,60 @@ export class HeartRateMonitor extends BiometricDevice {
           batteryLevel: this.status.batteryLevel
         }
       };
+
       this.lastHeartRate = heartRateData.heartRate;
       return reading;
+
     } catch (error) {
       console.error('Error reading heart rate data:', error);
       return null;
     }
   }
+
   /**
-   * Generate realistic heart rate data for testing
-   * In production, this would parse actual Bluetooth LE data
+   * Parse Bluetooth LE heart rate measurement data
    */
-  private generateRealisticHeartRate(): HeartRateData {
-    const baseRate = 70 + Math.sin(Date.now() / 30000) * 15; // Slow variation
-    const noise = (Math.random() - 0.5) * 6; // Small random variation
-    const heartRate = Math.max(50, Math.min(180, Math.round(baseRate + noise)));
-    // Generate realistic R-R intervals (time between heartbeats in ms)
-    const rrInterval = Math.round(60000 / heartRate); // Base interval
-    const rrVariation = (Math.random() - 0.5) * 50; // HRV
-    const adjustedRR = Math.max(300, Math.min(1200, rrInterval + rrVariation));
-    // Simulate sensor contact detection
-    const sensorContact = Math.random() > 0.05; // 95% good contact
+  private parseHeartRateData(dataView: DataView): HeartRateData {
+    // Standard Bluetooth LE Heart Rate Measurement format
+    const flags = dataView.getUint8(0);
+    const heartRateFormat = flags & 0x01; // 0 = UINT8, 1 = UINT16
+    const sensorContact = !!(flags & 0x06); // Sensor contact detected
+    const energyExpendedPresent = !!(flags & 0x08);
+    const rrIntervalsPresent = !!(flags & 0x10);
+
+    let offset = 1;
+    
+    // Read heart rate value
+    const heartRate = heartRateFormat === 0 
+      ? dataView.getUint8(offset++)
+      : dataView.getUint16(offset, true) & 0x03FF; // Little endian, 10-bit value
+    
+    if (heartRateFormat === 1) offset += 2;
+
+    // Read energy expended if present
+    let energyExpended = 0;
+    if (energyExpendedPresent && offset + 2 <= dataView.byteLength) {
+      energyExpended = dataView.getUint16(offset, true);
+      offset += 2;
+    }
+
+    // Read RR intervals if present
+    const rrIntervals: number[] = [];
+    if (rrIntervalsPresent) {
+      while (offset + 2 <= dataView.byteLength) {
+        const rrInterval = dataView.getUint16(offset, true) * (1000 / 1024); // Convert to ms
+        rrIntervals.push(rrInterval);
+        offset += 2;
+      }
+    }
+
     return {
-      heartRate: sensorContact ? heartRate : 0,
-      rrIntervals: sensorContact ? [adjustedRR] : [],
+      heartRate,
+      rrIntervals,
       sensorContact,
-      energyExpended: Math.floor(heartRate * 0.5) // Rough estimate
+      energyExpended
     };
+  }
   }
   /**
    * Update R-R interval buffer for HRV analysis

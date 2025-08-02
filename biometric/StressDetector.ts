@@ -289,39 +289,51 @@ export class StressDetector extends BiometricDevice {
       }
     };
   }
+
   /**
-   * Establish stress baseline for personalized measurements
+   * Establish stress baseline for personalized measurements using real sensor data
    */
   private async establishBaseline(): Promise<void> {
-    console.log('📏 Establishing stress baseline...');
-    // Collect baseline data for 30 seconds
-    const baselineData: number[] = [];
+    console.log('Establishing stress baseline from real sensor data...');
+    
+    if (!this.device || !this.device.connected) {
+      console.warn('Cannot establish baseline - no device connected');
+      return;
+    }
+
+    // Collect real baseline data for 30 seconds
+    const baselineRRIntervals: number[] = [];
+    
     for (let i = 0; i < 30; i++) {
-      const mockRR = 800 + Math.random() * 200; // Relaxed state RR intervals
-      baselineData.push(mockRR);
+      // Get real stress measurement data
+      const realData = this.measureRealStressLevels();
+      
+      // Extract HRV data if available
+      if (this.rrIntervals.length > 0) {
+        baselineRRIntervals.push(...this.rrIntervals.slice(-5)); // Last 5 intervals
+      }
+      
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    this.baselineHRV = this.calculateHRVFromIntervals(baselineData);
-  }
-  /**
-   * Close connection to stress detection devices
-   */
-  protected async closeConnection(): Promise<void> {
-    if (this.device) {
-      this.device = null;
-      this.gsrSensor = null;
-      this.temperatureSensor = null;
+    
+    // Calculate baseline HRV from real data
+    if (baselineRRIntervals.length > 10) {
+      this.baselineHRV = this.calculateRealHRV(baselineRRIntervals);
+    } else {
+      console.warn('Insufficient HRV data for baseline calculation');
     }
   }
   /**
-   * Read comprehensive stress data
+   * Read comprehensive stress data from real sensors
    */
   public async readData(): Promise<BiometricReading | null> {
-    if (!this.device) {
+    if (!this.device || !this.device.connected) {
       return null;
     }
+
     try {
-      const stressData = await this.measureStress();
+      const stressData = await this.measureRealStressLevels();
+      
       const reading: BiometricReading = {
         timestamp: Date.now(),
         deviceId: this.config.id,
@@ -339,57 +351,26 @@ export class StressDetector extends BiometricDevice {
           baseline: this.baselineHRV
         }
       };
+
       this.lastStressLevel = stressData.stressLevel;
       return reading;
+
     } catch (error) {
       console.error('Error reading stress data:', error);
       return null;
     }
   }
   /**
-   * Comprehensive stress measurement using multiple modalities
+   * Calculate HRV from real R-R intervals collected from actual heart rate sensor
    */
-  private async measureStress(): Promise<StressData> {
-    // Generate realistic HRV data for stress analysis
-    const currentHRV = this.generateCurrentHRV();
-    // Calculate HRV-based stress score
-    const hrvStressScore = this.calculateHRVStress(currentHRV);
-    // Galvanic Skin Response (if available)
-    const gsrStress = this.device.sensors.gsr ? this.measureGSRStress() : null;
-    // Skin temperature (if available)
-    const tempStress = this.device.sensors.temperature ? this.measureTemperatureStress() : null;
-    // Respiratory rate estimation
-    const respStress = this.estimateRespiratoryStress();
-    // Combine multiple stress indicators
-    const combinedStress = this.combineStressIndicators({
-      hrv: hrvStressScore,
-      gsr: gsrStress,
-      temperature: tempStress,
-      respiratory: respStress
-    });
-    return {
-      stressLevel: combinedStress.stressLevel,
-      hrvScore: hrvStressScore,
-      gsrValue: gsrStress,
-      respiratoryRate: respStress,
-      skinTemperature: tempStress,
-      confidence: combinedStress.confidence
-    };
-  }
-  /**
-   * Generate realistic HRV data based on current stress state
-   */
-  private generateCurrentHRV(): HRVAnalysis {
-    // Simulate realistic HRV patterns
-    const baseRR = 850 + Math.sin(Date.now() / 60000) * 100; // Slow breathing cycle
-    const stressInfluence = Math.random() * 0.3; // 0-30% stress influence
-    const intervals: number[] = [];
-    for (let i = 0; i < 60; i++) {
-      const variation = (Math.random() - 0.5) * (100 - stressInfluence * 80); // Less variation = more stress
-      const interval = Math.max(400, Math.min(1200, baseRR + variation));
-      intervals.push(interval);
+  private calculateCurrentHRV(): HRVAnalysis {
+    if (this.rrIntervals.length < 10) {
+      console.warn('Insufficient R-R intervals for HRV calculation');
+      return { rmssd: 0, sdnn: 0, pnn50: 0, stressIndex: 50 };
     }
-    return this.calculateHRVFromIntervals(intervals);
+
+    // Use actual collected R-R intervals
+    return this.calculateRealHRV(this.rrIntervals);
   }
   /**
    * Calculate HRV metrics from R-R intervals
@@ -438,50 +419,89 @@ export class StressDetector extends BiometricDevice {
     return Math.min(100, Math.max(0, hrvStress));
   }
   /**
-   * Measure stress from Galvanic Skin Response
+   * Measure stress from real Galvanic Skin Response sensor
    */
-  private measureGSRStress(): number {
-    // Simulate GSR reading (micro-siemens)
-    const baseGSR = 2.0 + Math.random() * 3.0; // 2-5 μS typical range
-    const stressMultiplier = 1 + Math.random() * 0.5; // Stress increases GSR
-    const gsrValue = baseGSR * stressMultiplier;
-    // Convert GSR to stress level (higher GSR = higher stress)
-    const stressLevel = Math.min(100, Math.max(0, (gsrValue - 2) / 4 * 100));
-    return Math.round(stressLevel);
-  }
-  /**
-   * Measure stress from skin temperature
-   */
-  private measureTemperatureStress(): number {
-    // Normal skin temperature: 32-36°C
-    const baseTemp = 34 + Math.random() * 2; // 34-36°C
-    const stressEffect = (Math.random() - 0.5) * 1.5; // Stress can raise or lower temp
-    const skinTemp = baseTemp + stressEffect;
-    // Deviation from normal range indicates stress
-    const normalRange = [33, 35];
-    let tempStress = 0;
-    if (skinTemp < normalRange[0]) {
-      tempStress = (normalRange[0] - skinTemp) / 2 * 100; // Cold stress
-    } else if (skinTemp > normalRange[1]) {
-      tempStress = (skinTemp - normalRange[1]) / 2 * 100; // Heat stress
+  private async measureGSRStress(): Promise<number> {
+    if (!this.gsrSensor || !this.device.sensors.gsr) {
+      return 0;
     }
-    return Math.min(100, Math.max(0, Math.round(tempStress)));
+
+    try {
+      // Read from real GSR sensor characteristic
+      const gsrValue = await this.gsrSensor.readValue();
+      const conductance = gsrValue.getFloat32(0, true); // μS (microsiemens)
+      
+      // Convert GSR to stress level (higher GSR = higher stress)
+      // Typical GSR range: 1-10 μS, stress range 2-8 μS
+      const stressLevel = Math.min(100, Math.max(0, (conductance - 1) / 7 * 100));
+      
+      return Math.round(stressLevel);
+    } catch (error) {
+      console.error('Error reading GSR sensor:', error);
+      return 0;
+    }
   }
   /**
-   * Estimate respiratory stress from HRV patterns
+   * Measure stress from real skin temperature sensor
+   */
+  private async measureTemperatureStress(): Promise<number> {
+    if (!this.temperatureSensor || !this.device.sensors.temperature) {
+      return 0;
+    }
+
+    try {
+      // Read from real temperature sensor characteristic
+      const tempValue = await this.temperatureSensor.readValue();
+      const skinTemp = tempValue.getFloat32(0, true); // °C
+      
+      // Normal skin temperature range: 32-36°C
+      // Deviation from normal range indicates stress
+      const normalRange = [32, 36];
+      let tempStress = 0;
+      
+      if (skinTemp < normalRange[0]) {
+        tempStress = (normalRange[0] - skinTemp) / 4 * 100; // Cold stress
+      } else if (skinTemp > normalRange[1]) {
+        tempStress = (skinTemp - normalRange[1]) / 4 * 100; // Heat stress  
+      }
+      
+      return Math.min(100, Math.max(0, Math.round(tempStress)));
+    } catch (error) {
+      console.error('Error reading temperature sensor:', error);
+      return 0;
+    }
+  }
+  /**
+   * Estimate respiratory stress from real HRV patterns
    */
   private estimateRespiratoryStress(): number {
-    // Normal respiratory rate: 12-20 breaths per minute
-    const baseRate = 16 + Math.random() * 4; // 16-20 BPM
-    const stressInfluence = Math.random() * 0.3; // Stress increases breathing rate
-    const respiratoryRate = baseRate * (1 + stressInfluence * 0.5);
-    // Calculate stress from deviation from normal
-    let respStress = 0;
-    if (respiratoryRate > 20) {
-      respStress = (respiratoryRate - 20) / 10 * 100; // Fast breathing = stress
-    } else if (respiratoryRate < 12) {
-      respStress = (12 - respiratoryRate) / 4 * 100; // Very slow can also indicate stress
+    if (this.rrIntervals.length < 20) {
+      return 0;
     }
+
+    // Extract respiratory patterns from R-R interval variations
+    // Real respiratory rate can be estimated from HRV patterns
+    const rrMean = this.rrIntervals.reduce((sum, rr) => sum + rr, 0) / this.rrIntervals.length;
+    
+    // Calculate respiratory sinus arrhythmia patterns
+    const respiratoryVariations = [];
+    for (let i = 1; i < this.rrIntervals.length; i++) {
+      respiratoryVariations.push(this.rrIntervals[i] - this.rrIntervals[i-1]);
+    }
+    
+    // Estimate respiratory rate from variability patterns
+    // Higher frequency variations suggest faster breathing
+    const meanVariation = Math.abs(respiratoryVariations.reduce((sum, v) => sum + v, 0) / respiratoryVariations.length);
+    const estimatedRespRate = Math.min(30, Math.max(8, 60000 / (rrMean + meanVariation * 10)));
+    
+    // Calculate stress from deviation from normal (12-20 BPM)
+    let respStress = 0;
+    if (estimatedRespRate > 20) {
+      respStress = (estimatedRespRate - 20) / 10 * 100; // Fast breathing = stress
+    } else if (estimatedRespRate < 12) {
+      respStress = (12 - estimatedRespRate) / 4 * 100; // Very slow can also indicate stress
+    }
+    
     return Math.min(100, Math.max(0, Math.round(respStress)));
   }
   /**
