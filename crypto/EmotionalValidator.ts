@@ -30,8 +30,9 @@ export class EmotionalValidatorUtils {
       focusScore * 0.25 +          // 25% focus
       authenticityScore * 0.20     // 20% authenticity
     );
-    // Scale to 0-100 and add some randomness for fairness
-    const emotionalScore = rawScore * 85 + Math.random() * 15;
+    // Scale to 0-100 and add some secure randomness for fairness
+    const randomByte = crypto.getRandomValues(new Uint8Array(1))[0];
+    const emotionalScore = rawScore * 85 + (randomByte / 255) * 15;
     return Math.round(emotionalScore * 100) / 100; // Round to 2 decimal places
   }
   /**

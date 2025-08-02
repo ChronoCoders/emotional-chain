@@ -383,16 +383,18 @@ export class IPFSStorage extends EventEmitter {
   }
   private async discoverNodes(): Promise<void> {
     // Simulate node discovery
-    const discoveredNodes = Math.floor(Math.random() * 3);
+    const randomBytes = crypto.getRandomValues(new Uint8Array(6));
+    const discoveredNodes = Math.floor(randomBytes[0] / 255 * 3);
     for (let i = 0; i < discoveredNodes; i++) {
-      const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+      const nodeRandom = crypto.getRandomValues(new Uint8Array(6));
+      const nodeId = `node-${Date.now()}-${Buffer.from(nodeRandom).toString('hex').substr(0, 6)}`;
       const node: IPFSNode = {
         id: nodeId,
-        multiaddr: `/ip4/192.168.1.${Math.floor(Math.random() * 255)}/tcp/4001/p2p/${nodeId}`,
-        online: Math.random() > 0.1, // 90% online
-        latency: 20 + Math.random() * 200,
-        reliability: 0.8 + Math.random() * 0.2,
-        storageCapacity: (0.5 + Math.random() * 2) * 1000000000, // 0.5-2.5GB
+        multiaddr: `/ip4/192.168.1.${Math.floor(nodeRandom[1] * 255 / 255)}/tcp/4001/p2p/${nodeId}`,
+        online: nodeRandom[2] / 255 > 0.1, // 90% online
+        latency: 20 + (nodeRandom[3] / 255) * 200,
+        reliability: 0.8 + (nodeRandom[4] / 255) * 0.2,
+        storageCapacity: (0.5 + (nodeRandom[5] / 255) * 2) * 1000000000, // 0.5-2.5GB
         storageUsed: 0,
         lastSeen: Date.now()
       };

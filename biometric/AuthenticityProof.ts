@@ -198,7 +198,7 @@ export class AuthenticityProofGenerator {
       deviceId: this.deviceId,
       timestamp: reading.timestamp,
       sequence: this.sequenceCounter,
-      randomness: Math.random().toString(36)
+      randomness: Buffer.from(crypto.getRandomValues(new Uint8Array(16))).toString('hex')
     };
     return CryptoJS.SHA256(JSON.stringify(tokenData) + this.deviceSecret).toString();
   }
@@ -253,7 +253,8 @@ export class AuthenticityProofGenerator {
    */
   private detectDeviceMovement(): number {
     // Simulate accelerometer/gyroscope data analysis
-    const movementScore = 0.6 + Math.random() * 0.3; // 60-90% movement detected
+    const randomByte = crypto.getRandomValues(new Uint8Array(1))[0];
+    const movementScore = 0.6 + (randomByte / 255) * 0.3; // 60-90% movement detected
     return movementScore;
   }
   /**
@@ -301,9 +302,9 @@ export class AuthenticityProofGenerator {
    */
   private generateProofId(): string {
     const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substr(2, 9);
+    const secureRandom = Buffer.from(crypto.getRandomValues(new Uint8Array(6))).toString('hex');
     const deviceHash = CryptoJS.SHA256(this.deviceId).toString().substr(0, 8);
-    return `${timestamp}-${deviceHash}-${random}`;
+    return `${timestamp}-${deviceHash}-${secureRandom}`;
   }
   /**
    * Generate device secret for signing
@@ -312,7 +313,7 @@ export class AuthenticityProofGenerator {
     const deviceData = {
       deviceId: this.deviceId,
       timestamp: Date.now(),
-      randomSeed: Math.random().toString(36)
+      randomSeed: Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('hex')
     };
     return CryptoJS.SHA256(JSON.stringify(deviceData)).toString();
   }

@@ -211,7 +211,8 @@ export class StateManager {
   }
   // State transitions and rollbacks
   async createStateSnapshot(): Promise<string> {
-    const snapshotId = `snapshot_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const randomBytes = crypto.getRandomValues(new Uint8Array(6));
+    const snapshotId = `snapshot_${Date.now()}_${Buffer.from(randomBytes).toString('hex')}`;
     const snapshot = {
       id: snapshotId,
       timestamp: Date.now(),

@@ -103,9 +103,9 @@ export class PerformanceOptimizationService {
         signature: Buffer.from('dummy_signature', 'hex'), // Would be actual signature
         stake: v.stake,
         biometricData: {
-          heartRate: 70 + Math.random() * 20,
-          stress: Math.random() * 0.5,
-          focus: 0.7 + Math.random() * 0.3
+          heartRate: 70 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 20,
+          stress: (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 0.5,
+          focus: 0.7 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 0.3
         }
       }));
       
@@ -120,7 +120,7 @@ export class PerformanceOptimizationService {
       const validatorSignatures = validatorData.map(v => ({
         validatorId: v.id,
         signature: Buffer.from(v.signature).toString('hex'),
-        emotionalScore: 75 + Math.random() * 25,
+        emotionalScore: 75 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 25,
         timestamp: Date.now()
       }));
       

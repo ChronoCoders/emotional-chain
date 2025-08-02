@@ -414,7 +414,8 @@ export class WebSocketSDK extends EventEmitter {
   }
   // Helper methods
   private generateSubscriptionId(): string {
-    return `sub_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const randomBytes = crypto.getRandomValues(new Uint8Array(6));
+    return `sub_${Date.now()}_${Buffer.from(randomBytes).toString('hex')}`;
   }
   // Cleanup
   async destroy(): Promise<void> {

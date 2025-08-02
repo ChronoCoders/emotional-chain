@@ -220,13 +220,14 @@ export class EmotionalProof {
       'emotional_consistency',
       'temporal_verification'
     ];
-    const challengeType = challengeTypes[Math.floor(Math.random() * challengeTypes.length)];
+    const randomByte = crypto.getRandomValues(new Uint8Array(1))[0];
+    const challengeType = challengeTypes[Math.floor(randomByte / 255 * challengeTypes.length)];
     const challengeId = crypto.randomBytes(16).toString('hex');
     let challenge: string;
     let expectedResponse: string;
     switch (challengeType) {
       case 'prove_liveness':
-        challenge = `liveness_${Date.now()}_${Math.random()}`;
+        challenge = `liveness_${Date.now()}_${crypto.getRandomValues(new Uint8Array(4))[0]}`;
         expectedResponse = crypto.createHash('sha256').update(challenge + validatorId).digest('hex');
         break;
       case 'biometric_freshness':

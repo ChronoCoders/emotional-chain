@@ -187,7 +187,8 @@ export class AIFeedbackCollector {
         return -10; // Small negative drift
       case 'proceed':
       default:
-        return Math.random() * 10 - 5; // Random small drift for normal operation
+        const randomByte = crypto.getRandomValues(new Uint8Array(1))[0];
+        return (randomByte / 255) * 10 - 5; // Random small drift for normal operation
     }
   }
 

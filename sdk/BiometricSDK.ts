@@ -463,8 +463,8 @@ export class BiometricSDK extends EventEmitter {
       type: 'heartrate',
       status: 'connected',
       lastReading: Date.now(),
-      batteryLevel: Math.floor(Math.random() * 100),
-      signalQuality: 0.8 + Math.random() * 0.2,
+      batteryLevel: Math.floor(crypto.getRandomValues(new Uint8Array(1))[0] * 100 / 255),
+      signalQuality: 0.8 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 0.2,
       manufacturer: 'Mock Corp',
       model: 'Test Device'
     };
@@ -474,19 +474,19 @@ export class BiometricSDK extends EventEmitter {
     let unit: string;
     switch (device.type) {
       case 'heartrate':
-        value = 65 + Math.random() * 20; // 65-85 BPM
+        value = 65 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 20; // 65-85 BPM
         unit = 'BPM';
         break;
       case 'stress':
-        value = 20 + Math.random() * 30; // 20-50 stress units
+        value = 20 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 30; // 20-50 stress units
         unit = 'stress_units';
         break;
       case 'focus':
-        value = 70 + Math.random() * 25; // 70-95 focus score
+        value = 70 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 25; // 70-95 focus score
         unit = 'focus_score';
         break;
       default:
-        value = Math.random() * 100;
+        value = (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 100;
         unit = 'units';
     }
     return {
@@ -495,18 +495,18 @@ export class BiometricSDK extends EventEmitter {
       value,
       unit,
       timestamp: Date.now(),
-      quality: 0.8 + Math.random() * 0.2,
+      quality: 0.8 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 0.2,
       processed: false
     };
   }
   private generateMockEmotionalState(): EmotionalState {
     return {
-      overall: 75 + Math.random() * 20,
-      stress: 70 + Math.random() * 25,
-      focus: 80 + Math.random() * 15,
-      authenticity: 85 + Math.random() * 10,
+      overall: 75 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 20,
+      stress: 70 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 25,
+      focus: 80 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 15,
+      authenticity: 85 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 10,
       timestamp: Date.now(),
-      confidence: 0.8 + Math.random() * 0.2
+      confidence: 0.8 + (crypto.getRandomValues(new Uint8Array(1))[0] / 255) * 0.2
     };
   }
   // Configuration

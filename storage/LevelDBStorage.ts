@@ -273,7 +273,8 @@ export class LevelDBStorage extends EventEmitter {
     if (!this.isOpen) {
       throw new Error('Storage is not open');
     }
-    const snapshotId = `snapshot_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const randomBytes = crypto.getRandomValues(new Uint8Array(6));
+    const snapshotId = `snapshot_${Date.now()}_${Buffer.from(randomBytes).toString('hex')}`;
     const snapshotPath = path.join(this.config.dataPath, 'snapshots', snapshotId);
     try {
       console.log(`📸 Creating storage snapshot: ${snapshotId}`);

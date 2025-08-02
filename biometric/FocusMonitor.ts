@@ -529,9 +529,11 @@ export class FocusMonitor extends BiometricDevice {
    * Get amplifier noise from EEG hardware
    */
   private getAmplifierNoise(): number {
-    // Thermal noise and amplifier characteristics - more realistic than Math.random()
-    const thermalNoise = 0.1 * (2 * Math.random() - 1); // Gaussian-like distribution
-    const quantizationNoise = 0.05 * (2 * Math.random() - 1); // ADC quantization
+    // Thermal noise and amplifier characteristics - using cryptographically secure randomness
+    const randomByte1 = crypto.getRandomValues(new Uint8Array(1))[0];
+    const randomByte2 = crypto.getRandomValues(new Uint8Array(1))[0];
+    const thermalNoise = 0.1 * (2 * (randomByte1 / 255) - 1); // Gaussian-like distribution
+    const quantizationNoise = 0.05 * (2 * (randomByte2 / 255) - 1); // ADC quantization
     
     return thermalNoise + quantizationNoise;
   }

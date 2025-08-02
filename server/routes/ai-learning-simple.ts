@@ -181,8 +181,9 @@ router.get('/feedback', async (req, res) => {
 router.post('/retrain', async (req, res) => {
   try {
     // Simulate retraining process
-    const newTrainingRound = Math.floor(Math.random() * 10) + 4;
-    const newAccuracy = 0.85 + Math.random() * 0.1;
+    const randomBytes = crypto.getRandomValues(new Uint8Array(2));
+    const newTrainingRound = Math.floor((randomBytes[0] / 255) * 10) + 4;
+    const newAccuracy = 0.85 + (randomBytes[1] / 255) * 0.1;
     
     res.json({
       success: true,

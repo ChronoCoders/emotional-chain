@@ -231,7 +231,8 @@ export class AIConsensusIntegration {
     });
     
     // Trigger model retraining periodically
-    if (patterns.length > 0 && Math.random() < 0.1) { // 10% chance
+    const randomByte = crypto.getRandomValues(new Uint8Array(1))[0];
+    if (patterns.length > 0 && (randomByte / 255) < 0.1) { // 10% chance
       anomalyDetectionEngine.retrainModel();
     }
   }

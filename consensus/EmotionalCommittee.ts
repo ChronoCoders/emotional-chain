@@ -171,7 +171,8 @@ export class EmotionalCommittee {
     return selected;
   }
   private weightedRandomSelect(probabilities: number[]): number {
-    const random = Math.random();
+    const randomByte = crypto.getRandomValues(new Uint8Array(1))[0];
+    const random = randomByte / 255;
     let cumulativeProbability = 0;
     for (let i = 0; i < probabilities.length; i++) {
       cumulativeProbability += probabilities[i];

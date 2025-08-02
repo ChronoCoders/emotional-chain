@@ -68,8 +68,9 @@ export function useWebSocket(): UseWebSocketReturn {
         config.reconnectDelay * Math.pow(2, attempt),
         config.maxBackoffDelay
       );
-      // Add jitter (±25%)
-      const jitter = exponentialDelay * 0.25 * (Math.random() - 0.5);
+      // Add jitter (±25%) using secure random
+      const randomByte = crypto.getRandomValues(new Uint8Array(1))[0];
+      const jitter = exponentialDelay * 0.25 * ((randomByte / 255) - 0.5);
       return Math.floor(exponentialDelay + jitter);
     };
     const startHeartbeat = () => {

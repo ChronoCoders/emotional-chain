@@ -37,12 +37,12 @@ export class P2PNode extends EventEmitter {
   constructor(config: P2PConfig) {
     super();
     this.config = {
-      maxConnections: 50, // Increased for production scale
-      minConnections: 20, // Higher minimum for resilience
-      enableWebRTC: true,
-      enableTCP: true,
-      enableWebSockets: true,
-      ...config
+      ...config,
+      maxConnections: config.maxConnections || 50, // Increased for production scale
+      minConnections: config.minConnections || 20, // Higher minimum for resilience
+      enableWebRTC: config.enableWebRTC !== undefined ? config.enableWebRTC : true,
+      enableTCP: config.enableTCP !== undefined ? config.enableTCP : true,
+      enableWebSockets: config.enableWebSockets !== undefined ? config.enableWebSockets : true,
     };
   }
   /**
@@ -82,26 +82,13 @@ export class P2PNode extends EventEmitter {
             list: this.config.bootstrapPeers.map(addr => multiaddr(addr))
           })
         ],
-        dht: kadDHT({
-          enabled: true,
-          randomWalk: {
-            enabled: true,
-            interval: 300000 // 5 minutes
-          }
-        }),
-        pubsub: floodsub(),
+        services: {
+          dht: kadDHT(),
+          pubsub: floodsub()
+        },
         connectionManager: {
           maxConnections: this.config.maxConnections,
-          minConnections: this.config.minConnections,
-          autoDial: true,
-          autoDialInterval: 10000, // Auto-dial every 10 seconds
           dialTimeout: 30000 // 30 second dial timeout
-        },
-        connectionGater: {
-          maxConnections: this.config.maxConnections,
-          minConnections: this.config.minConnections,
-          autoDialInterval: 10000, // Try to maintain connections every 10s
-          autoDial: true
         }
       });
       // Set up event listeners
@@ -203,11 +190,11 @@ export class P2PNode extends EventEmitter {
    * Publish to a pubsub topic
    */
   public async publishToTopic(topic: string, data: Uint8Array): Promise<void> {
-    if (!this.libp2p || !this.libp2p.pubsub) {
+    if (!this.libp2p || !this.libp2p.services?.pubsub) {
       throw new Error('P2P node not started or pubsub not available');
     }
     try {
-      await this.libp2p.pubsub.publish(topic, data);
+      await this.libp2p.services.pubsub.publish(topic, data);
       console.log(`📢 Published to topic ${topic} (${data.length} bytes)`);
     } catch (error) {
       console.error(`Failed to publish to ${topic}:`, error);
@@ -218,16 +205,16 @@ export class P2PNode extends EventEmitter {
    * Subscribe to a pubsub topic
    */
   public async subscribeToTopic(topic: string, handler: (data: Uint8Array, peerId: string) => void): Promise<void> {
-    if (!this.libp2p || !this.libp2p.pubsub) {
+    if (!this.libp2p || !this.libp2p.services?.pubsub) {
       throw new Error('P2P node not started or pubsub not available');
     }
-    this.libp2p.pubsub.addEventListener('message', (evt) => {
+    this.libp2p.services.pubsub.addEventListener('message', (evt: any) => {
       if (evt.detail.topic === topic) {
         const peerId = evt.detail.from.toString();
         handler(evt.detail.data, peerId);
       }
     });
-    await this.libp2p.pubsub.subscribe(topic);
+    await this.libp2p.services.pubsub.subscribe(topic);
     console.log(`🔔 Subscribed to topic: ${topic}`);
   }
   /**
@@ -261,20 +248,20 @@ export class P2PNode extends EventEmitter {
    * Find peer by ID using DHT
    */
   public async findPeer(peerId: string): Promise<PeerInfo | null> {
-    if (!this.libp2p || !this.libp2p.dht) {
+    if (!this.libp2p || !this.libp2p.services?.dht) {
       return null;
     }
     try {
-      const peerInfo = await this.libp2p.dht.findPeer(peerId);
+      const peerInfo = await this.libp2p.services.dht.findPeer(peerId);
       return {
         id: peerInfo.id.toString(),
-        multiaddrs: peerInfo.multiaddrs.map(ma => ma.toString()),
+        multiaddrs: peerInfo.multiaddrs.map((ma: any) => ma.toString()),
         protocols: [],
         lastSeen: Date.now(),
         reputation: 0,
         isBootstrap: false
       };
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`Failed to find peer ${peerId}:`, error.message);
       return null;
     }
@@ -335,12 +322,12 @@ export class P2PNode extends EventEmitter {
     if (!this.libp2p) return;
     console.log('🔍 Starting peer discovery...');
     // Start DHT for peer discovery
-    if (this.libp2p.dht) {
+    if (this.libp2p.services?.dht) {
       try {
         // Announce ourselves on the DHT
-        await this.libp2p.dht.setMode('server');
+        await this.libp2p.services.dht.setMode('server');
         console.log('📡 DHT server mode enabled');
-      } catch (error) {
+      } catch (error: any) {
         console.warn('DHT setup warning:', error.message);
       }
     }
@@ -351,11 +338,11 @@ export class P2PNode extends EventEmitter {
       if (peerCount < this.config.minConnections) {
         // Try to discover more peers
         try {
-          if (this.libp2p.dht) {
+          if (this.libp2p.services?.dht) {
             const randomPeerId = this.libp2p.peerId.toString();
-            await this.libp2p.dht.getClosestPeers(randomPeerId);
+            await this.libp2p.services.dht.getClosestPeers(randomPeerId);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.warn('Peer discovery error:', error.message);
         }
       }
@@ -380,7 +367,9 @@ export class P2PNode extends EventEmitter {
   public async disconnectPeer(peerId: string, reason?: string): Promise<void> {
     if (!this.libp2p) return;
     try {
-      const connections = this.libp2p.getConnections(peerId);
+      const connections = this.libp2p.getConnections().filter(conn => 
+        conn.remotePeer.toString() === peerId
+      );
       await Promise.all(connections.map(conn => conn.close()));
       console.log(`🚪 Disconnected from peer ${peerId.substring(0, 12)}...${reason ? ` (${reason})` : ''}`);
     } catch (error) {
