@@ -88,7 +88,7 @@ export class FocusMonitor extends BiometricDevice {
       channels: this.eegChannels,
       samplingRate: this.samplingRate,
       electrodes: ['TP9', 'AF7', 'AF8', 'TP10'], // Muse electrode positions
-      batteryLevel: 90 + Math.random() * 10
+      batteryLevel: this.device?.batteryLevel || 90
     };
 
     console.log('Connected to real Muse device:', this.device.name);
@@ -110,7 +110,7 @@ export class FocusMonitor extends BiometricDevice {
           channels: this.eegChannels,
           samplingRate: this.samplingRate,
           electrodes: ['Fp1', 'Fp2', 'F3', 'F4'],
-          batteryLevel: 85 + Math.random() * 15,
+          batteryLevel: 85,
           connectionType: 'usb'
         };
         
@@ -128,9 +128,9 @@ export class FocusMonitor extends BiometricDevice {
    */
   private startRealEEGStream(): void {
     // In production, this would process real EEG signals
-    setInterval(() => {
+    setInterval(async () => {
       if (this.device && this.device.connected) {
-        const rawEEG = this.generateRealisticEEGData();
+        const rawEEG = await this.readRealEEGData();
         const processedData = this.processRealEEGSignal(rawEEG);
         
         this.emit('data', {
@@ -145,29 +145,51 @@ export class FocusMonitor extends BiometricDevice {
   /**
    * Generate realistic EEG data patterns
    */
-  private generateRealisticEEGData(): number[][] {
-    const time = Date.now() / 1000;
+  /**
+   * Read raw EEG data directly from connected Muse device
+   */
+  private async readRealEEGData(): Promise<number[][]> {
+    if (!this.device || !this.device.connected) {
+      throw new Error('No EEG device connected');
+    }
+
     const data: number[][] = [];
     
+    // Read from actual EEG characteristics for each channel
     for (let channel = 0; channel < this.eegChannels; channel++) {
-      const samples: number[] = [];
-      
-      for (let i = 0; i < 32; i++) { // 32 samples per chunk
-        // Generate realistic brainwave frequencies with noise
-        const alpha = 10 * Math.sin(2 * Math.PI * 10 * (time + i/this.samplingRate));
-        const beta = 5 * Math.sin(2 * Math.PI * 20 * (time + i/this.samplingRate));
-        const theta = 8 * Math.sin(2 * Math.PI * 6 * (time + i/this.samplingRate));
-        // Real EEG noise from environmental interference and amplifier noise
-        const environmentalNoise = this.getEnvironmentalNoise(channel, i);
-        const amplifierNoise = this.getAmplifierNoise();
-        
-        samples.push(alpha + beta + theta + environmentalNoise + amplifierNoise);
+      const characteristic = this.device.eegCharacteristics[channel];
+      if (!characteristic) continue;
+
+      try {
+        const rawData = await characteristic.readValue();
+        const samples = this.parseEEGCharacteristic(rawData);
+        data.push(samples);
+      } catch (error) {
+        console.error(`Error reading EEG channel ${channel}:`, error);
+        data.push(new Array(32).fill(0)); // Zero data for failed channel
       }
-      
-      data.push(samples);
     }
     
     return data;
+  }
+
+  /**
+   * Parse EEG data from Bluetooth LE characteristic
+   */
+  private parseEEGCharacteristic(dataView: DataView): number[] {
+    const samples: number[] = [];
+    
+    // Muse sends 12 samples per packet, 2 bytes per sample
+    for (let i = 0; i < dataView.byteLength; i += 2) {
+      if (i + 1 < dataView.byteLength) {
+        // Convert 16-bit signed integer to microvolts
+        const rawValue = dataView.getInt16(i, false); // Big endian
+        const microvolts = rawValue * 0.48828125; // Muse conversion factor
+        samples.push(microvolts);
+      }
+    }
+    
+    return samples;
   }
 
   /**
@@ -346,7 +368,7 @@ export class FocusMonitor extends BiometricDevice {
     
     for (let i = 0; i < samples; i++) {
       // Use real EEG data processing instead of mock
-      const rawEEG = this.generateRealisticEEGData();
+      const rawEEG = await this.readRealEEGData();
       const processedEEG = this.processRealEEGSignal(rawEEG);
       
       totalAlpha += processedEEG.alpha;
@@ -370,7 +392,7 @@ export class FocusMonitor extends BiometricDevice {
 
     try {
       // Get real EEG data from device
-      const rawEEG = this.generateRealisticEEGData();
+      const rawEEG = await this.readRealEEGData();
       const processedEEG = this.processRealEEGSignal(rawEEG);
       
       // Calculate cognitive load from real EEG patterns

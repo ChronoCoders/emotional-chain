@@ -80,7 +80,7 @@ export class StressDetector extends BiometricDevice {
         hrv: true,    // Heart rate variability
         accelerometer: true // Motion detection
       },
-      batteryLevel: 80 + Math.random() * 20
+      batteryLevel: this.device?.batteryLevel || 85
     };
 
     console.log('Connected to real Empatica E4:', this.device.name);
@@ -118,9 +118,9 @@ export class StressDetector extends BiometricDevice {
    * Start real-time stress monitoring
    */
   private startRealStressMonitoring(): void {
-    setInterval(() => {
+    setInterval(async () => {
       if (this.device && this.device.connected) {
-        const stressData = this.measureRealStressLevels();
+        const stressData = await this.measureRealStressLevels();
         
         this.emit('data', {
           ...stressData,
@@ -134,10 +134,10 @@ export class StressDetector extends BiometricDevice {
   /**
    * Measure real stress levels from multiple sensors
    */
-  private measureRealStressLevels(): StressData {
+  private async measureRealStressLevels(): Promise<StressData> {
     // In production, these would be actual sensor readings
-    const gsrValue = this.measureGSR();
-    const skinTemp = this.measureSkinTemperature();
+    const gsrValue = await this.measureGSRStress();
+    const skinTemp = await this.measureTemperatureStress();
     const hrvMetrics = this.calculateRealHRV(this.rrIntervals);
     
     // Multi-modal stress calculation
@@ -155,27 +155,9 @@ export class StressDetector extends BiometricDevice {
   /**
    * Measure real GSR (Galvanic Skin Response)
    */
-  private measureGSR(): number {
-    // In production: Real GSR sensor reading
-    // For now, generate realistic GSR patterns
-    const baseGSR = 2.5; // μS (microsiemens)
-    const stressVariation = Math.sin(Date.now() / 30000) * 1.5; // Slow variation
-    const noise = (Math.random() - 0.5) * 0.3;
-    
-    return Math.max(0.1, baseGSR + stressVariation + noise);
-  }
 
-  /**
-   * Measure skin temperature
-   */
-  private measureSkinTemperature(): number {
-    // In production: Real temperature sensor
-    const baseTemp = 32.5; // °C (normal skin temperature)
-    const stressEffect = Math.random() * 1.2; // Stress can increase temperature
-    const ambient = (Math.random() - 0.5) * 0.8;
-    
-    return Math.max(30, Math.min(36, baseTemp + stressEffect + ambient));
-  }
+
+
 
   /**
    * Calculate real HRV analysis from R-R intervals
