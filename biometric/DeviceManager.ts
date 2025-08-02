@@ -271,6 +271,17 @@ export class BiometricDeviceManager extends EventEmitter {
     }
   }
   /**
+   * Get all devices across all validators
+   */
+  getAllDevices(): BiometricDevice[] {
+    const allDevices: BiometricDevice[] = [];
+    for (const group of this.deviceGroups.values()) {
+      allDevices.push(...group.devices);
+    }
+    return allDevices;
+  }
+
+  /**
    * Update health score for a validator
    */
   private updateHealthScore(validatorId: string): void {
