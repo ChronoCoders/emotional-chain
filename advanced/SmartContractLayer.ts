@@ -425,7 +425,7 @@ export class SmartContractEngine extends EventEmitter {
         biometricData,
         executionResult,
         timestamp: new Date().toISOString(),
-        blockHeight: Math.floor(Math.random() * 1000000)
+        blockHeight: await this.getCurrentBlockHeight()
       };
 
       this.executionHistory.push(execution);
@@ -490,7 +490,7 @@ export class SmartContractEngine extends EventEmitter {
       case 'updateHealthMetrics':
         result.outputData = { 
           healthScore: this.calculateEmotionalScore(biometricData),
-          improvement: Math.random() * 10
+          improvement: await this.calculateRealImprovement(currentMetrics, targetMetrics)
         };
         break;
       default:
@@ -508,6 +508,25 @@ export class SmartContractEngine extends EventEmitter {
       console.log(`Wellness goal completed: ${goalId} - Reward: ${goal.reward} EMO`);
       this.emit('wellnessGoalCompleted', goal);
     }
+  }
+
+  private async getCurrentBlockHeight(): Promise<number> {
+    // Get real current block height from database
+    const latestBlock = await this.advancedService.getLatestBlock();
+    return latestBlock ? latestBlock.height : 0;
+  }
+
+  private async calculateRealImprovement(currentMetrics: any, targetMetrics: any): Promise<number> {
+    // Calculate real improvement based on actual biometric measurements
+    if (!currentMetrics || !targetMetrics) return 0;
+    
+    const currentScore = currentMetrics.heartRate ? 
+      (75 - Math.abs(currentMetrics.heartRate - 75)) / 75 * 100 : 50;
+    
+    const targetScore = targetMetrics.heartRate ?
+      (75 - Math.abs(targetMetrics.heartRate - 75)) / 75 * 100 : 50;
+    
+    return Math.max(0, targetScore - currentScore);
   }
 
   private calculateEmotionalScore(biometricData: BiometricData): number {

@@ -119,7 +119,6 @@ export class QuantumResistanceManager extends EventEmitter {
         keySize: keyPair.publicKey.length + keyPair.privateKey.length,
         securityLevel: securityLevel.toString(),
         status: 'active',
-        createdAt: new Date(),
         expiresAt: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000) // 2 years
       };
 

@@ -144,7 +144,7 @@ export class AdvancedFeaturesManager {
           modelsActive: aiModels.length,
           types: ['emotional_predictor', 'anomaly_detector', 'consensus_optimizer'],
           averageAccuracy: aiModels.length > 0 ? 
-            aiModels.reduce((sum, m) => sum + parseFloat(m.accuracy), 0) / aiModels.length : 0
+            aiModels.reduce((sum, m) => sum + parseFloat(m.accuracy || '0'), 0) / aiModels.length : 0
         },
         overall: 'ALL_SYSTEMS_OPERATIONAL_DATABASE_BACKED'
       };

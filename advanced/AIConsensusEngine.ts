@@ -652,19 +652,84 @@ export class AIConsensusEngine extends EventEmitter {
       this.trainingInProgress = false;
     }
   }
-  private generateTrainingData(): any {
-    // Generate synthetic training data for demonstration
+  private async generateTrainingData(): Promise<any> {
+    // Generate authentic training data from database operations
+    const consensusData = await this.getHistoricalConsensusData();
+    const anomalyData = await this.getHistoricalAnomalyData();
+    
     return {
-      emotional: Array.from({ length: 1000 }, () => ({
-        features: Array.from({ length: 8 }, () => Math.random()),
-        labels: Array.from({ length: 4 }, () => Math.random())
+      emotional: consensusData.map(data => ({
+        features: data.features,
+        labels: data.labels
       })),
-      anomaly: Array.from({ length: 1000 }, () => ({
-        features: Array.from({ length: 12 }, () => Math.random()),
-        labels: Array.from({ length: 6 }, () => Math.random() > 0.8 ? 1 : 0)
+      anomaly: anomalyData.map(data => ({
+        features: data.features,
+        labels: data.labels
       }))
     };
   }
+  private async extractRealConsensusFeatures(): Promise<number[]> {
+    // Extract real consensus features from database
+    const recentBlocks = await this.advancedService.getRecentConsensusData(100);
+    return recentBlocks.map(block => [
+      parseFloat(block.consensusWeight || '0'),
+      parseFloat(block.emotionalScore || '0'),
+      block.validatorCount || 0,
+      block.averageEmotionalScore || 0
+    ]).flat();
+  }
+
+  private async getRealConsensusLabels(): Promise<number[]> {
+    // Get real consensus decision labels from database
+    const decisions = await this.advancedService.getConsensusDecisions(100);
+    return decisions.map(d => d.approved ? 1 : 0);
+  }
+
+  private async extractRealAnomalyFeatures(): Promise<number[]> {
+    // Extract real anomaly detection features from validator behavior
+    const validatorMetrics = await this.advancedService.getValidatorMetrics();
+    return validatorMetrics.map(v => [
+      v.responseTime || 0,
+      v.accuracy || 0,
+      v.uptime || 1,
+      v.emotionalVariance || 0
+    ]).flat();
+  }
+
+  private async getRealAnomalyLabels(): Promise<number[]> {
+    // Get real anomaly labels based on validator penalties/rewards
+    const penalties = await this.advancedService.getValidatorPenalties();
+    return penalties.map(p => p.penalty > 0 ? 1 : 0);
+  }
+
+  private async getHistoricalConsensusData(): Promise<Array<{features: number[], labels: number[]}>> {
+    // Get real historical consensus data for training
+    const consensusHistory = await this.advancedService.getConsensusHistory(1000);
+    return consensusHistory.map(entry => ({
+      features: [
+        parseFloat(entry.emotionalScore || '0'),
+        parseFloat(entry.consensusWeight || '0'),
+        entry.validatorCount || 0,
+        entry.blockHeight || 0
+      ],
+      labels: [entry.consensusReached ? 1 : 0]
+    }));
+  }
+
+  private async getHistoricalAnomalyData(): Promise<Array<{features: number[], labels: number[]}>> {
+    // Get real historical anomaly data for training
+    const anomalyHistory = await this.advancedService.getAnomalyHistory(1000);
+    return anomalyHistory.map(entry => ({
+      features: [
+        entry.deviationScore || 0,
+        entry.responseTime || 0,
+        entry.accuracy || 0,
+        entry.emotionalVariance || 0
+      ],
+      labels: [entry.isAnomaly ? 1 : 0]
+    }));
+  }
+
   private async retrainEmotionalModel(trainingData: any[]): Promise<void> {
     if (!this.emotionalModel) return;
     const xs = tf.tensor2d(trainingData.map(d => d.features));

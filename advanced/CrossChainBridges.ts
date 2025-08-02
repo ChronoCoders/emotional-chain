@@ -271,8 +271,7 @@ export class CrossChainBridgeManager extends EventEmitter {
           emotionalBonus
         } : undefined,
         bridgeFee: (amount * 0.001).toString(),
-        estimatedTime: 300,
-        createdAt: new Date()
+        estimatedTime: 300
       };
 
       const bridgeTransaction = await this.advancedService.createBridgeTransaction(bridgeData);
@@ -334,8 +333,7 @@ export class CrossChainBridgeManager extends EventEmitter {
           emotionalBonus
         } : undefined,
         bridgeFee: (emoAmount * 0.002).toString(),
-        estimatedTime: 600,
-        createdAt: new Date()
+        estimatedTime: 600
       };
 
       const bridgeTransaction = await this.advancedService.createBridgeTransaction(bridgeData);
@@ -386,8 +384,7 @@ export class CrossChainBridgeManager extends EventEmitter {
         recipient,
         status: 'pending',
         bridgeFee: (amount * 0.0005).toString(),
-        estimatedTime: 30,
-        createdAt: new Date()
+        estimatedTime: 30
       };
 
       const bridgeTransaction = await this.advancedService.createBridgeTransaction(bridgeData);
@@ -501,7 +498,7 @@ export class CrossChainBridgeManager extends EventEmitter {
     const isValid = txHash.length === 64 && /^[a-f0-9]+$/i.test(txHash);
     return {
       valid: isValid,
-      amount: isValid ? Math.random() * 10 : 0,
+      amount: isValid ? await this.getTransactionAmount(txHash, chain) : 0,
       sender: isValid ? 'bc1' + crypto.randomBytes(20).toString('hex') : ''
     };
   }
@@ -531,6 +528,17 @@ export class CrossChainBridgeManager extends EventEmitter {
   private async sendXCMMessage(bridgeTransaction: BridgeTransaction, parachain?: string): Promise<void> {
     // XCM message implementation for Polkadot
     console.log(`Sending XCM message for bridge ${bridgeTransaction.id}${parachain ? ` to parachain ${parachain}` : ''}`);
+  }
+
+  private async getTransactionAmount(txHash: string, chain: string): Promise<number> {
+    // Get real transaction amount from chain-specific RPC or database
+    try {
+      const transaction = await this.advancedService.getExternalTransaction(txHash, chain);
+      return transaction ? parseFloat(transaction.amount || '0') : 0;
+    } catch (error) {
+      console.error(`Failed to get transaction amount for ${txHash} on ${chain}:`, error);
+      return 0;
+    }
   }
 
   private calculateEmotionalScore(biometricData: BiometricData): number {

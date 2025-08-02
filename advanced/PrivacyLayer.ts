@@ -139,12 +139,10 @@ export class PrivacyEngine extends EventEmitter {
       // Store proof in database
       const proofData: InsertPrivacyProof = {
         proofType: 'emotional-threshold',
+        commitment: commitment,
+        proof: zkProof,
         validatorId: this.hashValidatorId(validatorId, salt),
-        proofData: zkProof,
-        publicSignals: zkProof.publicSignals,
-        verificationKey: zkProof.verificationKey,
-        isValid: true,
-        createdAt: new Date()
+        isValid: true
       };
 
       const storedProof = await this.advancedService.storePrivacyProof(proofData);
