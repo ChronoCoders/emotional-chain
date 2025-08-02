@@ -154,7 +154,7 @@ export class EmotionalProof {
     }
     return hashes[0] || '';
   }
-  // Proof signing
+  // CRITICAL FIX: Real cryptographic proof signing using ECDSA
   private static async signProofData(
     proofData: EmotionalProofData,
     validator: EmotionalValidator
@@ -167,10 +167,50 @@ export class EmotionalProof {
       proofTimestamp: proofData.proofTimestamp,
       consensusStrength: proofData.consensusStrength
     });
-    // In a real implementation, this would use the validator's private key
-    // For demo purposes, we'll create a deterministic signature
-    const hash = crypto.createHash('sha256').update(dataToSign + validator.getId()).digest('hex');
-    return `sig_${hash.substring(0, 32)}`;
+    
+    // Use ProductionCrypto for real ECDSA signatures
+    const messageHash = crypto.createHash('sha256').update(dataToSign).digest();
+    const privateKeyHex = validator.getPrivateKey();
+    const privateKey = Buffer.from(privateKeyHex, 'hex');
+    
+    // Import ProductionCrypto for real signatures
+    const { ProductionCrypto } = await import('../crypto/ProductionCrypto');
+    const signature = ProductionCrypto.signECDSA(messageHash, privateKey);
+    
+    return signature.signature;
+  }
+
+  // CRITICAL FIX: Real signature verification
+  static async verifyProofSignature(
+    proofData: EmotionalProofData,
+    signature: string,
+    publicKeyHex: string
+  ): Promise<boolean> {
+    try {
+      const dataToSign = JSON.stringify({
+        validators: proofData.validators.sort(),
+        emotionalScores: proofData.emotionalScores,
+        biometricHashes: proofData.biometricHashes,
+        temporalWindow: proofData.temporalWindow,
+        proofTimestamp: proofData.proofTimestamp,
+        consensusStrength: proofData.consensusStrength
+      });
+      
+      const messageHash = crypto.createHash('sha256').update(dataToSign).digest();
+      const publicKey = Buffer.from(publicKeyHex, 'hex');
+      
+      const { ProductionCrypto } = await import('../crypto/ProductionCrypto');
+      const signatureObj = {
+        signature,
+        algorithm: 'ECDSA-secp256k1' as const,
+        r: '', s: '', recovery: 0
+      };
+      
+      return ProductionCrypto.verifyECDSA(messageHash, signatureObj, publicKey);
+    } catch (error) {
+      console.error('Signature verification failed:', error);
+      return false;
+    }
   }
   // Challenge-response mechanism
   static async createEmotionalChallenge(validatorId: string): Promise<EmotionalChallenge> {

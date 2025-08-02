@@ -254,25 +254,67 @@ export class ConsensusRound extends EventEmitter {
     this.votes.set(validatorId, timeoutVote);
     this.emit('vote-timeout', { validatorId });
   }
-  // Vote validation
-  private isValidVote(vote: Vote): boolean {
+  // CRITICAL FIX: Vote validation with real cryptographic verification
+  private async isValidVote(vote: Vote): Promise<boolean> {
     // Check required fields
     if (!vote.validatorId || !vote.blockHash || !vote.signature) {
       return false;
     }
+    
     // Check block hash matches
     if (vote.blockHash !== this.proposedBlock.hash) {
       return false;
     }
+    
     // Check emotional score range
     if (vote.emotionalScore < 0 || vote.emotionalScore > 100) {
       return false;
     }
+    
     // Check timestamp is recent
     if (Date.now() - vote.timestamp > 60000) { // 1 minute max age
       return false;
     }
-    return true;
+    
+    // CRITICAL: Verify cryptographic signature
+    try {
+      const validators = this.committee.getValidators();
+      const validator = validators.find(v => v.getId() === vote.validatorId);
+      if (!validator) {
+        console.warn(`Unknown validator ${vote.validatorId}`);
+        return false;
+      }
+      
+      const voteData = JSON.stringify({
+        validatorId: vote.validatorId,
+        blockHash: vote.blockHash,
+        emotionalScore: vote.emotionalScore,
+        timestamp: vote.timestamp,
+        approved: vote.approved
+      });
+      
+      const messageHash = crypto.createHash('sha256').update(voteData).digest();
+      const publicKey = Buffer.from(validator.getPublicKey(), 'hex');
+      
+      const { ProductionCrypto } = await import('../crypto/ProductionCrypto');
+      const signatureObj = {
+        signature: vote.signature,
+        algorithm: 'ECDSA-secp256k1' as const,
+        r: '', s: '', recovery: 0
+      };
+      
+      const isValidSignature = ProductionCrypto.verifyECDSA(messageHash, signatureObj, publicKey);
+      if (!isValidSignature) {
+        console.error(`Invalid signature for vote from ${vote.validatorId}`);
+        return false;
+      }
+      
+      return true;
+      
+    } catch (error) {
+      console.error('Vote signature verification failed:', error);
+      return false;
+    }
   }
   // Result calculation
   private calculateResult(): VotingResult {

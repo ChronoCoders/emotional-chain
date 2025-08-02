@@ -1,105 +1,95 @@
-# Overview
+# EmotionalChain - Proof of Emotion Blockchain
 
-EmotionalChain is a novel blockchain platform implementing a "Proof of Emotion" consensus mechanism that uses real-time biometric data from validators to secure the network. The system combines traditional blockchain technology with biometric authentication, requiring validators to maintain emotional and physical wellness scores above certain thresholds to participate in consensus. This creates a unique approach to blockchain security that ties network participation to human emotional and physiological states.
+## Overview
 
-The project includes a full-stack implementation with a React frontend, Express.js backend, PostgreSQL database with Drizzle ORM, and comprehensive biometric device integration capabilities. It also features advanced components like cross-chain bridges, quantum-resistant cryptography, privacy layers with zero-knowledge proofs, and AI-powered consensus optimization.
+EmotionalChain is a revolutionary blockchain platform that introduces the world's first "Proof of Emotion" consensus mechanism. This system combines traditional blockchain technology with real-time biometric monitoring to create a more humane and authentic form of digital consensus. Validators must maintain emotional fitness through continuous heart rate, stress level, and focus monitoring to participate in block validation and earn rewards.
 
-# User Preferences
+The platform addresses the energy waste and centralization issues of traditional consensus mechanisms by replacing computational mining with emotional authenticity verification. This creates a more sustainable, inclusive, and psychologically-aware blockchain ecosystem where human emotional state becomes a form of digital proof-of-work.
+
+## User Preferences
 
 Preferred communication style: Simple, everyday language.
 
-# System Architecture
+## System Architecture
 
-## Frontend Architecture
-- **Framework**: React with TypeScript and Vite for development tooling
-- **UI Framework**: Tailwind CSS with shadcn/ui component library for consistent design
-- **Styling**: CSS variables for theming with dark mode support
-- **Build System**: Vite with custom aliases for clean imports (@, @shared, @assets)
-- **Component Structure**: Modular component architecture using Radix UI primitives
+### Frontend Architecture
+- **React + TypeScript**: Modern component-based UI with full type safety
+- **Vite Build System**: Fast development builds with HMR and production optimization
+- **Tailwind CSS + Shadcn/ui**: Utility-first styling with professional component library
+- **Path Aliases**: Clean imports using @ for components and @shared for cross-platform code
 
-## Backend Architecture
-- **Runtime**: Node.js with TypeScript and ESM modules
-- **Framework**: Express.js for REST API endpoints
-- **Database**: PostgreSQL with Neon serverless for cloud deployment
-- **ORM**: Drizzle ORM for type-safe database operations and migrations
-- **Build System**: ESBuild for production bundling with external package handling
+### Backend Architecture
+- **Node.js + Express**: RESTful API server with TypeScript for type safety
+- **Drizzle ORM**: Type-safe database operations with PostgreSQL dialect
+- **Database Migrations**: Version-controlled schema changes in ./migrations directory
+- **Shared Schema**: Common data types in ./shared/schema.ts for frontend/backend consistency
 
-## Consensus Engine
-- **Algorithm**: Custom "Proof of Emotion" consensus requiring 67% honest validators
-- **Committee Size**: 21 active validators selected through emotional scoring
-- **Round Structure**: Three-phase process (PROPOSE → VOTE → COMMIT) with 30-second epochs
-- **Byzantine Tolerance**: Advanced detection of emotional manipulation and collusion
-- **Emotional Thresholds**: 75% minimum emotional fitness score for participation
+### Consensus Engine
+- **Proof of Emotion**: Novel consensus mechanism using biometric validation
+- **Multi-phase Consensus**: PROPOSE → VOTE → COMMIT workflow with emotional fitness scoring
+- **Byzantine Fault Tolerance**: Advanced detection of malicious validators and emotional manipulation
+- **Dynamic Committee Selection**: Rotating validator groups with anti-collusion mechanisms
+- **Real-time Monitoring**: Continuous emotional state tracking and network health assessment
 
-## Biometric Integration
-- **Device Support**: Heart rate monitors (Polar H10), stress detectors (Empatica E4), focus monitors (EEG devices)
-- **Connection Types**: Web Bluetooth, USB, and WebRTC for device communication
-- **Data Processing**: Real-time signal processing with HRV analysis and authenticity proofs
-- **Security**: Hardware authentication and anti-tampering measures for biometric devices
+### Biometric Integration
+- **Multi-device Support**: Heart rate monitors, stress detectors, focus monitors via Bluetooth/USB
+- **Authenticity Proofs**: Cryptographic verification of live biometric data
+- **Device Security**: Hardware attestation and anti-tampering measures
+- **Privacy Protection**: Biometric data hashing and zero-knowledge proofs
 
-## Cryptographic Infrastructure
-- **Key Management**: Production-grade elliptic curve cryptography using @noble/curves
-- **Hashing**: SHA-256 and SHA-3 for block and transaction integrity
-- **Signatures**: EdDSA and BLS signature schemes for validator authentication
-- **Quantum Resistance**: Post-quantum cryptography preparation with CRYSTALS-Dilithium
-- **Privacy**: Zero-knowledge proofs for biometric data privacy protection
+### Cryptographic Security
+- **Production Cryptography**: @noble/curves library for ECDSA/EdDSA signatures
+- **Quantum Resistance**: Post-quantum cryptographic algorithms preparation
+- **Key Management**: Biometric-derived key pairs with secure storage
+- **Authenticity Verification**: Real cryptographic signatures replacing hash-based stubs
 
-## Network Layer
-- **P2P Protocol**: libp2p stack with TCP, WebSockets, and WebRTC transports
-- **Messaging**: Custom emotional protocol for biometric data broadcasting
-- **Peer Management**: Reputation-based peer selection with anti-DoS protection
-- **Consensus Networking**: Gossip protocol for efficient block and vote propagation
+### Network Layer
+- **libp2p Integration**: Production P2P networking with gossip protocols
+- **WebRTC Support**: Peer-to-peer connections with NAT traversal
+- **Byzantine Detection**: Advanced machine learning for malicious behavior identification
+- **Network Hardening**: DoS protection, peer reputation, and partition detection
 
-## Data Storage
-- **Primary Database**: PostgreSQL with comprehensive schema for validators, blocks, transactions
-- **Biometric Storage**: Encrypted biometric data with privacy-compliant retention policies
-- **Advanced Features**: Separate storage for quantum keys, privacy proofs, bridge transactions
-- **Performance**: Connection pooling and query optimization for high-throughput operations
+### Smart Contract Layer
+- **EVM Compatibility**: Ethereum-compatible smart contracts with emotional triggers
+- **Biometric Conditions**: Smart contract execution based on emotional state
+- **Wellness Incentives**: Automated rewards for maintaining emotional fitness
+- **Cross-chain Bridges**: Multi-chain interoperability with major blockchain networks
 
-## Monitoring and Compliance
-- **Metrics**: Prometheus integration for comprehensive system monitoring
-- **Privacy Compliance**: GDPR-compliant biometric data processing with consent management
-- **Security Compliance**: SOC 2 Type II controls implementation
-- **Audit Logging**: Comprehensive audit trails for all biometric and consensus operations
+## External Dependencies
 
-# External Dependencies
+### Database
+- **PostgreSQL**: Primary data store via Drizzle ORM with connection pooling
+- **Neon Database**: Serverless PostgreSQL provider for cloud deployment
 
-## Blockchain and Cryptography
-- **@noble/curves**: Production-grade elliptic curve cryptography for key generation and signatures
-- **@noble/hashes**: Secure hashing functions (SHA-256, SHA-3, HMAC, PBKDF2)
-- **@neondatabase/serverless**: PostgreSQL serverless database connection for cloud deployment
-- **drizzle-kit**: Database schema management and migrations
+### Cryptography
+- **@noble/curves**: Production-grade elliptic curve cryptography for signatures
+- **@noble/hashes**: Secure hashing algorithms for data integrity
 
-## P2P Networking
-- **@libp2p/tcp**: TCP transport for peer-to-peer communication
-- **@libp2p/websockets**: WebSocket transport for browser compatibility
-- **@libp2p/webrtc**: WebRTC transport for NAT traversal
-- **@libp2p/noise**: Secure transport encryption
-- **@libp2p/kad-dht**: Distributed hash table for peer discovery
-- **@libp2p/floodsub**: Publish-subscribe messaging for consensus coordination
+### P2P Networking
+- **libp2p**: Modular peer-to-peer networking stack
+- **WebSocket/WebRTC**: Real-time communication protocols
 
-## Cloud Infrastructure
-- **AWS SDK**: EC2, ECS, and S3 services for cloud deployment and storage
-- **Google Cloud**: Compute Engine, Storage, and Monitoring services
-- **Microsoft API Extractor**: API documentation and type extraction
+### Biometric Hardware
+- **Web Bluetooth API**: Polar H10 heart rate monitors
+- **WebUSB API**: Empatica E4 stress detection devices
+- **WebRTC Streams**: EEG headbands for focus monitoring
 
-## Frontend Development
-- **React**: Core frontend framework with TypeScript support
-- **@radix-ui**: Accessible UI primitives for complex components
-- **@hookform/resolvers**: Form validation with Joi schema integration
-- **Tailwind CSS**: Utility-first CSS framework for responsive design
+### Cloud Infrastructure
+- **AWS SDK**: EC2, ECS, S3 for cloud deployment and storage
+- **Google Cloud**: Compute Engine and monitoring services
 
-## Development and Monitoring
-- **@opentelemetry**: Distributed tracing and monitoring for performance insights
-- **@babel/core**: JavaScript transpilation for cross-browser compatibility
-- **Vite**: Fast development server and build tool
-- **@replit/vite-plugin-runtime-error-modal**: Development error handling
+### Blockchain Integrations
+- **Polkadot API**: Cross-chain communication and parachains
+- **LayerZero**: Omnichain interoperability protocol
+- **Axelar Network**: Cross-chain messaging infrastructure
 
-## Blockchain Interoperability
-- **@polkadot/api**: Polkadot ecosystem integration for cross-chain functionality
-- **LayerZero, Axelar, Wormhole**: Cross-chain bridge protocols for multi-chain deployment
+### Monitoring & Observability
+- **Prometheus**: Metrics collection and monitoring
+- **OpenTelemetry**: Distributed tracing and performance monitoring
 
-## Validation and Security
-- **@hapi/joi**: Schema validation for API endpoints and data integrity
-- **argon2**: Secure password hashing for key derivation from biometric data
-- **Various cryptographic libraries**: For quantum-resistant algorithms and zero-knowledge proofs
+### Machine Learning
+- **TensorFlow.js**: AI-powered consensus optimization and anomaly detection
+
+### Compliance
+- **GDPR**: Biometric data protection and privacy controls
+- **SOC 2**: Security compliance and audit frameworks
