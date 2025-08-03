@@ -402,22 +402,19 @@ export class PersistentTokenEconomics {
    */
   public async recalculateFromTransactions(): Promise<void> {
     try {
-      // Get rewards sum using Neon pool connection (db.raw doesn't exist in Drizzle)
-      const result = await pool.query(`
-        SELECT 
-          COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total_rewards,
-          COUNT(*) as reward_count
-        FROM transactions 
-        WHERE from_address = 'stakingPool'
+      // Calculate total EMO from all validator balances instead of transactions
+      const validatorBalances = await pool.query(`
+        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_circulating
+        FROM validator_states
       `);
       
       const blockResult = await pool.query(`SELECT MAX(height) as max_height FROM blocks`);
       
-      const totalRewards = parseFloat(result.rows[0].total_rewards || '0');
+      const totalCirculating = parseFloat(validatorBalances.rows[0].total_circulating || '0');
       const currentBlockHeight = parseInt(blockResult.rows[0].max_height || '0');
       
-      if (totalRewards > 0) {
-        // Direct SQL update using pool connection
+      if (totalCirculating >= 0) {
+        // Direct SQL update using pool connection - use actual circulating EMO
         await pool.query(`
           UPDATE token_economics SET 
             total_supply = $1,
@@ -426,9 +423,9 @@ export class PersistentTokenEconomics {
             staking_pool_remaining = $2,
             last_block_height = $3,
             updated_at = NOW()
-        `, [totalRewards.toString(), (400000000 - totalRewards).toString(), currentBlockHeight]);
+        `, [totalCirculating.toString(), (400000000 - totalCirculating).toString(), currentBlockHeight]);
         
-        console.log(`SYNC SUCCESS: ${totalRewards.toFixed(2)} EMO at block ${currentBlockHeight}`);
+        console.log(`SYNC SUCCESS: ${totalCirculating.toFixed(2)} EMO at block ${currentBlockHeight}`);
       }
     } catch (error) {
       console.error('Sync failed:', error);

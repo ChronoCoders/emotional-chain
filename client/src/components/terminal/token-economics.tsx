@@ -38,7 +38,9 @@ export default function TokenEconomics() {
   const { lastMessage } = useWebSocket();
 
   const { data: economics } = useQuery<TokenEconomics>({
-    queryKey: ['/api/token/economics']
+    queryKey: ['/api/token/economics'],
+    staleTime: 30000, // Refresh every 30 seconds to match wallet data
+    refetchInterval: 30000
   });
 
   // Update with real-time data from WebSocket
