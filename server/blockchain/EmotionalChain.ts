@@ -1,8 +1,11 @@
-// EmotionalChain Core Implementation
+// EmotionalChain Core Implementation with Distributed Consensus
 // Based on attached blockchain files
 import { EventEmitter } from 'events';
 import * as crypto from 'crypto';
 import { storage } from '../storage';
+import { P2PNode } from '../../network/P2PNode';
+import { ProofOfEmotionEngine } from '../../consensus/ProofOfEmotionEngine';
+import { ForkResolution } from '../../consensus/ForkResolution';
 export class EmotionalChain extends EventEmitter {
   private chain: any[] = [];
   private pendingTransactions: any[] = [];
@@ -11,6 +14,12 @@ export class EmotionalChain extends EventEmitter {
   private miningInterval: NodeJS.Timeout | null = null;
   private validators: Map<string, any> = new Map();
   private wallets: Map<string, number> = new Map(); // Validator wallets for EMO storage
+  
+  // Distributed Consensus Components
+  private p2pNode: P2PNode | null = null;
+  private consensusEngine: ProofOfEmotionEngine | null = null;
+  private forkResolution: ForkResolution;
+  private isDistributedMode: boolean = false;
   // Token Economics from attached specification
   private tokenEconomics = {
     maxSupply: 1000000000, // 1 billion EMO hard cap
@@ -37,9 +46,39 @@ export class EmotionalChain extends EventEmitter {
   };
   constructor() {
     super();
+    this.forkResolution = new ForkResolution(storage);
     // Note: initializeBlockchain is async but we can't await in constructor
     // This will be called immediately but blockchain might not be fully loaded initially
     this.initializeBlockchain().catch(() => {});
+  }
+
+  // Enable distributed consensus mode
+  async enableDistributedConsensus(enableNetworking: boolean = true): Promise<void> {
+    console.log('🌐 Enabling distributed consensus mode...');
+    
+    if (enableNetworking) {
+      // Initialize P2P networking
+      this.p2pNode = new P2PNode({
+        listenPort: 9001,
+        bootstrapPeers: [],
+        maxConnections: 50,
+        enableWebRTC: true
+      });
+      
+      await this.p2pNode.start();
+      console.log('🔗 P2P network started');
+      
+      // Initialize consensus engine
+      this.consensusEngine = new ProofOfEmotionEngine(this.p2pNode, storage);
+      await this.consensusEngine.start();
+      console.log('🧠 Consensus engine started');
+    }
+    
+    // Initialize fork resolution
+    await this.forkResolution.initialize();
+    this.isDistributedMode = true;
+    
+    console.log('✅ Distributed consensus enabled');
   }
   private async initializeBlockchain() {
     try {
@@ -231,6 +270,19 @@ export class EmotionalChain extends EventEmitter {
     if (hash.startsWith(target)) {
       newBlock.nonce = nonce;
       newBlock.hash = hash;
+      // DISTRIBUTED CONSENSUS: Check for forks before adding block
+      if (this.isDistributedMode) {
+        const blockForForkCheck = {
+          height: newBlock.index,
+          hash: newBlock.hash,
+          previousHash: newBlock.previousHash,
+          timestamp: new Date(newBlock.timestamp),
+          // Add other required fields for fork resolution
+        } as any;
+        
+        await this.forkResolution.checkAndResolve(blockForForkCheck);
+      }
+      
       // Add block to chain
       this.chain.push(newBlock);
       // CRITICAL: Save block to database
@@ -480,8 +532,45 @@ export class EmotionalChain extends EventEmitter {
   public getAllWallets(): Map<string, number> {
     return new Map(this.wallets);
   }
+  // Add consensus-validated block without mining
+  async addConsensusBlock(consensusBlock: any): Promise<void> {
+    console.log(`📦 Adding consensus-validated block ${consensusBlock.hash}`);
+    
+    // Add to chain (already validated by consensus)
+    this.chain.push(consensusBlock);
+    
+    // Save to database
+    try {
+      await storage.createBlock({
+        height: consensusBlock.index,
+        hash: consensusBlock.hash,
+        previousHash: consensusBlock.previousHash,
+        merkleRoot: consensusBlock.hash,
+        timestamp: consensusBlock.timestamp,
+        nonce: consensusBlock.nonce,
+        difficulty: this.difficulty,
+        validatorId: consensusBlock.validator,
+        emotionalScore: consensusBlock.emotionalScore,
+        emotionalProof: {
+          consensusScore: consensusBlock.consensusScore,
+          authenticity: consensusBlock.authenticity,
+          networkValidated: true
+        },
+        blockData: {
+          transactions: consensusBlock.transactions,
+          validator: consensusBlock.validator
+        },
+        transactionCount: consensusBlock.transactions.length
+      });
+      
+      console.log(`✅ Consensus block ${consensusBlock.hash} saved to database`);
+    } catch (error) {
+      console.error('Failed to save consensus block:', error);
+    }
+  }
+
   public getMiningStatus(): any {
-    return {
+    const baseStatus = {
       isActive: this.isMining,
       validators: this.validators.size,
       activeValidators: Array.from(this.validators.values())
@@ -490,7 +579,21 @@ export class EmotionalChain extends EventEmitter {
       difficulty: this.difficulty,
       lastBlock: this.getLatestBlock(),
       consensusScore: this.calculateConsensusScore(),
-      tokenEconomics: this.getTokenEconomics()
+      tokenEconomics: this.getTokenEconomics(),
+      isDistributedMode: this.isDistributedMode
     };
+
+    // Add distributed consensus status if enabled
+    if (this.isDistributedMode) {
+      return {
+        ...baseStatus,
+        connectedPeers: this.p2pNode ? this.p2pNode.getPeerCount() : 0,
+        consensusState: this.consensusEngine ? this.consensusEngine.getState() : 'initializing',
+        networkHealth: this.p2pNode ? this.p2pNode.getNetworkHealth() : 'unknown',
+        distributedConsensus: 'enabled'
+      };
+    }
+
+    return baseStatus;
   }
 }
