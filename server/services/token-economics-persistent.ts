@@ -67,7 +67,10 @@ export class PersistentTokenEconomics {
     await this.initialize();
 
     try {
-      // Get data directly from database without any blockchain sync
+      // Re-enable blockchain sync to get live mining data
+      await this.recalculateFromTransactions();
+      
+      // Get updated data from database
       const [economics] = await db.select().from(tokenEconomics).limit(1);
       
       if (!economics) {
