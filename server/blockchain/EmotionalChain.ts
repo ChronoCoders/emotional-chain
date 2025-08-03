@@ -197,7 +197,6 @@ export class EmotionalChain extends EventEmitter {
     return selectedValidator;
   }
   private async mineBlock(): Promise<boolean> {
-    if (this.pendingTransactions.length === 0) return false;
     const selectedValidator = this.selectValidator();
     if (!selectedValidator) {
       return false;
@@ -318,17 +317,18 @@ export class EmotionalChain extends EventEmitter {
           });
         } catch (error) {
         }
-        // Legacy: Add to pending transactions for in-memory tracking
+        // Create emotional validation transaction for this block
         this.addTransaction({
-          from: 'stakingPool',
+          from: 'emotionalValidation',
           to: selectedValidator.id,
           amount: miningReward,
-          type: 'mining_reward',
+          type: 'emotional_validation',
           timestamp: Date.now(),
           breakdown: {
             baseReward: this.tokenEconomics.rewards.baseBlockReward,
             consensusBonus: this.calculateConsensusBonus(selectedValidator.emotionalScore),
-            transactionFees: transactionFees
+            emotionalScore: selectedValidator.emotionalScore,
+            biometricData: selectedValidator.biometricData
           }
         });
         // CRITICAL: Update actual wallet balance with the total reward
@@ -366,7 +366,26 @@ export class EmotionalChain extends EventEmitter {
     this.isMining = true;
     // Start mining loop
     this.miningInterval = setInterval(async () => {
-      if (this.isMining && this.pendingTransactions.length > 0) {
+      if (this.isMining) {
+        // Generate emotional validation transaction if no pending transactions
+        if (this.pendingTransactions.length === 0) {
+          const validators = Array.from(this.validators.values());
+          if (validators.length > 0) {
+            // Create emotional validation transaction to ensure each block has transactions
+            const randomValidator = validators[Math.floor(Math.random() * validators.length)];
+            this.addTransaction({
+              from: 'emotionalNetwork',
+              to: randomValidator.id,
+              amount: 0.1, // Small validation transaction
+              type: 'emotional_heartbeat',
+              timestamp: Date.now(),
+              breakdown: {
+                emotionalScore: randomValidator.emotionalScore,
+                biometricData: randomValidator.biometricData
+              }
+            });
+          }
+        }
         await this.mineBlock();
       }
     }, 10000); // Attempt mining every 10 seconds

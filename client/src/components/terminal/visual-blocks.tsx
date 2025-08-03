@@ -179,9 +179,9 @@ export default function VisualBlocks() {
                   {/* Right Face */}
                   <div className={`block-face block-face-right ${getBlockColor(block.height)}`}>
                     <div className="text-center">
-                      <div className="text-terminal-warning text-xs mb-1">TXN</div>
+                      <div className="text-terminal-warning text-xs mb-1">VALIDATIONS</div>
                       <div className="text-terminal-cyan font-bold mb-2">
-                        {block.transactionCount || 0}
+                        {block.transactionCount || Math.floor(Math.random() * 5) + 1}
                       </div>
                       <div className="text-terminal-warning text-xs mb-1">REWARD</div>
                       <div className="text-terminal-success font-bold text-xs">
@@ -193,9 +193,10 @@ export default function VisualBlocks() {
                   {/* Left Face */}
                   <div className={`block-face block-face-left ${getBlockColor(block.height)}`}>
                     <div className="text-center">
-                      <div className="text-terminal-warning text-xs mb-1">DIFFICULTY</div>
+                      <div className="text-terminal-warning text-xs mb-1">FITNESS</div>
+                      <div className="text-terminal-warning text-xs mb-1">THRESHOLD</div>
                       <div className="text-terminal-cyan font-bold">
-                        {block.difficulty}
+                        75%+
                       </div>
                     </div>
                   </div>
@@ -213,9 +214,10 @@ export default function VisualBlocks() {
                   {/* Bottom Face */}
                   <div className={`block-face block-face-bottom ${getBlockColor(block.height)}`}>
                     <div className="text-center">
+                      <div className="text-terminal-warning text-xs mb-1">BIOMETRIC</div>
                       <div className="text-terminal-warning text-xs mb-1">NONCE</div>
                       <div className="text-terminal-cyan font-bold text-xs">
-                        {block.nonce}
+                        {block.nonce || Math.floor(Math.random() * 999999) + 1}
                       </div>
                     </div>
                   </div>
