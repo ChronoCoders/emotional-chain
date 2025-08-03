@@ -52,7 +52,7 @@ export class DatabaseManager {
       this.setupMonitoring();
       
       this.isInitialized = true;
-      console.log('✅ Database manager initialized successfully');
+      console.log(' Database manager initialized successfully');
       
     } catch (error) {
       console.error('Database initialization failed:', error);

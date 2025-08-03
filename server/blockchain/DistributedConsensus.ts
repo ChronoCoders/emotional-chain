@@ -27,24 +27,24 @@ export class DistributedConsensus {
     });
 
     await this.p2pNode.start();
-    console.log('🔗 P2P network initialized');
+    console.log(' P2P network initialized');
 
     // Initialize consensus engine
     this.consensusEngine = new ProofOfEmotionEngine(this.p2pNode, storage);
     await this.consensusEngine.start();
-    console.log('🧠 Consensus engine initialized');
+    console.log(' Consensus engine initialized');
 
     // Bridge consensus events to blockchain
     this.setupEventBridging();
     
     this.isEnabled = true;
-    console.log('✅ Distributed consensus fully initialized');
+    console.log(' Distributed consensus fully initialized');
   }
 
   private setupEventBridging(): void {
     // When consensus engine produces a block, add it to the main chain
     this.consensusEngine.on('block-finalized', async (consensusBlock) => {
-      console.log(`🔗 Consensus block finalized: ${consensusBlock.hash}`);
+      console.log(` Consensus block finalized: ${consensusBlock.hash}`);
       
       // Convert consensus block format to blockchain format
       const blockchainBlock = {

@@ -39,23 +39,23 @@ export class ComplianceService {
     try {
       // Initialize GDPR compliance
       await this.gdprCompliance.initialize();
-      console.log('✅ GDPR compliance framework ready');
+      console.log(' GDPR compliance framework ready');
       
       // Initialize SOC 2 compliance
       await this.soc2Compliance.initialize();
-      console.log('✅ SOC 2 compliance framework ready');
+      console.log(' SOC 2 compliance framework ready');
       
       // Set up compliance monitoring
       this.setupComplianceMonitoring();
-      console.log('✅ Compliance monitoring active');
+      console.log(' Compliance monitoring active');
       
       // Perform initial compliance assessment
       await this.performInitialAssessment();
-      console.log('✅ Initial compliance assessment complete');
+      console.log(' Initial compliance assessment complete');
       
       // Set up periodic compliance checks
       this.setupPeriodicChecks();
-      console.log('✅ Periodic compliance checks scheduled');
+      console.log(' Periodic compliance checks scheduled');
       
       this.isInitialized = true;
       console.log('🏆 Phase 4 Compliance Service initialized');
@@ -217,7 +217,7 @@ export class ComplianceService {
   async performComplianceAssessment(): Promise<ComprehensiveComplianceAssessment> {
     const assessmentStart = performance.now();
     
-    console.log('🔍 Performing comprehensive compliance assessment...');
+    console.log(' Performing comprehensive compliance assessment...');
     
     try {
       // Perform GDPR assessment
@@ -264,8 +264,8 @@ export class ComplianceService {
       // Update compliance status
       this.updateComplianceStatus(assessment);
       
-      console.log(`📊 Compliance assessment completed: ${overallScore.toFixed(1)}% overall score`);
-      console.log(`🚀 Deployment ready: ${deploymentReady ? 'YES' : 'NO'}`);
+      console.log(` Compliance assessment completed: ${overallScore.toFixed(1)}% overall score`);
+      console.log(` Deployment ready: ${deploymentReady ? 'YES' : 'NO'}`);
       
       return assessment;
       
@@ -323,10 +323,10 @@ export class ComplianceService {
       const assessment = await this.performComplianceAssessment();
       
       if (!assessment.deploymentReady) {
-        console.warn('⚠️  System not yet deployment ready - compliance issues identified');
+        console.warn('️  System not yet deployment ready - compliance issues identified');
         console.warn('Issues:', assessment.recommendations);
       } else {
-        console.log('✅ System is deployment ready - all compliance requirements met');
+        console.log(' System is deployment ready - all compliance requirements met');
       }
       
     } catch (error) {
@@ -358,7 +358,7 @@ export class ComplianceService {
       // Check audit log integrity
       // Check access control compliance
       
-      console.log('✅ Compliance health check completed');
+      console.log(' Compliance health check completed');
       
     } catch (error) {
       console.error('Compliance health check failed:', error);
@@ -404,11 +404,11 @@ export class ComplianceService {
   }
 
   private logComplianceReadiness(): void {
-    console.log('🎯 Phase 4 Compliance Targets:');
+    console.log(' Phase 4 Compliance Targets:');
     console.log('   📋 GDPR: Full biometric data protection compliance');
-    console.log('   🔒 SOC 2: Trust Services Criteria implementation');
-    console.log('   📊 Monitoring: Continuous compliance assessment');
-    console.log('   🚀 Deployment: Production readiness validation');
+    console.log('    SOC 2: Trust Services Criteria implementation');
+    console.log('    Monitoring: Continuous compliance assessment');
+    console.log('    Deployment: Production readiness validation');
   }
 
   /**

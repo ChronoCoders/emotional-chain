@@ -36,28 +36,28 @@ export class PerformanceOptimizationService {
       return;
     }
 
-    console.log('🚀 Initializing Phase 3 Performance Optimization...');
+    console.log(' Initializing Phase 3 Performance Optimization...');
     
     try {
       // Initialize WebAssembly optimizations
       await this.wasmOptimization.initialize();
-      console.log('✅ WebAssembly optimization ready');
+      console.log(' WebAssembly optimization ready');
       
       // Initialize database optimizations
       await this.databaseOptimization.initialize();
-      console.log('✅ Database optimization ready');
+      console.log(' Database optimization ready');
       
       // Set up performance monitoring
       this.setupPerformanceMonitoring();
-      console.log('✅ Performance monitoring active');
+      console.log(' Performance monitoring active');
       
       // Configure memory optimization
       this.configureMemoryOptimization();
-      console.log('✅ Memory optimization configured');
+      console.log(' Memory optimization configured');
       
       // Start performance health checks
       this.startPerformanceHealthChecks();
-      console.log('✅ Performance health checks started');
+      console.log(' Performance health checks started');
       
       this.isInitialized = true;
       console.log('🏆 Phase 3 Performance Optimization Service initialized');
@@ -93,7 +93,7 @@ export class PerformanceOptimizationService {
       const validators = await this.databaseOptimization.getValidatorsBatch(validatorIds);
       const fetchTime = performance.now() - fetchStart;
       
-      console.log(`📊 Fetched ${validators.length} validators in ${fetchTime.toFixed(2)}ms (target: 50ms)`);
+      console.log(` Fetched ${validators.length} validators in ${fetchTime.toFixed(2)}ms (target: 50ms)`);
       
       // Phase 2: WebAssembly-accelerated consensus (target: <500ms)
       const consensusStart = performance.now();
@@ -295,7 +295,7 @@ export class PerformanceOptimizationService {
       };
       
       if (!status.healthy) {
-        console.warn('⚠️  Performance health check failed:', status);
+        console.warn('️  Performance health check failed:', status);
       }
       
       return status;
@@ -324,7 +324,7 @@ export class PerformanceOptimizationService {
       .map(([key, target]) => `${key}: ${target}`)
       .join(', ');
     
-    console.log(`📊 Performance targets: ${targetsText}`);
+    console.log(` Performance targets: ${targetsText}`);
   }
 
   private async calculateMemoryEfficiency(): Promise<number> {
@@ -344,25 +344,25 @@ export class PerformanceOptimizationService {
     
     console.log(`🏆 Consensus Round ${result.consensusRound} Performance Summary:`);
     console.log(`   👥 Validators: ${result.validatorCount}`);
-    console.log(`   ⏱️  Total Time: ${perf.totalTime.toFixed(2)}ms (target: ${this.performanceTargets.consensusTime}ms)`);
-    console.log(`   📊 Database: ${perf.databaseFetch.toFixed(2)}ms (target: ${this.performanceTargets.databaseFetch}ms)`);
+    console.log(`   ⏱  Total Time: ${perf.totalTime.toFixed(2)}ms (target: ${this.performanceTargets.consensusTime}ms)`);
+    console.log(`    Database: ${perf.databaseFetch.toFixed(2)}ms (target: ${this.performanceTargets.databaseFetch}ms)`);
     console.log(`   🧮 Consensus: ${perf.consensusProcessing.toFixed(2)}ms (target: ${this.performanceTargets.consensusTime}ms)`);
     console.log(`   💾 Insertion: ${perf.blockInsertion.toFixed(2)}ms (target: ${this.performanceTargets.blockInsertion}ms)`);
-    console.log(`   📈 Throughput: ${scalabilityMetrics.validatorsPerSecond.toFixed(0)} validators/sec`);
-    console.log(`   ✅ Targets Met: ${Object.values(perf.targetsMet).filter(Boolean).length}/4`);
+    console.log(`    Throughput: ${scalabilityMetrics.validatorsPerSecond.toFixed(0)} validators/sec`);
+    console.log(`    Targets Met: ${Object.values(perf.targetsMet).filter(Boolean).length}/4`);
   }
 
   private logPerformanceTargets(): void {
-    console.log(`🎯 Phase 3 Performance Targets:`);
+    console.log(` Phase 3 Performance Targets:`);
     console.log(`   🏁 Consensus: ${this.performanceTargets.consensusTime}ms for 10,000 validators`);
-    console.log(`   ✍️  Signatures: ${this.performanceTargets.signatureVerification}ms for 1,000 verifications`);
-    console.log(`   📊 Database: ${this.performanceTargets.databaseFetch}ms for 10,000 validator fetch`);
+    console.log(`   ✍  Signatures: ${this.performanceTargets.signatureVerification}ms for 1,000 verifications`);
+    console.log(`    Database: ${this.performanceTargets.databaseFetch}ms for 10,000 validator fetch`);
     console.log(`   💾 Memory: ${this.performanceTargets.memoryUsage}MB maximum usage`);
-    console.log(`   🖥️  CPU: ${this.performanceTargets.cpuUsage}% maximum usage`);
+    console.log(`   🖥  CPU: ${this.performanceTargets.cpuUsage}% maximum usage`);
   }
 
   private logPerformanceStatus(wasmMetrics: any, dbMetrics: any): void {
-    console.log(`📊 Performance Status: WASM=${wasmMetrics.wasmInitialized ? 'Ready' : 'Pending'}, DB=${dbMetrics.optimized ? 'Optimized' : 'Standard'}`);
+    console.log(` Performance Status: WASM=${wasmMetrics.wasmInitialized ? 'Ready' : 'Pending'}, DB=${dbMetrics.optimized ? 'Optimized' : 'Standard'}`);
   }
 
   /**

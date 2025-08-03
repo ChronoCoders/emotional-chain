@@ -204,7 +204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Get all wallets for debugging
       const allWallets = await emotionalChainService.getAllWallets();
-      console.log(`📊 Wallet request for ${validatorId}: balance=${balance}, total wallets=${allWallets.size}`);
+      console.log(`Wallet request for ${validatorId}: balance=${balance}, total wallets=${allWallets.size}`);
       
       res.json({
         validatorId,
@@ -247,7 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currency: 'EMO'
       }));
       
-      console.log(`💰 Wallets API returning ${walletsArray.length} wallets:`, walletsArray.map(w => `${w.validatorId}: ${w.balance}`));
+      console.log(`Wallets API returning ${walletsArray.length} wallets:`, walletsArray.map(w => `${w.validatorId}: ${w.balance}`));
       
       res.json(walletsArray);
     } catch (error) {

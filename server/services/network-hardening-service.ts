@@ -36,7 +36,7 @@ export class NetworkHardeningService {
     this.setupNetworkMonitoring();
     
     this.isInitialized = true;
-    console.log('✅ Phase 2 Network Hardening Service initialized');
+    console.log(' Phase 2 Network Hardening Service initialized');
   }
 
   /**
@@ -55,7 +55,7 @@ export class NetworkHardeningService {
       const assessment = await this.byzantineDetection.analyzeValidatorBehavior(validatorId, action);
       
       if (assessment.threatLevel === 'high' || assessment.threatLevel === 'critical') {
-        console.warn(`🚨 Byzantine threat detected from validator ${validatorId}:`, assessment);
+        console.warn(` Byzantine threat detected from validator ${validatorId}:`, assessment);
         
         // Update Prometheus metrics
         prometheusIntegration.recordByzantineDetection(assessment.threatLevel);
@@ -143,7 +143,7 @@ export class NetworkHardeningService {
    * Handle Byzantine threat detection
    */
   private async handleByzantineThreat(validatorId: string, assessment: any): Promise<void> {
-    console.warn(`🚨 Handling Byzantine threat from ${validatorId}:`, assessment);
+    console.warn(` Handling Byzantine threat from ${validatorId}:`, assessment);
     
     // Generate detailed threat report
     const report = await this.byzantineDetection.generateThreatReport(validatorId);
@@ -183,7 +183,7 @@ export class NetworkHardeningService {
       // Add to blacklist
       // This would prevent future connections
       
-      console.log(`✅ Validator ${validatorId} isolated successfully`);
+      console.log(` Validator ${validatorId} isolated successfully`);
     } catch (error) {
       console.error(`Failed to isolate validator ${validatorId}:`, error);
     }
@@ -197,7 +197,7 @@ export class NetworkHardeningService {
     // Require additional authentication steps
     // Monitor consensus participation more closely
     
-    console.log(`🔍 Enhanced monitoring activated for ${validatorId}`);
+    console.log(` Enhanced monitoring activated for ${validatorId}`);
   }
 
   /**
@@ -213,17 +213,17 @@ export class NetworkHardeningService {
     
     // Check for network partitions
     if (networkMetrics.partitionStatus === 'partitioned') {
-      console.warn('🔥 Network partition detected!');
+      console.warn(' Network partition detected!');
       prometheusIntegration.recordNetworkPartition();
     }
     
     // Log network health summary
     if (networkMetrics.connectedPeers < 10) {
-      console.warn(`⚠️  Low peer count: ${networkMetrics.connectedPeers}`);
+      console.warn(`️  Low peer count: ${networkMetrics.connectedPeers}`);
     }
     
     if (networkMetrics.averageReputation < 80) {
-      console.warn(`⚠️  Low average peer reputation: ${networkMetrics.averageReputation}`);
+      console.warn(`️  Low average peer reputation: ${networkMetrics.averageReputation}`);
     }
   }
 

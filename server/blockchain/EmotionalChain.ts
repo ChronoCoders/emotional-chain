@@ -516,7 +516,7 @@ export class EmotionalChain extends EventEmitter {
   }
   // Add consensus-validated block without mining
   async addConsensusBlock(consensusBlock: any): Promise<void> {
-    console.log(`📦 Adding consensus-validated block ${consensusBlock.hash}`);
+    console.log(`Adding consensus-validated block ${consensusBlock.hash}`);
     
     // Add to chain (already validated by consensus)
     this.chain.push(consensusBlock);
@@ -545,7 +545,7 @@ export class EmotionalChain extends EventEmitter {
         transactionCount: consensusBlock.transactions.length
       });
       
-      console.log(`✅ Consensus block ${consensusBlock.hash} saved to database`);
+      console.log(`Consensus block ${consensusBlock.hash} saved to database`);
     } catch (error) {
       console.error('Failed to save consensus block:', error);
     }
