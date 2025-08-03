@@ -403,22 +403,19 @@ export class PersistentTokenEconomics {
    */
   public async recalculateFromTransactions(): Promise<void> {
     try {
-      // Get actual mined EMO from database transactions
-      const result = await pool.query(`
-        SELECT 
-          COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total_rewards,
-          COUNT(*) as reward_count
-        FROM transactions 
-        WHERE from_address = 'stakingPool'
+      // Get LIVE validator balances which represent actual circulating EMO
+      const validatorResult = await pool.query(`
+        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_circulating
+        FROM validator_states
       `);
       
       const blockResult = await pool.query(`SELECT COUNT(*) as total_blocks FROM blocks`);
       
-      const totalRewards = parseFloat(result.rows[0].total_rewards || '0');
+      const totalCirculating = parseFloat(validatorResult.rows[0].total_circulating || '0');
       const totalBlocks = parseInt(blockResult.rows[0].total_blocks || '0');
       
-      if (totalRewards > 0) {
-        // Update database with correct mined values
+      if (totalCirculating > 0) {
+        // Update database with LIVE mining totals
         await pool.query(`
           UPDATE token_economics SET 
             total_supply = $1,
@@ -427,12 +424,12 @@ export class PersistentTokenEconomics {
             staking_pool_remaining = $2,
             last_block_height = $3,
             updated_at = NOW()
-        `, [totalRewards.toString(), (400000000 - totalRewards).toString(), totalBlocks]);
+        `, [totalCirculating.toString(), (400000000 - totalCirculating).toString(), totalBlocks]);
         
-        console.log(`SYNC SUCCESS: ${totalRewards.toFixed(2)} EMO at block ${totalBlocks}`);
+        console.log(`LIVE SYNC: ${totalCirculating.toFixed(2)} EMO at block ${totalBlocks}`);
       }
     } catch (error) {
-      console.error('Sync failed:', error);
+      console.error('Live sync failed:', error);
     }
   }
 }
