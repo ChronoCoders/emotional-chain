@@ -579,28 +579,26 @@ Mining rewards distributed to ecosystem validators.`;
   }
   public async getTokenEconomics(): Promise<any> {
     try {
-      // Get real blockchain data first 
-      let blockchainData = null;
-      if (this.bootstrapNode && this.isRunning) {
-        blockchainData = this.bootstrapNode.getBlockchain().getTokenEconomics();
-      }
+      // Force sync all wallet balances to blockchain first
+      await this.syncWalletWithBlockchain();
       
-      // If blockchain has more recent data, update persistent storage immediately
-      if (blockchainData && blockchainData.totalSupply > 0) {
-        const persistentData = await persistentTokenEconomics.getTokenEconomics();
-        
-        // Sync if blockchain has more EMO than database
-        if (blockchainData.totalSupply > persistentData.totalSupply) {
-          console.log(`Syncing: Database ${persistentData.totalSupply} → Blockchain ${blockchainData.totalSupply} EMO`);
-          
-          const networkStats = this.network?.getNetworkStats();
-          const blockHeight = networkStats?.blockHeight || 0;
-          
-          await persistentTokenEconomics.updateTokenSupplyFromBlockchain(
-            blockchainData.totalSupply, 
-            blockHeight
-          );
-        }
+      // Get live wallet totals from blockchain
+      const wallets = await this.getAllWallets();
+      let totalFromWallets = 0;
+      wallets.forEach(balance => {
+        totalFromWallets += balance;
+      });
+      
+      // Get current block height
+      const networkStats = this.network?.getNetworkStats();
+      const blockHeight = networkStats?.blockHeight || 0;
+      
+      // Update persistent storage with real wallet totals
+      if (totalFromWallets > 0) {
+        await persistentTokenEconomics.updateTokenSupplyFromBlockchain(
+          totalFromWallets, 
+          blockHeight
+        );
       }
       
       // Return updated persistent data
