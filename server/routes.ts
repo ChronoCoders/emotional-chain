@@ -186,8 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.get('/api/token/economics', async (req, res) => {
     try {
-      // Force sync before getting token economics for fresh data
-      await emotionalChainService.syncWalletWithBlockchain();
+      // Get token economics directly from database without blockchain sync
       const economics = await emotionalChainService.getTokenEconomics();
       res.json(economics);
     } catch (error) {

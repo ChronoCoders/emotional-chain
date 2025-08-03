@@ -579,38 +579,10 @@ Mining rewards distributed to ecosystem validators.`;
   }
   public async getTokenEconomics(): Promise<any> {
     try {
-      // Force sync all wallet balances to blockchain first
-      await this.syncWalletWithBlockchain();
-      
-      // Get live wallet totals from blockchain
-      const wallets = await this.getAllWallets();
-      let totalFromWallets = 0;
-      wallets.forEach(balance => {
-        totalFromWallets += balance;
-      });
-      
-      // Get current block height
-      const networkStats = this.network?.getNetworkStats();
-      const blockHeight = networkStats?.blockHeight || 0;
-      
-      // Update persistent storage with real wallet totals
-      if (totalFromWallets > 0) {
-        await persistentTokenEconomics.updateTokenSupplyFromBlockchain(
-          totalFromWallets, 
-          blockHeight
-        );
-      }
-      
-      // Return updated persistent data
+      // Return data directly from database - no blockchain wallet calculation
       return await persistentTokenEconomics.getTokenEconomics();  
     } catch (error) {
       console.error('Failed to get token economics:', error);
-      
-      // Fallback to blockchain data if available
-      if (this.bootstrapNode && this.isRunning) {
-        return this.bootstrapNode.getBlockchain().getTokenEconomics();
-      }
-      
       return { error: 'Token economics not available' };
     }
   }

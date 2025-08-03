@@ -61,15 +61,13 @@ export class PersistentTokenEconomics {
   }
 
   /**
-   * Get current token economics state
+   * Get current token economics state from database only
    */
   public async getTokenEconomics(): Promise<any> {
     await this.initialize();
 
     try {
-      // REAL-TIME SYNC: Always sync with database transactions first
-      await this.recalculateFromTransactions();
-      
+      // Get data directly from database without any blockchain sync
       const [economics] = await db.select().from(tokenEconomics).limit(1);
       
       if (!economics) {
@@ -401,35 +399,9 @@ export class PersistentTokenEconomics {
    * WORKING SYNC: Recalculate from actual database transactions using pool connection
    */
   public async recalculateFromTransactions(): Promise<void> {
-    try {
-      // Calculate total EMO from all validator balances instead of transactions
-      const validatorBalances = await pool.query(`
-        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_circulating
-        FROM validator_states
-      `);
-      
-      const blockResult = await pool.query(`SELECT MAX(height) as max_height FROM blocks`);
-      
-      const totalCirculating = parseFloat(validatorBalances.rows[0].total_circulating || '0');
-      const currentBlockHeight = parseInt(blockResult.rows[0].max_height || '0');
-      
-      if (totalCirculating >= 0) {
-        // Direct SQL update using pool connection - use actual circulating EMO
-        await pool.query(`
-          UPDATE token_economics SET 
-            total_supply = $1,
-            circulating_supply = $1,
-            staking_pool_utilized = $1,
-            staking_pool_remaining = $2,
-            last_block_height = $3,
-            updated_at = NOW()
-        `, [totalCirculating.toString(), (400000000 - totalCirculating).toString(), currentBlockHeight]);
-        
-        console.log(`SYNC SUCCESS: ${totalCirculating.toFixed(2)} EMO at block ${currentBlockHeight}`);
-      }
-    } catch (error) {
-      console.error('Sync failed:', error);
-    }
+    // This method is disabled - token economics now reads directly from database
+    // without any real-time blockchain sync calculations
+    return;
   }
 }
 
