@@ -47,7 +47,7 @@ export default function Terminal() {
         <div className="terminal-window rounded-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
             <AsciBanner className="flex-1" />
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Link href="/privacy">
                 <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
                   <ExternalLink size={14} />
@@ -58,6 +58,18 @@ export default function Terminal() {
                 <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
                   <ExternalLink size={14} />
                   MONITORING
+                </div>
+              </Link>
+              <Link href="/ai-consensus">
+                <div className="bg-terminal-cyan/20 hover:bg-terminal-cyan/30 border border-terminal-cyan rounded px-3 py-2 text-terminal-cyan font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
+                  <ExternalLink size={14} />
+                  AI CONSENSUS
+                </div>
+              </Link>
+              <Link href="/ai-learning">
+                <div className="bg-terminal-warning/20 hover:bg-terminal-warning/30 border border-terminal-warning rounded px-3 py-2 text-terminal-warning font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
+                  <ExternalLink size={14} />
+                  AI LEARNING
                 </div>
               </Link>
               <Link href="/explorer">
