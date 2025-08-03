@@ -1,16 +1,18 @@
 // EmotionalChain Core Implementation with Distributed Consensus
 // Based on attached blockchain files
 import { EventEmitter } from 'events';
-import * as crypto from 'crypto';
+import { ProductionCrypto } from '../../crypto/ProductionCrypto';
+import { BlockCrypto, CryptographicBlock } from '../../crypto/BlockCrypto';
 import { storage } from '../storage';
 export class EmotionalChain extends EventEmitter {
-  private chain: any[] = [];
+  private chain: CryptographicBlock[] = [];
   private pendingTransactions: any[] = [];
   private difficulty: number = 2;
   private isMining: boolean = false;
   private miningInterval: NodeJS.Timeout | null = null;
   private validators: Map<string, any> = new Map();
   private wallets: Map<string, number> = new Map(); // Validator wallets for EMO storage
+  private validatorKeys: Map<string, { privateKey: Uint8Array; publicKey: Uint8Array }> = new Map();
   
   // Future: Distributed Consensus Components (when implemented)
   private isDistributedMode: boolean = false;
@@ -59,10 +61,10 @@ export class EmotionalChain extends EventEmitter {
       if (existingBlocks.length > 0) {
         this.chain = existingBlocks;
       } else {
-        this.createGenesisBlock();
+        await this.createGenesisBlock();
       }
     } catch (error) {
-      this.createGenesisBlock();
+      await this.createGenesisBlock();
     }
   }
   private async loadBlockchainFromDatabase(): Promise<any[]> {
@@ -87,24 +89,43 @@ export class EmotionalChain extends EventEmitter {
       return [];
     }
   }
-  private createGenesisBlock() {
-    const genesisBlock = {
+  private async createGenesisBlock() {
+    // Generate genesis validator key pair
+    const genesisKeyPair = ProductionCrypto.generateECDSAKeyPair();
+    this.validatorKeys.set('genesis', genesisKeyPair);
+    
+    // Create cryptographically secure genesis block
+    const genesisBlock = await BlockCrypto.signBlock({
       index: 0,
       timestamp: Date.now(),
       transactions: [],
       previousHash: "0",
-      hash: this.calculateHash(0, Date.now(), [], "0", 0),
-      nonce: 0,
+      validator: "genesis",
       emotionalScore: "100.00",
       consensusScore: "100.00",
       authenticity: "100.00",
-      validator: "genesis"
-    };
+      nonce: 0,
+      difficulty: this.difficulty
+    }, genesisKeyPair.privateKey);
+    
     this.chain.push(genesisBlock);
   }
   private calculateHash(index: number, timestamp: number, transactions: any[], previousHash: string, nonce: number): string {
-    const data = index + timestamp + JSON.stringify(transactions) + previousHash + nonce;
-    return crypto.createHash('sha256').update(data).digest('hex');
+    // Use production cryptography for block hashing
+    const merkleRoot = BlockCrypto.calculateMerkleRoot(transactions);
+    return BlockCrypto.generateBlockHash({
+      index,
+      timestamp,
+      transactions,
+      previousHash,
+      validator: 'system',
+      emotionalScore: '100.00',
+      consensusScore: '100.00',
+      authenticity: '100.00',
+      nonce,
+      difficulty: this.difficulty,
+      merkleRoot
+    });
   }
   private calculateEmotionalScore(biometricData: any): number {
     // Proof of Emotion calculation based on biometric validation

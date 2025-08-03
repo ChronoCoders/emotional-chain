@@ -1,4 +1,4 @@
-import * as crypto from 'crypto';
+import { ProductionCrypto } from './ProductionCrypto';
 import { Transaction } from './Transaction';
 export interface MerkleProof {
   leaf: string;
@@ -8,9 +8,22 @@ export interface MerkleProof {
 export class MerkleTree {
   private leaves: string[];
   private tree: string[][];
-  constructor(transactions: Transaction[]) {
-    // Create leaf hashes from transactions
-    this.leaves = transactions.map(tx => tx.calculateHash());
+  constructor(transactions: any[]) {
+    // Calculate hash for each transaction - handle both objects and strings
+    this.leaves = transactions.map(tx => {
+      if (typeof tx === 'string') {
+        return tx;
+      } else if (tx && typeof tx.calculateHash === 'function') {
+        return tx.calculateHash();
+      } else if (tx && tx.id) {
+        return tx.id;
+      } else {
+        // Fallback: hash the transaction object directly
+        const txString = JSON.stringify(tx);
+        const txBytes = new TextEncoder().encode(txString);
+        return Buffer.from(ProductionCrypto.hash(txBytes)).toString('hex');
+      }
+    });
     // Build the merkle tree
     this.tree = this.buildTree();
   }
@@ -31,7 +44,8 @@ export class MerkleTree {
         const left = currentLevel[i];
         const right = i + 1 < currentLevel.length ? currentLevel[i + 1] : left; // Duplicate if odd
         const combined = left + right;
-        const parentHash = crypto.createHash('sha256').update(combined).digest('hex');
+        const combinedBytes = new TextEncoder().encode(combined);
+        const parentHash = Buffer.from(ProductionCrypto.hash(combinedBytes)).toString('hex');
         nextLevel.push(parentHash);
       }
       currentLevel = nextLevel;

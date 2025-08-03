@@ -1,6 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 import { AxiosInstance } from 'axios';
-import { createHash, randomBytes } from 'crypto';
+import { ProductionCrypto } from '../crypto/ProductionCrypto';
+import { BiometricCrypto } from '../crypto/BiometricCrypto';
 /**
  * BiometricSDK - Biometric device integration and emotional authentication
  * 

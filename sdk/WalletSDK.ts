@@ -1,6 +1,7 @@
 import { EventEmitter } from 'eventemitter3';
 import { AxiosInstance } from 'axios';
-import { createHash, randomBytes } from 'crypto';
+import { ProductionCrypto } from '../crypto/ProductionCrypto';
+import { TransactionCrypto } from '../crypto/TransactionCrypto';
 /**
  * WalletSDK - Wallet management and transaction signing
  * 

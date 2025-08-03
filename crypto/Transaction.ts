@@ -1,4 +1,5 @@
-import * as crypto from 'crypto';
+import { ProductionCrypto } from './ProductionCrypto';
+import { TransactionCrypto, SignedTransaction } from './TransactionCrypto';
 import { KeyPair } from './KeyPair';
 export interface BiometricData {
   heartRate: number;
@@ -56,23 +57,22 @@ export class Transaction {
     this.id = this.calculateHash();
   }
   /**
-   * Calculate cryptographic hash of the transaction
+   * Calculate cryptographic hash of the transaction using production crypto
    */
   public calculateHash(): string {
-    const data = {
+    return TransactionCrypto.generateTransactionHash({
       from: this.from,
       to: this.to,
       amount: this.amount,
-      type: this.type,
+      nonce: 0, // Will be set during signing
       timestamp: this.timestamp,
       fee: this.fee,
+      type: this.type,
       biometricData: this.biometricData,
       emotionalScore: this.emotionalScore,
       consensusScore: this.consensusScore,
       breakdown: this.breakdown
-    };
-    const dataString = JSON.stringify(data);
-    return crypto.createHash('sha256').update(dataString).digest('hex');
+    });
   }
   /**
    * Sign the transaction with a private key
