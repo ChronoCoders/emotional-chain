@@ -60,18 +60,6 @@ export default function Terminal() {
                   MONITORING
                 </div>
               </Link>
-              <Link href="/ai-consensus">
-                <div className="bg-terminal-cyan/20 hover:bg-terminal-cyan/30 border border-terminal-cyan rounded px-3 py-2 text-terminal-cyan font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
-                  <ExternalLink size={14} />
-                  AI CONSENSUS
-                </div>
-              </Link>
-              <Link href="/ai-learning">
-                <div className="bg-terminal-warning/20 hover:bg-terminal-warning/30 border border-terminal-warning rounded px-3 py-2 text-terminal-warning font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
-                  <ExternalLink size={14} />
-                  AI LEARNING
-                </div>
-              </Link>
               <Link href="/explorer">
                 <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
                   <ExternalLink size={14} />
@@ -141,13 +129,29 @@ export default function Terminal() {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="terminal-window rounded-lg p-4 mt-6">
-          <div className="ascii-art text-terminal-green text-center text-xs">
-            {`┌─────────────────────────────────────────────────────────────────────────────────────────┐
+        {/* Admin Access Panel - Discrete placement */}
+        <div className="terminal-window rounded-lg p-3 mt-6 border border-terminal-border/30">
+          <div className="flex justify-between items-center">
+            <div className="ascii-art text-terminal-green text-center text-xs flex-1">
+              {`┌─────────────────────────────────────────────────────────────────────────────────────────┐
 │  EmotionalChain v1.0.0 | PoE Consensus Active | Network: Custom                          │
 │  Connected to Network | Block Height: ${stats ? stats.blockHeight : '----'} | Validators: ${stats ? stats.activeValidators : '--'}/${stats ? stats.activeValidators : '--'} | Status: ✅ OPERATIONAL │
 └─────────────────────────────────────────────────────────────────────────────────────────┘`}
+            </div>
+            
+            {/* Admin Panel - Small discrete links */}
+            <div className="ml-4 flex gap-1 opacity-60 hover:opacity-100 transition-opacity">
+              <Link href="/ai-consensus">
+                <div className="bg-terminal-surface/50 hover:bg-terminal-surface border border-terminal-border/50 rounded px-2 py-1 text-terminal-cyan font-mono text-xs transition-colors cursor-pointer">
+                  AI-CONS
+                </div>
+              </Link>
+              <Link href="/ai-learning">
+                <div className="bg-terminal-surface/50 hover:bg-terminal-surface border border-terminal-border/50 rounded px-2 py-1 text-terminal-warning font-mono text-xs transition-colors cursor-pointer">
+                  AI-LEARN
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
