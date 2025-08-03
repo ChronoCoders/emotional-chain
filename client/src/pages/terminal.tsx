@@ -21,6 +21,30 @@ export default function Terminal() {
     queryKey: ['/api/network/status']
   });
 
+  // Fetch real wallet data for primary validator
+  const { data: walletData, error: walletError, isLoading: walletLoading } = useQuery<{ validatorId: string; balance: number; currency: string }>({
+    queryKey: ['/api/wallet/StellarNode'],
+    staleTime: 30000, // Refresh every 30 seconds to get latest balance
+    refetchInterval: 30000
+  });
+
+  // Fetch all validator wallets for comprehensive dashboard
+  const { data: allWallets } = useQuery<Array<{ validatorId: string; balance: number; currency: string }>>({
+    queryKey: ['/api/wallets'],
+    staleTime: 30000,
+    refetchInterval: 30000
+  });
+
+  // Debug wallet data loading
+  useEffect(() => {
+    if (walletError) {
+      console.log('Wallet API Error:', walletError);
+    }
+    if (walletData) {
+      console.log('Wallet Data:', walletData);
+    }
+  }, [walletData, walletError]);
+
   // Update with real-time data from WebSocket
   useEffect(() => {
     if (lastMessage?.type === 'update' && lastMessage.data?.networkStatus?.stats) {
@@ -103,7 +127,7 @@ export default function Terminal() {
                 <span className="status-indicator status-online"></span>
                 <span className="text-terminal-success">WALLET STATUS</span>
               </div>
-              <div className="text-terminal-cyan">Balance: 15,420 EMO</div>
+              <div className="text-terminal-cyan">Balance: {walletLoading ? 'Loading...' : walletData ? formatNumber(walletData.balance) : walletError ? 'Error' : '--'} EMO</div>
               <div className="text-terminal-cyan">Staked: 10,000 EMO</div>
             </div>
           </div>

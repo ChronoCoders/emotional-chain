@@ -11,6 +11,13 @@ export default function ValidatorDashboard() {
     queryKey: ['/api/validators']
   });
 
+  // Fetch real wallet balances for all validators
+  const { data: walletBalances = [] } = useQuery<Array<{ validatorId: string; balance: number; currency: string }>>({
+    queryKey: ['/api/wallets'],
+    staleTime: 30000,
+    refetchInterval: 30000
+  });
+
   // Update with real-time data from WebSocket
   useEffect(() => {
     if (lastMessage?.type === 'update' && lastMessage.data?.validators) {
@@ -43,6 +50,12 @@ export default function ValidatorDashboard() {
     return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
 
+  // Get real wallet balance for a validator
+  const getValidatorBalance = (validatorId: string): number => {
+    const wallet = walletBalances.find(w => w.validatorId === validatorId);
+    return wallet ? wallet.balance : 0;
+  };
+
   return (
     <div className="terminal-window rounded-lg p-6">
       <h2 className="text-terminal-cyan text-lg font-bold mb-4">
@@ -59,7 +72,7 @@ export default function ValidatorDashboard() {
               <span className={`status-indicator ${getStatusColor(getValidatorStatus(validator))}`}></span>
             </div>
             <div className="text-terminal-green text-xs space-y-1">
-              <div>EMO Earned: {formatEmoEarned(validator.stake)} EMO</div>
+              <div>EMO Earned: {getValidatorBalance(validator.id).toLocaleString('en-US')} EMO</div>
               <div>Uptime: {parseFloat(validator.uptime).toFixed(1)}%</div>
               <div>Auth Score: {parseFloat(validator.authScore).toFixed(1)}%</div>
               <div>Device: {validator.device || 'Unknown Device'}</div>

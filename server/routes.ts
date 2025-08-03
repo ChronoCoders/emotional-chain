@@ -196,13 +196,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/wallet/:validatorId', async (req, res) => {
     try {
       const { validatorId } = req.params;
+      
+      // Force sync wallet with blockchain before getting balance
+      await emotionalChainService.syncWalletWithBlockchain();
+      
       const balance = await emotionalChainService.getWalletBalance(validatorId);
+      
+      // Get all wallets for debugging
+      const allWallets = await emotionalChainService.getAllWallets();
+      console.log(`📊 Wallet request for ${validatorId}: balance=${balance}, total wallets=${allWallets.size}`);
+      
       res.json({
         validatorId,
         balance,
         currency: 'EMO'
       });
     } catch (error) {
+      console.error('Wallet API error:', error);
       res.status(500).json({ error: 'Failed to fetch wallet balance' });
     }
   });
@@ -230,13 +240,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // CRITICAL: Force sync with blockchain before returning data
       await emotionalChainService.syncWalletWithBlockchain();
       const wallets = await emotionalChainService.getAllWallets();
+      
       const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
         validatorId,
         balance,
         currency: 'EMO'
       }));
+      
+      console.log(`💰 Wallets API returning ${walletsArray.length} wallets:`, walletsArray.map(w => `${w.validatorId}: ${w.balance}`));
+      
       res.json(walletsArray);
     } catch (error) {
+      console.error('Wallets API error:', error);
       res.status(500).json({ error: 'Failed to fetch wallets' });
     }
   });
