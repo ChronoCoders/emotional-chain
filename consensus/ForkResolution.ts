@@ -1,5 +1,5 @@
-import { DatabaseStorage } from '../storage/DatabaseStorage';
-import { Block } from '../server/blockchain/Block';
+import { DatabaseStorage } from '../server/storage';
+import { Block } from '../shared/schema';
 import * as _ from 'lodash';
 /**
  * Automatic fork detection and resolution for EmotionalChain

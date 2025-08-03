@@ -5,9 +5,8 @@ import { performance } from 'perf_hooks';
 import { BiometricReading } from '../biometric/BiometricDevice';
 import { AuthenticityProof } from '../biometric/AuthenticityProof';
 import { BiometricWallet } from '../biometric/BiometricWallet';
-import { Block } from '../server/blockchain/Block';
-import { Transaction } from '../crypto/Transaction';
-import { KeyPair } from '../crypto/KeyPair';
+import { Block } from '../shared/schema';
+import { Transaction } from '../shared/schema';
 /**
  * Enhanced validator with real-time emotional monitoring
  * Supports continuous biometric data validation and emotional score tracking

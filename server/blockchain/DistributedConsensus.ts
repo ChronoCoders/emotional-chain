@@ -5,6 +5,7 @@
 import { EmotionalChain } from './EmotionalChain';
 import { P2PNode } from '../../network/P2PNode';
 import { ProofOfEmotionEngine } from '../../consensus/ProofOfEmotionEngine';
+import { storage } from '../storage';
 
 export class DistributedConsensus {
   private blockchain: EmotionalChain;
