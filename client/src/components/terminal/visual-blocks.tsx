@@ -57,9 +57,9 @@ export default function VisualBlocks() {
 
   const calculateReward = (block: Block) => {
     // Calculate total reward from transactions
-    const miningReward = 69.1; // From logs: 50 base + 19.1 bonus
+    const emotionalReward = 69.1; // From logs: 50 base + 19.1 emotional bonus
     const validationReward = 4.02; // From logs
-    return miningReward + validationReward;
+    return emotionalReward + validationReward;
   };
 
   const getLayoutTransform = (index: number, total: number) => {
@@ -130,7 +130,7 @@ export default function VisualBlocks() {
       {blocks.length === 0 ? (
         <div className="text-terminal-dim text-center py-8">
           <div className="text-2xl mb-2">⛏️</div>
-          <div>Waiting for blocks to be mined...</div>
+          <div>Waiting for blocks to be validated...</div>
         </div>
       ) : (
         <div className="relative min-h-96 perspective-1000">
@@ -225,9 +225,9 @@ export default function VisualBlocks() {
                     <div className="block-connection"></div>
                   )}
 
-                  {/* Mining Glow for Latest Block */}
+                  {/* Validation Glow for Latest Block */}
                   {index === 0 && (
-                    <div className="mining-glow latest-block"></div>
+                    <div className="validation-glow latest-block"></div>
                   )}
                   
                   {/* Block Health Indicator */}
@@ -266,7 +266,7 @@ export default function VisualBlocks() {
             </div>
           </div>
           <div>
-            <div className="text-terminal-warning">MINING STATUS</div>
+            <div className="text-terminal-warning">VALIDATION STATUS</div>
             <div className="text-terminal-success text-lg font-bold flex items-center justify-center">
               <span className="w-2 h-2 bg-terminal-success rounded-full animate-pulse mr-2"></span>
               ACTIVE
@@ -316,11 +316,11 @@ export default function VisualBlocks() {
         </div>
       )}
 
-      {/* Live Mining Indicator */}
+      {/* Live Validation Indicator */}
       <div className="mt-4 text-center">
         <div className="inline-flex items-center space-x-2 text-xs text-terminal-dim">
           <span className="w-2 h-2 bg-terminal-success rounded-full animate-pulse"></span>
-          <span>Live mining with Proof of Emotion consensus</span>
+          <span>Live emotional validation with Proof of Emotion consensus</span>
           <span className="w-2 h-2 bg-terminal-success rounded-full animate-pulse"></span>
         </div>
       </div>

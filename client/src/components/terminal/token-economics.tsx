@@ -97,7 +97,7 @@ export default function TokenEconomics() {
         </h3>
         <div className="grid grid-cols-2 gap-4 text-xs">
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
-            <div className="text-terminal-warning">TOTAL MINED</div>
+            <div className="text-terminal-warning">TOTAL ISSUED</div>
             <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics?.totalSupply)}</div>
             <div className="text-terminal-dim text-xs">{formatPercentage(currentEconomics?.percentageIssued)} of max supply</div>
           </div>
@@ -125,10 +125,10 @@ export default function TokenEconomics() {
           [TOKEN_POOLS]
         </h3>
         <div className="space-y-3">
-          {/* Mining Pool */}
+          {/* Emotional Pool */}
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-terminal-warning">MINING POOL (40%)</span>
+              <span className="text-terminal-warning">EMOTIONAL POOL (40%)</span>
               <span className="text-terminal-cyan">{formatEMO(currentEconomics.pools.staking.remaining)}</span>
             </div>
             <div className="bg-terminal-bg rounded-full h-2 mb-1">
@@ -185,7 +185,7 @@ export default function TokenEconomics() {
         </h3>
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div className="bg-terminal-surface p-2 rounded border border-terminal-border">
-            <div className="text-terminal-warning">MINING BASE</div>
+            <div className="text-terminal-warning">EMOTIONAL BASE</div>
             <div className="text-terminal-cyan">{currentEconomics.rewards.baseBlockReward} EMO</div>
           </div>
           <div className="bg-terminal-surface p-2 rounded border border-terminal-border">
@@ -203,7 +203,7 @@ export default function TokenEconomics() {
         </div>
       </div>
 
-      {/* Live Mining Stats */}
+      {/* Live Validation Stats */}
       <div className="border-t border-terminal-border pt-3">
         <div className="text-terminal-dim text-xs">
           <div className="flex justify-between">

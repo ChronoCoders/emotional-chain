@@ -67,7 +67,7 @@ export default function BlockchainExplorer() {
         setRealtimeTransactions(lastMessage.data.latestTransactions);
       }
       
-      // Force refresh wallet data when new blocks are mined
+      // Force refresh wallet data when new blocks are validated
       queryClient.invalidateQueries({ queryKey: ['/api/wallets'] });
       queryClient.invalidateQueries({ queryKey: ['/api/wallet/status'] });
     }
@@ -318,9 +318,9 @@ export default function BlockchainExplorer() {
                   {walletStatus && (
                     <div className="text-xs space-y-1">
                       <div className="bg-terminal-background/50 p-2 rounded border-l-2 border-terminal-success">
-                        <div className="text-terminal-success font-medium">Mining Rewards</div>
+                        <div className="text-terminal-success font-medium">Validation Rewards</div>
                         <div className="text-terminal-green">+{(parseFloat(walletStatus.balance) * 0.8).toFixed(2)} EMO</div>
-                        <div className="text-gray-400">From blocks mined</div>
+                        <div className="text-gray-400">From blocks validated</div>
                       </div>
                       <div className="bg-terminal-background/50 p-2 rounded border-l-2 border-terminal-success">
                         <div className="text-terminal-success font-medium">Validation Rewards</div>
