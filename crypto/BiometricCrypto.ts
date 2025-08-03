@@ -82,8 +82,9 @@ export class BiometricCrypto {
     // Create aggregate signature
     const aggregateSignature = ProductionCrypto.signECDSA(proofDataBytes, validatorPrivateKey);
     
-    // Create timestamp signature for freshness
-    const timestampData = new TextEncoder().encode(`${Date.now()}:${proofHash}`);
+    // Create timestamp signature for freshness using the latest reading timestamp
+    const latestTimestamp = Math.max(...readings.map(r => r.timestamp));
+    const timestampData = new TextEncoder().encode(`${latestTimestamp}:${proofHash}`);
     const timestampSignature = ProductionCrypto.signECDSA(timestampData, validatorPrivateKey);
     
     // Generate anti-tamper hash
@@ -137,7 +138,9 @@ export class BiometricCrypto {
         const signatureObj: ECDSASignature = {
           signature,
           algorithm: 'ECDSA-secp256k1',
-          r: '', s: '', recovery: 0
+          r: signature.substring(0, 64),
+          s: signature.substring(64, 128),
+          recovery: 0
         };
         
         if (!ProductionCrypto.verifyECDSA(deviceProofData, signatureObj, validatorPublicKey)) {
@@ -145,7 +148,8 @@ export class BiometricCrypto {
         }
       }
       
-      // Verify aggregate signature
+      // Verify aggregate signature using same structure as generation
+      const validation = this.calculateEmotionalValidation(proof.readings);
       const aggregateData = {
         readings: proof.readings.map(r => ({
           deviceId: r.deviceId,
@@ -154,17 +158,19 @@ export class BiometricCrypto {
           timestamp: r.timestamp,
           unit: r.unit
         })),
-        emotionalScore: proof.authenticity,
-        authenticity: proof.authenticity,
+        emotionalScore: validation.authenticity,
+        authenticity: validation.authenticity,
         deviceCount: proof.readings.length,
-        consistencyScore: this.calculateEmotionalValidation(proof.readings).consistencyScore
+        consistencyScore: validation.consistencyScore
       };
       
       const aggregateDataBytes = new TextEncoder().encode(JSON.stringify(aggregateData));
       const aggregateSignatureObj: ECDSASignature = {
         signature: proof.aggregateSignature,
         algorithm: 'ECDSA-secp256k1',
-        r: '', s: '', recovery: 0
+        r: proof.aggregateSignature.substring(0, 64),
+        s: proof.aggregateSignature.substring(64, 128),
+        recovery: 0
       };
       
       if (!ProductionCrypto.verifyECDSA(aggregateDataBytes, aggregateSignatureObj, validatorPublicKey)) {
@@ -176,7 +182,9 @@ export class BiometricCrypto {
       const timestampSignatureObj: ECDSASignature = {
         signature: proof.timestampSignature,
         algorithm: 'ECDSA-secp256k1',
-        r: '', s: '', recovery: 0
+        r: proof.timestampSignature.substring(0, 64),
+        s: proof.timestampSignature.substring(64, 128),
+        recovery: 0
       };
       
       if (!ProductionCrypto.verifyECDSA(timestampData, timestampSignatureObj, validatorPublicKey)) {
@@ -226,14 +234,59 @@ export class BiometricCrypto {
       `${reading.deviceId}:${reading.deviceType}:${reading.value}:${reading.timestamp}`
     );
     
-    return ProductionCrypto.createBiometricProof(
-      ProductionCrypto.hash(proofData),
-      reading.deviceId,
-      reading.timestamp,
-      privateKey
-    );
+    const signature = ProductionCrypto.signECDSA(proofData, privateKey);
+    
+    return {
+      signature,
+      reading,
+      timestamp: reading.timestamp,
+      authenticity: this.calculateDeviceAuthenticity(reading),
+      nonce: ProductionCrypto.generateNonce()
+    };
   }
   
+  /**
+   * Calculate device authenticity score
+   */
+  private static calculateDeviceAuthenticity(reading: BiometricReading): number {
+    // Calculate authenticity based on device type and reading characteristics
+    let baseScore = 0.8; // Base authenticity score
+    
+    // Adjust score based on device type reliability
+    switch (reading.deviceType) {
+      case 'heart_rate':
+        baseScore = 0.9; // Heart rate monitors are generally reliable
+        break;
+      case 'stress':
+        baseScore = 0.8; // Stress sensors are moderately reliable
+        break;
+      case 'focus':
+        baseScore = 0.75; // Focus sensors are less reliable
+        break;
+      default:
+        baseScore = 0.7; // Unknown devices get lower score
+    }
+    
+    // Adjust for value plausibility
+    if (reading.deviceType === 'heart_rate') {
+      if (reading.value >= 40 && reading.value <= 200) {
+        baseScore += 0.05; // Plausible heart rate range
+      } else {
+        baseScore -= 0.2; // Implausible heart rate
+      }
+    }
+    
+    // Adjust for timestamp freshness (within last 5 minutes is best)
+    const age = Date.now() - reading.timestamp;
+    if (age < 300000) { // 5 minutes
+      baseScore += 0.05;
+    } else if (age > 3600000) { // 1 hour
+      baseScore -= 0.1;
+    }
+    
+    return Math.max(0, Math.min(1, baseScore));
+  }
+
   /**
    * Calculate emotional validation metrics from biometric readings
    */

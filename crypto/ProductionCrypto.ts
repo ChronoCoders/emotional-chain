@@ -1,6 +1,7 @@
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { ed25519 } from '@noble/curves/ed25519';
-import { sha256, sha512 } from '@noble/hashes/sha256';
+import { sha256 } from '@noble/hashes/sha256';
+import { sha512 } from '@noble/hashes/sha512';
 import { hmac } from '@noble/hashes/hmac';
 import { pbkdf2 } from '@noble/hashes/pbkdf2';
 import { randomBytes } from '@noble/hashes/utils';
@@ -194,7 +195,7 @@ export class ProductionCrypto {
     
     // In production, this would be actual AES-256-GCM encryption
     // For now, we create a cryptographically signed representation
-    const encryptedPayload = this.hash(new Uint8Array([...data, ...encryptionKey, ...iv]));
+    const encryptedPayload = this.hash(new Uint8Array([...Array.from(data), ...Array.from(encryptionKey), ...Array.from(iv)]));
     
     return {
       encryptedData: encryptedPayload,

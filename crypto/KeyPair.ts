@@ -116,7 +116,7 @@ export class BiometricKeyPair {
         r: signature.r,
         s: signature.s,
         recovery: signature.recoveryParam || 0,
-        signature: signature.r + signature.s, // Compact format
+        signature: signature.r + signature.s,
         algorithm: 'ECDSA-secp256k1'
       };
 

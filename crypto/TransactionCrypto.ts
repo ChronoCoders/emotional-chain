@@ -83,7 +83,9 @@ export class TransactionCrypto {
       const signatureObj: ECDSASignature = {
         signature: tx.signature,
         algorithm: 'ECDSA-secp256k1',
-        r: '', s: '', recovery: 0  // These will be parsed by ProductionCrypto
+        r: tx.signature.substring(0, 64),
+        s: tx.signature.substring(64, 128),
+        recovery: 0
       };
       
       return ProductionCrypto.verifyECDSA(
