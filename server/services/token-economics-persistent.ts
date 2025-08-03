@@ -403,33 +403,57 @@ export class PersistentTokenEconomics {
    */
   public async recalculateFromTransactions(): Promise<void> {
     try {
-      // Get LIVE validator balances which represent actual circulating EMO
-      const validatorResult = await pool.query(`
-        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_circulating
+      // Get total EMO mined from all transactions (TOTAL SUPPLY)
+      const totalMinedResult = await pool.query(`
+        SELECT COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total_mined
+        FROM transactions 
+        WHERE from_address = 'stakingPool'
+      `);
+      
+      // Get currently staked EMO (validators with >50 EMO are considered stakers)
+      const stakedResult = await pool.query(`
+        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_staked
         FROM validator_states
+        WHERE CAST(balance AS DECIMAL) >= 50
+      `);
+      
+      // Get liquid EMO (validators with <50 EMO, available for trading)
+      const liquidResult = await pool.query(`
+        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_liquid
+        FROM validator_states
+        WHERE CAST(balance AS DECIMAL) < 50
       `);
       
       const blockResult = await pool.query(`SELECT COUNT(*) as total_blocks FROM blocks`);
       
-      const totalCirculating = parseFloat(validatorResult.rows[0].total_circulating || '0');
+      const totalMined = parseFloat(totalMinedResult.rows[0].total_mined || '0');
+      const totalStaked = parseFloat(stakedResult.rows[0].total_staked || '0');
+      const totalLiquid = parseFloat(liquidResult.rows[0].total_liquid || '0');
+      const circulatingSupply = totalLiquid; // Only liquid EMO is circulating
       const totalBlocks = parseInt(blockResult.rows[0].total_blocks || '0');
       
-      if (totalCirculating > 0) {
-        // Update database with LIVE mining totals
+      if (totalMined > 0) {
+        // Update with proper token economics
         await pool.query(`
           UPDATE token_economics SET 
             total_supply = $1,
-            circulating_supply = $1,
-            staking_pool_utilized = $1,
-            staking_pool_remaining = $2,
-            last_block_height = $3,
+            circulating_supply = $2,
+            staking_pool_utilized = $3,
+            staking_pool_remaining = $4,
+            last_block_height = $5,
             updated_at = NOW()
-        `, [totalCirculating.toString(), (400000000 - totalCirculating).toString(), totalBlocks]);
+        `, [
+          totalMined.toString(),
+          circulatingSupply.toString(), 
+          totalStaked.toString(),
+          (400000000 - totalMined).toString(),
+          totalBlocks
+        ]);
         
-        console.log(`LIVE SYNC: ${totalCirculating.toFixed(2)} EMO at block ${totalBlocks}`);
+        console.log(`TOKEN SYNC: ${totalMined.toFixed(2)} total, ${circulatingSupply.toFixed(2)} circulating, ${totalStaked.toFixed(2)} staked at block ${totalBlocks}`);
       }
     } catch (error) {
-      console.error('Live sync failed:', error);
+      console.error('Token sync failed:', error);
     }
   }
 }
