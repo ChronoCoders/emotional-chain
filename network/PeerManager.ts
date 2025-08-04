@@ -32,12 +32,15 @@ export class PeerManager extends EventEmitter {
   private readonly BLACKLIST_DURATION = 3600000; // 1 hour
   private readonly REPUTATION_THRESHOLD = 30;
   private readonly MAX_FAILURES = 5;
+  private readonly REPUTATION_RECOVERY_INTERVAL = 300000; // 5 minutes
+  private readonly REPUTATION_RECOVERY_AMOUNT = 1; // +1 reputation every 5 minutes of good behavior
   constructor(nodeId: string, p2pNode: P2PNode) {
     super();
     this.nodeId = nodeId;
     this.p2pNode = p2pNode;
     this.setupEventHandlers();
     this.startPeerMaintenance();
+    this.startReputationRecovery();
   }
   /**
    * Start peer management
@@ -118,6 +121,15 @@ export class PeerManager extends EventEmitter {
       this.blacklistPeer(peerId, `Low reputation: ${metrics.reputation}`);
     }
     this.emit('reputationUpdated', { peerId, oldReputation, newReputation: metrics.reputation, reason });
+    
+    // If reputation improved above threshold, remove from blacklist
+    if (oldReputation < this.REPUTATION_THRESHOLD && metrics.reputation >= this.REPUTATION_THRESHOLD) {
+      if (this.blacklistedPeers.has(peerId)) {
+        this.blacklistedPeers.delete(peerId);
+        console.log(`Peer ${peerId.substring(0, 12)}... removed from blacklist due to reputation recovery`);
+        this.emit('peerRehabilitatedFromBlacklist', { peerId, newReputation: metrics.reputation });
+      }
+    }
   }
   /**
    * Record peer message activity
@@ -138,6 +150,11 @@ export class PeerManager extends EventEmitter {
     }
     metrics.lastSeen = Date.now();
     this.updateConnectionQuality(metrics);
+    
+    // Reward good behavior with reputation increase
+    if (type === 'received' && responseTime && responseTime < 5000) {
+      this.updatePeerReputation(peerId, +0.5, 'Fast response time');
+    }
   }
   /**
    * Record peer error
@@ -280,6 +297,27 @@ export class PeerManager extends EventEmitter {
     console.log(`🔍 Discovered peer: ${peerId.substring(0, 12)}... (${multiaddrs.length} addresses)`);
     this.emit('peerDiscovered', { peerId, multiaddrs });
   }
+  
+  /**
+   * Start reputation recovery system
+   */
+  private startReputationRecovery(): void {
+    setInterval(() => {
+      const now = Date.now();
+      for (const [peerId, metrics] of this.peerMetrics) {
+        // Only apply recovery to active peers that haven't had recent errors
+        const timeSinceLastSeen = now - metrics.lastSeen;
+        const isActivePeer = timeSinceLastSeen < this.PEER_TIMEOUT;
+        const hasLowReputation = metrics.reputation < 80; // Below excellent threshold
+        const noRecentErrors = (now - metrics.lastSeen) > 60000; // No activity means no errors for 1 min
+        
+        if (isActivePeer && hasLowReputation && noRecentErrors) {
+          this.updatePeerReputation(peerId, this.REPUTATION_RECOVERY_AMOUNT, 'Reputation recovery - good behavior');
+        }
+      }
+    }, this.REPUTATION_RECOVERY_INTERVAL);
+  }
+  
   /**
    * Initialize bootstrap peers
    */

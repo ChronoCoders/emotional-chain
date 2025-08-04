@@ -4,6 +4,7 @@
  */
 import { EventEmitter } from 'events';
 import crypto from 'crypto';
+import { CONFIG } from '@shared/config';
 export interface Validator {
   id: string;
   address: string;
@@ -72,14 +73,14 @@ export class EmotionalStaking extends EventEmitter {
   private slashingEvents: Map<string, SlashingEvent> = new Map();
   private rewardHistory: RewardDistribution[] = [];
   private metrics: StakingMetrics;
-  private readonly minStake = 50000; // Minimum 50k EMO to become validator
+  private readonly minStake = 10000; // Minimum 10k EMO to become validator
   private readonly maxValidators = 101; // Maximum active validators
   private readonly slashingRates = {
     minor: 0.01, // 1%
     major: 0.05, // 5%
     critical: 0.15 // 15%
   };
-  private readonly emotionalThreshold = 75; // Minimum emotional score
+  private readonly emotionalThreshold = CONFIG.consensus.thresholds.emotionalScore;
   private currentEpoch = 0;
   constructor() {
     super();
@@ -262,7 +263,7 @@ export class EmotionalStaking extends EventEmitter {
       // Deactivate validator if stake falls below minimum
       if (validator.stake < this.minStake) {
         validator.isActive = false;
-        console.log(`🚫 Validator deactivated due to insufficient stake: ${validatorId}`);
+        console.log(`Validator deactivated due to insufficient stake: ${validatorId}`);
       }
       this.slashingEvents.set(slashingEvent.id, slashingEvent);
       this.updateMetrics();
@@ -377,15 +378,32 @@ export class EmotionalStaking extends EventEmitter {
   private determineSeverity(offense: SlashingEvent['offense'], evidence: any): SlashingEvent['severity'] {
     switch (offense) {
       case 'poor_emotional_behavior':
-        return evidence.emotionalScore < 50 ? 'major' : 'minor';
+        // PRECISE EMOTIONAL SLASHING THRESHOLDS
+        if (evidence.emotionalScore < 40) return 'critical';     // Below 40: Critical failure
+        if (evidence.emotionalScore < 55) return 'major';       // 40-54: Major decline  
+        return 'minor';                                          // 55-74: Minor weakness
+        
       case 'missed_consensus':
-        return evidence.missedRounds > 10 ? 'major' : 'minor';
+        // PRECISE CONSENSUS PARTICIPATION THRESHOLDS  
+        if (evidence.missedRounds > 20) return 'critical';      // >20 missed: Critical failure
+        if (evidence.missedRounds > 10) return 'major';        // 11-20 missed: Major issue
+        return 'minor';                                         // 1-10 missed: Minor issue
+        
       case 'invalid_biometric':
-        return evidence.spoofingDetected ? 'critical' : 'major';
+        // PRECISE BIOMETRIC AUTHENTICITY THRESHOLDS
+        if (evidence.spoofingDetected) return 'critical';       // Spoofing: Critical security threat
+        if (evidence.authenticityScore < 0.7) return 'major';   // <70% authentic: Major concern
+        return 'minor';                                         // 70-89% authentic: Minor issue
+        
       case 'double_signing':
-        return 'critical';
+        return 'critical';                                      // Always critical: Byzantine fault
+        
       case 'downtime':
-        return evidence.downtimeHours > 24 ? 'major' : 'minor';
+        // PRECISE UPTIME SLASHING THRESHOLDS
+        if (evidence.uptime < 85) return 'critical';           // <85% uptime: Critical failure
+        if (evidence.uptime < 95) return 'major';              // 85-94% uptime: Major issue  
+        return 'minor';                                         // 95-97% uptime: Minor concern
+        
       default:
         return 'minor';
     }
@@ -451,18 +469,61 @@ export class EmotionalStaking extends EventEmitter {
   private detectSlashingConditions(): void {
     for (const [id, validator] of this.validators.entries()) {
       if (!validator.isActive) continue;
-      // Check for poor emotional behavior
-      if (validator.emotionalScore < this.emotionalThreshold - 20) {
+      
+      // PRECISE SLASHING CONDITIONS - Enterprise-Grade Rules
+      
+      // CRITICAL: Emotional score below 40 (immediate major slashing)
+      if (validator.emotionalScore < 40) {
         this.slashStakeForPoorBehavior(id, 'poor_emotional_behavior', {
           emotionalScore: validator.emotionalScore,
-          threshold: this.emotionalThreshold
+          threshold: 40,
+          severity: 'critical_emotional_failure'
         });
       }
-      // Check for excessive downtime
-      if (validator.performance.uptime < 95) {
+      // MAJOR: Emotional score 40-54 (significant slashing)
+      else if (validator.emotionalScore < 55) {
+        this.slashStakeForPoorBehavior(id, 'poor_emotional_behavior', {
+          emotionalScore: validator.emotionalScore,
+          threshold: 55,
+          severity: 'major_emotional_decline'
+        });
+      }
+      // MINOR: Emotional score 55-74 (warning slashing)
+      else if (validator.emotionalScore < this.emotionalThreshold) {
+        this.slashStakeForPoorBehavior(id, 'poor_emotional_behavior', {
+          emotionalScore: validator.emotionalScore,
+          threshold: this.emotionalThreshold,
+          severity: 'minor_emotional_weakness'
+        });
+      }
+      
+      // UPTIME-BASED SLASHING (Precise thresholds)
+      
+      // CRITICAL: Uptime below 85% (major network disruption)
+      if (validator.performance.uptime < 85) {
         this.slashStakeForPoorBehavior(id, 'downtime', {
           uptime: validator.performance.uptime,
-          downtimeHours: (100 - validator.performance.uptime) * 24 / 100
+          downtimeHours: ((100 - validator.performance.uptime) * 24) / 100,
+          threshold: 85,
+          severity: 'critical_downtime'
+        });
+      }
+      // MAJOR: Uptime 85-94% (significant unavailability)
+      else if (validator.performance.uptime < 95) {
+        this.slashStakeForPoorBehavior(id, 'downtime', {
+          uptime: validator.performance.uptime,
+          downtimeHours: ((100 - validator.performance.uptime) * 24) / 100,
+          threshold: 95,
+          severity: 'major_downtime'
+        });
+      }
+      // MINOR: Uptime 95-97% (performance concern)
+      else if (validator.performance.uptime < 98) {
+        this.slashStakeForPoorBehavior(id, 'downtime', {
+          uptime: validator.performance.uptime,
+          downtimeHours: ((100 - validator.performance.uptime) * 24) / 100,
+          threshold: 98,
+          severity: 'minor_downtime'
         });
       }
     }

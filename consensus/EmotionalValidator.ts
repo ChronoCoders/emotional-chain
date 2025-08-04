@@ -750,7 +750,7 @@ export class EmotionalValidator extends EventEmitter {
     return { ...this.metrics };
   }
   isActive(): boolean {
-    return this.isActiveStatus && this.stake >= 1000;
+    return this.isActiveStatus && this.stake >= 10000;
   }
   getReputationScore(): number {
     return this.metrics.reputationScore;
@@ -769,7 +769,7 @@ export class EmotionalValidator extends EventEmitter {
   }
   // Validator lifecycle
   async activate(): Promise<void> {
-    if (this.stake < 1000) {
+    if (this.stake < 10000) {
       throw new Error('Insufficient stake to activate validator');
     }
     this.isActiveStatus = true;

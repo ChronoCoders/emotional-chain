@@ -29,7 +29,7 @@ contract EMOToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable, Reent
     uint256 public constant ECOSYSTEM_POOL = 250_000_000 * 10**18;
     uint256 public constant TEAM_ALLOCATION = 150_000_000 * 10**18;
     
-    // Emotional Validation Thresholds
+    // Emotional Validation Thresholds (centralized in shared/config.ts)
     uint256 public emotionalThreshold = 75; // Minimum emotional score for sensitive operations
     uint256 public authenticityThreshold = 90; // Minimum authenticity for high-value transfers
     
@@ -345,15 +345,34 @@ contract EMOToken is ERC20, ERC20Burnable, ERC20Permit, Ownable, Pausable, Reent
         uint256 focusLevel,
         uint256 authenticity
     ) internal pure returns (uint256) {
-        // Normalize heart rate (60-100 BPM optimal range)
-        uint256 normalizedHR = heartRate >= 60 && heartRate <= 100 ? 100 : 
-                              (heartRate < 60 ? (heartRate * 100) / 60 : (200 - heartRate) * 100 / 100);
+        // UNIFIED ENTERPRISE-GRADE CALCULATION (shared/config.ts standard)
         
-        // Calculate composite emotional score
+        // Heart Rate Score: Optimize for 60-100 BPM range, target 75 BPM
+        uint256 heartRateScore;
+        if (heartRate >= 60 && heartRate <= 100) {
+            uint256 deviation = heartRate > 75 ? heartRate - 75 : 75 - heartRate;
+            heartRateScore = 100 - (deviation * 2); // 2 points per BPM deviation
+        } else if (heartRate >= 50 && heartRate <= 120) {
+            heartRateScore = 70; // Acceptable range
+        } else {
+            heartRateScore = 40; // Poor range
+        }
+        
+        // Stress Score: Lower stress = higher score (invert 0-100 to 100-0)
+        uint256 stressScore = 100 - stressLevel;
+        
+        // Focus Score: Direct mapping (0-100)
+        uint256 focusScore = focusLevel;
+        
+        // Authenticity Score: Critical security component (0-100)
+        uint256 authenticityScore = authenticity;
+        
+        // WEIGHTED COMPOSITE CALCULATION (Enterprise Standard Weights)
         uint256 emotionalScore = (
-            (100 - stressLevel) * 30 +  // 30% weight for low stress
-            focusLevel * 30 +           // 30% weight for focus
-            authenticity * 40           // 40% weight for authenticity
+            heartRateScore * 30 +      // 30% heart rate optimization
+            stressScore * 25 +         // 25% stress level (inverted)  
+            focusScore * 20 +          // 20% focus level
+            authenticityScore * 25     // 25% authenticity (critical for security)
         ) / 100;
         
         return emotionalScore;

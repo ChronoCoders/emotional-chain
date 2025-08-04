@@ -151,20 +151,30 @@ export class EmotionalConsensusEngine {
    * Calculate base emotional score from biometric data
    */
   private calculateBaseEmotionalScore(profile: EmotionalProfile): number {
-    // Heart rate optimization (60-100 BPM is optimal)
+    // UNIFIED ENTERPRISE-GRADE EMOTIONAL SCORE CALCULATION
+    // This is the authoritative method used across the entire platform
+    const config = CONFIG.consensus.emotionalScoring;
+    
+    // Heart Rate Score: Use enterprise-grade optimization algorithm
     const heartRateScore = this.calculateHeartRateScore(profile.heartRate);
-    // Stress level (lower is better, max 70%)
-    const stressScore = Math.max(0, (100 - profile.stressLevel) / 100 * 100);
-    // Focus level (higher is better, min 60%)
-    const focusScore = Math.min(100, profile.focusLevel);
-    // Quality bonus
-    const qualityBonus = profile.qualityScore * 10; // Up to 10% bonus
-    // Weighted combination
+    
+    // Stress Score: Lower stress = higher score (invert 0-100 to 100-0)
+    const stressScore = Math.max(0, 100 - profile.stressLevel);
+    
+    // Focus Score: Direct mapping (0-100)
+    const focusScore = profile.focusLevel;
+    
+    // Authenticity Score: Critical security component (0-100 scale)
+    const authenticityScore = profile.authenticity * 100;
+    
+    // ENTERPRISE WEIGHTED COMPOSITE CALCULATION
     const baseScore = (
-      heartRateScore * 0.30 +
-      stressScore * 0.35 +
-      focusScore * 0.35
-    ) + qualityBonus;
+      heartRateScore * config.heartRateWeight +      // 30% heart rate optimization
+      stressScore * config.stressWeight +            // 25% stress level (inverted)
+      focusScore * config.focusWeight +              // 20% focus level  
+      authenticityScore * config.authenticityWeight  // 25% authenticity (critical)
+    );
+    
     return Math.max(0, Math.min(100, baseScore));
   }
   /**

@@ -192,9 +192,47 @@ export const CONFIG: EmotionalChainConfig = {
       rotationInterval: 300 // 5 minutes
     },
     thresholds: {
-      emotionalScore: 75,
+      emotionalScore: 75,          // Minimum emotional score for consensus operations
+      basicOperations: 60,         // Minimum emotional score for basic staking
+      sensitiveOperations: 75,     // Minimum emotional score for sensitive operations
       participationRate: 0.67,
       consensusQuorum: 0.67
+    },
+    // UNIFIED AUTHENTICITY-EMOTIONAL SCORE CALCULATION RULES (Enterprise-Grade)
+    emotionalScoring: {
+      // AUTHENTICITY INTERACTION: How authenticity affects emotional score calculation
+      authenticityWeight: 0.25,     // 25% of final emotional score comes from authenticity
+      heartRateWeight: 0.30,        // 30% from heart rate optimization  
+      stressWeight: 0.25,          // 25% from stress level (inverted)
+      focusWeight: 0.20,           // 20% from focus level
+      
+      // AUTHENTICITY THRESHOLDS (0.0 - 1.0 scale)
+      authenticityThresholds: {
+        excellent: 0.95,           // >95% authenticity = excellent  
+        good: 0.85,               // 85-95% authenticity = good
+        acceptable: 0.70,         // 70-85% authenticity = acceptable
+        poor: 0.50,              // 50-70% authenticity = poor  
+        critical: 0.30           // <30% authenticity = critical failure
+      },
+      
+      // HEART RATE OPTIMIZATION (BPM)
+      heartRateOptimal: {
+        min: 60,                 // Minimum optimal heart rate
+        max: 100,               // Maximum optimal heart rate  
+        target: 75              // Target heart rate for maximum score
+      },
+      
+      // EMOTIONAL SCORE CALCULATION METHOD
+      calculationMethod: 'weighted_composite', // weighted_composite | simple_average | neural_network
+      
+      // FINAL SCORE RANGES  
+      scoreRanges: {
+        excellent: 90,          // 90-100: Excellent emotional state
+        good: 75,              // 75-89: Good emotional state
+        acceptable: 60,        // 60-74: Acceptable emotional state  
+        poor: 40,             // 40-59: Poor emotional state
+        critical: 0           // 0-39: Critical emotional failure
+      }
     },
     rewards: {
       baseReward: 10,
