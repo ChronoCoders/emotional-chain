@@ -1,12 +1,33 @@
 import { EventEmitter } from 'eventemitter3';
 import { BehaviorSubject, Observable } from 'rxjs';
-import * as _ from 'lodash';
 import { performance } from 'perf_hooks';
 import { BiometricReading } from '../biometric/BiometricDevice';
 import { AuthenticityProof } from '../biometric/AuthenticityProof';
 import { BiometricWallet } from '../biometric/BiometricWallet';
-import { Block } from '../shared/schema';
-import { Transaction } from '../shared/schema';
+import { VALIDATOR_CONFIG, VALIDATOR_THRESHOLDS, ValidatorConfigHelpers } from '../shared/ValidatorConfig';
+
+// Type definitions
+export interface KeyPair {
+  publicKey: string;
+  privateKey: string;
+}
+
+export interface Block {
+  id: string;
+  height: number;
+  hash: string;
+  previousHash: string;
+  merkleRoot: string;
+  timestamp: number;
+  nonce: number;
+  difficulty: number;
+  validatorId: string;
+  emotionalScore: number;
+  consensusScore: number;
+  signature: string;
+  proposerPublicKey: string;
+  transactions: any[];
+}
 /**
  * Enhanced validator with real-time emotional monitoring
  * Supports continuous biometric data validation and emotional score tracking
@@ -94,6 +115,18 @@ export class EmotionalValidator extends EventEmitter {
 
   getPublicKey(): string {
     return this.keyPair.publicKey;
+  }
+
+  getEmotionalScore(): number {
+    return this.emotionalState$.value.currentScore;
+  }
+
+  getConfidence(): number {
+    return this.emotionalState$.value.confidence;
+  }
+
+  getEmotionalProfile(): EmotionalState | null {
+    return this.emotionalState$.value;
   }
 
   // Core validator operations
@@ -608,42 +641,58 @@ export class EmotionalValidator extends EventEmitter {
     return Math.max(0, 10 - (variance / 10));
   }
   private calculateVariance(values: number[]): number {
-    const mean = _.mean(values);
+    if (values.length === 0) return 0;
+    const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
     const squaredDiffs = values.map(value => Math.pow(value - mean, 2));
-    return _.mean(squaredDiffs);
+    return squaredDiffs.reduce((sum, val) => sum + val, 0) / squaredDiffs.length;
   }
   // Reputation and slashing
   async checkSlashingConditions(): Promise<SlashingCondition[]> {
     const conditions: SlashingCondition[] = [];
     const now = Date.now();
+    const currentState = this.emotionalState$.value;
+    
     // Check for emotional manipulation
     if (this.detectEmotionalManipulation()) {
       conditions.push({
         type: 'emotional_manipulation',
         severity: 'major',
-        penalty: this.stake * 0.1, // 10% stake slash
-        description: 'Suspected emotional data manipulation'
+        penalty: ValidatorConfigHelpers.calculateSlashingPenalty('major', this.stake),
+        description: 'Suspected emotional data manipulation detected'
       });
     }
-    // Check for poor performance
-    const currentState = this.emotionalState$.value;
-    if (currentState.currentScore < 50 && this.metrics.averageEmotionalScore < 60) {
+    
+    // Check emotional performance using configurable thresholds
+    const severity = ValidatorConfigHelpers.getSlashingSeverity(currentState.currentScore);
+    if (severity !== 'none') {
       conditions.push({
         type: 'poor_performance',
-        severity: 'minor',
-        penalty: this.stake * 0.02, // 2% stake slash
-        description: 'Consistently poor emotional performance'
+        severity,
+        penalty: ValidatorConfigHelpers.calculateSlashingPenalty(severity, this.stake),
+        description: `Emotional score ${currentState.currentScore.toFixed(1)} below ${severity} threshold`
       });
     }
-    // Check for offline behavior
-    if (now - this.metrics.lastActiveTime > 300000) { // 5 minutes
+    
+    // Check for offline behavior using configurable timeout
+    if (now - this.metrics.lastActiveTime > VALIDATOR_CONFIG.performance.maxOfflineTime) {
       conditions.push({
         type: 'offline',
         severity: 'minor',
-        penalty: this.stake * 0.01, // 1% stake slash
-        description: 'Validator offline for extended period'
+        penalty: ValidatorConfigHelpers.calculateSlashingPenalty('minor', this.stake),
+        description: `Validator offline for ${Math.round((now - this.metrics.lastActiveTime) / 60000)} minutes`
       });
     }
+    
+    // Check uptime performance
+    if (this.metrics.uptimePercentage < VALIDATOR_CONFIG.performance.uptimeThreshold) {
+      conditions.push({
+        type: 'poor_performance',
+        severity: 'major',
+        penalty: ValidatorConfigHelpers.calculateSlashingPenalty('major', this.stake) * 0.6,
+        description: `Uptime ${this.metrics.uptimePercentage.toFixed(1)}% below required ${VALIDATOR_CONFIG.performance.uptimeThreshold}%`
+      });
+    }
+    
     return conditions;
   }
   private detectEmotionalManipulation(): boolean {
