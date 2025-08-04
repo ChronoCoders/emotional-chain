@@ -303,15 +303,15 @@ export function EmotionalTrendChart({
           <h4 className="text-md font-medium text-terminal-green mb-4">
             Validator Performance Distribution
           </h4>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
                 data={performanceDistribution}
                 cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={5}
+                cy="40%"
+                innerRadius={50}
+                outerRadius={75}
+                paddingAngle={3}
                 dataKey="value"
               >
                 {performanceDistribution.map((entry, index) => (
@@ -319,7 +319,11 @@ export function EmotionalTrendChart({
                 ))}
               </Pie>
               <Tooltip />
-              <Legend />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                wrapperStyle={{ paddingTop: '20px' }}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -329,7 +333,7 @@ export function EmotionalTrendChart({
           <h4 className="text-md font-medium text-terminal-green mb-4">
             Validator Performance vs Consistency
           </h4>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={300}>
             <ScatterChart data={validatorPerformance}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis 
