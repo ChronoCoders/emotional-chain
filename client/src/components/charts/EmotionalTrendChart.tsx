@@ -113,13 +113,13 @@ export function EmotionalTrendChart({
     return null;
   };
 
-  // Performance distribution data
+  // Performance distribution data - filter out zero values to avoid rendering issues
   const performanceDistribution = [
     { name: 'Excellent (90-100)', value: validatorPerformance.filter(v => v.emotionalScore >= 90).length, color: '#10B981' },
     { name: 'Good (80-89)', value: validatorPerformance.filter(v => v.emotionalScore >= 80 && v.emotionalScore < 90).length, color: '#3B82F6' },
     { name: 'Fair (70-79)', value: validatorPerformance.filter(v => v.emotionalScore >= 70 && v.emotionalScore < 80).length, color: '#F59E0B' },
     { name: 'Poor (<70)', value: validatorPerformance.filter(v => v.emotionalScore < 70).length, color: '#EF4444' }
-  ];
+  ].filter(item => item.value > 0); // Remove segments with zero values
 
   return (
     <div className="w-full space-y-6">

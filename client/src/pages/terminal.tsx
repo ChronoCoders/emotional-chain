@@ -84,10 +84,19 @@ export default function Terminal() {
 
   // Generate validator performance data
   const generateValidatorPerformance = () => {
-    const validators = ['StellarNode', 'NebulaForge', 'QuantumReach', 'OrionPulse', 'DarkMatterLabs'];
-    return validators.map(name => ({
+    const validators = [
+      { name: 'StellarNode', baseScore: 92 },
+      { name: 'NebulaForge', baseScore: 88 },
+      { name: 'QuantumReach', baseScore: 85 },
+      { name: 'OrionPulse', baseScore: 76 },
+      { name: 'DarkMatterLabs', baseScore: 82 },
+      { name: 'GravityCore', baseScore: 94 },
+      { name: 'AstroSentinel', baseScore: 78 },
+      { name: 'ByteGuardians', baseScore: 68 }
+    ];
+    return validators.map(({ name, baseScore }) => ({
       validatorId: name,
-      emotionalScore: 70 + Math.random() * 25,
+      emotionalScore: Math.max(60, Math.min(98, baseScore + (Math.random() - 0.5) * 10)),
       consistency: 80 + Math.random() * 20,
       participation: 90 + Math.random() * 10,
       color: `#${Math.floor(Math.random()*16777215).toString(16)}`
