@@ -111,12 +111,18 @@ export default function TokenEconomics() {
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
             <div className="text-terminal-warning">CIRCULATING SUPPLY</div>
             <div className="text-terminal-cyan text-lg">{formatEMO(currentEconomics?.circulatingSupply)}</div>
-            <div className="text-terminal-dim text-xs">Available to validators</div>
+            <div className="text-terminal-dim text-xs">
+              {((currentEconomics?.circulatingSupply / currentEconomics?.totalSupply) * 100 || 0).toFixed(1)}% circulation rate
+            </div>
           </div>
           <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
-            <div className="text-terminal-warning">STATUS</div>
-            <div className="text-terminal-success text-sm">AUTHENTIC</div>
-            <div className="text-terminal-dim text-xs">Zero pre-mint</div>
+            <div className="text-terminal-warning">STAKED SUPPLY</div>
+            <div className="text-terminal-cyan text-lg">
+              {formatEMO((currentEconomics?.totalSupply - currentEconomics?.circulatingSupply) || 0)}
+            </div>
+            <div className="text-terminal-dim text-xs">
+              {(((currentEconomics?.totalSupply - currentEconomics?.circulatingSupply) / currentEconomics?.totalSupply) * 100 || 0).toFixed(1)}% staked
+            </div>
           </div>
         </div>
       </div>
