@@ -24,7 +24,7 @@ export class ImmutableBlockchainService {
    */
   private async initializeFromDatabase(): Promise<void> {
     try {
-      console.log('BLOCKCHAIN IMMUTABILITY: Initializing from database...');
+
       
       // Load all blocks from database
       const dbBlocks = await db.select().from(blocks).orderBy(blocks.height);
@@ -48,7 +48,7 @@ export class ImmutableBlockchainService {
       // Sync state manager with blockchain data
       this.stateManager.syncFromBlockchain(enhancedBlocks);
       
-      console.log(`BLOCKCHAIN IMMUTABILITY: Loaded ${enhancedBlocks.length} blocks and synced state`);
+
     } catch (error) {
       console.error('BLOCKCHAIN IMMUTABILITY: Failed to initialize from database:', error);
     }
@@ -142,7 +142,7 @@ export class ImmutableBlockchainService {
     // Add to pending pool
     this.pendingTransactions.push(transaction);
     
-    console.log(`BLOCKCHAIN IMMUTABILITY: Created transaction ${transaction.id} from ${from} to ${to} for ${amount} EMO`);
+
     
     return transaction;
   }
@@ -226,9 +226,7 @@ export class ImmutableBlockchainService {
       // Update blockchain state
       this.stateManager.updateState(stateValidation.newState);
 
-      console.log(`BLOCKCHAIN IMMUTABILITY: Created block ${newHeight} with ${blockTransactions.length} transactions`);
-      console.log(`BLOCKCHAIN IMMUTABILITY: State root: ${tempBlock.header.stateRoot}`);
-      console.log(`BLOCKCHAIN IMMUTABILITY: Transaction root: ${tempBlock.header.transactionRoot}`);
+
 
       return tempBlock;
     } catch (error) {
@@ -351,7 +349,7 @@ export class ImmutableBlockchainService {
         }
       }
       
-      console.log(`BLOCKCHAIN IMMUTABILITY: Verified ${dbBlocks.length} blocks, found ${errors.length} errors`);
+  
       
       return {
         valid: errors.length === 0,

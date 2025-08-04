@@ -205,7 +205,7 @@ export class EmotionalChainService {
         '' // signature - to be implemented with cryptographic signing
       );
       
-      console.log(`BLOCKCHAIN IMMUTABILITY: Created transaction ${transaction.id} from ${from} to ${to} for ${amount} EMO`);
+
       return true;
     } catch (error) {
       console.error('BLOCKCHAIN IMMUTABILITY: Transaction failed:', error);
@@ -221,7 +221,7 @@ export class EmotionalChainService {
     // **BLOCKCHAIN IMMUTABILITY**: Get balance from immutable blockchain state
     try {
       const balance = this.immutableBlockchain.getBalanceFromBlockchain(validatorId);
-      console.log(`BLOCKCHAIN IMMUTABILITY: Retrieved balance ${balance} EMO for ${validatorId} from blockchain state`);
+
       return balance;
     } catch (error) {
       console.error('BLOCKCHAIN IMMUTABILITY: Failed to get balance from blockchain:', error);
@@ -243,7 +243,7 @@ export class EmotionalChainService {
         walletMap.set(address, balance);
       }
       
-      console.log(`BLOCKCHAIN IMMUTABILITY: Retrieved ${walletMap.size} wallet balances from blockchain state`);
+
       return walletMap;
     } catch (error) {
       console.error('BLOCKCHAIN IMMUTABILITY: Failed to get wallets from blockchain:', error);

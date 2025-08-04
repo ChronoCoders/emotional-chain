@@ -304,7 +304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         currency: 'EMO'
       }));
       
-      console.log(`Wallets API returning ${walletsArray.length} wallets:`, walletsArray.map(w => `${w.validatorId}: ${w.balance}`));
+
       
       res.json(walletsArray);
     } catch (error) {

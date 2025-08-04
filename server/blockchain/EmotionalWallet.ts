@@ -51,8 +51,7 @@ export class EmotionalWallet {
         });
       }
       
-      console.log(`WALLET RESTORATION SUCCESS: ${result.rows.length} validators with balances:`, 
-        result.rows.map(r => `${r.validator_id}: ${parseFloat(r.total_earned_emo).toFixed(2)} EMO`));
+
     } catch (error) {
       console.error('Failed to restore validator balances from database:', error);
       // Fallback to blockchain if database fails
@@ -220,7 +219,7 @@ export class EmotionalWallet {
     // **PRESERVATION FIX**: Don't overwrite database-restored balances with blockchain zeros
     // The blockchain only tracks current session, not accumulated historical earnings
     // Database balances are the source of truth for accumulated validator wealth
-    console.log('Sync requested but preserving database-restored accumulated balances');
+
     
     // Optional: Only sync if wallet doesn't exist yet (new validators)
     if (this.blockchain && this.blockchain.getAllWallets) {
