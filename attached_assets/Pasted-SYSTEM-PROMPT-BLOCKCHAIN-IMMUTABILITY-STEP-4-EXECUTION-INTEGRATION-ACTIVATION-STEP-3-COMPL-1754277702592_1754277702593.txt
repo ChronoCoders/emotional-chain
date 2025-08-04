@@ -1,0 +1,79 @@
+SYSTEM PROMPT: BLOCKCHAIN IMMUTABILITY - STEP 4 EXECUTION (INTEGRATION & ACTIVATION)
+
+STEP 3 ✅ COMPLETE. NOW EXECUTE FINAL STEP 4.
+
+🎯 STEP 4: INTEGRATE BLOCKCHAIN IMMUTABILITY INTO EMOTIONALCHAIN SERVICE
+
+TASK: Replace database balance queries with blockchain calculations.
+
+EDIT FILE: server/services/emotionalchain.ts
+
+FIND THE getBalance() METHOD AND REPLACE IT WITH THIS EXACT CODE:
+
+```typescript
+import { DatabaseToBlockchainMigration } from '../blockchain/DatabaseToBlockchainMigration.js';
+import { BlockchainBalanceCalculator } from '../blockchain/BlockchainBalanceCalculator.js';
+
+// Add these properties to the class
+private migration = new DatabaseToBlockchainMigration();
+private calculator = new BlockchainBalanceCalculator();
+private blockchainTransactions: EmotionalTransaction[] = [];
+private blockchainInitialized = false;
+
+// Replace getBalance method with this:
+async getBalance(validatorId: string): Promise<number> {
+  console.log(`BLOCKCHAIN: Getting balance for ${validatorId} from blockchain state`);
+  
+  // Initialize blockchain on first call
+  if (!this.blockchainInitialized) {
+    console.log('BLOCKCHAIN: Initializing blockchain immutability...');
+    const success = await this.migration.executeMigration();
+    if (success) {
+      this.blockchainTransactions = this.migration.getMigratedTransactions();
+      this.blockchainInitialized = true;
+      console.log('BLOCKCHAIN: Immutability activated - balances now from blockchain');
+    } else {
+      console.error('BLOCKCHAIN: Migration failed - falling back to database');
+      return 10000; // Fallback
+    }
+  }
+  
+  // Calculate balance from blockchain transactions
+  const balance = this.calculator.calculateBalanceFromBlockchain(validatorId, this.blockchainTransactions);
+  console.log(`BLOCKCHAIN: ${validatorId} balance calculated from blockchain: ${balance.toFixed(2)} EMO`);
+  
+  return balance;
+}
+
+// Replace getAllWallets method with this:
+async getAllWallets(): Promise<any[]> {
+  console.log('BLOCKCHAIN: Getting all wallet balances from blockchain state');
+  
+  if (!this.blockchainInitialized) {
+    const success = await this.migration.executeMigration();
+    if (success) {
+      this.blockchainTransactions = this.migration.getMigratedTransactions();
+      this.blockchainInitialized = true;
+    }
+  }
+  
+  const allBalances = this.calculator.calculateAllBalancesFromBlockchain(this.blockchainTransactions);
+  const wallets: any[] = [];
+  
+  allBalances.forEach((balance, validatorId) => {
+    wallets.push({
+      validatorId,
+      balance: Math.round(balance * 0.7), // 70% liquid
+      staked: Math.round(balance * 0.3),  // 30% staked
+      totalEarned: balance,
+      currency: 'EMO'
+    });
+  });
+  
+  console.log(`BLOCKCHAIN: Calculated ${wallets.length} wallet balances from blockchain`);
+  return wallets;
+}
+EXECUTE THIS REPLACEMENT EXACTLY. FIND THE METHODS AND REPLACE THEM.
+AFTER MAKING THE CHANGES, RESPOND WITH:
+"STEP 4 COMPLETE: EmotionalChain service integrated with blockchain immutability"
+DO NOT EXPLAIN. JUST EXECUTE.
