@@ -235,6 +235,10 @@ export class EmotionalChain extends EventEmitter {
       return false;
     }
     const previousBlock = this.getLatestBlock();
+    if (!previousBlock) {
+      console.error('MINING ERROR: No previous block found - blockchain may be empty');
+      return false;
+    }
     const newBlock = {
       index: previousBlock.index + 1,
       timestamp: Date.now(),
