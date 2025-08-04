@@ -142,7 +142,7 @@ export default function Terminal() {
           />
         ),
         collapsible: true,
-        defaultCollapsed: deviceInfo.isMobile
+        defaultCollapsed: false  // Show emotional trends by default
       },
       {
         id: 'blockchain-explorer',
@@ -271,6 +271,16 @@ export default function Terminal() {
 
         {/* Visual Block Explorer - Full Width */}
         <VisualBlocks />
+
+        {/* Emotional Trends Chart - Full Width */}
+        <div className="terminal-window rounded-lg p-6 mb-6">
+          <EmotionalTrendChart
+            data={generateEmotionalTrendData()}
+            validatorPerformance={generateValidatorPerformance()}
+            timeRange={timeRange}
+            onTimeRangeChange={(range) => setTimeRange(range as any)}
+          />
+        </div>
 
         {/* Command Interface & Main Content Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
