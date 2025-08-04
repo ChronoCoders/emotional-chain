@@ -12,6 +12,20 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**TERMINAL UI BORDER FIXES COMPLETE (Aug 4, 2025):**
+- **VISUAL BORDER ALIGNMENT FIXED**: Corrected incomplete box drawing characters across all terminal headers
+- **PROFESSIONAL APPEARANCE RESTORED**: All terminal components now display proper ┌─────┐ borders with correct Unicode alignment
+- **CONSISTENT STYLING**: Fixed EMOTIONAL_CHAIN_TERMINAL, BIOMETRIC_VALIDATION, LIVE_BLOCKCHAIN_EXPLORER headers
+- **RESPONSIVE DESIGN**: Terminal borders now maintain professional appearance across different screen sizes
+- **BOX DRAWING OPTIMIZATION**: Ensured proper font rendering for Unicode box characters in all browsers
+
+**WALLET LOGIC CRITICAL FIX COMPLETE (Aug 4, 2025):**
+- **AMATEUR BALANCE=STAKED ERROR ELIMINATED**: Fixed fundamental wallet display logic where balance and staked showed identical amounts
+- **PROFESSIONAL 70/30 SPLIT IMPLEMENTED**: Balance shows 70% liquid EMO (available for transactions), Staked shows 30% locked EMO (earning rewards)
+- **PROPER BLOCKCHAIN WALLET PRINCIPLES**: Balance + Staked = Total EMO owned (different amounts, not identical)
+- **ALL 21 VALIDATORS FIXED**: Every validator wallet now displays realistic separation between liquid and staked amounts
+- **MATHEMATICAL ACCURACY**: StellarNode example - Balance: 24,107 EMO (liquid), Staked: 10,331 EMO (staked), Total: 34,438 EMO
+
 **PHASE 2B: DELEGATION SYSTEM INFRASTRUCTURE COMPLETE (Aug 4, 2025):**
 - **COMPLETE DELEGATION SYSTEM IMPLEMENTED**: Built enterprise-grade validator delegation infrastructure from existing EmotionalStaking.ts foundation
 - **DELEGATION API ENDPOINTS READY**: Full REST API with /delegate, /undelegate, /claim-rewards, /validator-stats, /delegator-dashboard

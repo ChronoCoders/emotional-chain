@@ -16,7 +16,7 @@ export default function BiometricStatus() {
   return (
     <div className="terminal-window rounded-lg p-6">
       <h2 className="text-terminal-cyan text-lg font-bold mb-4">
-        ┌── BIOMETRIC_VALIDATION ──┐
+        ┌───── BIOMETRIC_VALIDATION ─────┐
       </h2>
       
       {!biometric ? (

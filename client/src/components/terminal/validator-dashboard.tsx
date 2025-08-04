@@ -59,7 +59,7 @@ export default function ValidatorDashboard() {
   return (
     <div className="terminal-window rounded-lg p-6">
       <h2 className="text-terminal-cyan text-lg font-bold mb-4">
-        ┌── ACTIVE_VALIDATORS ──┐
+        ┌────── ACTIVE_VALIDATORS ──────┐
       </h2>
       
       <div className="space-y-3 max-h-80 overflow-y-auto scrollbar-terminal">

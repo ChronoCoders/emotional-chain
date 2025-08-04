@@ -160,7 +160,7 @@ export default function BlockchainExplorer() {
   return (
     <div className="terminal-window rounded-lg p-6">
       <h2 className="text-terminal-cyan text-lg font-bold mb-4">
-        ┌── LIVE_BLOCKCHAIN_EXPLORER ──┐
+        ┌──── LIVE_BLOCKCHAIN_EXPLORER ────┐
       </h2>
       
       {/* EmotionalWallet Interface */}
