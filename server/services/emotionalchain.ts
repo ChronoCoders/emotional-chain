@@ -5,14 +5,18 @@ import { EmotionalWallet } from '../blockchain/EmotionalWallet';
 import { persistentTokenEconomics } from './token-economics-persistent';
 import { EmotionalStaking } from '../../consensus/EmotionalStaking';
 import { voluntaryStakingService } from './staking';
+import { ImmutableBlockchainService } from '../blockchain/ImmutableBlockchainService';
 export class EmotionalChainService {
   private isRunning: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private bootstrapNode: BootstrapNode | null = null;
   private wallet: EmotionalWallet | null = null;
   public emotionalStaking: EmotionalStaking;
+  private immutableBlockchain: ImmutableBlockchainService; // NEW: True blockchain immutability
+
   constructor() {
     this.emotionalStaking = new EmotionalStaking();
+    this.immutableBlockchain = new ImmutableBlockchainService(); // Initialize immutable blockchain
     this.initializeBlockchain();
     this.startHeartbeat();
     this.initializePersistentTokenEconomics();
@@ -191,25 +195,66 @@ export class EmotionalChainService {
     return [];
   }
   public async transferEMO(from: string, to: string, amount: number): Promise<boolean> {
-    if (this.blockchain && this.isRunning) {
-      return this.blockchain.transferEMO(from, to, amount);
+    // **BLOCKCHAIN IMMUTABILITY**: Create transaction on immutable blockchain
+    try {
+      const transaction = await this.immutableBlockchain.createTransaction(
+        from,
+        to,
+        amount,
+        '', // emotionalProofHash - to be implemented with ZK proofs
+        '' // signature - to be implemented with cryptographic signing
+      );
+      
+      console.log(`BLOCKCHAIN IMMUTABILITY: Created transaction ${transaction.id} from ${from} to ${to} for ${amount} EMO`);
+      return true;
+    } catch (error) {
+      console.error('BLOCKCHAIN IMMUTABILITY: Transaction failed:', error);
+      
+      // Fallback to existing blockchain if immutable blockchain fails
+      if (this.blockchain && this.isRunning) {
+        return this.blockchain.transferEMO(from, to, amount);
+      }
+      return false;
     }
-    return false;
   }
   public async getWalletBalance(validatorId: string): Promise<number> {
-    if (this.blockchain && this.isRunning) {
-      return this.blockchain.getWalletBalance(validatorId);
+    // **BLOCKCHAIN IMMUTABILITY**: Get balance from immutable blockchain state
+    try {
+      const balance = this.immutableBlockchain.getBalanceFromBlockchain(validatorId);
+      console.log(`BLOCKCHAIN IMMUTABILITY: Retrieved balance ${balance} EMO for ${validatorId} from blockchain state`);
+      return balance;
+    } catch (error) {
+      console.error('BLOCKCHAIN IMMUTABILITY: Failed to get balance from blockchain:', error);
+      
+      // Fallback to existing blockchain if immutable blockchain fails
+      if (this.blockchain && this.isRunning) {
+        return this.blockchain.getWalletBalance(validatorId);
+      }
+      return 0;
     }
-    return 0;
   }
   public async getAllWallets(): Promise<Map<string, number>> {
-    // **CRITICAL FIX**: Use EmotionalWallet (with database restoration) instead of blockchain wallets
-    if (this.wallet && this.isRunning) {
-      // Ensure wallet is fully initialized with database balances
-      await this.wallet.waitForInitialization();
-      return this.wallet.getAllWallets();
+    // **BLOCKCHAIN IMMUTABILITY**: Get balances from immutable blockchain state
+    try {
+      const blockchainBalances = this.immutableBlockchain.getAllBalancesFromBlockchain();
+      const walletMap = new Map<string, number>();
+      
+      for (const [address, balance] of Object.entries(blockchainBalances)) {
+        walletMap.set(address, balance);
+      }
+      
+      console.log(`BLOCKCHAIN IMMUTABILITY: Retrieved ${walletMap.size} wallet balances from blockchain state`);
+      return walletMap;
+    } catch (error) {
+      console.error('BLOCKCHAIN IMMUTABILITY: Failed to get wallets from blockchain:', error);
+      
+      // Fallback to existing wallet service if blockchain fails
+      if (this.wallet && this.isRunning) {
+        await this.wallet.waitForInitialization();
+        return this.wallet.getAllWallets();
+      }
+      return new Map();
     }
-    return new Map();
   }
   public async getWalletStatus(validatorId: string) {
     if (this.wallet && this.isRunning) {

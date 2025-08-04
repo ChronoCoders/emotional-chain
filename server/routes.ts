@@ -31,6 +31,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const monitoringRouter = await import("./routes/monitoring");
   app.use("/api/monitoring", monitoringRouter.default);
   
+  // Immutable Blockchain API
+  const blockchainRouter = await import("./routes/blockchain-immutable");
+  app.use("/api/blockchain", blockchainRouter.default);
+  
   // Production Prometheus metrics endpoint
   app.get('/metrics', async (req, res) => {
     try {

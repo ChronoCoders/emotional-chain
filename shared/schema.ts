@@ -13,6 +13,8 @@ export const blocks = pgTable("blocks", {
   hash: text("hash").notNull().unique(),
   previousHash: text("previous_hash").notNull(),
   merkleRoot: text("merkle_root").notNull(),
+  transactionRoot: text("transaction_root").notNull(), // NEW: Merkle root of transactions
+  stateRoot: text("state_root").notNull(), // NEW: State tree root hash
   timestamp: bigint("timestamp", { mode: "number" }).notNull(),
   nonce: integer("nonce").notNull(),
   difficulty: integer("difficulty").notNull(),
@@ -20,22 +22,29 @@ export const blocks = pgTable("blocks", {
   emotionalScore: decimal("emotional_score", { precision: 5, scale: 2 }).notNull(),
   emotionalProof: jsonb("emotional_proof"),
   blockData: jsonb("block_data"),
+  transactions: jsonb("transactions").default('[]'), // NEW: Full transaction list (immutable)
+  zkProofs: jsonb("zk_proofs").default('[]'), // NEW: Privacy-preserving proofs
   transactionCount: integer("transaction_count").default(0),
   createdAt: timestamp("created_at").defaultNow(),
 });
+// NOTE: This table becomes READ-ONLY cache for query optimization
+// All transaction data is now stored immutably in blocks.transactions
 export const transactions = pgTable("transactions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   hash: text("hash").notNull().unique(),
   blockHash: text("block_hash").references(() => blocks.hash),
+  blockNumber: integer("block_number").notNull(), // NEW: Block inclusion number
   fromAddress: text("from_address").notNull(),
   toAddress: text("to_address").notNull(),
   amount: decimal("amount", { precision: 18, scale: 8 }).notNull(),
   fee: decimal("fee", { precision: 18, scale: 8 }).default("0"),
   timestamp: bigint("timestamp", { mode: "number" }).notNull(),
   signature: jsonb("signature").notNull(),
-  biometricData: jsonb("biometric_data"),
+  emotionalProofHash: text("emotional_proof_hash"), // NEW: ZK proof commitment
+  biometricData: jsonb("biometric_data"), // DEPRECATED: Moving to off-chain encrypted storage
   transactionData: jsonb("transaction_data"),
   status: text("status").notNull().default("confirmed"),
+  isBlockchainVerified: boolean("is_blockchain_verified").default(false), // NEW: Verification flag
   createdAt: timestamp("created_at").defaultNow(),
 });
 export const validatorStates = pgTable("validator_states", {
