@@ -126,7 +126,7 @@ export default function PrivacyDashboard() {
             <Hash className="w-4 h-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{privacyStats?.totalProofs || 0}</div>
+            <div className="text-2xl font-bold">{(privacyStats as any)?.totalProofs || 0}</div>
             <p className="text-xs text-muted-foreground">
               Last 24 hours
             </p>
@@ -139,10 +139,10 @@ export default function PrivacyDashboard() {
             <CheckCircle className="w-4 h-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{privacyStats?.validProofs || 0}</div>
+            <div className="text-2xl font-bold">{(privacyStats as any)?.validProofs || 0}</div>
             <p className="text-xs text-muted-foreground">
-              {privacyStats?.totalProofs ? 
-                ((privacyStats.validProofs / privacyStats.totalProofs) * 100).toFixed(1) : 0}% success rate
+              {(privacyStats as any)?.totalProofs ? 
+                (((privacyStats as any).validProofs / (privacyStats as any).totalProofs) * 100).toFixed(1) : 0}% success rate
             </p>
           </CardContent>
         </Card>
@@ -153,7 +153,7 @@ export default function PrivacyDashboard() {
             <UserCheck className="w-4 h-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{privacyStats?.uniqueValidators || 0}</div>
+            <div className="text-2xl font-bold">{(privacyStats as any)?.uniqueValidators || 0}</div>
             <p className="text-xs text-muted-foreground">
               Using privacy layer
             </p>
@@ -187,7 +187,7 @@ export default function PrivacyDashboard() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {privacyStats?.securityFeatures?.map((feature: string, index: number) => (
+            {((privacyStats as any)?.securityFeatures || []).map((feature: string, index: number) => (
               <div key={index} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <span className="text-sm font-medium text-green-800">{feature}</span>

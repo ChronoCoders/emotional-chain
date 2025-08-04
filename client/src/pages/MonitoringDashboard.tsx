@@ -42,10 +42,10 @@ export default function MonitoringDashboard() {
     );
   }
 
-  const consensusHealth = dashboardData?.consensusHealth;
-  const validatorParticipation = dashboardData?.validatorParticipation;
-  const systemPerformance = dashboardData?.systemPerformance;
-  const summary = dashboardData?.summary;
+  const consensusHealth = dashboardData?.consensusHealth || {};
+  const validatorParticipation = dashboardData?.validatorParticipation || {};
+  const systemPerformance = dashboardData?.systemPerformance || {};
+  const summary = dashboardData?.summary || {};
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -151,17 +151,17 @@ export default function MonitoringDashboard() {
       </div>
 
       {/* Active Alerts */}
-      {alertsData?.alerts && alertsData.alerts.length > 0 && (
+      {(alertsData as any)?.alerts && (alertsData as any).alerts.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5" />
-              Active Alerts ({alertsData.summary.total})
+              Active Alerts ({(alertsData as any).summary?.total})
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {alertsData.alerts.slice(0, 5).map((alert: any, index: number) => (
+              {((alertsData as any).alerts || []).slice(0, 5).map((alert: any, index: number) => (
                 <div key={index} className={`flex items-center gap-3 p-3 rounded-lg border ${
                   alert.level === 'critical' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'
                 }`}>
@@ -276,19 +276,19 @@ export default function MonitoringDashboard() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Active Validators</span>
                         <Badge variant="secondary">
-                          {validatorParticipation.validatorDetails.filter(v => v.status === 'active').length}
+                          {(validatorParticipation as any).validatorDetails?.filter((v: any) => v.status === 'active').length || 0}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Degraded Performance</span>
                         <Badge variant="outline">
-                          {validatorParticipation.validatorDetails.filter(v => v.status === 'degraded').length}
+                          {(validatorParticipation as any).validatorDetails?.filter((v: any) => v.status === 'degraded').length || 0}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Inactive</span>
                         <Badge variant="destructive">
-                          {validatorParticipation.validatorDetails.filter(v => v.status === 'inactive').length}
+                          {(validatorParticipation as any).validatorDetails?.filter((v: any) => v.status === 'inactive').length || 0}
                         </Badge>
                       </div>
                     </>
@@ -448,7 +448,7 @@ export default function MonitoringDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {dashboardData?.blockchainStats?.transactionThroughput?.toFixed(1) || 0} TPS
+                  {((dashboardData as any)?.blockchainStats?.transactionThroughput?.toFixed(1)) || 0} TPS
                 </div>
                 <p className="text-xs text-muted-foreground">Transactions per second</p>
               </CardContent>
@@ -460,7 +460,7 @@ export default function MonitoringDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {((dashboardData?.blockchainStats?.networkHashrate || 0) / 1000).toFixed(1)}K H/s
+                  {(((dashboardData as any)?.blockchainStats?.networkHashrate || 0) / 1000).toFixed(1)}K H/s
                 </div>
                 <p className="text-xs text-muted-foreground">Emotional consensus power</p>
               </CardContent>
