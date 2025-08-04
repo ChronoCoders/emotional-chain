@@ -241,8 +241,16 @@ export default function Terminal() {
                 <span className="status-indicator status-warning"></span>
                 <span className="text-terminal-warning">BIOMETRIC VAL</span>
               </div>
-              <div className="text-terminal-cyan">Active: {stats ? Math.floor(stats.activeValidators * 0.85) : '--'}/{stats ? stats.activeValidators : '--'}</div>
-              <div className="text-terminal-cyan">Avg Auth: 94.3%</div>
+              <div className="text-terminal-cyan">Active: {(() => {
+                const validatorPerf = generateValidatorPerformance();
+                const activeCount = validatorPerf.filter(v => v.emotionalScore >= 70).length;
+                return `${activeCount}/${stats ? stats.activeValidators : validatorPerf.length}`;
+              })()}</div>
+              <div className="text-terminal-cyan">Avg Auth: {(() => {
+                const validatorPerf = generateValidatorPerformance();
+                const avgAuth = validatorPerf.reduce((sum, v) => sum + v.participation, 0) / validatorPerf.length;
+                return avgAuth.toFixed(1);
+              })()}%</div>
             </div>
             
             <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
