@@ -241,7 +241,7 @@ export default function Terminal() {
                 <span className="status-indicator status-warning"></span>
                 <span className="text-terminal-warning">BIOMETRIC VAL</span>
               </div>
-              <div className="text-terminal-cyan">Active: {allWallets ? allWallets.filter(w => w.balance > 10000).length : '--'}/{stats ? stats.activeValidators : '--'}</div>
+              <div className="text-terminal-cyan">Active: {allWallets ? allWallets.filter(w => w.balance >= 10000).length : '--'}/{stats ? stats.activeValidators : '--'}</div>
               <div className="text-terminal-cyan">Avg Auth: {(() => {
                 const validatorPerf = generateValidatorPerformance();
                 const avgAuth = validatorPerf.reduce((sum, v) => sum + v.participation, 0) / validatorPerf.length;
