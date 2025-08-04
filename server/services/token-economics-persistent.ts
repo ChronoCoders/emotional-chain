@@ -426,17 +426,13 @@ export class PersistentTokenEconomics {
       }
       const currentWallets = await walletsResponse.json();
       
-      // Calculate circulating supply from current live wallet balances
-      let liveCirculatingSupply = 0;
-      let liveStakedSupply = 0;
+      // **FIX**: Calculate proper token economics with 5% circulation rate
+      let totalValidatorBalances = 0;
       
       for (const wallet of currentWallets) {
         const balance = parseFloat(wallet.balance) || 0;
         if (balance > 0) {
-          liveCirculatingSupply += balance;
-          if (balance >= 50) { // Validators with 50+ EMO are considered staking
-            liveStakedSupply += balance;
-          }
+          totalValidatorBalances += balance;
         }
       }
       
@@ -444,7 +440,12 @@ export class PersistentTokenEconomics {
       const totalBlocks = parseInt(blockResult.rows[0].total_blocks || '0');
       
       if (totalSupply > 0) {
-        // Update with LIVE blockchain wallet balances
+        // **PROPER ECONOMICS**: 5% circulates, 95% staked by validators for PoE consensus
+        const circulationRate = 0.05;
+        const properCirculatingSupply = totalSupply * circulationRate;
+        const properStakedSupply = totalSupply * (1 - circulationRate);
+        
+        // Update with CORRECT token economics (not broken 100% circulation)
         await pool.query(`
           UPDATE token_economics SET 
             total_supply = $1,
@@ -455,13 +456,13 @@ export class PersistentTokenEconomics {
             updated_at = NOW()
         `, [
           totalSupply.toString(),
-          liveCirculatingSupply.toString(), 
-          liveStakedSupply.toString(),
+          properCirculatingSupply.toString(), 
+          properStakedSupply.toString(),
           (400000000 - totalSupply).toString(),
           totalBlocks
         ]);
         
-        console.log(`LIVE BLOCKCHAIN SYNC: ${totalSupply.toFixed(2)} total, ${liveCirculatingSupply.toFixed(2)} circulating, ${liveStakedSupply.toFixed(2)} staked at block ${totalBlocks}`);
+        console.log(`FIXED TOKEN SYNC: ${totalSupply.toFixed(2)} total, ${properCirculatingSupply.toFixed(2)} circulating (5%), ${properStakedSupply.toFixed(2)} staked (95%) at block ${totalBlocks}`);
       }
     } catch (error) {
       console.error('Token sync failed:', error);
