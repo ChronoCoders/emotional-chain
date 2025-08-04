@@ -148,8 +148,8 @@ export default function TerminalInterface({ className = "" }: TerminalInterfaceP
   return (
     <div className={`terminal-window rounded-lg p-6 ${className}`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-terminal-cyan text-lg font-bold">
-          ┌─────── EMOTIONAL_CHAIN_TERMINAL ───────┐
+        <h2 className="text-terminal-cyan text-lg font-bold font-mono">
+          +====== EMOTIONAL_CHAIN_TERMINAL ======+
         </h2>
         <div className="flex items-center space-x-2">
           <div className={`status-indicator ${isConnected ? 'status-online' : 'status-offline'}`}></div>

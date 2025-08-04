@@ -78,8 +78,8 @@ export default function VisualBlocks() {
   return (
     <div className="terminal-window rounded-lg p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-terminal-cyan text-lg font-bold">
-          ┌──── VISUAL_BLOCK_EXPLORER ────┐
+        <h2 className="text-terminal-cyan text-lg font-bold font-mono">
+          +=== VISUAL_BLOCK_EXPLORER ===+
         </h2>
         
         {/* View Controls */}

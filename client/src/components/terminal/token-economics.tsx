@@ -88,8 +88,8 @@ export default function TokenEconomics() {
 
   return (
     <div className="terminal-window rounded-lg p-6">
-      <h2 className="text-terminal-cyan text-lg font-bold mb-4">
-        ┌───── EMO_TOKEN_ECONOMICS ─────┐
+      <h2 className="text-terminal-cyan text-lg font-bold font-mono mb-4">
+        +===== EMO_TOKEN_ECONOMICS =====+
       </h2>
       
       {/* Supply Metrics */}

@@ -40,8 +40,8 @@ export default function ConsensusMonitor() {
 
   return (
     <div className="terminal-window rounded-lg p-6">
-      <h2 className="text-terminal-cyan text-lg font-bold mb-4">
-        ┌───── PoE_CONSENSUS_MONITOR ─────┐
+      <h2 className="text-terminal-cyan text-lg font-bold font-mono mb-4">
+        +===== PoE_CONSENSUS_MONITOR =====+
       </h2>
       
       {/* Network Emotional State */}

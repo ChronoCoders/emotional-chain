@@ -73,6 +73,17 @@
   * {
     @apply border-border;
   }
+  
+  /* Fix box drawing character rendering */
+  .terminal-window h2,
+  .terminal-text,
+  pre {
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    font-feature-settings: normal;
+    text-rendering: optimizeSpeed;
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+  }
 
   body {
     @apply font-mono antialiased;
