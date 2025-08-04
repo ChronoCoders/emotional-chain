@@ -412,36 +412,25 @@ export class PersistentTokenEconomics {
       
       const blockResult = await pool.query(`SELECT COUNT(*) as total_blocks FROM blocks`);
       
-      // **MANUAL FIX**: Use hardcoded current balances since import is broken
-      // Current validator balances from live blockchain logs:
-      const currentValidatorBalances = {
-        'StellarNode': 219.36,
-        'NebulaForge': 212.64,
-        'QuantumReach': 201.03,
-        'OrionPulse': 203.70,
-        'DarkMatterLabs': 202.32,
-        'GravityCore': 206.85,
-        'AstroSentinel': 190.71,
-        'ByteGuardians': 192.99,
-        'ZeroLagOps': 184.05,
-        'ChainFlux': 189.87,
-        'BlockNerve': 182.73,
-        'ValidatorX': 176.91,
-        'NovaSync': 170.67,
-        'IronNode': 117.06,
-        'SentinelTrust': 112.88,
-        'VaultProof': 110.20,
-        'SecureMesh': 107.52
-      };
+      // **DYNAMIC FIX**: Calculate from live API wallet data instead of stale hardcoded values
+      // Get current wallet balances from the wallets API endpoint
+      const walletsResponse = await fetch('http://localhost:5000/api/wallets');
+      if (!walletsResponse.ok) {
+        throw new Error('Failed to fetch current wallet balances');
+      }
+      const currentWallets = await walletsResponse.json();
       
-      // Calculate circulating supply from current validator balances
+      // Calculate circulating supply from current live wallet balances
       let liveCirculatingSupply = 0;
       let liveStakedSupply = 0;
       
-      for (const [validatorId, balance] of Object.entries(currentValidatorBalances)) {
-        liveCirculatingSupply += balance;
-        if (balance >= 50) { // Validators with 50+ EMO are considered staking
-          liveStakedSupply += balance;
+      for (const wallet of currentWallets) {
+        const balance = parseFloat(wallet.balance) || 0;
+        if (balance > 0) {
+          liveCirculatingSupply += balance;
+          if (balance >= 50) { // Validators with 50+ EMO are considered staking
+            liveStakedSupply += balance;
+          }
         }
       }
       

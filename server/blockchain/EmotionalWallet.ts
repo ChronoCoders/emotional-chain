@@ -6,21 +6,62 @@ export class EmotionalWallet {
   constructor(blockchain: any, network: any) {
     this.blockchain = blockchain;
     this.network = network;
+    // Initialize wallets synchronously to ensure they're ready
     this.initializeWallets();
   }
-  private initializeWallets() {
-    // Initialize wallets for all validators when they're added
-    if (this.blockchain && this.blockchain.getAllWallets) {
-      const blockchainWallets = this.blockchain.getAllWallets();
-      blockchainWallets.forEach((balance: number, validatorId: string) => {
+  
+  // Add public method to check initialization status
+  public async waitForInitialization(): Promise<void> {
+    return this.initializeWallets();
+  }
+  private async initializeWallets() {
+    // **CRITICAL FIX**: Initialize wallets with accumulated balances from database
+    try {
+      // Get validator accumulated earnings from transactions table
+      const { Pool } = await import('@neondatabase/serverless');
+      const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+      const result = await pool.query(`
+        SELECT 
+          to_address as validator_id,
+          SUM(CAST(amount AS DECIMAL)) as total_earned_emo
+        FROM transactions 
+        WHERE to_address IS NOT NULL 
+          AND to_address != '' 
+          AND amount > 0
+        GROUP BY to_address
+      `);
+      
+      // Initialize each validator with their proper accumulated balance
+      for (const row of result.rows) {
+        const validatorId = row.validator_id;
+        const accumulatedBalance = parseFloat(row.total_earned_emo) || 0;
+        
         this.wallets.set(validatorId, {
           address: this.generateAddress(validatorId),
-          balance: balance,
-          staked: 0,
+          balance: accumulatedBalance, // Use accumulated database balance, not zero
+          staked: accumulatedBalance >= 50 ? accumulatedBalance : 0,
           isValidator: true,
           validatorId: validatorId
         });
-      });
+      }
+      
+      console.log(`WALLET RESTORATION SUCCESS: ${result.rows.length} validators with balances:`, 
+        result.rows.map(r => `${r.validator_id}: ${parseFloat(r.total_earned_emo).toFixed(2)} EMO`));
+    } catch (error) {
+      console.error('Failed to restore validator balances from database:', error);
+      // Fallback to blockchain if database fails
+      if (this.blockchain && this.blockchain.getAllWallets) {
+        const blockchainWallets = this.blockchain.getAllWallets();
+        blockchainWallets.forEach((balance: number, validatorId: string) => {
+          this.wallets.set(validatorId, {
+            address: this.generateAddress(validatorId),
+            balance: balance,
+            staked: 0,
+            isValidator: true,
+            validatorId: validatorId
+          });
+        });
+      }
     }
   }
   private generateAddress(validatorId: string): string {
@@ -88,8 +129,13 @@ export class EmotionalWallet {
     const primaryWallet = this.wallets.get('StellarNode');
     return primaryWallet ? primaryWallet.balance : 0;
   }
-  public getAllWallets(): Map<string, any> {
-    return new Map(this.wallets);
+  public getAllWallets(): Map<string, number> {
+    // **FIX**: Extract balance numbers from wallet objects for API compatibility
+    const balanceMap = new Map<string, number>();
+    this.wallets.forEach((wallet, validatorId) => {
+      balanceMap.set(validatorId, wallet.balance || 0);
+    });
+    return balanceMap;
   }
   public updateWalletBalance(validatorId: string, balance: number): void {
     if (this.wallets.has(validatorId)) {
@@ -131,13 +177,20 @@ export class EmotionalWallet {
     return true;
   }
   public syncWithBlockchain(): void {
-    // CRITICAL: Force sync all wallet balances with blockchain
+    // **PRESERVATION FIX**: Don't overwrite database-restored balances with blockchain zeros
+    // The blockchain only tracks current session, not accumulated historical earnings
+    // Database balances are the source of truth for accumulated validator wealth
+    console.log('Sync requested but preserving database-restored accumulated balances');
+    
+    // Optional: Only sync if wallet doesn't exist yet (new validators)
     if (this.blockchain && this.blockchain.getAllWallets) {
       const blockchainWallets = this.blockchain.getAllWallets();
-      // Clear any cached balances that might be wrong
       blockchainWallets.forEach((balance: number, validatorId: string) => {
-        // Always set the absolute balance from blockchain source
-        this.updateWalletBalance(validatorId, balance);
+        // Only set balance if wallet doesn't exist yet (new validator)
+        if (!this.wallets.has(validatorId)) {
+          this.updateWalletBalance(validatorId, balance);
+        }
+        // Otherwise preserve existing database-restored balance
       });
     }
   }

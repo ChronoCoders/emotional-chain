@@ -199,8 +199,11 @@ export class EmotionalChainService {
     return 0;
   }
   public async getAllWallets(): Promise<Map<string, number>> {
-    if (this.blockchain && this.isRunning) {
-      return this.blockchain.getAllWallets();
+    // **CRITICAL FIX**: Use EmotionalWallet (with database restoration) instead of blockchain wallets
+    if (this.wallet && this.isRunning) {
+      // Ensure wallet is fully initialized with database balances
+      await this.wallet.waitForInitialization();
+      return this.wallet.getAllWallets();
     }
     return new Map();
   }
@@ -282,6 +285,8 @@ export class EmotionalChainService {
   }
   public async syncWalletWithBlockchain(): Promise<void> {
     if (this.wallet) {
+      // Ensure wallet initialization completes before sync
+      await this.wallet.waitForInitialization();
       this.wallet.syncWithBlockchain();
     }
   }
