@@ -99,14 +99,14 @@ export function MobileResponsiveTerminal({
 
   const getLayoutClasses = () => {
     if (isMobile) {
-      return 'flex flex-col min-h-screen bg-gray-50';
+      return 'flex flex-col min-h-screen bg-terminal-bg';
     }
     
     if (isTablet) {
-      return 'flex flex-col lg:flex-row min-h-screen bg-gray-50';
+      return 'flex flex-col lg:flex-row min-h-screen bg-terminal-bg';
     }
     
-    return 'flex min-h-screen bg-gray-50';
+    return 'flex min-h-screen bg-terminal-bg';
   };
 
   const getSectionClasses = (index: number) => {
@@ -125,10 +125,10 @@ export function MobileResponsiveTerminal({
     <div className={getLayoutClasses()}>
       {/* Mobile Header */}
       {isMobile && (
-        <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div className="bg-terminal-surface border-b border-terminal-border px-4 py-3 flex items-center justify-between sticky top-0 z-50">
           <div className="flex items-center space-x-2">
             {getDeviceIcon()}
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-terminal-green">
               EmotionalChain
             </span>
           </div>
@@ -156,7 +156,7 @@ export function MobileResponsiveTerminal({
 
       {/* Mobile Sidebar/Navigation */}
       {isMobile && sidebarOpen && (
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="bg-terminal-surface border-b border-terminal-border px-4 py-3">
           <div className="grid grid-cols-2 gap-2">
             {sections.map((section) => (
               <button
@@ -165,11 +165,11 @@ export function MobileResponsiveTerminal({
                   toggleSection(section.id);
                   setSidebarOpen(false);
                 }}
-                className="flex items-center justify-center p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                className="flex items-center justify-center p-3 rounded-lg bg-terminal-bg hover:bg-terminal-surface transition-colors border border-terminal-border"
               >
                 <div className="flex flex-col items-center space-y-1">
                   {section.icon}
-                  <span className="text-xs font-medium text-gray-700">
+                  <span className="text-xs font-medium text-terminal-green">
                     {section.title}
                   </span>
                 </div>
@@ -195,8 +195,8 @@ export function MobileResponsiveTerminal({
               <div
                 key={section.id}
                 className={`
-                  bg-white 
-                  border border-gray-200 
+                  bg-terminal-surface 
+                  border border-terminal-border 
                   rounded-lg overflow-hidden shadow-sm
                   ${getSectionClasses(index)}
                   ${isMobile && collapsedSections.has(section.id) ? 'h-auto' : ''}
@@ -205,16 +205,16 @@ export function MobileResponsiveTerminal({
                 {/* Section Header */}
                 <div
                   className={`
-                    px-4 py-3 bg-gray-50 
-                    border-b border-gray-200 
+                    px-4 py-3 bg-terminal-bg 
+                    border-b border-terminal-border 
                     flex items-center justify-between
-                    ${section.collapsible ? 'cursor-pointer hover:bg-gray-100' : ''}
+                    ${section.collapsible ? 'cursor-pointer hover:bg-terminal-surface' : ''}
                   `}
                   onClick={() => section.collapsible && toggleSection(section.id)}
                 >
                   <div className="flex items-center space-x-2">
                     {section.icon}
-                    <h3 className="text-sm font-medium text-gray-900">
+                    <h3 className="text-sm font-medium text-terminal-green">
                       {section.title}
                     </h3>
                   </div>

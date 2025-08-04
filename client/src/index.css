@@ -12,41 +12,6 @@
 }
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(222.2, 84%, 4.9%);
-  --muted: hsl(210, 40%, 96%);
-  --muted-foreground: hsl(215.4, 16.3%, 46.9%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(222.2, 84%, 4.9%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(222.2, 84%, 4.9%);
-  --border: hsl(214.3, 31.8%, 91.4%);
-  --input: hsl(214.3, 31.8%, 91.4%);
-  --primary: hsl(222.2, 47.4%, 11.2%);
-  --primary-foreground: hsl(210, 40%, 98%);
-  --secondary: hsl(210, 40%, 96%);
-  --secondary-foreground: hsl(222.2, 84%, 4.9%);
-  --accent: hsl(210, 40%, 96%);
-  --accent-foreground: hsl(222.2, 84%, 4.9%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(210, 40%, 98%);
-  --ring: hsl(222.2, 84%, 4.9%);
-  --radius: 0.5rem;
-  
-  /* Terminal specific colors - using light theme with accent colors */
-  --terminal-bg: hsl(0, 0%, 98%);
-  --terminal-surface: hsl(0, 0%, 96%);
-  --terminal-border: hsl(214.3, 31.8%, 91.4%);
-  --terminal-green: hsl(120, 60%, 40%);
-  --terminal-cyan: hsl(180, 60%, 40%);
-  --terminal-orange: hsl(25, 80%, 50%);
-  --terminal-gold: hsl(51, 80%, 45%);
-  --terminal-error: hsl(0, 80%, 50%);
-  --terminal-success: hsl(120, 60%, 40%);
-  --terminal-warning: hsl(51, 80%, 45%);
-}
-
-.dark {
   --background: hsl(0, 0%, 4%);
   --foreground: hsl(120, 100%, 50%);
   --muted: hsl(0, 0%, 6.7%);
@@ -63,11 +28,25 @@
   --secondary-foreground: hsl(120, 100%, 50%);
   --accent: hsl(0, 0%, 6.7%);
   --accent-foreground: hsl(120, 100%, 50%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
   --ring: hsl(120, 100%, 50%);
   --radius: 0.5rem;
+  
+  /* Terminal specific colors */
+  --terminal-bg: hsl(0, 0%, 4%);
+  --terminal-surface: hsl(0, 0%, 6.7%);
+  --terminal-border: hsl(0, 0%, 20%);
+  --terminal-green: hsl(120, 100%, 50%);
+  --terminal-cyan: hsl(180, 100%, 50%);
+  --terminal-orange: hsl(25, 100%, 60%);
+  --terminal-gold: hsl(51, 100%, 50%);
+  --terminal-error: hsl(0, 100%, 60%);
+  --terminal-success: hsl(120, 100%, 60%);
+  --terminal-warning: hsl(51, 100%, 60%);
 }
+
+
 
 @layer base {
   * {

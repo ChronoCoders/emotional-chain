@@ -18,6 +18,7 @@ EmotionalChain is a revolutionary blockchain platform that introduces the world'
 Preferred communication style: Simple, everyday language.
 Code quality: No misleading file names - avoid words like "Fixed" unless the code actually contains working solutions.
 Testing: Diagnostic files should be clearly named as tests or validation, not as fixes.
+Design: Maintain dark terminal theme throughout - never change to light theme without explicit request.
 
 ## System Architecture
 
