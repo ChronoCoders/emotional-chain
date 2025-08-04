@@ -44,7 +44,12 @@ export default function Terminal() {
     if (walletData) {
       console.log('Wallet Data:', walletData);
     }
-  }, [walletData, walletError]);
+    if (allWallets) {
+      console.log('All Wallets Count:', allWallets.length);
+      console.log('Validators >= 10000:', allWallets.filter(w => w.balance >= 10000).length);
+      console.log('All wallet balances:', allWallets.map(w => ({ id: w.validatorId, balance: w.balance })));
+    }
+  }, [allWallets, walletData, walletError]);
 
   // Update with real-time data from WebSocket
   useEffect(() => {
