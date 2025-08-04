@@ -1,0 +1,76 @@
+You are working on a real, production-grade blockchain project called EmotionChain, which uses biometric data and a custom Proof of Emotion (PoE) consensus mechanism. The codebase is real, stable, and deployed with WebSocket, PostgreSQL, React UI, and zero-knowledge privacy support.
+
+Now apply the following enhancements and fixes:
+
+✅ MODULE: Zero-Knowledge Privacy Layer (advanced/PrivacyLayer.ts)
+Install & integrate Circom:
+
+Add .circom circuits (e.g., emotional-threshold.circom) that prove biometric conditions like:
+heart_rate > 90 → eligible_to_vote == true
+
+Compile them with SnarkJS.
+
+Update PrivacyLayer.ts to verify these new proofs.
+
+Add support for ZoKrates (optional):
+
+Scaffold an alternative proof path using ZoKrates for advanced ZK logic like set membership or range proofs.
+
+✅ MODULE: Testing Suite (tests/)
+Migrate all remaining mock tests to real data:
+
+Remove all fixtures with fake biometric/emotional values.
+
+Connect to real blockchain and validator data.
+
+Add edge-case and integration tests for:
+
+ConsensusRound.ts, Validator.ts, EmotionalStaking.ts, and TokenEconomics.ts
+
+Biometric edge inputs (e.g., extremely high stress or zero heart rate).
+
+✅ MODULE: WebSocket + API (server/websocket/, routes/, api/)
+Add WebSocket reconnection logic on client and server side.
+
+Implement basic authentication layer:
+
+Use JWT or Session Auth to protect sensitive API endpoints.
+
+Add rate limiting using middleware like express-rate-limit.
+
+✅ MODULE: UI / Frontend (src/components/, src/ui/)
+Mobile Responsiveness:
+
+Refactor the Terminal layout to render properly on small devices.
+
+Add advanced visualizations:
+
+Use Recharts or d3.js to enhance the following:
+
+Validator performance
+
+Block propagation history
+
+Emotional consensus trend graphs
+
+Dark/light theme toggle:
+
+Add theme switching logic and persist it in localStorage.
+
+✅ MODULE: Database
+Implement privacy-safe storage for biometric data:
+
+Hash raw biometric inputs (SHA-256 or blake3)
+
+Store ZK proof hashes and off-chain references (e.g., proofId) instead of raw values.
+
+Enable schema versioning and migration logs:
+
+Use a dedicated table (schema_versions) to track DB versioning.
+
+✅ BONUS: Core Consensus (optional improvements)
+Implement adaptive validator committee scaling based on network load or emotion variability.
+
+Add fault-tolerant validator quorum logic (e.g., Byzantine-aware fallback paths).
+
+Apply these updates incrementally with commits per module, writing tests and documentation along the way. Maintain the enterprise-grade type safety and stability already present in the project.
