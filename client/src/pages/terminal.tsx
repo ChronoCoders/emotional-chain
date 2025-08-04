@@ -121,10 +121,10 @@ export default function Terminal() {
             <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
               <div className="flex items-center mb-2">
                 <span className="status-indicator status-online"></span>
-                <span className="text-terminal-success">WALLET STATUS</span>
+                <span className="text-terminal-success">NETWORK VALUE</span>
               </div>
-              <div className="text-terminal-cyan">Balance: {walletLoading ? 'Loading...' : walletData ? formatNumber(walletData.balance) : walletError ? 'Error' : '--'} EMO</div>
-              <div className="text-terminal-cyan">Staked: {walletLoading ? 'Loading...' : walletData ? formatNumber(walletData.balance * 0.95) : '--'} EMO</div>
+              <div className="text-terminal-cyan">Total Validators: {allWallets ? allWallets.filter(w => w.balance > 0).length : '--'}</div>
+              <div className="text-terminal-cyan">Avg Balance: {allWallets ? formatNumber(allWallets.reduce((sum, w) => sum + w.balance, 0) / allWallets.filter(w => w.balance > 0).length) : '--'} EMO</div>
             </div>
           </div>
         </div>
