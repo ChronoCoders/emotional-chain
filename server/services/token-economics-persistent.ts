@@ -403,7 +403,7 @@ export class PersistentTokenEconomics {
    */
   public async recalculateFromTransactions(): Promise<void> {
     try {
-      // Get total EMO mined from all transactions (TOTAL SUPPLY)
+      // Calculate token economics from total rewards mined (this grows as mining continues)
       const totalMinedResult = await pool.query(`
         SELECT COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total_mined
         FROM transactions 
@@ -426,14 +426,14 @@ export class PersistentTokenEconomics {
       
       const blockResult = await pool.query(`SELECT COUNT(*) as total_blocks FROM blocks`);
       
-      const totalMined = parseFloat(totalMinedResult.rows[0].total_mined || '0');
+      const totalSupply = parseFloat(totalMinedResult.rows[0].total_mined || '0');
       const totalStaked = parseFloat(stakedResult.rows[0].total_staked || '0');
       const totalLiquid = parseFloat(liquidResult.rows[0].total_liquid || '0');
       const circulatingSupply = totalLiquid; // Only liquid EMO is circulating
       const totalBlocks = parseInt(blockResult.rows[0].total_blocks || '0');
       
-      if (totalMined > 0) {
-        // Update with proper token economics
+      if (totalSupply > 0) {
+        // Update with LIVE token economics that grows with mining
         await pool.query(`
           UPDATE token_economics SET 
             total_supply = $1,
@@ -443,14 +443,14 @@ export class PersistentTokenEconomics {
             last_block_height = $5,
             updated_at = NOW()
         `, [
-          totalMined.toString(),
+          totalSupply.toString(),
           circulatingSupply.toString(), 
           totalStaked.toString(),
-          (400000000 - totalMined).toString(),
+          (400000000 - totalSupply).toString(),
           totalBlocks
         ]);
         
-        console.log(`TOKEN SYNC: ${totalMined.toFixed(2)} total, ${circulatingSupply.toFixed(2)} circulating, ${totalStaked.toFixed(2)} staked at block ${totalBlocks}`);
+        console.log(`GROWING TOKEN SYNC: ${totalSupply.toFixed(2)} total, ${circulatingSupply.toFixed(2)} circulating, ${totalStaked.toFixed(2)} staked at block ${totalBlocks}`);
       }
     } catch (error) {
       console.error('Token sync failed:', error);
