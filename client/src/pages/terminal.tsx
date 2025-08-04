@@ -150,13 +150,28 @@ export default function Terminal() {
         </div>
 
         {/* Admin Access Panel - Discrete placement */}
-        <div className="terminal-window rounded-lg p-3 mt-6 border border-terminal-border/30">
+        <div className="terminal-window rounded-lg p-4 mt-6 border border-terminal-border/30">
           <div className="flex justify-between items-center">
-            <div className="ascii-art text-terminal-green text-center text-xs flex-1 font-mono">
-              {`+=====================================================================================+
-|  EmotionalChain v1.0.0 | PoE Consensus Active | Network: Custom                        |
-|  Connected to Network | Block Height: ${stats ? stats.blockHeight : '----'} | Validators: ${stats ? stats.activeValidators : '--'}/${stats ? stats.activeValidators : '--'} | Status: ✅ OPERATIONAL |
-+======================================================================================+`}
+            <div className="flex-1">
+              {/* Clean Status Bar Design */}
+              <div className="bg-terminal-surface/40 rounded-lg p-3 border border-terminal-green/30">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-mono">
+                  <div className="flex items-center space-x-4">
+                    <span className="text-terminal-cyan font-bold">EmotionalChain v1.0.0</span>
+                    <span className="text-terminal-success">PoE Consensus Active</span>
+                    <span className="text-terminal-warning">Network: Custom</span>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-terminal-green">Connected to Network</span>
+                    <span className="text-terminal-cyan">Block Height: {stats ? stats.blockHeight : '----'}</span>
+                    <span className="text-terminal-orange">Validators: {stats ? stats.activeValidators : '--'}/{stats ? stats.activeValidators : '--'}</span>
+                    <span className="text-terminal-success flex items-center gap-1">
+                      <span className="status-indicator status-online w-2 h-2"></span>
+                      OPERATIONAL
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
             
             {/* Admin Panel - Small discrete links */}
