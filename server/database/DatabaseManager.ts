@@ -201,7 +201,7 @@ export class DatabaseManager {
   async getActiveValidators(
     limit: number = 100, 
     offset: number = 0,
-    minEmotionalScore: number = 75
+    minEmotionalScore: number = 40
   ): Promise<ValidatorRecord[]> {
     const startTime = performance.now();
     
@@ -212,7 +212,7 @@ export class DatabaseManager {
         FROM validators 
         WHERE is_active = true 
           AND emotional_score >= ${minEmotionalScore}
-          AND last_activity > NOW() - INTERVAL '1 hour'
+          AND last_activity > NOW() - INTERVAL '6 hours'
         ORDER BY emotional_score DESC, stake DESC
         LIMIT ${limit} OFFSET ${offset}
       `);

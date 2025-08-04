@@ -168,9 +168,9 @@ export class OptimizedConsensusEngine extends ProofOfEmotionEngine {
       `;
       
       const params = [
-        75, // Minimum emotional score
-        Date.now() - 300000, // Active within last 5 minutes
-        50, // Minimum reputation
+        40, // Lowered minimum emotional score for ecosystem validators
+        Date.now() - 3600000, // Active within last hour (more lenient)
+        20, // Lowered minimum reputation for ecosystem validators
         2000 // Maximum validators to consider
       ];
       

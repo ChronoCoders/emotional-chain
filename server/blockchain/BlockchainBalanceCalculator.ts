@@ -4,12 +4,13 @@ export class BlockchainBalanceCalculator {
   private validatorBalances: Map<string, number> = new Map();
   
   constructor() {
-    // Initialize with genesis balances (17 validators × 10,000 EMO each)
+    // Initialize with genesis balances (21 validators × 10,000 EMO each)
     const genesisValidators = [
       'StellarNode', 'NebulaForge', 'QuantumReach', 'OrionPulse', 
       'DarkMatterLabs', 'GravityCore', 'AstroSentinel', 'ByteGuardians',
       'ZeroLagOps', 'ChainFlux', 'BlockNerve', 'ValidatorX', 'NovaSync',
-      'IronNode', 'SentinelTrust', 'VaultProof', 'SecureMesh'
+      'IronNode', 'SentinelTrust', 'VaultProof', 'SecureMesh',
+      'WatchtowerOne', 'AetherRunes', 'ChronoKeep', 'SolForge'
     ];
     
     genesisValidators.forEach(validator => {
