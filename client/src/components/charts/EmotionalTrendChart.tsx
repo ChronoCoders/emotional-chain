@@ -58,7 +58,6 @@ export function EmotionalTrendChart({
   onTimeRangeChange 
 }: EmotionalTrendChartProps) {
   const [activeMetric, setActiveMetric] = useState<'emotional' | 'biometric' | 'consensus'>('emotional');
-  const [hoveredValidator, setHoveredValidator] = useState<string | null>(null);
 
   // Format timestamp for display
   const formatTime = (timestamp: number) => {
@@ -181,7 +180,7 @@ export function EmotionalTrendChart({
       {/* Main Trend Chart */}
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
         <ResponsiveContainer width="100%" height={400}>
-          {activeMetric === 'emotional' && (
+          {activeMetric === 'emotional' ? (
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="emotionalGradient" x1="0" y1="0" x2="0" y2="1">
@@ -211,9 +210,7 @@ export function EmotionalTrendChart({
                 name="Emotional Score"
               />
             </AreaChart>
-          )}
-
-          {activeMetric === 'biometric' && (
+          ) : activeMetric === 'biometric' ? (
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis 
@@ -265,9 +262,7 @@ export function EmotionalTrendChart({
                 name="Heart Rate (BPM)"
               />
             </LineChart>
-          )}
-
-          {activeMetric === 'consensus' && (
+          ) : (
             <AreaChart data={data}>
               <defs>
                 <linearGradient id="consensusGradient" x1="0" y1="0" x2="0" y2="1">
@@ -360,8 +355,6 @@ export function EmotionalTrendChart({
               <Scatter 
                 dataKey="emotionalScore" 
                 fill="#3B82F6"
-                onMouseEnter={(data) => setHoveredValidator(data.validatorId)}
-                onMouseLeave={() => setHoveredValidator(null)}
               />
             </ScatterChart>
           </ResponsiveContainer>

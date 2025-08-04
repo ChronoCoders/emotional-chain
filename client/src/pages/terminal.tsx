@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Activity, Users, Coins, BarChart3, Monitor, TrendingUp, Heart, Brain } from 'lucide-react';
 import AsciBanner from '@/components/terminal/ascii-banner';
 import TerminalInterface from '@/components/terminal/terminal-interface';
 import BlockchainExplorer from '@/components/terminal/blockchain-explorer';
@@ -11,11 +11,17 @@ import ValidatorDashboard from '@/components/terminal/validator-dashboard';
 import BiometricStatus from '@/components/terminal/biometric-status';
 import TokenEconomics from '@/components/terminal/token-economics';
 import VisualBlocks from '@/components/terminal/visual-blocks';
+import MobileResponsiveTerminal from '@/components/layout/MobileResponsiveTerminal';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
+import EmotionalTrendChart from '@/components/charts/EmotionalTrendChart';
+import { useResponsive } from '@/components/layout/MobileResponsiveTerminal';
 import type { NetworkStats } from '@shared/schema';
 
 export default function Terminal() {
   const [realtimeStats, setRealtimeStats] = useState<NetworkStats | null>(null);
+  const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d'>('24h');
   const { lastMessage } = useWebSocket();
+  const deviceInfo = useResponsive();
 
   const { data: networkStatus } = useQuery<{ stats: NetworkStats }>({
     queryKey: ['/api/network/status']
@@ -55,6 +61,142 @@ export default function Terminal() {
     return n.toLocaleString('en-US');
   };
 
+  // Generate mock emotional trend data
+  const generateEmotionalTrendData = () => {
+    const now = Date.now();
+    const data = [];
+    const points = timeRange === '1h' ? 12 : timeRange === '6h' ? 36 : timeRange === '24h' ? 48 : 168;
+    const interval = timeRange === '1h' ? 5 * 60 * 1000 : timeRange === '6h' ? 10 * 60 * 1000 : timeRange === '24h' ? 30 * 60 * 1000 : 60 * 60 * 1000;
+    
+    for (let i = points; i >= 0; i--) {
+      data.push({
+        timestamp: now - (i * interval),
+        blockHeight: 9920 + (points - i),
+        averageEmotionalScore: 75 + Math.sin(i * 0.1) * 10 + Math.random() * 5,
+        heartRateAvg: 75 + Math.sin(i * 0.05) * 15 + Math.random() * 8,
+        stressLevelAvg: 25 + Math.sin(i * 0.08) * 10 + Math.random() * 5,
+        focusLevelAvg: 80 + Math.cos(i * 0.06) * 12 + Math.random() * 6,
+        validatorCount: 21,
+        consensusStrength: 85 + Math.sin(i * 0.04) * 8 + Math.random() * 4
+      });
+    }
+    return data;
+  };
+
+  // Generate validator performance data
+  const generateValidatorPerformance = () => {
+    const validators = ['StellarNode', 'NebulaForge', 'QuantumReach', 'OrionPulse', 'DarkMatterLabs'];
+    return validators.map(name => ({
+      validatorId: name,
+      emotionalScore: 70 + Math.random() * 25,
+      consistency: 80 + Math.random() * 20,
+      participation: 90 + Math.random() * 10,
+      color: `#${Math.floor(Math.random()*16777215).toString(16)}`
+    }));
+  };
+
+  // If on mobile or tablet, use the responsive terminal layout
+  if (deviceInfo.isMobile || deviceInfo.isTablet) {
+    const sections = [
+      {
+        id: 'validator-status',
+        title: 'Validator Status',
+        icon: <Activity className="w-4 h-4" />,
+        content: <ValidatorDashboard walletData={walletData} networkStats={stats} />,
+        collapsible: true,
+        defaultCollapsed: false
+      },
+      {
+        id: 'blockchain-stats',
+        title: 'Blockchain Stats',
+        icon: <BarChart3 className="w-4 h-4" />,
+        content: <TokenEconomics allWallets={allWallets} networkStats={stats} />,
+        collapsible: true,
+        defaultCollapsed: deviceInfo.isMobile
+      },
+      {
+        id: 'consensus-monitor',
+        title: 'Consensus Monitor',
+        icon: <Users className="w-4 h-4" />,
+        content: <ConsensusMonitor networkStats={stats} />,
+        collapsible: true,
+        defaultCollapsed: deviceInfo.isMobile
+      },
+      {
+        id: 'biometric-status',
+        title: 'Biometric Status',
+        icon: <Heart className="w-4 h-4" />,
+        content: <BiometricStatus />,
+        collapsible: true,
+        defaultCollapsed: deviceInfo.isMobile
+      },
+      {
+        id: 'emotional-trends',
+        title: 'Emotional Trends',
+        icon: <TrendingUp className="w-4 h-4" />,
+        content: (
+          <EmotionalTrendChart
+            data={generateEmotionalTrendData()}
+            validatorPerformance={generateValidatorPerformance()}
+            timeRange={timeRange}
+            onTimeRangeChange={(range) => setTimeRange(range as any)}
+          />
+        ),
+        collapsible: true,
+        defaultCollapsed: deviceInfo.isMobile
+      },
+      {
+        id: 'blockchain-explorer',
+        title: 'Blockchain Explorer',
+        icon: <Coins className="w-4 h-4" />,
+        content: <BlockchainExplorer />,
+        collapsible: true,
+        defaultCollapsed: true
+      }
+    ];
+
+    const header = (
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-2">
+          <Monitor className="w-5 h-5 text-blue-500" />
+          <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+            EmotionalChain
+          </h1>
+        </div>
+        <div className="flex items-center space-x-2">
+          <ThemeToggle />
+          <Link href="/privacy">
+            <div className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm transition-colors cursor-pointer flex items-center gap-2">
+              <ExternalLink size={14} />
+              Privacy
+            </div>
+          </Link>
+        </div>
+      </div>
+    );
+
+    const footer = (
+      <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+        <div className="flex justify-center items-center space-x-4">
+          <span>Block {stats?.blockHeight?.toLocaleString() || '9,920+'}</span>
+          <span>•</span>
+          <span>{stats?.totalSupply ? formatNumber(stats.totalSupply) : '574K+'} EMO</span>
+          <span>•</span>
+          <span>21 Validators</span>
+        </div>
+      </div>
+    );
+
+    return (
+      <MobileResponsiveTerminal
+        sections={sections}
+        header={header}
+        footer={footer}
+      />
+    );
+  }
+
+  // Desktop/traditional terminal view
   return (
     <div className="min-h-screen bg-terminal-bg text-terminal-green relative">
       {/* Matrix Rain Effect (decorative) */}
@@ -68,6 +210,7 @@ export default function Terminal() {
           <div className="flex justify-between items-start mb-4">
             <AsciBanner className="flex-1" />
             <div className="flex gap-2 flex-wrap">
+              <ThemeToggle className="mr-2" />
               <Link href="/privacy">
                 <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
                   <ExternalLink size={14} />

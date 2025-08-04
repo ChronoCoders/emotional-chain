@@ -3,7 +3,7 @@
  * Optimized display for all device sizes with collapsible sections
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Monitor, 
   Smartphone, 
