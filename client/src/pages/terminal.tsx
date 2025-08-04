@@ -46,8 +46,8 @@ export default function Terminal() {
     }
     if (allWallets) {
       console.log('All Wallets Count:', allWallets.length);
-      console.log('Validators >= 10000:', allWallets.filter(w => w.balance >= 10000).length);
-      console.log('All wallet balances:', allWallets.map(w => ({ id: w.validatorId, balance: w.balance })));
+      console.log('Validators >= 10000 (total):', allWallets.filter(w => (w.totalEarned || w.balance) >= 10000).length);
+      console.log('All wallet balances:', allWallets.map(w => ({ id: w.validatorId, balance: w.balance, total: w.totalEarned })));
     }
   }, [allWallets, walletData, walletError]);
 
@@ -246,7 +246,7 @@ export default function Terminal() {
                 <span className="status-indicator status-warning"></span>
                 <span className="text-terminal-warning">BIOMETRIC VAL</span>
               </div>
-              <div className="text-terminal-cyan">Active: {allWallets ? allWallets.filter(w => w.balance >= 10000).length : '--'}/{stats ? stats.activeValidators : '--'}</div>
+              <div className="text-terminal-cyan">Active: {allWallets ? allWallets.filter(w => (w.totalEarned || w.balance) >= 10000).length : '--'}/{stats ? stats.activeValidators : '--'}</div>
               <div className="text-terminal-cyan">Avg Auth: {(() => {
                 const validatorPerf = generateValidatorPerformance();
                 const avgAuth = validatorPerf.reduce((sum, v) => sum + v.participation, 0) / validatorPerf.length;

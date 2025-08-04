@@ -297,6 +297,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // BLOCKCHAIN IMMUTABILITY: Get wallets directly from blockchain calculation
       const wallets = await emotionalChainService.getAllWallets();
       
+      console.log('API DEBUG - Raw wallet data:', wallets.slice(0, 5));
+      console.log('API DEBUG - Last 4 validators:', wallets.slice(-4));
+      
       // The service now returns an array of wallet objects directly
       res.json(wallets);
     } catch (error) {
