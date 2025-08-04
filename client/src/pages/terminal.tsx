@@ -172,12 +172,7 @@ export default function Terminal() {
           </h1>
         </div>
         <div className="flex items-center space-x-2">
-          <Link href="/privacy">
-            <div className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm transition-colors cursor-pointer flex items-center gap-2">
-              <ExternalLink size={14} />
-              Privacy
-            </div>
-          </Link>
+          {/* Navigation buttons removed per user request */}
         </div>
       </div>
     );
@@ -217,24 +212,7 @@ export default function Terminal() {
           <div className="flex justify-between items-start mb-4">
             <AsciBanner className="flex-1" />
             <div className="flex gap-2 flex-wrap">
-              <Link href="/privacy">
-                <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
-                  <ExternalLink size={14} />
-                  PRIVACY
-                </div>
-              </Link>
-              <Link href="/monitoring">
-                <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
-                  <ExternalLink size={14} />
-                  MONITORING
-                </div>
-              </Link>
-              <Link href="/explorer">
-                <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
-                  <ExternalLink size={14} />
-                  EXPLORER
-                </div>
-              </Link>
+              {/* Dashboard navigation buttons removed per user request */}
             </div>
           </div>
           
@@ -333,18 +311,9 @@ export default function Terminal() {
               </div>
             </div>
             
-            {/* Admin Panel - Small discrete links */}
+            {/* Admin Panel - Links removed per user request */}
             <div className="ml-4 flex gap-1 opacity-60 hover:opacity-100 transition-opacity">
-              <Link href="/ai-consensus">
-                <div className="bg-terminal-surface/50 hover:bg-terminal-surface border border-terminal-border/50 rounded px-2 py-1 text-terminal-cyan font-mono text-xs transition-colors cursor-pointer">
-                  AI-CONS
-                </div>
-              </Link>
-              <Link href="/ai-learning">
-                <div className="bg-terminal-surface/50 hover:bg-terminal-surface border border-terminal-border/50 rounded px-2 py-1 text-terminal-warning font-mono text-xs transition-colors cursor-pointer">
-                  AI-LEARN
-                </div>
-              </Link>
+              {/* All dashboard links removed */}
             </div>
           </div>
         </div>
