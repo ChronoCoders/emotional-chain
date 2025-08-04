@@ -30,11 +30,13 @@ async function getWebSocketConfig(): Promise<WebSocketConfig> {
     if (!response.ok) {
       throw new Error(`Failed to fetch WebSocket config: ${response.status}`);
     }
-    return await response.json();
+    const config = await response.json();
+    console.log('Loaded WebSocket config from API:', config);
+    return config;
   } catch (error) {
     console.error('Failed to fetch WebSocket config, using defaults:', error);
     // Fallback configuration with safe defaults
-    return {
+    const defaultConfig = {
       heartbeatInterval: 30000,
       reconnectAttempts: 5,
       reconnectDelay: 2000,
@@ -44,6 +46,8 @@ async function getWebSocketConfig(): Promise<WebSocketConfig> {
       exponentialBackoffEnabled: true,
       maxBackoffDelay: 30000,
     };
+    console.log('Using default WebSocket config:', defaultConfig);
+    return defaultConfig;
   }
 }
 export function useWebSocket(): UseWebSocketReturn {
@@ -59,6 +63,8 @@ export function useWebSocket(): UseWebSocketReturn {
   }, []);
   useEffect(() => {
     if (!config) return;
+    
+    console.log('WebSocket config loaded:', config);
     let isCleaningUp = false;
     const calculateBackoffDelay = (attempt: number): number => {
       if (!config.exponentialBackoffEnabled) {
@@ -91,25 +97,29 @@ export function useWebSocket(): UseWebSocketReturn {
     };
     const connectWithFallback = (useFallback = false) => {
       if (isCleaningUp) return;
-      if (!config.fallbackHost || !config.fallbackPort) {
-        return;
-      }
+      
       try {
         const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
         let wsUrl: string;
-        if (useFallback) {
-          wsUrl = `${protocol}//${config.fallbackHost || 'localhost'}:5000/ws`;
+        
+        if (useFallback && config) {
+          wsUrl = `${protocol}//${config.fallbackHost || 'localhost'}:${config.fallbackPort || 5000}/ws`;
         } else {
           const hostname = window.location.hostname;
           const port = window.location.port;
           // For Replit domains, don't specify port - use same as current page  
           if (hostname.includes('.replit.dev') || hostname.includes('.repl.co') || hostname.includes('.replit.app')) {
             wsUrl = `${protocol}//${hostname}/ws`;
-          } else {
+          } else if (hostname === 'localhost') {
             // For localhost development - use port 5000 (same as HTTP server)
-            wsUrl = `${protocol}//${hostname}:5000/ws`;
+            wsUrl = `${protocol}//localhost:5000/ws`;
+          } else {
+            // Default case - try same host and port
+            const portPart = port ? `:${port}` : '';
+            wsUrl = `${protocol}//${hostname}${portPart}/ws`;
           }
         }
+        console.log('Attempting WebSocket connection to:', wsUrl);
         const socket = new WebSocket(wsUrl);
         wsRef.current = socket;
         socket.onopen = () => {
@@ -147,7 +157,8 @@ export function useWebSocket(): UseWebSocketReturn {
           }
         };
         socket.onerror = (error) => {
-          console.warn('WebSocket error occurred:', error);
+          console.error('WebSocket connection error:', error);
+          console.error('Failed URL was:', wsUrl);
           setIsConnected(false);
           stopHeartbeat();
         };
