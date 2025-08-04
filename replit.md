@@ -1,207 +1,91 @@
 # EmotionalChain - Proof of Emotion Blockchain
 
 ## Overview
-
-EmotionalChain is a revolutionary blockchain platform that introduces the world's first "Proof of Emotion" consensus mechanism. This system combines traditional blockchain technology with real-time biometric monitoring to create a more humane and authentic form of digital consensus. Validators must maintain emotional fitness through continuous heart rate, stress level, and focus monitoring to participate in block validation and earn rewards.
-
-The platform addresses the energy waste and centralization issues of traditional consensus mechanisms by replacing computational mining with emotional authenticity verification. This creates a more sustainable, inclusive, and psychologically-aware blockchain ecosystem where human emotional state becomes a form of digital proof-of-work.
+EmotionalChain is a revolutionary blockchain platform that introduces the world's first "Proof of Emotion" consensus mechanism. It combines traditional blockchain technology with real-time biometric monitoring, requiring validators to maintain emotional fitness (heart rate, stress, focus) to participate in block validation. This platform aims to address energy waste and centralization by replacing computational mining with emotional authenticity verification, fostering a sustainable, inclusive, and psychologically-aware blockchain ecosystem where human emotional state serves as a form of digital proof-of-work.
 
 ## User Preferences
-
 Preferred communication style: Simple, everyday language.
-
-## Recent Changes
-
-**TERMINAL UI BORDER FIXES COMPLETE (Aug 4, 2025):**
-- **VISUAL BORDER ALIGNMENT FIXED**: Corrected incomplete box drawing characters across all terminal headers
-- **PROFESSIONAL APPEARANCE RESTORED**: All terminal components now display proper ┌─────┐ borders with correct Unicode alignment
-- **CONSISTENT STYLING**: Fixed EMOTIONAL_CHAIN_TERMINAL, BIOMETRIC_VALIDATION, LIVE_BLOCKCHAIN_EXPLORER headers
-- **RESPONSIVE DESIGN**: Terminal borders now maintain professional appearance across different screen sizes
-- **BOX DRAWING OPTIMIZATION**: Ensured proper font rendering for Unicode box characters in all browsers
-
-**WALLET LOGIC CRITICAL FIX COMPLETE (Aug 4, 2025):**
-- **AMATEUR BALANCE=STAKED ERROR ELIMINATED**: Fixed fundamental wallet display logic where balance and staked showed identical amounts
-- **PROFESSIONAL 70/30 SPLIT IMPLEMENTED**: Balance shows 70% liquid EMO (available for transactions), Staked shows 30% locked EMO (earning rewards)
-- **PROPER BLOCKCHAIN WALLET PRINCIPLES**: Balance + Staked = Total EMO owned (different amounts, not identical)
-- **ALL 21 VALIDATORS FIXED**: Every validator wallet now displays realistic separation between liquid and staked amounts
-- **MATHEMATICAL ACCURACY**: StellarNode example - Balance: 24,107 EMO (liquid), Staked: 10,331 EMO (staked), Total: 34,438 EMO
-
-**PHASE 2B: DELEGATION SYSTEM INFRASTRUCTURE COMPLETE (Aug 4, 2025):**
-- **COMPLETE DELEGATION SYSTEM IMPLEMENTED**: Built enterprise-grade validator delegation infrastructure from existing EmotionalStaking.ts foundation
-- **DELEGATION API ENDPOINTS READY**: Full REST API with /delegate, /undelegate, /claim-rewards, /validator-stats, /delegator-dashboard
-- **EMOTIONAL STAKING ENGINE ACTIVE**: Connected EmotionalStaking service to main EmotionalChain with delegateStake(), undelegateStake(), reward distribution
-- **COMMISSION & REWARDS SYSTEM**: Validators earn 0-20% commission, delegators receive emotional multiplier rewards based on validator performance
-- **LOCKUP & UNBONDING PERIODS**: 21-day lockup periods, 21-day unbonding for security and network stability
-- **MINIMUM DELEGATION ENFORCED**: 1,000 EMO minimum delegation amount to prevent spam and ensure meaningful participation
-- **VALIDATOR STATS TRACKING**: Real-time APY estimation, emotional scores, uptime, total delegated amounts, delegator counts
-- **TEST INTERFACE DEPLOYED**: Complete HTML test interface at /test-delegation.html for delegation system validation
-
-**PHASE 2A: ECONOMIC INCENTIVE FIXES COMPLETE (Aug 4, 2025):**
-- **BROKEN AUTO-STAKING ELIMINATED**: Removed forced 95% staking mechanism that locked validator rewards
-- **100% LIQUID MINING REWARDS**: ALL mining rewards now go directly to validator wallets as liquid EMO
-- **VOLUNTARY STAKING SYSTEM**: Added optional staking endpoints with 15% bonus APY for validators who choose to stake
-- **ECONOMIC FREEDOM RESTORED**: Validators now control their own earnings and staking decisions
-- **REAL VALIDATOR INCENTIVES**: Liquid rewards enable operational flexibility and growth capital
-
-**ENTERPRISE-GRADE ARCHITECTURAL CONSISTENCY ACHIEVED (Aug 4, 2025):**
-- **ALL 6 CRITICAL BUG FIXES COMPLETED**: EmotionalChain now enterprise deployment ready
-- **BUG FIX #1**: Eliminated conflicting thresholds - unified emotional score requirements (75) across all components
-- **BUG FIX #2**: Removed redundant calculation functions - all calculations now reference shared/config.ts authoritative methods
-- **BUG FIX #3**: Fixed inconsistent calculation methods - 30% heart rate, 25% stress (inverted), 20% focus, 25% authenticity weights
-- **BUG FIX #4**: Implemented precise slashing conditions - exact thresholds (40/55 emotional score, 85%/95% uptime requirements)
-- **BUG FIX #5**: Clarified authenticity-emotional score relationship - authenticity is 25% of final emotional score calculation
-- **BUG FIX #6**: Updated documentation with enterprise fixes - all architectural inconsistencies resolved
-
-**TOKEN ECONOMICS LOGIC COMPLETELY FIXED - PROPER CIRCULATION VS STAKING (Aug 4, 2025):**
-- **FINAL BREAKTHROUGH**: Fixed fundamental token economics flaw where total supply equaled circulating supply (mathematically impossible)
-- **PROPER ECONOMICS IMPLEMENTED**: Total (490,000+ EMO), Circulating (24,500+ EMO - 5%), Staked (465,500+ EMO - 95%)
-- **CIRCULATION RATE LOGIC**: Only 5% of mined EMO enters circulation, 95% gets staked by validators for PoE consensus
-- **SYNC SYSTEM FIXED**: Replaced broken "all EMO = circulating" logic with proper staking economics in token-economics-persistent.ts
-- **REALISTIC TOKEN DISTRIBUTION**: System now displays authentic blockchain economics like Bitcoin/Ethereum where most coins are staked/held
-- **MATHEMATICAL VALIDATION**: Circulating + Staked = Total Supply (24,500 + 465,500 = 490,000) - proper accounting achieved
-- **WALLET PERSISTENCE MAINTAINED**: Validators retain 25,000-33,000+ EMO accumulated wealth with proper staking allocation
-
-**Token Economics Database-Only Display Complete (Aug 3, 2025):**
-- **FIXED**: Token economics now reads directly from database instead of blockchain wallets
-- Token economics displays authentic database values (115.42 EMO total issued)
-- Disabled blockchain wallet sync to prevent data override
-- Added auto-refresh to token economics API endpoint (30-second intervals)
-- System maintains database integrity by separating wallet data from token economics
-- Total issued and circulating supply now reflect actual database state
-- Frontend displays database-driven token economics without blockchain interference
-
-**Frontend-Backend Data Integration Complete (Aug 3, 2025):**
-- **LIVE DATA SUCCESS**: Connected frontend dashboard to real wallet balances from blockchain
-- Frontend now displays actual EMO earnings (70+ EMO per validator) instead of hardcoded values
-- Real-time wallet balance updates every 30 seconds with automatic refresh
-- ValidatorDashboard shows authentic earnings from blockchain mining rewards
-- API endpoints properly sync wallet data with blockchain before serving to frontend
-- Eliminated frontend-backend data disconnect - dashboard now reflects real validator wealth
-- All 21 validators showing live EMO accumulation with proper balance tracking
-
-**Distributed Consensus Foundation Ready (Aug 3, 2025):**
-- **BREAKTHROUGH**: EmotionalChain already has full Bitcoin/Ethereum-level distributed consensus infrastructure
-- Built production-ready P2P network using libp2p with WebRTC, TCP, and WebSocket transports
-- Implemented Byzantine fault tolerant consensus with 67% threshold and cryptographic vote verification
-- Created automatic fork resolution system with longest valid emotional chain rule
-- Added consensus block integration to main blockchain for seamless distributed operation
-- Network ready for multi-node deployment to achieve true immutability like Bitcoin/Ethereum
-
-**Visual Block Explorer & PoE Terminology Complete (Aug 3, 2025):**
-- **COMPLETE**: Eliminated all traditional mining terminology from visual interfaces
-- Replaced "DIFFICULTY" with "FITNESS THRESHOLD" showing PoE's 75%+ emotional wellness requirement
-- Changed "TXN" to "VALIDATIONS" reflecting emotional validation transactions
-- Updated "NONCE" to "BIOMETRIC NONCE" for PoE-specific cryptographic terminology
-- Modified blockchain engine to automatically generate emotional validation transactions
-- Fixed transaction count display - blocks now show proper validation data instead of zero
-- Network stable at 6500+ blocks with 400K+ EMO tokens and proper PoE visualization
-
-**Banner & UI Refinements (Aug 3, 2025):**
-- Centered EmotionalChain ASCII banner with proper flexbox layout
-- Aligned "CHAIN" text positioning under "EMOTIONAL" banner as requested
-- Enhanced typography with consistent terminal styling and colors
-- All dashboard components now display authentic PoE consensus metrics
-
-**COMPLETE CRYPTOGRAPHIC INFRASTRUCTURE SUCCESS (Aug 3, 2025):**
-- **100% TEST SUCCESS**: Achieved perfect 20/20 cryptographic validation tests passing
-- **PRODUCTION CRYPTOGRAPHY COMPLETE**: Eliminated amateur Node.js crypto throughout entire stack
-- **REAL ECDSA SIGNATURES**: All transactions use production @noble/curves secp256k1 signatures
-- **CRYPTOGRAPHIC BLOCKS**: Block validation uses real Merkle trees and multi-signature consensus
-- **BIOMETRIC PROOFS OPERATIONAL**: Emotional validation with cryptographically secure anti-tampering proofs
-- **SDK FULLY UPGRADED**: WalletSDK and BiometricSDK use production cryptography exclusively
-- **PERFORMANCE VALIDATED**: Transaction signing <10ms, verification <5ms meeting enterprise standards
-- **SECURITY CONFIRMED**: Replay protection, fork resistance, and authenticity verification working
-- Network operating with Bitcoin/Ethereum-level cryptographic security at 7500+ blocks
-
-**Systematic Gap Remediation (Aug 2, 2025):**
-- **PRIORITY 1 COMPLETE**: Eliminated all Math.random() usage from SDK TestingFramework (10+ instances)
-- **PRIORITY 2 COMPLETE**: Fixed P2P networking LSP diagnostics (reduced from 27 to 0 errors)
-- **PRIORITY 3 COMPLETE**: Eliminated all Math.random() from production code (45+ instances systematically replaced)
-- Replaced insecure random with crypto.getRandomValues() across biometric, consensus, storage, and networking layers
-- Network remains stable at 6193+ blocks with 381K+ EMO tokens during comprehensive security hardening
 
 ## System Architecture
 
 ### Frontend Architecture
-- **React + TypeScript**: Modern component-based UI with full type safety
-- **Vite Build System**: Fast development builds with HMR and production optimization
-- **Tailwind CSS + Shadcn/ui**: Utility-first styling with professional component library
-- **Path Aliases**: Clean imports using @ for components and @shared for cross-platform code
+- **Technology Stack**: React + TypeScript with Vite for fast builds.
+- **Styling**: Tailwind CSS and Shadcn/ui for utility-first design.
+- **Organization**: Path aliases (`@` for components, `@shared` for cross-platform code) for clean imports.
 
 ### Backend Architecture
-- **Node.js + Express**: RESTful API server with TypeScript for type safety
-- **Drizzle ORM**: Type-safe database operations with PostgreSQL dialect
-- **Database Migrations**: Version-controlled schema changes in ./migrations directory
-- **Shared Schema**: Common data types in ./shared/schema.ts for frontend/backend consistency
+- **Technology Stack**: Node.js + Express with TypeScript.
+- **Database ORM**: Drizzle ORM for type-safe PostgreSQL operations.
+- **Schema Management**: Version-controlled database migrations in `./migrations`.
+- **Data Consistency**: Shared schema in `./shared/schema.ts` for frontend/backend consistency.
 
 ### Consensus Engine
-- **Proof of Emotion**: Novel consensus mechanism using biometric validation with enterprise-grade rules
-- **Multi-phase Consensus**: PROPOSE → VOTE → COMMIT workflow with emotional fitness scoring
-- **Byzantine Fault Tolerance**: Advanced detection of malicious validators and emotional manipulation
-- **Dynamic Committee Selection**: Rotating validator groups with anti-collusion mechanisms
-- **Real-time Monitoring**: Continuous emotional state tracking and network health assessment
-- **Enterprise Slashing Rules**: Precise thresholds - Critical (<40 score), Major (40-54), Minor (55-74), with uptime requirements
+- **Mechanism**: Proof of Emotion (PoE) using biometric validation with enterprise-grade rules.
+- **Workflow**: Multi-phase consensus (PROPOSE → VOTE → COMMIT) incorporating emotional fitness scoring.
+- **Resilience**: Byzantine Fault Tolerance for detecting malicious validators and emotional manipulation.
+- **Validator Management**: Dynamic committee selection with anti-collusion mechanisms.
+- **Monitoring**: Real-time emotional state tracking and network health assessment.
+- **Slashing Rules**: Precise thresholds for critical, major, and minor emotional scores, coupled with uptime requirements.
 
 ### Biometric Integration
-- **Multi-device Support**: Heart rate monitors, stress detectors, focus monitors via Bluetooth/USB
-- **Authenticity Proofs**: Cryptographic verification of live biometric data
-- **Device Security**: Hardware attestation and anti-tampering measures
-- **Privacy Protection**: Biometric data hashing and zero-knowledge proofs
+- **Device Support**: Multi-device compatibility (heart rate monitors, stress detectors, focus monitors) via Bluetooth/USB.
+- **Verification**: Cryptographic authenticity proofs for live biometric data.
+- **Security**: Hardware attestation and anti-tampering measures.
+- **Privacy**: Biometric data hashing and zero-knowledge proofs.
 
 ### Cryptographic Security
-- **Production Cryptography**: @noble/curves library for ECDSA/EdDSA signatures
-- **Quantum Resistance**: Post-quantum cryptographic algorithms preparation
-- **Key Management**: Biometric-derived key pairs with secure storage
-- **Authenticity Verification**: Real cryptographic signatures replacing hash-based stubs
-- **Unified Calculation Engine**: Centralized authenticity-emotional score methodology in shared/config.ts
+- **Core Library**: `@noble/curves` for production-grade ECDSA/EdDSA signatures.
+- **Key Management**: Biometric-derived key pairs with secure storage.
+- **Verification**: Real cryptographic signatures replacing hash-based stubs for authenticity.
+- **Calculation Engine**: Unified, centralized methodology for authenticity-emotional score in `shared/config.ts`.
 
 ### Network Layer
-- **libp2p Integration**: Production P2P networking with gossip protocols
-- **WebRTC Support**: Peer-to-peer connections with NAT traversal
-- **Byzantine Detection**: Advanced machine learning for malicious behavior identification
-- **Network Hardening**: DoS protection, peer reputation, and partition detection
+- **P2P Networking**: `libp2p` integration with gossip protocols.
+- **Connectivity**: WebRTC support for peer-to-peer connections and NAT traversal.
+- **Security**: Advanced machine learning for Byzantine detection, DoS protection, peer reputation, and partition detection.
 
 ### Smart Contract Layer
-- **EVM Compatibility**: Ethereum-compatible smart contracts with emotional triggers
-- **Biometric Conditions**: Smart contract execution based on emotional state
-- **Wellness Incentives**: Automated rewards for maintaining emotional fitness
-- **Cross-chain Bridges**: Multi-chain interoperability with major blockchain networks
+- **Compatibility**: EVM-compatible smart contracts.
+- **Conditional Execution**: Smart contract execution based on emotional state.
+- **Incentives**: Automated rewards for maintaining emotional wellness.
+- **Interoperability**: Cross-chain bridges for multi-chain compatibility.
+
+### UI/UX Decisions
+- Consistent terminal styling and colors.
+- ASCII banner with proper alignment.
+- Dashboard components displaying authentic PoE consensus metrics.
 
 ## External Dependencies
 
 ### Database
-- **PostgreSQL**: Primary data store via Drizzle ORM with connection pooling
-- **Neon Database**: Serverless PostgreSQL provider for cloud deployment
+- **PostgreSQL**: Primary data store.
+- **Neon Database**: Serverless PostgreSQL provider.
 
 ### Cryptography
-- **@noble/curves**: Production-grade elliptic curve cryptography for signatures
-- **@noble/hashes**: Secure hashing algorithms for data integrity
+- **@noble/curves**: Elliptic curve cryptography.
+- **@noble/hashes**: Secure hashing algorithms.
 
 ### P2P Networking
-- **libp2p**: Modular peer-to-peer networking stack
-- **WebSocket/WebRTC**: Real-time communication protocols
+- **libp2p**: Modular peer-to-peer networking stack.
+- **WebSocket/WebRTC**: Real-time communication protocols.
 
 ### Biometric Hardware
-- **Web Bluetooth API**: Polar H10 heart rate monitors
-- **WebUSB API**: Empatica E4 stress detection devices
-- **WebRTC Streams**: EEG headbands for focus monitoring
+- **Web Bluetooth API**: Polar H10 heart rate monitors.
+- **WebUSB API**: Empatica E4 stress detection devices.
+- **WebRTC Streams**: EEG headbands for focus monitoring.
 
 ### Cloud Infrastructure
-- **AWS SDK**: EC2, ECS, S3 for cloud deployment and storage
-- **Google Cloud**: Compute Engine and monitoring services
+- **AWS SDK**: EC2, ECS, S3.
+- **Google Cloud**: Compute Engine.
 
 ### Blockchain Integrations
-- **Polkadot API**: Cross-chain communication and parachains
-- **LayerZero**: Omnichain interoperability protocol
-- **Axelar Network**: Cross-chain messaging infrastructure
+- **Polkadot API**: Cross-chain communication.
+- **LayerZero**: Omnichain interoperability protocol.
+- **Axelar Network**: Cross-chain messaging infrastructure.
 
 ### Monitoring & Observability
-- **Prometheus**: Metrics collection and monitoring
-- **OpenTelemetry**: Distributed tracing and performance monitoring
+- **Prometheus**: Metrics collection.
+- **OpenTelemetry**: Distributed tracing.
 
 ### Machine Learning
-- **TensorFlow.js**: AI-powered consensus optimization and anomaly detection
-
-### Compliance
-- **GDPR**: Biometric data protection and privacy controls
-- **SOC 2**: Security compliance and audit frameworks
+- **TensorFlow.js**: AI-powered consensus optimization and anomaly detection.
