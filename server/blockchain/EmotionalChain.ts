@@ -278,7 +278,9 @@ export class EmotionalChain extends EventEmitter {
           height: newBlock.index,
           hash: newBlock.hash,
           previousHash: newBlock.previousHash,
-          merkleRoot: newBlock.hash, // Using hash as merkle root for now
+          merkleRoot: BlockCrypto.calculateMerkleRoot(newBlock.transactions),
+          transactionRoot: BlockCrypto.calculateMerkleRoot(newBlock.transactions),
+          stateRoot: 'state_' + newBlock.hash.substring(0, 8),
           timestamp: newBlock.timestamp,
           nonce: newBlock.nonce,
           difficulty: this.difficulty,
@@ -318,6 +320,7 @@ export class EmotionalChain extends EventEmitter {
           const miningTransaction = await storage.createTransaction({
             hash: miningTxHash,
             blockHash: newBlock.hash,
+            blockNumber: newBlock.index,
             fromAddress: 'stakingPool',
             toAddress: selectedValidator.id,
             amount: miningReward.toString(),
@@ -343,6 +346,7 @@ export class EmotionalChain extends EventEmitter {
           const validationTransaction = await storage.createTransaction({
             hash: validationTxHash,
             blockHash: newBlock.hash,
+            blockNumber: newBlock.index,
             fromAddress: 'stakingPool',
             toAddress: selectedValidator.id,
             amount: validationReward.toString(),
@@ -537,7 +541,9 @@ export class EmotionalChain extends EventEmitter {
         height: consensusBlock.index,
         hash: consensusBlock.hash,
         previousHash: consensusBlock.previousHash,
-        merkleRoot: consensusBlock.hash,
+        merkleRoot: BlockCrypto.calculateMerkleRoot(consensusBlock.transactions),
+        transactionRoot: BlockCrypto.calculateMerkleRoot(consensusBlock.transactions),
+        stateRoot: 'state_' + consensusBlock.hash.substring(0, 8),
         timestamp: consensusBlock.timestamp,
         nonce: consensusBlock.nonce,
         difficulty: this.difficulty,
@@ -579,10 +585,10 @@ export class EmotionalChain extends EventEmitter {
     if (this.isDistributedMode) {
       return {
         ...baseStatus,
-        connectedPeers: this.p2pNode ? this.p2pNode.getPeerCount() : 0,
-        consensusState: this.consensusEngine ? this.consensusEngine.getState() : 'initializing',
-        networkHealth: this.p2pNode ? this.p2pNode.getNetworkHealth() : 'unknown',
-        distributedConsensus: 'enabled'
+        connectedPeers: 0, // P2P networking not yet implemented
+        consensusState: 'single-node', // Using single-node PoE consensus
+        networkHealth: 'operational',
+        distributedConsensus: 'planned'
       };
     }
 
