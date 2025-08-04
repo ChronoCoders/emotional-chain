@@ -44,11 +44,7 @@ export default function Terminal() {
     if (walletData) {
       console.log('Wallet Data:', walletData);
     }
-    if (allWallets) {
-      console.log('All Wallets Count:', allWallets.length);
-      console.log('Validators >= 10000 (total):', allWallets.filter(w => (w.totalEarned || w.balance) >= 10000).length);
-      console.log('All wallet balances:', allWallets.map(w => ({ id: w.validatorId, balance: w.balance, total: w.totalEarned })));
-    }
+    // Debug: Removed verbose logging after fix confirmed
   }, [allWallets, walletData, walletError]);
 
   // Update with real-time data from WebSocket
