@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 import { ProductionCrypto } from '../../crypto/ProductionCrypto';
 import { BlockCrypto, CryptographicBlock } from '../../crypto/BlockCrypto';
 import { storage } from '../storage';
+import * as crypto from 'crypto';
 export class EmotionalChain extends EventEmitter {
   private chain: CryptographicBlock[] = [];
   private pendingTransactions: any[] = [];
@@ -306,6 +307,7 @@ export class EmotionalChain extends EventEmitter {
         this.tokenEconomics.pools.stakingPool.remaining -= totalReward;
         this.tokenEconomics.totalSupply += totalReward;
         this.tokenEconomics.circulatingSupply += totalReward;
+        console.log(`REWARD PROCESSING: ${totalReward.toFixed(2)} EMO (${miningReward.toFixed(2)} mining + ${validationReward.toFixed(2)} validation) to ${selectedValidator.id}`);
         // CRITICAL: Save mining reward transaction to database
         try {
           const miningTxHash = crypto.createHash('sha256').update(`mining_${newBlock.hash}_${selectedValidator.id}`).digest('hex');
@@ -327,7 +329,9 @@ export class EmotionalChain extends EventEmitter {
             },
             status: 'confirmed'
           });
+          console.log(`MINING REWARD RECORDED: ${miningReward.toFixed(2)} EMO to ${selectedValidator.id} in tx ${miningTxHash.substring(0, 8)}...`);
         } catch (error) {
+          console.error(`MINING TX FAILED for ${selectedValidator.id}:`, error);
         }
         // CRITICAL: Save validation reward transaction to database
         try {
@@ -349,7 +353,9 @@ export class EmotionalChain extends EventEmitter {
             },
             status: 'confirmed'
           });
+          console.log(`VALIDATION REWARD RECORDED: ${validationReward.toFixed(2)} EMO to ${selectedValidator.id} in tx ${validationTxHash.substring(0, 8)}...`);
         } catch (error) {
+          console.error(`VALIDATION TX FAILED for ${selectedValidator.id}:`, error);
         }
         // Create emotional validation transaction for this block
         this.addTransaction({

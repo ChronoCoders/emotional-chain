@@ -12,6 +12,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+**MINING TRANSACTION RECORDING FIXED (Aug 4, 2025):**
+- **BREAKTHROUGH**: Fixed critical mining transaction recording failure that blocked token economics growth
+- Mining rewards now properly recorded as database transactions (67+ EMO per validator)
+- Token economics total supply now grows with live mining activity (462,608+ EMO and climbing)
+- Fixed missing crypto import that caused "crypto.createHash is not a function" errors
+- Both mining and validation reward transactions recorded separately for full audit trail
+- System now creates authentic growing token supply reflecting actual validator earnings
+
 **Token Economics Database-Only Display Complete (Aug 3, 2025):**
 - **FIXED**: Token economics now reads directly from database instead of blockchain wallets
 - Token economics displays authentic database values (115.42 EMO total issued)
