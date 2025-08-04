@@ -294,19 +294,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.get('/api/wallets', async (req, res) => {
     try {
-      // CRITICAL: Force sync with blockchain before returning data
-      await emotionalChainService.syncWalletWithBlockchain();
+      // BLOCKCHAIN IMMUTABILITY: Get wallets directly from blockchain calculation
       const wallets = await emotionalChainService.getAllWallets();
       
-      const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
-        validatorId,
-        balance,
-        currency: 'EMO'
-      }));
-      
-
-      
-      res.json(walletsArray);
+      // The service now returns an array of wallet objects directly
+      res.json(wallets);
     } catch (error) {
       console.error('Wallets API error:', error);
       res.status(500).json({ error: 'Failed to fetch wallets' });

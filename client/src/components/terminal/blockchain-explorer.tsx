@@ -391,7 +391,7 @@ export default function BlockchainExplorer() {
                 .slice(0, 6)
                 .map((wallet) => (
                   <div key={wallet.validatorId} className="flex justify-between bg-terminal-background p-2 rounded">
-                    <span className="text-terminal-green">{wallet.validatorId.substring(0, 8)}...</span>
+                    <span className="text-terminal-green">{(wallet.validatorId || '').toString().substring(0, 8)}...</span>
                     <span className="text-terminal-warning font-bold">{wallet.balance.toFixed(2)} EMO</span>
                   </div>
                 ))}
@@ -410,10 +410,10 @@ export default function BlockchainExplorer() {
                 <div>
                   <div className="text-terminal-cyan font-bold">Block #{block.height}</div>
                   <div className="text-terminal-green text-sm">Hash: {formatHash(block.hash)}</div>
-                  <div className="text-terminal-green text-sm">Transactions: {block.transactions.length}</div>
+                  <div className="text-terminal-green text-sm">Transactions: {Array.isArray(block.transactions) ? block.transactions.length : 0}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-terminal-orange text-sm">{formatTimeAgo(block.timestamp)}</div>
+                  <div className="text-terminal-orange text-sm">{formatTimeAgo(new Date(block.timestamp))}</div>
                   <div className="text-terminal-success text-sm">✅ Validated</div>
                   <div className="text-terminal-cyan text-sm">PoE Score: {block.emotionalScore}%</div>
                 </div>
@@ -441,8 +441,8 @@ export default function BlockchainExplorer() {
               {transactions.map((tx) => (
                 <tr key={tx.id}>
                   <td className="terminal-text">{tx.id ? tx.id.substring(0, 8) + '...' : 'N/A'}</td>
-                  <td className="terminal-text">{formatHash(tx.from || tx.fromAddress)}</td>
-                  <td className="terminal-text">{formatHash(tx.to || tx.toAddress)}</td>
+                  <td className="terminal-text">{formatHash(tx.from || tx.fromAddress || '')}</td>
+                  <td className="terminal-text">{formatHash(tx.to || tx.toAddress || '')}</td>
                   <td className="text-right">{tx.amount} EMO</td>
                   <td>
                     <span className={getStatusColor(tx.status)}>
