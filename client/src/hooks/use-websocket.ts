@@ -153,9 +153,8 @@ export function useWebSocket(): UseWebSocketReturn {
             console.log(`WebSocket reconnection attempt ${retryCountRef.current} in ${delay}ms`);
             setTimeout(() => {
               if (!isCleaningUp && (!wsRef.current || wsRef.current.readyState === WebSocket.CLOSED)) {
-                // Only use fallback for localhost development after multiple failures
-                const shouldUseFallback = window.location.hostname === 'localhost' && retryCountRef.current > 3;
-                connectWithFallback(shouldUseFallback);
+                // Never use fallback - only retry main connection
+                connectWithFallback(false);
               }
             }, delay);
           } else {
@@ -170,10 +169,11 @@ export function useWebSocket(): UseWebSocketReturn {
         };
       } catch (error) {
         console.warn('WebSocket connection failed:', error);
-        if (retryCountRef.current < config.retryLimit) {
+        if (retryCountRef.current < config.retryLimit && !useFallback) {
           const delay = calculateBackoffDelay(retryCountRef.current);
           retryCountRef.current++;
-          setTimeout(() => connectWithFallback(true), delay);
+          // Only retry without fallback for main connection
+          setTimeout(() => connectWithFallback(false), delay);
         }
       }
     };
