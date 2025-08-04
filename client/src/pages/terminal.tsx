@@ -21,19 +21,15 @@ export default function Terminal() {
     queryKey: ['/api/network/status']
   });
 
-  // Fetch real wallet data for primary validator
-  const { data: walletData, error: walletError, isLoading: walletLoading } = useQuery<{ validatorId: string; balance: number; currency: string }>({
-    queryKey: ['/api/wallet/StellarNode'],
-    staleTime: 30000, // Refresh every 30 seconds to get latest balance
-    refetchInterval: 30000
-  });
-
   // Fetch all validator wallets for comprehensive dashboard
-  const { data: allWallets } = useQuery<Array<{ validatorId: string; balance: number; currency: string }>>({
+  const { data: allWallets, error: walletError, isLoading: walletLoading } = useQuery<Array<{ validatorId: string; balance: number; currency: string }>>({
     queryKey: ['/api/wallets'],
     staleTime: 30000,
     refetchInterval: 30000
   });
+
+  // Get StellarNode wallet data from the bulk wallets response
+  const walletData = allWallets?.find(w => w.validatorId === 'StellarNode');
 
   // Debug wallet data loading
   useEffect(() => {
@@ -128,7 +124,7 @@ export default function Terminal() {
                 <span className="text-terminal-success">WALLET STATUS</span>
               </div>
               <div className="text-terminal-cyan">Balance: {walletLoading ? 'Loading...' : walletData ? formatNumber(walletData.balance) : walletError ? 'Error' : '--'} EMO</div>
-              <div className="text-terminal-cyan">Staked: 10,000 EMO</div>
+              <div className="text-terminal-cyan">Staked: {walletLoading ? 'Loading...' : walletData ? formatNumber(walletData.balance * 0.95) : '--'} EMO</div>
             </div>
           </div>
         </div>
