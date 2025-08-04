@@ -152,11 +152,11 @@ export default function Terminal() {
         {/* Admin Access Panel - Discrete placement */}
         <div className="terminal-window rounded-lg p-3 mt-6 border border-terminal-border/30">
           <div className="flex justify-between items-center">
-            <div className="ascii-art text-terminal-green text-center text-xs flex-1">
-              {`┌─────────────────────────────────────────────────────────────────────────────────────────┐
-│  EmotionalChain v1.0.0 | PoE Consensus Active | Network: Custom                          │
-│  Connected to Network | Block Height: ${stats ? stats.blockHeight : '----'} | Validators: ${stats ? stats.activeValidators : '--'}/${stats ? stats.activeValidators : '--'} | Status: ✅ OPERATIONAL │
-└─────────────────────────────────────────────────────────────────────────────────────────┘`}
+            <div className="ascii-art text-terminal-green text-center text-xs flex-1 font-mono">
+              {`+=====================================================================================+
+|  EmotionalChain v1.0.0 | PoE Consensus Active | Network: Custom                        |
+|  Connected to Network | Block Height: ${stats ? stats.blockHeight : '----'} | Validators: ${stats ? stats.activeValidators : '--'}/${stats ? stats.activeValidators : '--'} | Status: ✅ OPERATIONAL |
++======================================================================================+`}
             </div>
             
             {/* Admin Panel - Small discrete links */}
