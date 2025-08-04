@@ -18,7 +18,6 @@ import {
   BarChart3
 } from 'lucide-react';
 import { Button } from '../ui/button';
-import { ThemeToggle } from '../ui/ThemeToggle';
 
 interface Section {
   id: string;
@@ -100,14 +99,14 @@ export function MobileResponsiveTerminal({
 
   const getLayoutClasses = () => {
     if (isMobile) {
-      return 'flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900';
+      return 'flex flex-col min-h-screen bg-gray-50';
     }
     
     if (isTablet) {
-      return 'flex flex-col lg:flex-row min-h-screen bg-gray-50 dark:bg-gray-900';
+      return 'flex flex-col lg:flex-row min-h-screen bg-gray-50';
     }
     
-    return 'flex min-h-screen bg-gray-50 dark:bg-gray-900';
+    return 'flex min-h-screen bg-gray-50';
   };
 
   const getSectionClasses = (index: number) => {
@@ -126,16 +125,16 @@ export function MobileResponsiveTerminal({
     <div className={getLayoutClasses()}>
       {/* Mobile Header */}
       {isMobile && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
+        <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50">
           <div className="flex items-center space-x-2">
             {getDeviceIcon()}
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+            <span className="text-sm font-medium text-gray-900">
               EmotionalChain
             </span>
           </div>
           
           <div className="flex items-center space-x-2">
-            <ThemeToggle />
+
             <Button
               variant="outline"
               size="sm"
@@ -150,14 +149,14 @@ export function MobileResponsiveTerminal({
 
       {/* Desktop/Tablet Header */}
       {!isMobile && header && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+        <div className="bg-white  border-b border-gray-200  px-6 py-4">
           {header}
         </div>
       )}
 
       {/* Mobile Sidebar/Navigation */}
       {isMobile && sidebarOpen && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
+        <div className="bg-white border-b border-gray-200 px-4 py-3">
           <div className="grid grid-cols-2 gap-2">
             {sections.map((section) => (
               <button
@@ -166,11 +165,11 @@ export function MobileResponsiveTerminal({
                   toggleSection(section.id);
                   setSidebarOpen(false);
                 }}
-                className="flex items-center justify-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                className="flex items-center justify-center p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
               >
                 <div className="flex flex-col items-center space-y-1">
                   {section.icon}
-                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                  <span className="text-xs font-medium text-gray-700">
                     {section.title}
                   </span>
                 </div>
@@ -196,8 +195,8 @@ export function MobileResponsiveTerminal({
               <div
                 key={section.id}
                 className={`
-                  bg-white dark:bg-gray-800 
-                  border border-gray-200 dark:border-gray-700 
+                  bg-white 
+                  border border-gray-200 
                   rounded-lg overflow-hidden shadow-sm
                   ${getSectionClasses(index)}
                   ${isMobile && collapsedSections.has(section.id) ? 'h-auto' : ''}
@@ -206,16 +205,16 @@ export function MobileResponsiveTerminal({
                 {/* Section Header */}
                 <div
                   className={`
-                    px-4 py-3 bg-gray-50 dark:bg-gray-700 
-                    border-b border-gray-200 dark:border-gray-600
+                    px-4 py-3 bg-gray-50 
+                    border-b border-gray-200 
                     flex items-center justify-between
-                    ${section.collapsible ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600' : ''}
+                    ${section.collapsible ? 'cursor-pointer hover:bg-gray-100' : ''}
                   `}
                   onClick={() => section.collapsible && toggleSection(section.id)}
                 >
                   <div className="flex items-center space-x-2">
                     {section.icon}
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    <h3 className="text-sm font-medium text-gray-900">
                       {section.title}
                     </h3>
                   </div>
@@ -249,7 +248,7 @@ export function MobileResponsiveTerminal({
 
       {/* Footer */}
       {footer && (
-        <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-3">
+        <div className="bg-white  border-t border-gray-200  px-4 py-3">
           {footer}
         </div>
       )}

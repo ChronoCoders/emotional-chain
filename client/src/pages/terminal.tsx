@@ -12,7 +12,6 @@ import BiometricStatus from '@/components/terminal/biometric-status';
 import TokenEconomics from '@/components/terminal/token-economics';
 import VisualBlocks from '@/components/terminal/visual-blocks';
 import MobileResponsiveTerminal from '@/components/layout/MobileResponsiveTerminal';
-import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import EmotionalTrendChart from '@/components/charts/EmotionalTrendChart';
 import { useResponsive } from '@/components/layout/MobileResponsiveTerminal';
 import type { NetworkStats } from '@shared/schema';
@@ -159,12 +158,11 @@ export default function Terminal() {
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <Monitor className="w-5 h-5 text-blue-500" />
-          <h1 className="text-lg font-bold text-gray-900 dark:text-gray-100">
+          <h1 className="text-lg font-bold text-gray-900">
             EmotionalChain
           </h1>
         </div>
         <div className="flex items-center space-x-2">
-          <ThemeToggle />
           <Link href="/privacy">
             <div className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm transition-colors cursor-pointer flex items-center gap-2">
               <ExternalLink size={14} />
@@ -176,11 +174,11 @@ export default function Terminal() {
     );
 
     const footer = (
-      <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="text-center text-sm text-gray-500">
         <div className="flex justify-center items-center space-x-4">
           <span>Block {stats?.blockHeight?.toLocaleString() || '9,920+'}</span>
           <span>•</span>
-          <span>{stats?.totalSupply ? formatNumber(stats.totalSupply) : '574K+'} EMO</span>
+          <span>{stats?.totalSupply ? formatNumber(stats.totalSupply) : '577K+'} EMO</span>
           <span>•</span>
           <span>21 Validators</span>
         </div>
@@ -210,7 +208,6 @@ export default function Terminal() {
           <div className="flex justify-between items-start mb-4">
             <AsciBanner className="flex-1" />
             <div className="flex gap-2 flex-wrap">
-              <ThemeToggle className="mr-2" />
               <Link href="/privacy">
                 <div className="bg-terminal-success/20 hover:bg-terminal-success/30 border border-terminal-success rounded px-3 py-2 text-terminal-success font-mono text-xs transition-colors cursor-pointer flex items-center gap-2">
                   <ExternalLink size={14} />

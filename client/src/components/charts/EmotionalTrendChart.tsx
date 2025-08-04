@@ -73,24 +73,24 @@ export function EmotionalTrendChart({
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white dark:bg-gray-800 p-4 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
+          <p className="text-sm font-medium text-gray-900">
             Block {data.blockHeight}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          <p className="text-xs text-gray-500 mb-2">
             {formatTime(data.timestamp)}
           </p>
           
           <div className="space-y-1">
             <div className="flex items-center">
               <Heart className="w-3 h-3 text-red-500 mr-2" />
-              <span className="text-xs text-gray-600 dark:text-gray-300">
+              <span className="text-xs text-gray-600">
                 Emotional Score: {data.averageEmotionalScore.toFixed(1)}
               </span>
             </div>
             <div className="flex items-center">
               <Activity className="w-3 h-3 text-blue-500 mr-2" />
-              <span className="text-xs text-gray-600 dark:text-gray-300">
+              <span className="text-xs text-gray-600">
                 Heart Rate: {data.heartRateAvg.toFixed(0)} BPM
               </span>
             </div>
@@ -126,7 +126,7 @@ export function EmotionalTrendChart({
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
             <TrendingUp className="w-5 h-5 mr-2 text-blue-500" />
             Emotional Consensus Trends
           </h3>
@@ -137,15 +137,15 @@ export function EmotionalTrendChart({
 
         <div className="flex gap-2">
           {/* Time Range Selector */}
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-lg p-1">
             {['1h', '6h', '24h', '7d'].map((range) => (
               <button
                 key={range}
                 onClick={() => onTimeRangeChange(range)}
                 className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
                   timeRange === range
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 dark:hover:text-gray-100'
                 }`}
               >
                 {range}
@@ -154,7 +154,7 @@ export function EmotionalTrendChart({
           </div>
 
           {/* Metric Selector */}
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className="flex bg-gray-100 rounded-lg p-1">
             {[
               { key: 'emotional', label: 'Emotional', icon: Heart },
               { key: 'biometric', label: 'Biometric', icon: Activity },
@@ -165,8 +165,8 @@ export function EmotionalTrendChart({
                 onClick={() => setActiveMetric(key as any)}
                 className={`px-3 py-1 text-xs font-medium rounded transition-colors flex items-center ${
                   activeMetric === key
-                    ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900 dark:hover:text-gray-100'
                 }`}
               >
                 <Icon className="w-3 h-3 mr-1" />
@@ -178,7 +178,7 @@ export function EmotionalTrendChart({
       </div>
 
       {/* Main Trend Chart */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
         <ResponsiveContainer width="100%" height={400}>
           {activeMetric === 'emotional' ? (
             <AreaChart data={data}>
@@ -299,8 +299,8 @@ export function EmotionalTrendChart({
       {/* Performance Distribution and Validator Scatter */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Performance Distribution Pie Chart */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h4 className="text-md font-medium text-gray-900 mb-4">
             Validator Performance Distribution
           </h4>
           <ResponsiveContainer width="100%" height={200}>
@@ -325,8 +325,8 @@ export function EmotionalTrendChart({
         </div>
 
         {/* Validator Performance Scatter */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-          <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h4 className="text-md font-medium text-gray-900 mb-4">
             Validator Performance vs Consistency
           </h4>
           <ResponsiveContainer width="100%" height={200}>
