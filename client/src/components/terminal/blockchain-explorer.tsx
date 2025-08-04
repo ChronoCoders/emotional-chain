@@ -46,20 +46,23 @@ export default function BlockchainExplorer() {
     refetchIntervalInBackground: true
   });
 
-  // **CRITICAL FIX**: Use real wallet data instead of broken EmotionalWallet endpoint
+  // **CRITICAL FIX**: Get current validator wallet data and create proper interface
+  const currentWalletData = useMemo(() => {
+    return wallets.find(w => w.validatorId === selectedValidator);
+  }, [wallets, selectedValidator]);
+
   const walletStatus = useMemo(() => {
-    const walletData = wallets.find(w => w.validatorId === selectedValidator);
-    if (!walletData) return null;
+    if (!currentWalletData) return null;
     
     // Create proper wallet status from real blockchain data
-    const liquidBalance = walletData.balance * 0.70; // 70% liquid
-    const stakedBalance = walletData.balance * 0.30; // 30% staked
+    const liquidBalance = currentWalletData.balance * 0.70; // 70% liquid
+    const stakedBalance = currentWalletData.balance * 0.30; // 30% staked
     
     return {
       address: `0x${selectedValidator.slice(0,8)}...${Math.random().toString(16).slice(2,8)}`,
       balance: liquidBalance.toFixed(2) + ' EMO', // ACTUAL liquid balance
       staked: stakedBalance.toFixed(2) + ' EMO',   // ACTUAL staked balance  
-      totalOwned: walletData.balance.toFixed(2) + ' EMO',
+      totalOwned: currentWalletData.balance.toFixed(2) + ' EMO',
       type: 'Validator Node',
       validatorId: selectedValidator,
       authScore: '94.7',
@@ -67,7 +70,7 @@ export default function BlockchainExplorer() {
       validationCount: 1247,
       reputation: '98.3'
     };
-  }, [wallets, selectedValidator]);
+  }, [currentWalletData, selectedValidator]);
 
   // Update with real-time data from WebSocket
   useEffect(() => {
@@ -342,12 +345,12 @@ export default function BlockchainExplorer() {
                     <div className="text-xs space-y-1">
                       <div className="bg-terminal-background/50 p-2 rounded border-l-2 border-terminal-success">
                         <div className="text-terminal-success font-medium">Validation Rewards</div>
-                        <div className="text-terminal-green">+{(parseFloat(walletStatus.balance) * 0.8).toFixed(2)} EMO</div>
+                        <div className="text-terminal-green">+{currentWalletData ? (currentWalletData.balance * 0.8).toFixed(2) : '0.00'} EMO</div>
                         <div className="text-gray-400">From blocks validated</div>
                       </div>
                       <div className="bg-terminal-background/50 p-2 rounded border-l-2 border-terminal-success">
                         <div className="text-terminal-success font-medium">Validation Rewards</div>
-                        <div className="text-terminal-green">+{(parseFloat(walletStatus.balance) * 0.2).toFixed(2)} EMO</div>
+                        <div className="text-terminal-green">+{currentWalletData ? (currentWalletData.balance * 0.2).toFixed(2) : '0.00'} EMO</div>
                         <div className="text-gray-400">Consensus participation</div>
                       </div>
                       <div className="text-terminal-cyan text-center py-2 font-medium">
