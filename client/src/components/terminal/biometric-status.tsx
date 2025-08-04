@@ -9,8 +9,8 @@ export default function BiometricStatus() {
   const currentValidator = validators[0];
 
   const { data: biometric } = useQuery<BiometricData>({
-    queryKey: ['/api/biometric', currentValidator?.id],
-    enabled: !!currentValidator?.id
+    queryKey: ['/api/biometric', currentValidator?.validatorId],
+    enabled: !!currentValidator?.validatorId
   });
 
   return (
@@ -35,23 +35,23 @@ export default function BiometricStatus() {
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-terminal-green">Heart Rate:</span>
-                <span className="text-terminal-cyan">{biometric.heartRate} BPM</span>
+                <span className="text-terminal-cyan">{biometric.value} BPM</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-terminal-green">HRV:</span>
-                <span className="text-terminal-cyan">{biometric.hrv}ms</span>
+                <span className="text-terminal-cyan">{biometric.value}ms</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-terminal-green">Stress Level:</span>
-                <span className="text-terminal-success">{biometric.stressLevel}%</span>
+                <span className="text-terminal-success">{biometric.value}%</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-terminal-green">Focus Level:</span>
-                <span className="text-terminal-cyan">{biometric.focusLevel}%</span>
+                <span className="text-terminal-cyan">{biometric.value}%</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-terminal-green">Authenticity:</span>
-                <span className="text-terminal-success">{biometric.authenticity}%</span>
+                <span className="text-terminal-success">{biometric.quality}%</span>
               </div>
             </div>
           </div>

@@ -275,7 +275,7 @@ export class EmotionalChain extends EventEmitter {
         ...newBlock,
         signature: 'ecdsa_' + newBlock.hash.substring(0, 16),
         merkleRoot: BlockCrypto.calculateMerkleRoot(newBlock.transactions),
-        validatorSignatures: new Map([[selectedValidator.id, 'sig_' + newBlock.hash.substring(0, 8)]]),
+        validatorSignatures: [`${selectedValidator.id}:sig_${newBlock.hash.substring(0, 8)}`],
         difficulty: this.difficulty
       };
       this.chain.push(cryptographicBlock);

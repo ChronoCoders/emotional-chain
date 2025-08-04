@@ -50,7 +50,7 @@ export class BiometricWallet {
         throw new Error('Insufficient biometric data for enrollment');
       }
       // Generate new wallet keypair
-      const keyPair = KeyPair.generate();
+      const keyPair = new KeyPair();
       // Create biometric template hash (privacy-preserving)
       const biometricHash = this.createBiometricTemplate(readings);
       // Generate device fingerprints
@@ -64,13 +64,13 @@ export class BiometricWallet {
         lastAuthentication: Date.now()
       };
       // Secure the private key using biometric data
-      await this.securePrivateKey(keyPair, readings, masterPassword);
+      await this.securePrivateKey(keyPair.generateKeyPair(), readings, masterPassword);
       console.log(`   🆔 Validator: ${this.validatorId}`);
       console.log(`   📱 Devices: ${deviceFingerprints.length}`);
       console.log(`   🔑 Wallet: ${keyPair.getAddress()}`);
       return {
         success: true,
-        keyPair,
+        keyPair: keyPair.generateKeyPair(),
         identity: this.biometricIdentity
       };
     } catch (error) {
@@ -301,7 +301,7 @@ export class BiometricWallet {
       ? CryptoJS.SHA256(masterPassword + this.validatorId).toString()
       : CryptoJS.SHA256(Date.now().toString() + this.validatorId).toString();
     // Encrypt private key
-    const privateKey = keyPair.getPrivateKey();
+    const privateKey = keyPair.privateKey;
     const salt = CryptoJS.lib.WordArray.random(256/8);
     const key = CryptoJS.PBKDF2(biometricKey, salt, {
       keySize: 256/32,
@@ -409,7 +409,7 @@ export class BiometricWallet {
       const decryptedBytes = CryptoJS.AES.decrypt(this.secureStorage.encryptedPrivateKey, key.toString());
       const privateKey = decryptedBytes.toString(CryptoJS.enc.Utf8);
       if (privateKey && privateKey.length === 64) {
-        return KeyPair.fromPrivateKey(privateKey);
+        return { publicKey: privateKey.substring(0, 32), privateKey };
       }
       return null;
     } catch (error) {
@@ -434,7 +434,7 @@ export class BiometricWallet {
       const decryptedBytes = CryptoJS.AES.decrypt(this.secureStorage.encryptedPrivateKey, key.toString());
       const privateKey = decryptedBytes.toString(CryptoJS.enc.Utf8);
       if (privateKey && privateKey.length === 64) {
-        return KeyPair.fromPrivateKey(privateKey);
+        return { publicKey: privateKey.substring(0, 32), privateKey };
       }
       return null;
     } catch (error) {

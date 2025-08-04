@@ -237,5 +237,5 @@ export class BiometricKeyPair {
   }
 }
 
-// Legacy export for compatibility
-export { BiometricKeyPair as KeyPair };
+// Legacy export for compatibility  
+export { BiometricKeyPair as KeyPairLegacy };
