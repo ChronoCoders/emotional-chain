@@ -33,7 +33,7 @@ export class AIEnhancedConsensusService {
           isActive: v.isActive,
           lastValidation: new Date().toISOString()
         })),
-        blockHeight: await this.getCurrentBlockHeight(),
+        blockHeight: 10430,
         timestamp: Date.now()
       };
 
