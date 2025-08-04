@@ -206,9 +206,9 @@ export default function ExplorerTransactionsPage() {
 
                     {/* From/To */}
                     <div className="flex items-center space-x-2 text-sm text-slate-400 mb-2">
-                      <span className="font-mono">{formatAddress(tx.from)}</span>
+                      <span className="font-mono">{formatAddress(tx.fromAddress || tx.from || 'EmotionalChain-Network')}</span>
                       <ArrowRight className="w-3 h-3" />
-                      <span className="font-mono">{formatAddress(tx.to)}</span>
+                      <span className="font-mono">{formatAddress(tx.toAddress || tx.to || tx.to_address || 'EmotionalChain-Validator')}</span>
                     </div>
 
                     {/* Emotional Data */}

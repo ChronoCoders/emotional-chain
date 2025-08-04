@@ -131,17 +131,18 @@ export class EmotionalWallet {
   public getBalance(validatorId?: string): number {
     if (validatorId) {
       const wallet = this.wallets.get(validatorId);
-      return wallet ? wallet.balance : 0;
+      return wallet ? (wallet.totalOwned || wallet.balance) : 0;
     }
-    // Return primary wallet balance
+    // Return primary wallet total owned EMO
     const primaryWallet = this.wallets.get('StellarNode');
-    return primaryWallet ? primaryWallet.balance : 0;
+    return primaryWallet ? (primaryWallet.totalOwned || primaryWallet.balance) : 0;
   }
   public getAllWallets(): Map<string, number> {
-    // **FIX**: Extract balance numbers from wallet objects for API compatibility
+    // **CRITICAL FIX**: Return total owned EMO, not just liquid portion
+    // This ensures ALL UI displays show the same total earned amount
     const balanceMap = new Map<string, number>();
     this.wallets.forEach((wallet, validatorId) => {
-      balanceMap.set(validatorId, wallet.balance || 0);
+      balanceMap.set(validatorId, wallet.totalOwned || wallet.balance || 0);
     });
     return balanceMap;
   }

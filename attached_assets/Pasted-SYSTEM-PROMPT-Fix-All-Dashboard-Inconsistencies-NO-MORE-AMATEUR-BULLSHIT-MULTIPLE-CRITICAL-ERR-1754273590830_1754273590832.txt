@@ -1,0 +1,76 @@
+SYSTEM PROMPT: Fix All Dashboard Inconsistencies - NO MORE AMATEUR BULLSHIT
+
+MULTIPLE CRITICAL ERRORS IDENTIFIED IN EMOTIONALCHAIN DASHBOARD:
+
+🚨 EMERGENCY FIXES REQUIRED - EXECUTE ALL IMMEDIATELY:
+
+1. STELLARNODE WALLET MATH ERROR - COMPLETELY BROKEN
+INCONSISTENT DATA:
+- Wallet Interface: Balance 73.12 EMO + Staked 10,397.47 EMO = 10,470.59 EMO total
+- Validator List: EMO Earned 24,260.754 EMO 
+- Top Balances: StellarNode 24,260.75 EMO
+
+MATH DOESN'T ADD UP! 10,470.59 ≠ 24,260.754
+
+FIX REQUIREMENTS:
+- Find the source of this calculation inconsistency
+- Make ALL StellarNode displays show SAME NUMBERS
+- Balance + Staked should equal Total EMO Earned
+- Fix wallet sync logic immediately
+
+2. NETWORK ISOLATION - CONNECTED PEERS = 0
+CRITICAL NETWORK ERROR:
+- "Connected Peers: 0" indicates network isolation
+- This is UNACCEPTABLE for a blockchain claiming "OPERATIONAL" status
+- Validators can't operate without peer connections
+
+FIX REQUIREMENTS:
+- Fix peer connection logic immediately
+- Show realistic peer count (minimum 6-15 peers)
+- Network status should reflect actual connectivity
+- Test and verify peer discovery working
+
+3. BROKEN TRANSACTION TRACKING
+TRANSACTION DATA CORRUPTION:
+- All transactions show "From: N/A, To: N/A"
+- Transaction IDs present but addresses missing
+- This looks like amateur blockchain development
+
+FIX REQUIREMENTS:
+- Fix transaction display to show real From/To addresses
+- Ensure transaction history shows proper wallet addresses
+- Fix database transaction recording logic
+- Show meaningful transaction data, not "N/A" garbage
+
+4. TOKEN ECONOMICS CALCULATION DRIFT
+INCONSISTENT CIRCULATION RATES:
+- Previous: 70% circulating, 30% staked (professional)
+- Current: 79% circulating, 21% staked (drifting)
+- Circulation rate should be stable, not fluctuating randomly
+
+FIX REQUIREMENTS:
+- Stabilize circulation rate calculation
+- Ensure consistent token economics over time
+- Fix any calculation drift in staking percentage
+- Maintain professional 70/30 or 80/20 ratio consistently
+
+5. WALLET INTERFACE SYNC FAILURE
+MULTIPLE BALANCE DISPLAYS NOT SYNCHRONIZED:
+- Wallet Status, Top Balances, and Validator Lists show different numbers
+- This indicates broken state synchronization
+- Makes system look unreliable and amateurish
+
+FIX REQUIREMENTS:
+- Synchronize ALL wallet displays to show identical balances
+- Fix state management across all UI components
+- Ensure single source of truth for validator balances
+- Test all displays show consistent data
+
+EXECUTION PROTOCOL:
+- Fix ALL 5 issues in this response
+- Show concrete code changes made
+- Test each fix and verify working
+- Provide evidence that inconsistencies are resolved
+
+NO PARTIAL FIXES. NO EXPLANATIONS. NO BULLSHIT.
+EXECUTE ALL FIXES IMMEDIATELY OR ADMIT SYSTEM FAILURE.
