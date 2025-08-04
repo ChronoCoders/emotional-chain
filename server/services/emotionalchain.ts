@@ -3,12 +3,16 @@ import { type Block, type Transaction, type Validator, type BiometricData, type 
 import { BootstrapNode } from '../blockchain/BootstrapNode';
 import { EmotionalWallet } from '../blockchain/EmotionalWallet';
 import { persistentTokenEconomics } from './token-economics-persistent';
+import { EmotionalStaking } from '../../consensus/EmotionalStaking';
+import { voluntaryStakingService } from './staking';
 export class EmotionalChainService {
   private isRunning: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private bootstrapNode: BootstrapNode | null = null;
   private wallet: EmotionalWallet | null = null;
+  public emotionalStaking: EmotionalStaking;
   constructor() {
+    this.emotionalStaking = new EmotionalStaking();
     this.initializeBlockchain();
     this.startHeartbeat();
     this.initializePersistentTokenEconomics();
@@ -591,6 +595,91 @@ Mining rewards distributed to ecosystem validators.`;
       return { error: 'Token economics not available' };
     }
   }
+  async stakeEMO(validatorId: string, amount: number): Promise<boolean> {
+    return voluntaryStakingService.stakeTokens(validatorId, amount);
+  }
+
+  async unstakeEMO(validatorId: string, amount: number): Promise<boolean> {
+    return voluntaryStakingService.unstakeTokens(validatorId, amount);
+  }
+
+  async getStakingInfo(validatorId: string) {
+    // Get voluntary staking info from the staking service
+    const stakingInfo = voluntaryStakingService.getStakingInfo(validatorId);
+    
+    // Get delegation info from emotional staking engine
+    const validatorStats = this.emotionalStaking.getValidatorStats(validatorId);
+    
+    return {
+      validatorId,
+      voluntaryStaking: stakingInfo,
+      validatorStats,
+      canDelegate: true,
+      delegationMinimum: 1000, // 1k EMO minimum
+      stakingAPY: stakingInfo.bonusAPY
+    };
+  }
+
+  // DELEGATION SYSTEM METHODS
+  async delegateToValidator(delegatorId: string, validatorId: string, amount: number) {
+    const result = await this.emotionalStaking.delegateStake(validatorId, delegatorId, amount);
+    if (result.success) {
+      console.log(`DELEGATION: ${delegatorId} delegated ${amount} EMO to ${validatorId}`);
+    }
+    return result;
+  }
+
+  async undelegateFromValidator(delegatorId: string, validatorId: string, amount: number) {
+    const result = await this.emotionalStaking.undelegateStake(validatorId, delegatorId, amount);
+    if (result.success) {
+      console.log(`UNDELEGATION: ${delegatorId} undelegated ${amount} EMO from ${validatorId}`);
+    }
+    return result;
+  }
+
+  async claimDelegationRewards(delegatorId: string, validatorId?: string) {
+    const result = this.emotionalStaking.claimDelegationRewards(delegatorId, validatorId);
+    if (result.success) {
+      console.log(`REWARDS CLAIMED: ${delegatorId} claimed ${result.amount} EMO`);
+    }
+    return result;
+  }
+
+  async getValidatorStats(validatorId: string) {
+    return this.emotionalStaking.getValidatorStats(validatorId);
+  }
+
+  async getAllValidatorsForDelegation() {
+    return this.emotionalStaking.getAllValidators().map(v => ({
+      id: v.id,
+      commission: v.commission,
+      totalStake: v.stake,
+      emotionalScore: v.emotionalScore,
+      uptime: v.performance.uptime,
+      estimatedAPY: this.emotionalStaking.getValidatorStats(v.id)?.estimatedAPY || 8
+    }));
+  }
+
+  async getDelegatorDashboard(delegatorId: string) {
+    const delegations = this.emotionalStaking.getDelegationsByDelegator(delegatorId);
+    const totalDelegated = delegations.reduce((sum, d) => sum + d.amount, 0);
+    const pendingRewards = this.emotionalStaking.calculateDelegationRewards(delegatorId);
+    
+    return {
+      delegatorId,
+      totalDelegated,
+      pendingRewards,
+      activeDelegations: delegations.length,
+      delegations: delegations.map(d => ({
+        validatorId: d.validatorId,
+        amount: d.amount,
+        rewards: d.rewards,
+        timestamp: d.timestamp,
+        status: d.status
+      }))
+    };
+  }
+
   public shutdown() {
     this.isRunning = false;
     if (this.heartbeatInterval) {

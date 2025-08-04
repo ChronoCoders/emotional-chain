@@ -414,6 +414,138 @@ export class EmotionalStaking extends EventEmitter {
   private getActiveValidatorCount(): number {
     return Array.from(this.validators.values()).filter(v => v.isActive).length;
   }
+  // DELEGATION SYSTEM IMPLEMENTATION
+  public calculateDelegationRewards(delegator: string, validatorId?: string): number {
+    const stakes = Array.from(this.stakes.values()).filter(s => 
+      s.delegator === delegator && 
+      (validatorId ? s.validatorId === validatorId : true) &&
+      s.status === 'active'
+    );
+    
+    return stakes.reduce((total, stake) => total + stake.rewards, 0);
+  }
+
+  public async undelegateStake(
+    validatorId: string, 
+    delegator: string, 
+    amount: number
+  ): Promise<{ success: boolean; message: string; unstakingPeriod?: number }> {
+    try {
+      const stakeId = this.generateStakeId(validatorId, delegator);
+      const stake = this.stakes.get(stakeId);
+      
+      if (!stake) {
+        return { success: false, message: 'No delegation found' };
+      }
+      
+      if (stake.amount < amount) {
+        return { success: false, message: 'Insufficient delegated amount' };
+      }
+      
+      // Check lockup period
+      const lockupEnd = stake.timestamp + stake.lockupPeriod * 1000;
+      if (Date.now() < lockupEnd) {
+        const remainingTime = Math.ceil((lockupEnd - Date.now()) / (24 * 60 * 60 * 1000));
+        return { 
+          success: false, 
+          message: `Lockup period active. ${remainingTime} days remaining.` 
+        };
+      }
+      
+      // Start unbonding process
+      stake.amount -= amount;
+      stake.status = stake.amount === 0 ? 'unbonding' : 'active';
+      
+      // Update validator stake
+      const validator = this.validators.get(validatorId);
+      if (validator) {
+        validator.stake -= amount;
+      }
+      
+      this.updateMetrics();
+      this.emit('stakeUndelegated', { validatorId, delegator, amount });
+      
+      return { 
+        success: true, 
+        message: 'Undelegation successful', 
+        unstakingPeriod: 21 // 21 days unbonding period
+      };
+    } catch (error) {
+      return { success: false, message: 'Undelegation failed' };
+    }
+  }
+
+  public claimDelegationRewards(delegator: string, validatorId?: string): { success: boolean; amount: number; message: string } {
+    try {
+      const stakes = Array.from(this.stakes.values()).filter(s => 
+        s.delegator === delegator && 
+        (validatorId ? s.validatorId === validatorId : true) &&
+        s.status === 'active'
+      );
+      
+      let totalRewards = 0;
+      for (const stake of stakes) {
+        totalRewards += stake.rewards;
+        stake.rewards = 0; // Reset after claiming
+        stake.lastClaimTime = Date.now();
+      }
+      
+      if (totalRewards === 0) {
+        return { success: false, amount: 0, message: 'No rewards to claim' };
+      }
+      
+      this.emit('rewardsClaimed', { delegator, amount: totalRewards });
+      return { success: true, amount: totalRewards, message: 'Rewards claimed successfully' };
+    } catch (error) {
+      return { success: false, amount: 0, message: 'Failed to claim rewards' };
+    }
+  }
+
+  public getValidatorStats(validatorId: string) {
+    const validator = this.validators.get(validatorId);
+    if (!validator) return null;
+    
+    const validatorStakes = Array.from(this.stakes.values()).filter(s => 
+      s.validatorId === validatorId && s.status === 'active'
+    );
+    
+    const totalDelegated = validatorStakes.reduce((sum, s) => sum + s.amount, 0);
+    const totalDelegators = validatorStakes.length;
+    
+    return {
+      validatorId,
+      commission: validator.commission,
+      totalStake: validator.stake,
+      totalDelegated,
+      totalDelegators,
+      isActive: validator.isActive,
+      emotionalScore: validator.emotionalScore,
+      reputation: validator.reputation,
+      performance: validator.performance,
+      estimatedAPY: this.calculateEstimatedAPY(validator),
+      uptime: validator.performance.uptime
+    };
+  }
+
+  private calculateEstimatedAPY(validator: Validator): number {
+    // Base APY calculation with emotional multipliers
+    const baseAPY = 8; // 8% base APY
+    const emotionalBonus = Math.max(0, (validator.emotionalScore - 70) / 100 * 5); // Up to 5% bonus
+    const reputationMultiplier = validator.reputation / 100;
+    
+    return (baseAPY + emotionalBonus) * reputationMultiplier;
+  }
+
+  public getAllValidators(): Validator[] {
+    return Array.from(this.validators.values()).filter(v => v.isActive);
+  }
+
+  public getDelegationsByDelegator(delegator: string): StakeEntry[] {
+    return Array.from(this.stakes.values()).filter(s => 
+      s.delegator === delegator && s.status === 'active'
+    );
+  }
+
   private updateMetrics(): void {
     const allValidators = Array.from(this.validators.values());
     const activeValidators = allValidators.filter(v => v.isActive);

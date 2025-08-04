@@ -558,6 +558,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // DELEGATION SYSTEM API ENDPOINTS
+  app.get('/api/delegation/validators', async (req, res) => {
+    try {
+      const validators = await emotionalChainService.getAllValidatorsForDelegation();
+      res.json(validators);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get validators for delegation' });
+    }
+  });
+
+  app.get('/api/delegation/validator/:id/stats', async (req, res) => {
+    try {
+      const stats = await emotionalChainService.getValidatorStats(req.params.id);
+      if (!stats) {
+        return res.status(404).json({ error: 'Validator not found' });
+      }
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get validator stats' });
+    }
+  });
+
+  app.post('/api/delegation/delegate', async (req, res) => {
+    try {
+      const { delegatorId, validatorId, amount } = req.body;
+      if (!delegatorId || !validatorId || !amount) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+      const result = await emotionalChainService.delegateToValidator(delegatorId, validatorId, amount);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to delegate tokens' });
+    }
+  });
+
+  app.post('/api/delegation/undelegate', async (req, res) => {
+    try {
+      const { delegatorId, validatorId, amount } = req.body;
+      if (!delegatorId || !validatorId || !amount) {
+        return res.status(400).json({ error: 'Missing required fields' });
+      }
+      const result = await emotionalChainService.undelegateFromValidator(delegatorId, validatorId, amount);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to undelegate tokens' });
+    }
+  });
+
+  app.post('/api/delegation/claim-rewards', async (req, res) => {
+    try {
+      const { delegatorId, validatorId } = req.body;
+      if (!delegatorId) {
+        return res.status(400).json({ error: 'Missing delegatorId' });
+      }
+      const result = await emotionalChainService.claimDelegationRewards(delegatorId, validatorId);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to claim rewards' });
+    }
+  });
+
+  app.get('/api/delegation/delegator/:id/dashboard', async (req, res) => {
+    try {
+      const dashboard = await emotionalChainService.getDelegatorDashboard(req.params.id);
+      res.json(dashboard);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get delegator dashboard' });
+    }
+  });
+
   const httpServer = createServer(app);
   // WebSocket server for real-time updates - using centralized CONFIG
   const wss = new WebSocketServer({ 
