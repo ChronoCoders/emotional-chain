@@ -146,8 +146,14 @@ export class PersistentTokenEconomics {
         if (!economics) throw new Error('Token economics not found');
 
         const newTotalSupply = parseFloat(economics.totalSupply) + rewardAmount;
-        const newCirculatingSupply = parseFloat(economics.circulatingSupply) + rewardAmount;
-        const newStakingPoolUtilized = parseFloat(economics.stakingPoolUtilized) + rewardAmount;
+        // **FIX**: Validators stake their rewards, they don't circulate them immediately
+        // Only a small percentage enters circulation, most gets staked for PoE consensus
+        const circulationRate = 0.05; // 5% enters circulation, 95% gets staked
+        const circulatingAmount = rewardAmount * circulationRate;
+        const stakingAmount = rewardAmount * (1 - circulationRate);
+        
+        const newCirculatingSupply = parseFloat(economics.circulatingSupply) + circulatingAmount;
+        const newStakingPoolUtilized = parseFloat(economics.stakingPoolUtilized) + stakingAmount;
         const newStakingPoolRemaining = parseFloat(economics.stakingPoolRemaining) - rewardAmount;
 
         // Update token economics state
