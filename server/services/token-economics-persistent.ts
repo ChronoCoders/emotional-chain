@@ -146,15 +146,12 @@ export class PersistentTokenEconomics {
         if (!economics) throw new Error('Token economics not found');
 
         const newTotalSupply = parseFloat(economics.totalSupply) + rewardAmount;
-        // **FIX**: Validators stake their rewards, they don't circulate them immediately
-        // Only a small percentage enters circulation, most gets staked for PoE consensus
-        const circulationRate = 0.05; // 5% enters circulation, 95% gets staked
-        const circulatingAmount = rewardAmount * circulationRate;
-        const stakingAmount = rewardAmount * (1 - circulationRate);
-        
-        const newCirculatingSupply = parseFloat(economics.circulatingSupply) + circulatingAmount;
-        const newStakingPoolUtilized = parseFloat(economics.stakingPoolUtilized) + stakingAmount;
-        const newStakingPoolRemaining = parseFloat(economics.stakingPoolRemaining) - rewardAmount;
+        // **FIXED**: ALL mining rewards go to validator wallet as LIQUID
+        // No automatic staking - validators control their own earnings
+        const newCirculatingSupply = parseFloat(economics.circulatingSupply) + rewardAmount;
+        // Staking pool remains unchanged - only voluntary staking affects it
+        const newStakingPoolUtilized = parseFloat(economics.stakingPoolUtilized);
+        const newStakingPoolRemaining = parseFloat(economics.stakingPoolRemaining);
 
         // Update token economics state
         await tx.update(tokenEconomics)
@@ -440,12 +437,11 @@ export class PersistentTokenEconomics {
       const totalBlocks = parseInt(blockResult.rows[0].total_blocks || '0');
       
       if (totalSupply > 0) {
-        // **PROPER ECONOMICS**: 5% circulates, 95% staked by validators for PoE consensus
-        const circulationRate = 0.05;
-        const properCirculatingSupply = totalSupply * circulationRate;
-        const properStakedSupply = totalSupply * (1 - circulationRate);
+        // **ECONOMIC FIX**: ALL rewards are LIQUID - no forced staking
+        // Circulating supply = total validator earnings (actual liquid tokens)
+        // Staked supply = only voluntary staking (initially zero)
         
-        // Update with CORRECT token economics (not broken 100% circulation)
+        // Update with FIXED economics - all mining rewards are liquid
         await pool.query(`
           UPDATE token_economics SET 
             total_supply = $1,
@@ -456,13 +452,13 @@ export class PersistentTokenEconomics {
             updated_at = NOW()
         `, [
           totalSupply.toString(),
-          properCirculatingSupply.toString(), 
-          properStakedSupply.toString(),
+          totalSupply.toString(), // ALL tokens circulating (liquid)
+          "0", // No forced staking
           (400000000 - totalSupply).toString(),
           totalBlocks
         ]);
         
-        console.log(`FIXED TOKEN SYNC: ${totalSupply.toFixed(2)} total, ${properCirculatingSupply.toFixed(2)} circulating (5%), ${properStakedSupply.toFixed(2)} staked (95%) at block ${totalBlocks}`);
+        console.log(`ECONOMICS FIXED: ${totalSupply.toFixed(2)} total, ${totalSupply.toFixed(2)} circulating (100% liquid), 0 forced staking at block ${totalBlocks}`);
       }
     } catch (error) {
       console.error('Token sync failed:', error);

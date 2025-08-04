@@ -217,6 +217,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch wallet balance' });
     }
   });
+  // NEW: Voluntary staking endpoints
+  app.post('/api/staking/stake', async (req, res) => {
+    try {
+      const { validatorId, amount } = req.body;
+      const success = await emotionalChainService.stakeEMO(validatorId, amount);
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: `Successfully staked ${amount} EMO for ${validatorId}`,
+          bonusAPY: "15%" // Bonus rewards for voluntary staking
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          message: 'Staking failed - insufficient liquid balance' 
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to stake EMO' });
+    }
+  });
+
+  app.post('/api/staking/unstake', async (req, res) => {
+    try {
+      const { validatorId, amount } = req.body;
+      const success = await emotionalChainService.unstakeEMO(validatorId, amount);
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: `Successfully unstaked ${amount} EMO for ${validatorId}` 
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          message: 'Unstaking failed - insufficient staked balance' 
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to unstake EMO' });
+    }
+  });
+
+  app.get('/api/staking/status/:validatorId', async (req, res) => {
+    try {
+      const { validatorId } = req.params;
+      const stakingInfo = await emotionalChainService.getStakingInfo(validatorId);
+      res.json(stakingInfo);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get staking status' });
+    }
+  });
+
   app.post('/api/transfer', async (req, res) => {
     try {
       const { from, to, amount } = req.body;
