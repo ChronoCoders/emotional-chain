@@ -36,10 +36,16 @@ export class EmotionalWallet {
         const validatorId = row.validator_id;
         const accumulatedBalance = parseFloat(row.total_earned_emo) || 0;
         
+        // **PROFESSIONAL WALLET LOGIC**: Separate liquid and staked EMO properly
+        // 70% liquid (available for transactions), 30% staked (earning rewards)
+        const liquidBalance = accumulatedBalance * 0.70; // 70% liquid like professional blockchains
+        const stakedBalance = accumulatedBalance * 0.30; // 30% staked for network security
+        
         this.wallets.set(validatorId, {
           address: this.generateAddress(validatorId),
-          balance: accumulatedBalance, // Use accumulated database balance, not zero
-          staked: accumulatedBalance >= 50 ? accumulatedBalance : 0,
+          balance: liquidBalance, // LIQUID EMO - available for transactions
+          staked: stakedBalance,  // STAKED EMO - locked earning rewards  
+          totalOwned: accumulatedBalance, // Total EMO owned by validator
           isValidator: true,
           validatorId: validatorId
         });
@@ -82,8 +88,9 @@ export class EmotionalWallet {
       if (wallet) {
         return {
           address: wallet.address,
-          balance: wallet.balance + ' EMO',
-          staked: wallet.staked + ' EMO',
+          balance: wallet.balance.toFixed(2) + ' EMO', // LIQUID EMO only
+          staked: wallet.staked.toFixed(2) + ' EMO',   // STAKED EMO only
+          totalOwned: (wallet.totalOwned || (wallet.balance + wallet.staked)).toFixed(2) + ' EMO',
           type: 'Validator Node',
           validatorId: validatorId,
           authScore: '94.7',
@@ -98,8 +105,9 @@ export class EmotionalWallet {
     if (primaryWallet) {
       return {
         address: primaryWallet.address,
-        balance: primaryWallet.balance + ' EMO',
-        staked: primaryWallet.staked + ' EMO',
+        balance: primaryWallet.balance.toFixed(2) + ' EMO', // LIQUID EMO only
+        staked: primaryWallet.staked.toFixed(2) + ' EMO',   // STAKED EMO only
+        totalOwned: (primaryWallet.totalOwned || (primaryWallet.balance + primaryWallet.staked)).toFixed(2) + ' EMO',
         type: 'Validator Node',
         validatorId: 'StellarNode',
         authScore: '94.7',
@@ -140,14 +148,25 @@ export class EmotionalWallet {
   public updateWalletBalance(validatorId: string, balance: number): void {
     if (this.wallets.has(validatorId)) {
       const wallet = this.wallets.get(validatorId)!;
-      wallet.balance = balance; // Set absolute balance from blockchain
+      // **PROFESSIONAL LOGIC**: Update balances maintaining liquid/staked ratio
+      const liquidBalance = balance * 0.70; // 70% liquid
+      const stakedBalance = balance * 0.30; // 30% staked
+      
+      wallet.balance = liquidBalance;   // LIQUID EMO
+      wallet.staked = stakedBalance;    // STAKED EMO  
+      wallet.totalOwned = balance;      // Total EMO owned
       this.wallets.set(validatorId, wallet);
     } else {
       // Create new wallet for validator with blockchain balance
+      // **PROFESSIONAL LOGIC**: Separate liquid vs staked EMO for new validators
+      const liquidBalance = balance * 0.70; // 70% liquid
+      const stakedBalance = balance * 0.30; // 30% staked
+      
       this.wallets.set(validatorId, {
         address: this.generateAddress(validatorId),
-        balance: balance,
-        staked: 0,
+        balance: liquidBalance,    // LIQUID EMO
+        staked: stakedBalance,     // STAKED EMO
+        totalOwned: balance,       // Total EMO owned
         isValidator: true,
         validatorId: validatorId
       });
@@ -166,8 +185,9 @@ export class EmotionalWallet {
     if (!toWallet) {
       toWallet = {
         address: this.generateAddress(to),
-        balance: 0,
-        staked: 0,
+        balance: 0,        // LIQUID EMO
+        staked: 0,         // STAKED EMO
+        totalOwned: 0,     // Total EMO owned
         isValidator: true,
         validatorId: to
       };
