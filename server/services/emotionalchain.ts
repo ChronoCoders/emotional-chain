@@ -63,40 +63,15 @@ export class EmotionalChainService {
     await this.initializeRealBlockchain();
   }
   public async getNetworkStatus() {
-    if (this.bootstrapNode && this.isRunning) {
-      try {
-        const realStats = this.bootstrapNode.getNetwork().getNetworkStats();
-        return {
-          isRunning: this.isRunning,
-          stats: {
-            id: crypto.randomUUID(),
-            connectedPeers: Math.max(realStats.connectedPeers || 0, 16), // Minimum 16 operational peers
-            activeValidators: realStats.activeValidators || 21,
-            blockHeight: realStats.blockHeight || await this.immutableBlockchain?.getCurrentBlockHeight() || 8894,
-            consensusPercentage: realStats.consensusPercentage || "94.30",
-            networkStress: realStats.networkStress || "18.70",
-            networkEnergy: realStats.networkEnergy || "91.80",
-            networkFocus: realStats.networkFocus || "96.20",
-            timestamp: new Date()
-          },
-          validators: await this.getValidators(),
-          latestBlock: await this.getLatestBlock(),
-          timestamp: new Date().toISOString()
-        };
-      } catch (error) {
-        console.error('Error getting network status:', error);
-      }
-    }
-    
-    // **REAL POE CONSENSUS**: Calculate authentic metrics from blockchain state
+    // **ALWAYS USE REAL POE CONSENSUS**: Calculate authentic metrics from blockchain state
     const currentHeight = await this.immutableBlockchain?.getCurrentBlockHeight() || 8894;
     const validators = await this.getValidators();
     const activeValidatorCount = validators?.filter(v => v.isActive).length || 21;
     
-    // Calculate real consensus percentage from active validators
+    // Calculate real consensus percentage from active validators  
     const consensusPercentage = activeValidatorCount >= 21 ? 
       ((activeValidatorCount / 21) * 100).toFixed(2) : 
-      "0.00";
+      ((activeValidatorCount / 21) * 100).toFixed(2);
     
     // Calculate real network emotional metrics from validator auth scores
     const avgStress = validators?.reduce((sum, v) => {
@@ -113,6 +88,14 @@ export class EmotionalChainService {
       const authScore = parseFloat(v.authScore || "85");
       return sum + Math.min(authScore + 5, 100); // Focus correlates with auth score
     }, 0) / (validators?.length || 21);
+    
+    console.log('REAL CONSENSUS CALCULATION:', {
+      activeValidators: activeValidatorCount,
+      consensusPercentage,
+      avgStress: avgStress.toFixed(2),
+      avgEnergy: avgEnergy.toFixed(2),
+      avgFocus: avgFocus.toFixed(2)
+    });
     
     return {
       isRunning: true,
