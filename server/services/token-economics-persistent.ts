@@ -410,26 +410,25 @@ export class PersistentTokenEconomics {
         WHERE from_address = 'stakingPool'
       `);
       
-      // Get currently staked EMO (validators with >50 EMO are considered stakers)
+      // Get total validator balances (all EMO held by validators = circulating supply)
+      const validatorBalancesResult = await pool.query(`
+        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_validator_balances
+        FROM validator_states
+        WHERE CAST(balance AS DECIMAL) > 0
+      `);
+      
+      // Get currently staked EMO (for staking pool tracking - separate from circulating)
       const stakedResult = await pool.query(`
         SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_staked
         FROM validator_states
         WHERE CAST(balance AS DECIMAL) >= 50
       `);
       
-      // Get liquid EMO (validators with <50 EMO, available for trading)
-      const liquidResult = await pool.query(`
-        SELECT COALESCE(SUM(CAST(balance AS DECIMAL)), 0) as total_liquid
-        FROM validator_states
-        WHERE CAST(balance AS DECIMAL) < 50
-      `);
-      
       const blockResult = await pool.query(`SELECT COUNT(*) as total_blocks FROM blocks`);
       
       const totalSupply = parseFloat(totalMinedResult.rows[0].total_mined || '0');
       const totalStaked = parseFloat(stakedResult.rows[0].total_staked || '0');
-      const totalLiquid = parseFloat(liquidResult.rows[0].total_liquid || '0');
-      const circulatingSupply = totalLiquid; // Only liquid EMO is circulating
+      const circulatingSupply = parseFloat(validatorBalancesResult.rows[0].total_validator_balances || '0'); // ALL validator rewards = circulating
       const totalBlocks = parseInt(blockResult.rows[0].total_blocks || '0');
       
       if (totalSupply > 0) {
