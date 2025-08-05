@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
 import { ExternalLink, Activity, Users, Coins, BarChart3, Monitor, TrendingUp, Heart, Brain, Zap, Shield, Globe, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 import type { NetworkStats } from '@shared/schema';
 
 export default function LandingPage() {
@@ -90,7 +91,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Brain className="w-6 h-6 text-terminal-cyan" />
+              <EmotionalChainLogo size={24} className="text-terminal-cyan" />
               <span className="text-xl font-bold text-terminal-green">EmotionalChain</span>
             </div>
             <nav className="hidden md:flex items-center space-x-6">
@@ -174,10 +175,13 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* Main Headline */}
-          <h1 className="text-3xl md:text-5xl font-bold mb-6 text-terminal-green">
-            World's First <span className="text-terminal-cyan">Emotion-Driven</span> Blockchain
-          </h1>
+          {/* Logo and Main Headline */}
+          <div className="flex items-center justify-center mb-6">
+            <EmotionalChainLogo size={64} className="text-terminal-cyan mr-4 animate-pulse" />
+            <h1 className="text-3xl md:text-5xl font-bold text-terminal-green">
+              World's First <span className="text-terminal-cyan">Emotion-Driven</span> Blockchain
+            </h1>
+          </div>
           
           <p className="text-lg md:text-xl mb-8 text-terminal-green/80 max-w-3xl mx-auto">
             Revolutionary Proof of Emotion (PoE) consensus mechanism powered by real-time biometric validation.
