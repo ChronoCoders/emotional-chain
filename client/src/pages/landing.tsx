@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useWebSocket } from '@/hooks/use-websocket';
 import { useEffect, useState } from 'react';
 import { Link } from 'wouter';
-import { ExternalLink, Activity, Users, Coins, BarChart3, Monitor, TrendingUp, Heart, Brain, Zap, Shield, Globe } from 'lucide-react';
+import { ExternalLink, Activity, Users, Coins, BarChart3, Monitor, TrendingUp, Heart, Brain, Zap, Shield, Globe, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { NetworkStats } from '@shared/schema';
 
@@ -10,6 +10,7 @@ export default function LandingPage() {
   const [realtimeStats, setRealtimeStats] = useState<NetworkStats | null>(null);
   const [typingText, setTypingText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { lastMessage } = useWebSocket();
 
   const { data: networkStatus } = useQuery<{ stats: NetworkStats }>({
@@ -96,15 +97,48 @@ export default function LandingPage() {
               <Link href="/explorer" className="text-terminal-green hover:text-terminal-cyan transition-colors">
                 Explorer
               </Link>
-              <Button 
-                variant="outline" 
-                className="border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg"
-              >
-                Get Started
-              </Button>
+              <Link href="#get-started">
+                <Button 
+                  variant="outline" 
+                  className="border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg"
+                >
+                  Get Started
+                </Button>
+              </Link>
             </nav>
+            
+            {/* Mobile menu button */}
+            <button 
+              className="md:hidden text-terminal-green hover:text-terminal-cyan"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-terminal-border bg-terminal-surface/90 backdrop-blur-sm">
+            <div className="container mx-auto px-4 py-4 space-y-4">
+              <Link 
+                href="/explorer" 
+                className="block text-terminal-green hover:text-terminal-cyan transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Explorer
+              </Link>
+              <Link href="#get-started" onClick={() => setMobileMenuOpen(false)}>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg"
+                >
+                  Get Started
+                </Button>
+              </Link>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -144,18 +178,20 @@ export default function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button 
-              size="lg"
-              className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8"
-            >
-              <Zap className="w-5 h-5 mr-2" />
-              Start Validating
-            </Button>
+            <Link href="#get-started">
+              <Button 
+                size="lg"
+                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 w-full sm:w-auto"
+              >
+                <Zap className="w-5 h-5 mr-2" />
+                Start Validating
+              </Button>
+            </Link>
             <Link href="/explorer">
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 w-full sm:w-auto"
               >
                 <Globe className="w-5 h-5 mr-2" />
                 Explore Network
@@ -182,9 +218,9 @@ export default function LandingPage() {
                 <span className="text-sm text-terminal-green/60">EMO SUPPLY</span>
               </div>
               <div className="text-2xl font-bold text-terminal-gold">
-                {stats?.circulatingSupply ? formatNumber(stats.circulatingSupply) : '631,267'}
+                {stats?.circulatingSupply ? formatNumber(stats.circulatingSupply) : '633K+'}
               </div>
-              <div className="text-sm text-terminal-green/60">Total EMO</div>
+              <div className="text-sm text-terminal-green/60">Circulating EMO</div>
             </div>
 
             <div className="terminal-window p-6 text-center">
@@ -193,7 +229,7 @@ export default function LandingPage() {
                 <span className="text-sm text-terminal-green/60">BLOCKS</span>
               </div>
               <div className="text-2xl font-bold text-terminal-cyan">
-                {stats ? formatNumber(stats.blockHeight) : '10,852'}
+                {stats ? formatNumber(stats.blockHeight) : '10,896+'}
               </div>
               <div className="text-sm text-terminal-green/60">Block Height</div>
             </div>
@@ -322,7 +358,7 @@ export default function LandingPage() {
       </section>
 
       {/* Getting Started */}
-      <section className="relative z-10 py-16">
+      <section id="get-started" className="relative z-10 py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
             &gt; Ready to Join the Network?
@@ -333,18 +369,20 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg"
-              className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8"
-            >
-              <Heart className="w-5 h-5 mr-2" />
-              Setup Validator
-            </Button>
+            <Link href="/admin">
+              <Button 
+                size="lg"
+                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 w-full sm:w-auto"
+              >
+                <Heart className="w-5 h-5 mr-2" />
+                Setup Validator
+              </Button>
+            </Link>
             <Link href="/explorer">
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 w-full sm:w-auto"
               >
                 <ExternalLink className="w-5 h-5 mr-2" />
                 View Documentation
