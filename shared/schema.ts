@@ -344,6 +344,9 @@ export type NetworkStats = {
   networkStress: string;
   networkEnergy: string;
   networkFocus: string;
+  tps?: string; // Transactions per second
+  transactions24h?: string; // 24-hour transaction count
+  volume24h?: number; // 24-hour transaction volume
   timestamp: Date;
 };
 export type InsertNetworkStats = Omit<NetworkStats, "id" | "timestamp">;
