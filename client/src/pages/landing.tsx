@@ -98,12 +98,9 @@ export default function LandingPage() {
                 Explorer
               </Link>
               <Link href="#get-started">
-                <Button 
-                  variant="outline" 
-                  className="border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg"
-                >
+                <button className="border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium">
                   Get Started
-                </Button>
+                </button>
               </Link>
             </nav>
             
@@ -129,12 +126,9 @@ export default function LandingPage() {
                 Explorer
               </Link>
               <Link href="#get-started" onClick={() => setMobileMenuOpen(false)}>
-                <Button 
-                  variant="outline" 
-                  className="w-full border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg"
-                >
+                <button className="w-full border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium">
                   Get Started
-                </Button>
+                </button>
               </Link>
             </div>
           </div>
@@ -179,23 +173,16 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link href="#get-started">
-              <Button 
-                size="lg"
-                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 w-full sm:w-auto"
-              >
+              <button className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors">
                 <Zap className="w-5 h-5 mr-2" />
                 Start Validating
-              </Button>
+              </button>
             </Link>
             <Link href="/explorer">
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 w-full sm:w-auto"
-              >
+              <button className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent">
                 <Globe className="w-5 h-5 mr-2" />
                 Explore Network
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
@@ -370,23 +357,16 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/admin">
-              <Button 
-                size="lg"
-                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 w-full sm:w-auto"
-              >
+              <button className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors">
                 <Heart className="w-5 h-5 mr-2" />
                 Setup Validator
-              </Button>
+              </button>
             </Link>
             <Link href="/explorer">
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 w-full sm:w-auto"
-              >
+              <button className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent">
                 <ExternalLink className="w-5 h-5 mr-2" />
                 View Documentation
-              </Button>
+              </button>
             </Link>
           </div>
         </div>
