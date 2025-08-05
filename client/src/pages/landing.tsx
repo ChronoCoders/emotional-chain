@@ -393,10 +393,14 @@ export default function LandingPage() {
                 <span style={{ color: '#0a0a0a', fontWeight: 'bold' }}>Setup Validator</span>
               </button>
             </a>
-            <a href="https://docs.emotionalchain.org" target="_blank" rel="noopener noreferrer">
+            <a href="/docs">
               <button 
                 className="border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-gray-900 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
                 style={{ borderColor: '#00ff00', color: '#00ff00' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = '/docs';
+                }}
               >
                 <ExternalLink className="w-5 h-5 mr-2" />
                 <span style={{ color: '#00ff00', fontWeight: 'bold' }}>View Documentation</span>
