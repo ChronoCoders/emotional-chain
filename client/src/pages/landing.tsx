@@ -1,0 +1,373 @@
+import { useQuery } from '@tanstack/react-query';
+import { useWebSocket } from '@/hooks/use-websocket';
+import { useEffect, useState } from 'react';
+import { Link } from 'wouter';
+import { ExternalLink, Activity, Users, Coins, BarChart3, Monitor, TrendingUp, Heart, Brain, Zap, Shield, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import type { NetworkStats } from '@shared/schema';
+
+export default function LandingPage() {
+  const [realtimeStats, setRealtimeStats] = useState<NetworkStats | null>(null);
+  const [typingText, setTypingText] = useState('');
+  const [showCursor, setShowCursor] = useState(true);
+  const { lastMessage } = useWebSocket();
+
+  const { data: networkStatus } = useQuery<{ stats: NetworkStats }>({
+    queryKey: ['/api/network/status']
+  });
+
+  // Update with real-time data from WebSocket
+  useEffect(() => {
+    if (lastMessage?.type === 'update' && lastMessage.data?.networkStatus?.stats) {
+      setRealtimeStats(lastMessage.data.networkStatus.stats);
+    }
+  }, [lastMessage]);
+
+  const stats = realtimeStats || networkStatus?.stats;
+
+  // Typing animation effect
+  useEffect(() => {
+    const text = 'EmotionalChain Network Initialized...';
+    let index = 0;
+    
+    const typeInterval = setInterval(() => {
+      if (index < text.length) {
+        setTypingText(text.slice(0, index + 1));
+        index++;
+      } else {
+        clearInterval(typeInterval);
+      }
+    }, 80);
+
+    return () => clearInterval(typeInterval);
+  }, []);
+
+  // Cursor blinking effect
+  useEffect(() => {
+    const cursorInterval = setInterval(() => {
+      setShowCursor(prev => !prev);
+    }, 600);
+
+    return () => clearInterval(cursorInterval);
+  }, []);
+
+  const formatNumber = (num: number | string) => {
+    const n = typeof num === 'string' ? parseFloat(num) : num;
+    return n.toLocaleString('en-US');
+  };
+
+  const deviceCategories = [
+    {
+      name: 'Consumer Wearables',
+      devices: ['Apple Watch', 'Galaxy Watch', 'Fitbit', 'Garmin', 'Oura Ring', 'Muse Headband'],
+      icon: Heart,
+      count: 14
+    },
+    {
+      name: 'Professional Monitors', 
+      devices: ['Polar H10', 'Empatica E4', 'OpenBCI', 'Biosemi', 'g.tec'],
+      icon: Monitor,
+      count: 5
+    },
+    {
+      name: 'Medical Grade',
+      devices: ['FDA Cleared ECG', 'Medical EEG'],
+      icon: Shield,
+      count: 2
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-terminal-bg text-terminal-green font-mono overflow-x-hidden">
+      {/* Matrix Rain Background */}
+      <div className="fixed inset-0 pointer-events-none opacity-10">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-terminal-green/5 to-transparent"></div>
+      </div>
+
+      {/* Header Navigation */}
+      <header className="relative z-10 border-b border-terminal-border bg-terminal-surface/50 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Brain className="w-6 h-6 text-terminal-cyan" />
+              <span className="text-xl font-bold text-terminal-green">EmotionalChain</span>
+            </div>
+            <nav className="hidden md:flex items-center space-x-6">
+              <Link href="/explorer" className="text-terminal-green hover:text-terminal-cyan transition-colors">
+                Explorer
+              </Link>
+              <Button 
+                variant="outline" 
+                className="border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg"
+              >
+                Get Started
+              </Button>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero Section */}
+      <section className="relative z-10 pt-20 pb-16">
+        <div className="container mx-auto px-4 text-center">
+          {/* ASCII Banner */}
+          <div className="mb-8">
+            <pre className="ascii-art text-terminal-green text-xs sm:text-sm lg:text-base inline-block">
+{`
+███████╗███╗   ███╗ ██████╗ ████████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██╗      ██████╗██╗  ██╗ █████╗ ██╗███╗   ██╗
+██╔════╝████╗ ████║██╔═══██╗╚══██╔══╝██║██╔═══██╗████╗  ██║██╔══██╗██║     ██╔════╝██║  ██║██╔══██╗██║████╗  ██║
+█████╗  ██╔████╔██║██║   ██║   ██║   ██║██║   ██║██╔██╗ ██║███████║██║     ██║     ███████║███████║██║██╔██╗ ██║
+██╔══╝  ██║╚██╔╝██║██║   ██║   ██║   ██║██║   ██║██║╚██╗██║██╔══██║██║     ██║     ██╔══██║██╔══██║██║██║╚██╗██║
+███████╗██║ ╚═╝ ██║╚██████╔╝   ██║   ██║╚██████╔╝██║ ╚████║██║  ██║███████╗╚██████╗██║  ██║██║  ██║██║██║ ╚████║
+╚══════╝╚═╝     ╚═╝ ╚═════╝    ╚═╝   ╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝
+`}
+            </pre>
+          </div>
+
+          {/* Typing Animation */}
+          <div className="mb-8">
+            <span className="text-terminal-cyan text-lg">
+              {typingText}
+              {showCursor && <span className="text-terminal-green">█</span>}
+            </span>
+          </div>
+
+          {/* Main Headline */}
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 text-terminal-green">
+            World's First <span className="text-terminal-cyan">Emotion-Driven</span> Blockchain
+          </h1>
+          
+          <p className="text-lg md:text-xl mb-8 text-terminal-green/80 max-w-3xl mx-auto">
+            Revolutionary Proof of Emotion (PoE) consensus mechanism powered by real-time biometric validation.
+            <br />Enterprise-grade blockchain with Bitcoin/Ethereum-level immutability.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <Button 
+              size="lg"
+              className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8"
+            >
+              <Zap className="w-5 h-5 mr-2" />
+              Start Validating
+            </Button>
+            <Link href="/explorer">
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8"
+              >
+                <Globe className="w-5 h-5 mr-2" />
+                Explore Network
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Network Stats */}
+      <section className="relative z-10 py-16 bg-terminal-surface/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
+              &gt; Network Status: <span className="text-terminal-success">ONLINE</span>
+            </h2>
+            <p className="text-terminal-green/80">Real-time statistics from the EmotionalChain network</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="terminal-window p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Coins className="w-8 h-8 text-terminal-gold mr-2" />
+                <span className="text-sm text-terminal-green/60">EMO SUPPLY</span>
+              </div>
+              <div className="text-2xl font-bold text-terminal-gold">
+                {stats?.circulatingSupply ? formatNumber(stats.circulatingSupply) : '631,267'}
+              </div>
+              <div className="text-sm text-terminal-green/60">Total EMO</div>
+            </div>
+
+            <div className="terminal-window p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <BarChart3 className="w-8 h-8 text-terminal-cyan mr-2" />
+                <span className="text-sm text-terminal-green/60">BLOCKS</span>
+              </div>
+              <div className="text-2xl font-bold text-terminal-cyan">
+                {stats ? formatNumber(stats.blockHeight) : '10,852'}
+              </div>
+              <div className="text-sm text-terminal-green/60">Block Height</div>
+            </div>
+
+            <div className="terminal-window p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Users className="w-8 h-8 text-terminal-success mr-2" />
+                <span className="text-sm text-terminal-green/60">VALIDATORS</span>
+              </div>
+              <div className="text-2xl font-bold text-terminal-success">21</div>
+              <div className="text-sm text-terminal-green/60">Active</div>
+            </div>
+
+            <div className="terminal-window p-6 text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Activity className="w-8 h-8 text-terminal-orange mr-2" />
+                <span className="text-sm text-terminal-green/60">CONSENSUS</span>
+              </div>
+              <div className="text-2xl font-bold text-terminal-orange">
+                {stats?.consensusPercentage ? `${Math.round(parseFloat(stats.consensusPercentage))}%` : '98%'}
+              </div>
+              <div className="text-sm text-terminal-green/60">Emotional Fitness</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section className="relative z-10 py-16">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
+              &gt; How Proof of Emotion Works
+            </h2>
+            <p className="text-terminal-green/80 max-w-3xl mx-auto">
+              Revolutionary consensus mechanism that validates blocks based on real-time emotional fitness metrics
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="terminal-window p-6">
+              <div className="flex items-center mb-4">
+                <Heart className="w-8 h-8 text-terminal-error mr-3" />
+                <h3 className="text-xl font-bold text-terminal-green">Biometric Monitoring</h3>
+              </div>
+              <p className="text-terminal-green/80 mb-4">
+                Validators connect wearable devices to provide real-time heart rate, stress levels, and focus metrics.
+              </p>
+              <ul className="text-sm text-terminal-green/70 space-y-1">
+                <li>&gt; Heart Rate Variability</li>
+                <li>&gt; Stress Detection</li>
+                <li>&gt; Focus & Attention</li>
+                <li>&gt; Emotional Authenticity</li>
+              </ul>
+            </div>
+
+            <div className="terminal-window p-6">
+              <div className="flex items-center mb-4">
+                <Brain className="w-8 h-8 text-terminal-cyan mr-3" />
+                <h3 className="text-xl font-bold text-terminal-green">7-Metric Processing</h3>
+              </div>
+              <p className="text-terminal-green/80 mb-4">
+                Advanced emotional intelligence system processes multiple physiological signals for consensus.
+              </p>
+              <ul className="text-sm text-terminal-green/70 space-y-1">
+                <li>&gt; Primary: Stress, Focus, Authenticity</li>
+                <li>&gt; Secondary: Valence, Arousal</li>
+                <li>&gt; Additional: Fatigue, Confidence</li>
+                <li>&gt; Real-time AI Analysis</li>
+              </ul>
+            </div>
+
+            <div className="terminal-window p-6">
+              <div className="flex items-center mb-4">
+                <Shield className="w-8 h-8 text-terminal-gold mr-3" />
+                <h3 className="text-xl font-bold text-terminal-green">Secure Validation</h3>
+              </div>
+              <p className="text-terminal-green/80 mb-4">
+                Only emotionally fit validators can participate in block creation and consensus voting.
+              </p>
+              <ul className="text-sm text-terminal-green/70 space-y-1">
+                <li>&gt; Anti-spoofing Measures</li>
+                <li>&gt; Byzantine Fault Tolerance</li>
+                <li>&gt; Zero-knowledge Privacy</li>
+                <li>&gt; Enterprise Immutability</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Supported Devices */}
+      <section className="relative z-10 py-16 bg-terminal-surface/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
+              &gt; Device Ecosystem
+            </h2>
+            <p className="text-terminal-green/80">
+              Fair mining regardless of hardware quality - consumer and professional devices compete equally
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {deviceCategories.map((category, index) => (
+              <div key={index} className="terminal-window p-6">
+                <div className="flex items-center mb-4">
+                  <category.icon className="w-8 h-8 text-terminal-cyan mr-3" />
+                  <div>
+                    <h3 className="text-xl font-bold text-terminal-green">{category.name}</h3>
+                    <span className="text-sm text-terminal-green/60">{category.count} devices supported</span>
+                  </div>
+                </div>
+                <ul className="space-y-2">
+                  {category.devices.map((device, idx) => (
+                    <li key={idx} className="text-terminal-green/80 flex items-center">
+                      <span className="text-terminal-cyan mr-2">&gt;</span>
+                      {device}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Getting Started */}
+      <section className="relative z-10 py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
+            &gt; Ready to Join the Network?
+          </h2>
+          <p className="text-terminal-green/80 mb-8 max-w-2xl mx-auto">
+            Become a validator in the world's first emotion-driven blockchain. 
+            Connect your wearable device and start earning EMO tokens.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg"
+              className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8"
+            >
+              <Heart className="w-5 h-5 mr-2" />
+              Setup Validator
+            </Button>
+            <Link href="/explorer">
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8"
+              >
+                <ExternalLink className="w-5 h-5 mr-2" />
+                View Documentation
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 border-t border-terminal-border bg-terminal-surface/50 py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-2 mb-4 md:mb-0">
+              <Brain className="w-5 h-5 text-terminal-cyan" />
+              <span className="text-terminal-green">EmotionalChain Network</span>
+            </div>
+            <div className="text-terminal-green/60 text-sm">
+              &gt; Powered by Proof of Emotion | Enterprise-Grade Blockchain
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

@@ -344,6 +344,8 @@ export type NetworkStats = {
   networkStress: string;
   networkEnergy: string;
   networkFocus: string;
+  totalSupply?: string; // Total EMO supply
+  circulatingSupply?: string; // Circulating EMO supply
   tps?: string; // Transactions per second
   transactions24h?: string; // 24-hour transaction count
   volume24h?: number; // 24-hour transaction volume
