@@ -175,13 +175,10 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* Logo and Main Headline */}
-          <div className="flex items-center justify-center mb-6">
-            <EmotionalChainLogo size={64} className="text-terminal-cyan mr-4 animate-pulse" />
-            <h1 className="text-3xl md:text-5xl font-bold text-terminal-green">
-              World's First <span className="text-terminal-cyan">Emotion-Driven</span> Blockchain
-            </h1>
-          </div>
+          {/* Main Headline */}
+          <h1 className="text-3xl md:text-5xl font-bold mb-6 text-terminal-green">
+            World's First <span className="text-terminal-cyan">Emotion-Driven</span> Blockchain
+          </h1>
           
           <p className="text-lg md:text-xl mb-8 text-terminal-green/80 max-w-3xl mx-auto">
             Revolutionary Proof of Emotion (PoE) consensus mechanism powered by real-time biometric validation.
