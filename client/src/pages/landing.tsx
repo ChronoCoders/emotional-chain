@@ -97,11 +97,18 @@ export default function LandingPage() {
               <Link href="/explorer" className="text-terminal-green hover:text-terminal-cyan transition-colors">
                 Explorer
               </Link>
-              <Link href="#get-started">
-                <button className="border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium">
+              <a href="#get-started">
+                <button 
+                  className="border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+                    setMobileMenuOpen(false);
+                  }}
+                >
                   Get Started
                 </button>
-              </Link>
+              </a>
             </nav>
             
             {/* Mobile menu button */}
@@ -125,11 +132,18 @@ export default function LandingPage() {
               >
                 Explorer
               </Link>
-              <Link href="#get-started" onClick={() => setMobileMenuOpen(false)}>
-                <button className="w-full border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium">
+              <a href="#get-started">
+                <button 
+                  className="w-full border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+                    setMobileMenuOpen(false);
+                  }}
+                >
                   Get Started
                 </button>
-              </Link>
+              </a>
             </div>
           </div>
         )}
@@ -172,15 +186,19 @@ export default function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Link href="#get-started">
+            <a href="#get-started">
               <button 
                 className="bg-cyan-500 text-gray-900 hover:bg-green-500 border-2 border-cyan-500 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
                 style={{ color: '#0a0a0a', backgroundColor: '#00ffff', borderColor: '#00ffff' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+                }}
               >
                 <Zap className="w-5 h-5 mr-2" />
                 <span style={{ color: '#0a0a0a', fontWeight: 'bold' }}>Start Validating</span>
               </button>
-            </Link>
+            </a>
             <Link href="/explorer">
               <button 
                 className="border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-gray-900 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
@@ -362,16 +380,20 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/admin">
+            <a href="/admin">
               <button 
                 className="bg-cyan-500 text-gray-900 hover:bg-green-500 border-2 border-cyan-500 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
                 style={{ color: '#0a0a0a', backgroundColor: '#00ffff', borderColor: '#00ffff' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = '/admin';
+                }}
               >
                 <Heart className="w-5 h-5 mr-2" />
                 <span style={{ color: '#0a0a0a', fontWeight: 'bold' }}>Setup Validator</span>
               </button>
-            </Link>
-            <Link href="/explorer">
+            </a>
+            <a href="https://docs.emotionalchain.org" target="_blank" rel="noopener noreferrer">
               <button 
                 className="border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-gray-900 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
                 style={{ borderColor: '#00ff00', color: '#00ff00' }}
@@ -379,7 +401,7 @@ export default function LandingPage() {
                 <ExternalLink className="w-5 h-5 mr-2" />
                 <span style={{ color: '#00ff00', fontWeight: 'bold' }}>View Documentation</span>
               </button>
-            </Link>
+            </a>
           </div>
         </div>
       </section>
