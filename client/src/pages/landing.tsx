@@ -98,6 +98,9 @@ export default function LandingPage() {
               <Link href="/explorer" className="text-terminal-green hover:text-terminal-cyan transition-colors">
                 Explorer
               </Link>
+              <Link href="/whitepaper" className="text-terminal-green hover:text-terminal-cyan transition-colors">
+                Whitepaper
+              </Link>
               <a href="#get-started">
                 <button 
                   className="border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
@@ -132,6 +135,13 @@ export default function LandingPage() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Explorer
+              </Link>
+              <Link 
+                href="/whitepaper" 
+                className="block text-terminal-green hover:text-terminal-cyan transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Whitepaper
               </Link>
               <a href="#get-started">
                 <button 
