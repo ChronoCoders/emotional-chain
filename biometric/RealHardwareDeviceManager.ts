@@ -66,25 +66,59 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
     try {
       console.log('📡 Scanning for Bluetooth LE biometric devices...');
 
-      // Heart rate monitors
+      // Heart rate monitors - Consumer & Professional
       const heartRateDevices = await this.scanForDeviceType([
-        { services: ['180d'] }, // Heart Rate Service
-        { namePrefix: 'Polar' },
+        { services: ['180d'] }, // Heart Rate Service (Standard)
+        // Consumer brands
+        { namePrefix: 'Apple Watch' },
+        { namePrefix: 'Galaxy Watch' },
+        { namePrefix: 'Fitbit' },
         { namePrefix: 'Garmin' },
-        { namePrefix: 'Wahoo' }
+        { namePrefix: 'Suunto' },
+        { namePrefix: 'Amazfit' },
+        { namePrefix: 'Huawei' },
+        { namePrefix: 'Withings' },
+        // Professional brands
+        { namePrefix: 'Polar' },
+        { namePrefix: 'Wahoo' },
+        { namePrefix: 'Coros' },
+        { namePrefix: 'Firstbeat' }
       ]);
 
-      // EEG devices
+      // Focus & EEG devices - Consumer & Professional
       const eegDevices = await this.scanForDeviceType([
+        // Consumer EEG/focus devices
         { namePrefix: 'Muse' },
+        { namePrefix: 'NeuroSky' },
+        { namePrefix: 'Emotiv EPOC' },
+        { namePrefix: 'InteraXon' },
+        { namePrefix: 'Macrotellect' },
+        // Professional EEG systems
         { namePrefix: 'OpenBCI' },
-        { services: ['0000fe8d-0000-1000-8000-00805f9b34fb'] } // Muse service
+        { namePrefix: 'g.tec' },
+        { namePrefix: 'Cognionics' },
+        { namePrefix: 'ANT Neuro' },
+        { namePrefix: 'Brain Products' },
+        // Service UUIDs for various EEG devices
+        { services: ['0000fe8d-0000-1000-8000-00805f9b34fb'] }, // Muse service
+        { services: ['0000180a-0000-1000-8000-00805f9b34fb'] }, // Device Information
+        { services: ['0000180f-0000-1000-8000-00805f9b34fb'] }  // Battery Service
       ]);
 
-      // Stress detection devices
+      // Stress & Multi-modal devices - Consumer & Professional
       const stressDevices = await this.scanForDeviceType([
+        // Professional stress detection
         { namePrefix: 'Empatica' },
-        { namePrefix: 'BioHarness' }
+        { namePrefix: 'BioHarness' },
+        { namePrefix: 'Shimmer' },
+        { namePrefix: 'Biopac' },
+        // Consumer stress/wellness
+        { namePrefix: 'Spire' },
+        { namePrefix: 'HeartMath' },
+        { namePrefix: 'Muse' }, // Also does stress via EEG
+        // Integrated consumer devices
+        { namePrefix: 'Oura' }, // Ring with HRV
+        { namePrefix: 'WHOOP' } // Strap with recovery metrics
       ]);
 
       // Register discovered devices
@@ -228,12 +262,43 @@ export class RealHardwareDeviceManager extends BiometricDeviceManager {
   private detectBiometricType(vendorId: number, productId: number): string {
     const deviceKey = `${vendorId.toString(16)}:${productId.toString(16)}`;
     const typeMap: { [key: string]: string } = {
-      '4d8:3f': 'stress',    // Empatica
-      'fcf:1008': 'heartRate', // Garmin ANT+
-      '483:3748': 'focus',   // STM32 EEG
-      '16c0:483': 'multimodal' // Generic biometric
+      // Professional devices
+      '4d8:3f': 'stress',        // Empatica E4
+      'fcf:1008': 'heartRate',   // Garmin ANT+
+      '483:3748': 'focus',       // STM32 EEG
+      '16c0:483': 'multimodal',  // Generic biometric
+      '2ab:1234': 'professional-hrv', // Polar H10
+      '1915:eef5': 'eeg-professional', // OpenBCI
+      // Consumer devices
+      '5ac:8600': 'consumer-watch', // Apple Watch
+      '04e8:a000': 'consumer-galaxy', // Galaxy Watch
+      '057e:2009': 'consumer-fitbit', // Fitbit
+      '091e:4b48': 'consumer-garmin', // Garmin consumer
+      '2687:fb01': 'consumer-oura',   // Oura Ring
+      '2a03:43': 'consumer-muse'      // Muse headband
     };
     return typeMap[deviceKey] || 'unknown';
+  }
+  
+  // NEW: Enhanced device capability mapping
+  private getDeviceCapabilities(deviceType: string): string[] {
+    const capabilityMap: { [key: string]: string[] } = {
+      // Consumer devices - Basic emotional metrics
+      'consumer-watch': ['heartRate', 'stress', 'arousal', 'fatigue'],
+      'consumer-galaxy': ['heartRate', 'stress', 'arousal', 'fatigue'],
+      'consumer-fitbit': ['heartRate', 'stress', 'arousal'],
+      'consumer-garmin': ['heartRate', 'stress', 'arousal', 'fatigue'],
+      'consumer-oura': ['heartRate', 'stress', 'arousal', 'fatigue', 'confidence'],
+      'consumer-muse': ['focus', 'valence', 'confidence', 'fatigue'],
+      
+      // Professional devices - Advanced emotional metrics
+      'professional-hrv': ['heartRate', 'stress', 'arousal', 'fatigue', 'confidence', 'valence'],
+      'eeg-professional': ['focus', 'valence', 'confidence', 'fatigue', 'arousal'],
+      'stress': ['stress', 'arousal', 'valence', 'fatigue'], // Empatica E4
+      'multimodal': ['heartRate', 'stress', 'focus', 'arousal', 'valence', 'fatigue', 'confidence']
+    };
+    
+    return capabilityMap[deviceType] || ['heartRate', 'stress', 'focus'];
   }
 
   /**

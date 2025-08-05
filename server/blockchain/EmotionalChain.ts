@@ -129,26 +129,104 @@ export class EmotionalChain extends EventEmitter {
     });
   }
   private calculateEmotionalScore(biometricData: any): number {
-    // DEVICE-AGNOSTIC PoE: Prevents professional devices from dominating
+    // ENTERPRISE-GRADE 7-METRIC PoE SYSTEM
+    // Primary metrics (60% weight)
     const heartRate = biometricData?.heartRate || 70;
     const stressLevel = biometricData?.stressLevel || 0.3;
     const focusLevel = biometricData?.focusLevel || 0.8;
     const authenticity = biometricData?.authenticity || 0.9;
     
-    // Calculate raw emotional consensus score
-    const rawScore = (
-      (1 - stressLevel) * 0.3 + 
-      focusLevel * 0.3 + 
-      authenticity * 0.4
-    ) * 100;
+    // NEW: Secondary metrics (40% weight) - Enterprise-grade emotional analysis
+    const valence = this.calculateEmotionalValence(biometricData);
+    const arousal = this.calculateArousalLevel(biometricData);
+    const fatigue = this.calculateFatigueIndex(biometricData);
+    const confidence = this.calculateConfidenceScore(biometricData);
     
-    // CRITICAL: Device normalization to ensure fairness
-    // Professional devices (>95% accuracy) get capped at 95% max score
-    // Consumer devices (70-95% accuracy) get full range
+    // Primary emotional score (traditional 3-metric system)
+    const primaryScore = (
+      (1 - stressLevel) * 0.2 + 
+      focusLevel * 0.2 + 
+      authenticity * 0.2
+    );
+    
+    // Secondary emotional intelligence score (new 4-metric system)
+    const secondaryScore = (
+      valence * 0.1 +        // Emotional positivity
+      arousal * 0.1 +        // Energy/activation state  
+      (1 - fatigue) * 0.1 +  // Anti-fatigue (inverted)
+      confidence * 0.1       // Decision certainty
+    );
+    
+    const rawScore = (primaryScore + secondaryScore) * 100;
+    
+    // Device normalization for fairness
     const deviceType = this.detectDeviceType(biometricData);
     const normalizedScore = this.normalizeByDeviceType(rawScore, deviceType);
     
     return Math.round(normalizedScore * 100) / 100;
+  }
+  
+  // NEW: Enterprise emotional valence calculation
+  private calculateEmotionalValence(biometricData: any): number {
+    // Positive/negative emotional state from HRV and GSR patterns
+    const hrv = biometricData?.heartRateVariability || 0.5;
+    const gsr = biometricData?.galvanicSkinResponse || 0.5;
+    const facialExpression = biometricData?.facialExpression || 0.5; // Future: computer vision
+    
+    // Consumer devices: Basic HRV analysis
+    // Professional devices: Advanced multi-modal analysis
+    const deviceType = this.detectDeviceType(biometricData);
+    
+    if (deviceType === 'medical' || deviceType === 'professional') {
+      // Advanced valence: Multi-modal emotional state
+      return (hrv * 0.4 + (1 - gsr) * 0.4 + facialExpression * 0.2);
+    } else {
+      // Consumer valence: HRV-based estimation
+      return Math.max(0.3, Math.min(0.9, hrv + (Math.random() - 0.5) * 0.1));
+    }
+  }
+  
+  // NEW: Arousal level calculation
+  private calculateArousalLevel(biometricData: any): number {
+    // Energy/activation state distinguishes calm-focused from excited-focused
+    const heartRate = biometricData?.heartRate || 70;
+    const gsr = biometricData?.galvanicSkinResponse || 0.5;
+    const movement = biometricData?.accelerometer?.magnitude || 0.2;
+    
+    // Normalize heart rate to arousal scale
+    const hrArousal = Math.max(0, Math.min(1, (heartRate - 60) / 40));
+    
+    // Combine physiological indicators
+    return (hrArousal * 0.5 + gsr * 0.3 + movement * 0.2);
+  }
+  
+  // NEW: Fatigue index calculation  
+  private calculateFatigueIndex(biometricData: any): number {
+    // Mental/physical exhaustion prevents validator burnout
+    const hrv = biometricData?.heartRateVariability || 0.5;
+    const blinkRate = biometricData?.blinkRate || 0.3; // Eye tracking
+    const reactionTime = biometricData?.reactionTime || 0.5; // Cognitive speed
+    const sessionDuration = biometricData?.sessionDuration || 0; // Hours active
+    
+    // Calculate base fatigue from physiological indicators
+    const physicalFatigue = (1 - hrv) * 0.4 + blinkRate * 0.3;
+    const cognitiveFatigue = reactionTime * 0.3;
+    
+    // Session duration penalty (increases fatigue over time)
+    const durationPenalty = Math.min(0.3, sessionDuration / 8); // Max 30% penalty after 8 hours
+    
+    return Math.min(0.95, physicalFatigue + cognitiveFatigue + durationPenalty);
+  }
+  
+  // NEW: Confidence score calculation
+  private calculateConfidenceScore(biometricData: any): number {
+    // Decision-making certainty affects voting weight in consensus
+    const heartRateStability = 1 - (biometricData?.heartRateVariability || 0.3);
+    const responseConsistency = biometricData?.responseConsistency || 0.7;
+    const emotionalStability = 1 - Math.abs((biometricData?.stressLevel || 0.3) - 0.2);
+    
+    // Confidence increases with physiological stability
+    return (heartRateStability * 0.4 + responseConsistency * 0.4 + emotionalStability * 0.2);
   }
   
   private detectDeviceType(biometricData: any): 'consumer' | 'professional' | 'medical' {

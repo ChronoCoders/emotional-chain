@@ -14,6 +14,7 @@ import VisualBlocks from '@/components/terminal/visual-blocks';
 import MobileResponsiveTerminal from '@/components/layout/MobileResponsiveTerminal';
 import EmotionalTrendChart from '@/components/charts/EmotionalTrendChart';
 import { useResponsive } from '@/components/layout/MobileResponsiveTerminal';
+import EmotionalMetricsDashboard from '@/components/terminal/emotional-metrics-dashboard';
 import type { NetworkStats } from '@shared/schema';
 
 export default function Terminal() {
@@ -140,6 +141,14 @@ export default function Terminal() {
         defaultCollapsed: deviceInfo.isMobile
       },
       {
+        id: 'emotional-metrics',
+        title: '7-Metric Emotional Intelligence',
+        icon: <Brain className="w-4 h-4" />,
+        content: <EmotionalMetricsDashboard />,
+        collapsible: true,
+        defaultCollapsed: false  // Show emotional intelligence by default
+      },
+      {
         id: 'emotional-trends',
         title: 'Emotional Trends',
         icon: <TrendingUp className="w-4 h-4" />,
@@ -152,7 +161,7 @@ export default function Terminal() {
           />
         ),
         collapsible: true,
-        defaultCollapsed: false  // Show emotional trends by default
+        defaultCollapsed: true  // Collapse trends in favor of metrics
       },
       {
         id: 'blockchain-explorer',
@@ -263,6 +272,11 @@ export default function Terminal() {
 
         {/* Visual Block Explorer - Full Width */}
         <VisualBlocks />
+
+        {/* Enterprise 7-Metric Emotional Intelligence Dashboard */}
+        <div className="mb-6">
+          <EmotionalMetricsDashboard />
+        </div>
 
         {/* Emotional Trends Chart - Full Width */}
         <div className="terminal-window rounded-lg p-6 mb-6">
