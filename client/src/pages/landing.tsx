@@ -376,7 +376,7 @@ export default function LandingPage() {
           </h2>
           <p className="text-terminal-green/80 mb-8 max-w-2xl mx-auto">
             Become a validator in the world's first emotion-driven blockchain. 
-            Connect your wearable device and start earning EMO tokens.
+            Connect your wearable device and start earning EMO coins.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

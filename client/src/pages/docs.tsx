@@ -15,7 +15,7 @@ export default function DocsPage() {
     { id: 'api-reference', title: 'API Reference', icon: Code },
     { id: 'network', title: 'Network', icon: Network },
     { id: 'privacy', title: 'Privacy & ZK Proofs', icon: Lock },
-    { id: 'tokenomics', title: 'Tokenomics', icon: Database }
+    { id: 'tokenomics', title: 'Coin & Token Economics', icon: Database }
   ];
 
   useEffect(() => {
@@ -159,8 +159,9 @@ export default function DocsPage() {
                 <div>
                   <h3 className="text-xl font-bold text-terminal-green mb-3">3. Start Earning EMO</h3>
                   <p className="text-terminal-green/80">
-                    Maintain emotional fitness to validate blocks and earn EMO tokens through our 
-                    innovative consensus mechanism that rewards emotional wellness.
+                    Maintain emotional fitness to validate blocks and earn EMO coins through our 
+                    innovative consensus mechanism that rewards emotional wellness. Cross-chain 
+                    compatibility available through ERC20 EMO tokens.
                   </p>
                 </div>
               </div>
@@ -479,7 +480,7 @@ export default function DocsPage() {
             <section id="tokenomics" className="terminal-window p-8">
               <h2 className="text-2xl font-bold text-terminal-cyan mb-6 flex items-center">
                 <Database className="w-6 h-6 mr-3" />
-                EMO Tokenomics
+                EMO Coin & Token Economics
               </h2>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -500,18 +501,43 @@ export default function DocsPage() {
                 <div>
                   <h3 className="text-xl font-bold text-terminal-green mb-3">Reward Structure</h3>
                   <ul className="space-y-2 text-terminal-green/80">
-                    <li>&gt; Mining rewards: 50-55 EMO per block (varies by emotional score)</li>
-                    <li>&gt; Validation rewards: 3-4 EMO per validation</li>
+                    <li>&gt; Mining rewards: 50-55 EMO coins per block (varies by emotional score)</li>
+                    <li>&gt; Validation rewards: 3-4 EMO coins per validation</li>
                     <li>&gt; Emotional bonus: Up to 10% for exceptional fitness</li>
                     <li>&gt; Stake rewards: Annual yield based on network participation</li>
                   </ul>
                 </div>
 
+                <div>
+                  <h3 className="text-xl font-bold text-terminal-green mb-3">Dual Asset System</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="border border-terminal-border p-4 rounded">
+                      <h4 className="text-terminal-cyan font-bold mb-2">EMO Coin (Native)</h4>
+                      <ul className="space-y-1 text-terminal-green/80 text-sm">
+                        <li>&gt; Native EmotionalChain currency</li>
+                        <li>&gt; Used for staking and validation</li>
+                        <li>&gt; Gas fees and network operations</li>
+                        <li>&gt; Proof of Emotion consensus rewards</li>
+                      </ul>
+                    </div>
+                    <div className="border border-terminal-border p-4 rounded">
+                      <h4 className="text-terminal-cyan font-bold mb-2">EMO Token (ERC20)</h4>
+                      <ul className="space-y-1 text-terminal-green/80 text-sm">
+                        <li>&gt; Cross-chain compatible version</li>
+                        <li>&gt; Trading on DEX/CEX platforms</li>
+                        <li>&gt; DeFi protocol integration</li>
+                        <li>&gt; Bridge for multi-chain use</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="bg-terminal-surface/50 p-4 rounded border border-terminal-border">
                   <h4 className="text-terminal-cyan font-bold mb-2">Immutable Supply</h4>
                   <p className="text-terminal-green/80">
-                    All EMO balances are calculated from immutable blockchain state, ensuring 
-                    Bitcoin/Ethereum-level integrity and preventing unauthorized minting.
+                    All EMO coin balances are calculated from immutable blockchain state, ensuring 
+                    Bitcoin/Ethereum-level integrity. EMO tokens maintain 1:1 parity with native coins 
+                    through secure bridge mechanisms, preventing unauthorized minting.
                   </p>
                 </div>
               </div>
