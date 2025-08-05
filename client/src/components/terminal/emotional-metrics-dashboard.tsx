@@ -81,14 +81,14 @@ export default function EmotionalMetricsDashboard() {
   };
 
   const renderMetricBar = (label: string, value: number, inverted = false) => (
-    <div key={label} className="mb-3">
-      <div className="flex justify-between text-sm mb-1">
+    <div key={label} className="mb-1">
+      <div className="flex justify-between text-xs mb-1">
         <span className="text-terminal-cyan">{label}</span>
         <span className={getPrimaryColor(value, inverted)}>{value.toFixed(1)}%</span>
       </div>
-      <div className="w-full bg-terminal-surface rounded-full h-2 border border-terminal-border">
+      <div className="w-full bg-black rounded-full h-1.5 border border-terminal-border">
         <div 
-          className={`h-2 rounded-full transition-all duration-300 ${getBarColor(value, inverted)}`}
+          className={`h-1.5 rounded-full transition-all duration-300 ${getBarColor(value, inverted)}`}
           style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
         ></div>
       </div>
@@ -96,74 +96,78 @@ export default function EmotionalMetricsDashboard() {
   );
 
   return (
-    <div className="terminal-window rounded-lg p-6">
-      <h2 className="text-terminal-cyan text-lg font-bold font-mono mb-4">
-        +==== 7-METRIC EMOTIONAL INTELLIGENCE ====+
+    <div className="terminal-window rounded-lg p-4">
+      <h2 className="text-terminal-cyan text-lg font-bold font-mono mb-3">
+        +== 7-METRIC EMOTIONAL INTELLIGENCE ==+
       </h2>
       
-      {/* Network Overview */}
-      <div className="mb-6 bg-terminal-surface p-4 rounded border border-terminal-border">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-terminal-orange font-semibold">Network Emotional Health:</span>
+      {/* Compact Header with Network Health */}
+      <div className="flex justify-between items-center mb-4 bg-terminal-surface p-3 rounded border border-terminal-border">
+        <div>
+          <span className="text-terminal-orange font-semibold">Network Health: </span>
           <span className="text-terminal-success font-bold">{metrics.networkHealth}</span>
         </div>
-        <div className="flex justify-between text-sm">
-          <span className="text-terminal-green">Average PoE Score:</span>
-          <span className="text-terminal-cyan">{metrics.avgScore.toFixed(1)}%</span>
+        <div>
+          <span className="text-terminal-green">Avg PoE: </span>
+          <span className="text-terminal-cyan font-bold">{metrics.avgScore.toFixed(1)}%</span>
         </div>
       </div>
 
-      {/* Primary Metrics (Traditional PoE) */}
-      <div className="mb-6">
-        <h3 className="text-terminal-orange mb-3 font-semibold">🔹 Primary Emotional Metrics (60% Weight):</h3>
-        <div className="space-y-1">
-          {renderMetricBar('Stress Level (Inverted)', 100 - metrics.primaryMetrics.stress, false)}
-          {renderMetricBar('Focus Level', metrics.primaryMetrics.focus)}
-          {renderMetricBar('Authenticity Score', metrics.primaryMetrics.authenticity)}
-        </div>
-      </div>
-
-      {/* Secondary Metrics (Enterprise Enhancement) */}
-      <div className="mb-6">
-        <h3 className="text-terminal-orange mb-3 font-semibold">🔸 Secondary Intelligence Metrics (40% Weight):</h3>
-        <div className="space-y-1">
-          {renderMetricBar('Emotional Valence', metrics.secondaryMetrics.valence)}
-          {renderMetricBar('Arousal/Energy Level', metrics.secondaryMetrics.arousal)}
-          {renderMetricBar('Fatigue Index', metrics.secondaryMetrics.fatigue, true)}
-          {renderMetricBar('Confidence Score', metrics.secondaryMetrics.confidence)}
-        </div>
-      </div>
-
-      {/* Device Mix Analysis */}
-      <div className="mb-6">
-        <h3 className="text-terminal-orange mb-3 font-semibold">📱 Device Ecosystem (21 Validators):</h3>
-        <div className="grid grid-cols-3 gap-4 text-center">
-          <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
-            <div className="text-terminal-cyan text-2xl font-bold">{metrics.deviceMix.consumer}</div>
-            <div className="text-terminal-green text-xs">Consumer</div>
-            <div className="text-terminal-muted text-xs">Apple, Galaxy, Fitbit</div>
+      {/* Compact Grid Layout: Primary + Secondary Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+        {/* Primary Metrics Column */}
+        <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
+          <h3 className="text-terminal-orange mb-2 text-sm font-semibold">🔹 Primary (60%):</h3>
+          <div className="space-y-2">
+            {renderMetricBar('Stress', 100 - metrics.primaryMetrics.stress, false)}
+            {renderMetricBar('Focus', metrics.primaryMetrics.focus)}
+            {renderMetricBar('Authenticity', metrics.primaryMetrics.authenticity)}
           </div>
-          <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
-            <div className="text-terminal-warning text-2xl font-bold">{metrics.deviceMix.professional}</div>
-            <div className="text-terminal-green text-xs">Professional</div>
-            <div className="text-terminal-muted text-xs">Polar, Empatica</div>
-          </div>
-          <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
-            <div className="text-terminal-error text-2xl font-bold">{metrics.deviceMix.medical}</div>
-            <div className="text-terminal-green text-xs">Medical</div>
-            <div className="text-terminal-muted text-xs">Clinical Grade</div>
+        </div>
+
+        {/* Secondary Metrics Column */}
+        <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
+          <h3 className="text-terminal-orange mb-2 text-sm font-semibold">🔸 Secondary (40%):</h3>
+          <div className="space-y-2">
+            {renderMetricBar('Valence', metrics.secondaryMetrics.valence)}
+            {renderMetricBar('Arousal', metrics.secondaryMetrics.arousal)}
+            {renderMetricBar('Fatigue', metrics.secondaryMetrics.fatigue, true)}
+            {renderMetricBar('Confidence', metrics.secondaryMetrics.confidence)}
           </div>
         </div>
       </div>
 
-      {/* Metric Descriptions */}
-      <div className="bg-terminal-surface p-4 rounded border border-terminal-border">
-        <h4 className="text-terminal-cyan mb-2 font-semibold">Metric Definitions:</h4>
-        <div className="text-xs space-y-1 text-terminal-muted">
-          <div><span className="text-terminal-orange">Valence:</span> Positive/negative emotional state (happiness vs sadness)</div>
-          <div><span className="text-terminal-orange">Arousal:</span> Energy/activation state (calm-focused vs excited-focused)</div>
-          <div><span className="text-terminal-orange">Fatigue:</span> Mental/physical exhaustion (prevents validator burnout)</div>
-          <div><span className="text-terminal-orange">Confidence:</span> Decision-making certainty (affects voting weight)</div>
+      {/* Compact Device Mix - Single Row */}
+      <div className="bg-terminal-surface p-3 rounded border border-terminal-border">
+        <div className="flex justify-between items-center">
+          <h3 className="text-terminal-orange text-sm font-semibold">📱 Device Mix:</h3>
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center space-x-1">
+              <span className="text-terminal-cyan font-bold">{metrics.deviceMix.consumer}</span>
+              <span className="text-terminal-green">Consumer</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-terminal-warning font-bold">{metrics.deviceMix.professional}</span>
+              <span className="text-terminal-green">Pro</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="text-terminal-error font-bold">{metrics.deviceMix.medical}</span>
+              <span className="text-terminal-green">Medical</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Visual Device Distribution */}
+        <div className="mt-2 flex items-center space-x-1">
+          {Array.from({ length: metrics.deviceMix.consumer }, (_, i) => (
+            <div key={`c-${i}`} className="w-2 h-2 bg-terminal-cyan rounded-full"></div>
+          ))}
+          {Array.from({ length: metrics.deviceMix.professional }, (_, i) => (
+            <div key={`p-${i}`} className="w-2 h-2 bg-terminal-warning rounded-full"></div>
+          ))}
+          {Array.from({ length: metrics.deviceMix.medical }, (_, i) => (
+            <div key={`m-${i}`} className="w-2 h-2 bg-terminal-error rounded-full"></div>
+          ))}
         </div>
       </div>
     </div>
