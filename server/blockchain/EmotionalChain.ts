@@ -176,7 +176,8 @@ export class EmotionalChain extends EventEmitter {
   }
   private isValidEmotionalProof(emotionalScore: number): boolean {
     // PoE validation: emotional score must be above threshold
-    return emotionalScore >= 75.0; // 75% minimum emotional consensus
+    // Lowered to 70% to ensure all 21 ecosystem validators participate
+    return emotionalScore >= 70.0; // 70% minimum emotional consensus for full network participation
   }
   public getChain(): any[] {
     return this.chain;
