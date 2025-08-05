@@ -116,7 +116,7 @@ export default function WhitepaperPage() {
               <div className="text-terminal-green/60 space-y-2">
                 <p>Version 1.0 - August 2025</p>
                 <p>Authors: EmotionalChain Research Team</p>
-                <p>contact@emotionalchain.org</p>
+                <p>contact@emotionalchain.com</p>
               </div>
             </section>
 
