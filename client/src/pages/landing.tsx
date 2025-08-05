@@ -173,15 +173,21 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link href="#get-started">
-              <button className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors">
+              <button 
+                className="bg-cyan-500 text-gray-900 hover:bg-green-500 border-2 border-cyan-500 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                style={{ color: '#0a0a0a', backgroundColor: '#00ffff', borderColor: '#00ffff' }}
+              >
                 <Zap className="w-5 h-5 mr-2" />
-                Start Validating
+                <span style={{ color: '#0a0a0a', fontWeight: 'bold' }}>Start Validating</span>
               </button>
             </Link>
             <Link href="/explorer">
-              <button className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent">
+              <button 
+                className="border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-gray-900 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
+                style={{ borderColor: '#00ff00', color: '#00ff00' }}
+              >
                 <Globe className="w-5 h-5 mr-2" />
-                Explore Network
+                <span style={{ color: '#00ff00', fontWeight: 'bold' }}>Explore Network</span>
               </button>
             </Link>
           </div>
@@ -357,15 +363,21 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/admin">
-              <button className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green border-2 border-terminal-cyan font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors">
+              <button 
+                className="bg-cyan-500 text-gray-900 hover:bg-green-500 border-2 border-cyan-500 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                style={{ color: '#0a0a0a', backgroundColor: '#00ffff', borderColor: '#00ffff' }}
+              >
                 <Heart className="w-5 h-5 mr-2" />
-                Setup Validator
+                <span style={{ color: '#0a0a0a', fontWeight: 'bold' }}>Setup Validator</span>
               </button>
             </Link>
             <Link href="/explorer">
-              <button className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent">
+              <button 
+                className="border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-gray-900 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
+                style={{ borderColor: '#00ff00', color: '#00ff00' }}
+              >
                 <ExternalLink className="w-5 h-5 mr-2" />
-                View Documentation
+                <span style={{ color: '#00ff00', fontWeight: 'bold' }}>View Documentation</span>
               </button>
             </Link>
           </div>
