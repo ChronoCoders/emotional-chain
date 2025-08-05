@@ -426,7 +426,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <Brain className="w-5 h-5 text-terminal-cyan" />
+              <EmotionalChainLogo size={20} className="text-terminal-cyan" />
               <span className="text-terminal-green">EmotionalChain Network</span>
             </div>
             <div className="text-terminal-green/60 text-sm">
