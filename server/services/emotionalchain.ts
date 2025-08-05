@@ -87,13 +87,7 @@ export class EmotionalChainService {
         return sum + Math.min(authScore + 5, 100); // Focus correlates with auth score
       }, 0) / (validators?.length || 21);
       
-      console.log('REAL CONSENSUS CALCULATION:', {
-        activeValidators: activeValidatorCount,
-        consensusPercentage,
-        avgStress: avgStress.toFixed(2),
-        avgEnergy: avgEnergy.toFixed(2),
-        avgFocus: avgFocus.toFixed(2)
-      });
+      // Real consensus metrics calculated from authentic validator data
       
       // Calculate real TPS from transaction volume
       let volumeData = { transactions24h: 4624, volume24h: 145311.56 };
