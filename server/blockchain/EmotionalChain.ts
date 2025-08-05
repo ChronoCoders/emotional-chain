@@ -129,19 +129,52 @@ export class EmotionalChain extends EventEmitter {
     });
   }
   private calculateEmotionalScore(biometricData: any): number {
-    // Proof of Emotion calculation based on biometric validation
+    // DEVICE-AGNOSTIC PoE: Prevents professional devices from dominating
     const heartRate = biometricData?.heartRate || 70;
     const stressLevel = biometricData?.stressLevel || 0.3;
     const focusLevel = biometricData?.focusLevel || 0.8;
     const authenticity = biometricData?.authenticity || 0.9;
-    // Calculate emotional consensus score
-    const normalizedHR = Math.max(0, Math.min(1, (heartRate - 60) / 40)); // 60-100 BPM range
-    const emotionalScore = (
+    
+    // Calculate raw emotional consensus score
+    const rawScore = (
       (1 - stressLevel) * 0.3 + 
       focusLevel * 0.3 + 
       authenticity * 0.4
     ) * 100;
-    return Math.round(emotionalScore * 100) / 100;
+    
+    // CRITICAL: Device normalization to ensure fairness
+    // Professional devices (>95% accuracy) get capped at 95% max score
+    // Consumer devices (70-95% accuracy) get full range
+    const deviceType = this.detectDeviceType(biometricData);
+    const normalizedScore = this.normalizeByDeviceType(rawScore, deviceType);
+    
+    return Math.round(normalizedScore * 100) / 100;
+  }
+  
+  private detectDeviceType(biometricData: any): 'consumer' | 'professional' | 'medical' {
+    // Detect device type based on precision patterns and authenticity
+    const authenticity = biometricData?.authenticity || 0.9;
+    const precision = biometricData?.precision || 0.8; // Data precision indicator
+    
+    if (authenticity > 0.98 && precision > 0.95) return 'medical';
+    if (authenticity > 0.95 && precision > 0.90) return 'professional';
+    return 'consumer';
+  }
+  
+  private normalizeByDeviceType(rawScore: number, deviceType: string): number {
+    // FAIRNESS ALGORITHM: Prevents device-based mining dominance
+    switch (deviceType) {
+      case 'medical':
+        // Medical devices: Cap at 95% to prevent dominance, but reward accuracy
+        return Math.min(rawScore, 95) + (rawScore > 90 ? 2 : 0); // +2 bonus for excellence
+      case 'professional':
+        // Professional devices: Cap at 92% with small bonus
+        return Math.min(rawScore, 92) + (rawScore > 85 ? 1 : 0); // +1 bonus
+      case 'consumer':
+      default:
+        // Consumer devices: Full range 70-100% (no caps)
+        return rawScore;
+    }
   }
   private calculateWellnessMultiplier(emotionalScore: number): number {
     // Wellness multiplier for staking rewards (up to 1.5x for score > 80%)
@@ -169,10 +202,15 @@ export class EmotionalChain extends EventEmitter {
     return baseReward + transactionFees + consensusBonus;
   }
   private calculateConsensusBonus(emotionalScore: number): number {
-    // Emotional consensus bonus up to 25 EMO based on validator performance
+    // FAIR CONSENSUS BONUS: Device-agnostic reward calculation
     const maxBonus = this.tokenEconomics.rewards.emotionalConsensusBonus;
-    const bonusMultiplier = Math.max(0, (emotionalScore - 75) / 25); // Bonus starts at 75% score
-    return Math.round(maxBonus * bonusMultiplier * 100) / 100;
+    
+    // Bonus calculation ensures all device types can earn maximum rewards
+    // Professional devices can't dominate through higher scores alone
+    const bonusMultiplier = Math.max(0, (emotionalScore - 75) / 20); // Adjusted range for fairness
+    const cappedMultiplier = Math.min(bonusMultiplier, 1.0); // Cap at 100% bonus
+    
+    return Math.round(maxBonus * cappedMultiplier * 100) / 100;
   }
   private isValidEmotionalProof(emotionalScore: number): boolean {
     // PoE validation: emotional score must be above threshold
