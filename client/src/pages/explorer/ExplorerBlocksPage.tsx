@@ -25,8 +25,8 @@ export default function ExplorerBlocksPage() {
     return (
       <div className="space-y-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-slate-700 rounded w-1/3 mb-4"></div>
-          <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+          <div className="h-8 bg-terminal-surface rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-terminal-surface rounded w-1/2"></div>
         </div>
         <div className="space-y-4">
           {[...Array(10)].map((_, i) => (
@@ -49,8 +49,8 @@ export default function ExplorerBlocksPage() {
     return (
       <div className="space-y-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-slate-700 rounded w-1/3 mb-4"></div>
-          <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+          <div className="h-8 bg-terminal-surface rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-terminal-surface rounded w-1/2"></div>
         </div>
       </div>
     );

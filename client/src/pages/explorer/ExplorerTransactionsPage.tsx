@@ -30,14 +30,14 @@ export default function ExplorerTransactionsPage() {
     return (
       <div className="space-y-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-slate-700 rounded w-1/3 mb-4"></div>
-          <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+          <div className="h-8 bg-terminal-surface rounded w-1/3 mb-4"></div>
+          <div className="h-4 bg-terminal-surface rounded w-1/2"></div>
         </div>
         <div className="space-y-4">
           {[...Array(10)].map((_, i) => (
             <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-pulse">
-              <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+              <div className="h-4 bg-terminal-surface rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-terminal-surface rounded w-1/2"></div>
             </div>
           ))}
         </div>
@@ -238,7 +238,7 @@ export default function ExplorerTransactionsPage() {
                   <p className="text-terminal-green/70 text-sm terminal-text">
                     {formatEmoToUSD(tx.amount)}
                   </p>
-                  <p className="text-slate-500 text-xs mt-1">
+                  <p className="text-terminal-green/50 text-xs mt-1">
                     {formatTimeAgo(tx.timestamp)}
                   </p>
                 </div>
