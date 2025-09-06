@@ -12,11 +12,22 @@ import AIConsensusPage from "@/pages/AIConsensusPage";
 import AILearningPage from "@/pages/AILearningPage";
 import MonitoringDashboard from "@/pages/MonitoringDashboard";
 import PrivacyDashboard from "@/pages/PrivacyDashboard";
+import RoleBasedAccess from "@/components/auth/RoleBasedAccess";
+import UserDashboard from "@/pages/UserDashboard";
+import ValidatorDashboard from "@/pages/ValidatorDashboard";
+import AdminPanel from "@/pages/AdminPanel";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/admin" component={TerminalInterface} />
+      {/* Role-based access routes */}
+      <Route path="/access" component={RoleBasedAccess} />
+      <Route path="/dashboard" component={UserDashboard} />
+      <Route path="/validator" component={ValidatorDashboard} />
+      <Route path="/admin" component={AdminPanel} />
+      {/* Legacy terminal route for direct admin access */}
+      <Route path="/terminal" component={TerminalInterface} />
+      {/* Application routes */}
       <Route path="/docs" component={DocsPage} />
       <Route path="/whitepaper" component={WhitepaperPage} />
       <Route path="/explorer" component={ExplorerApp} />
