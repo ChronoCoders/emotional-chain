@@ -15,30 +15,47 @@ export default function LandingPage() {
   const { lastMessage } = useWebSocket();
 
   const { data: networkStatus } = useQuery<{ stats: NetworkStats }>({
-    queryKey: ['/api/network/status']
+    queryKey: ['/api/network/status'],
+    refetchInterval: 3000  // Refetch every 3 seconds
   });
 
   const { data: tokenEconomics } = useQuery({
-    queryKey: ['/api/token/economics']
+    queryKey: ['/api/token/economics'],
+    refetchInterval: 5000  // Refetch every 5 seconds
   });
 
   const { data: wallets } = useQuery({
-    queryKey: ['/api/wallets']
+    queryKey: ['/api/wallets'],
+    refetchInterval: 5000  // Refetch every 5 seconds
   });
 
   // Update with real-time data from WebSocket
   useEffect(() => {
-    if (lastMessage?.type === 'update' && lastMessage.data?.networkStatus?.stats) {
-      setRealtimeStats(lastMessage.data.networkStatus.stats);
+    if (lastMessage?.type === 'update') {
+      // Update network stats
+      if (lastMessage.data?.networkStatus?.stats) {
+        setRealtimeStats(lastMessage.data.networkStatus.stats);
+      }
+      // Force refetch of token economics and wallets when we get updates
+      if (lastMessage.data?.tokenEconomics || lastMessage.data?.validators) {
+        // Trigger a refetch by updating query keys
+        window.dispatchEvent(new CustomEvent('blockchain-update'));
+      }
     }
   }, [lastMessage]);
 
   const stats = realtimeStats || networkStatus?.stats;
   
-  // Calculate live statistics from blockchain data
-  const circulatingSupply = (tokenEconomics as any)?.circulatingSupply || (stats as any)?.circulatingSupply || 0;
+  // Calculate live statistics from blockchain data with WebSocket updates
+  const circulatingSupply = lastMessage?.data?.tokenEconomics?.circulatingSupply || 
+                           (tokenEconomics as any)?.circulatingSupply || 
+                           (stats as any)?.circulatingSupply || 0;
+  
   const blockHeight = stats?.blockHeight || 0;
-  const activeValidators = (wallets as any)?.filter((wallet: any) => wallet.balance > 0).length || 21;
+  
+  const activeValidators = lastMessage?.data?.validators?.filter((validator: any) => validator.balance > 0).length ||
+                          (wallets as any)?.filter((wallet: any) => wallet.balance > 0).length || 21;
+  
   const consensusHealth = (stats as any)?.consensusQuality || (stats as any)?.emotionalAverage || 100;
 
   // Typing animation effect
