@@ -60,9 +60,9 @@ export default function ExplorerWellnessPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Wellness Analytics</h1>
-        <p className="text-slate-400">
+      <div className="terminal-window p-6">
+        <h1 className="text-3xl font-bold text-terminal-green mb-2 terminal-text">&gt; Wellness Analytics</h1>
+        <p className="text-terminal-cyan terminal-text">
           Real-time biometric and emotional health insights from the EmotionalChain network
         </p>
       </div>

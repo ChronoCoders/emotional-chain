@@ -115,22 +115,22 @@ export default function ExplorerTransactionsPage() {
       <div className="terminal-window p-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-terminal-green w-4 h-4" />
             <input
               type="text"
               placeholder="Search by hash, address..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-900 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:border-green-400"
+              className="w-full pl-10 pr-4 py-2 bg-terminal-surface border-2 border-terminal-border text-terminal-green terminal-text placeholder-terminal-green/50 focus:outline-none focus:border-terminal-success"
             />
           </div>
           
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-terminal-green w-4 h-4" />
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="pl-10 pr-8 py-2 bg-slate-900 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-green-400 appearance-none"
+              className="pl-10 pr-8 py-2 bg-terminal-surface border-2 border-terminal-border text-terminal-green terminal-text focus:outline-none focus:border-terminal-success appearance-none"
             >
               <option value="all">All Types</option>
               <option value="transfer">Transfers</option>
@@ -144,19 +144,19 @@ export default function ExplorerTransactionsPage() {
       </div>
 
       {/* Transactions List */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-slate-700">
-          <h2 className="text-xl font-semibold text-white">
-            Recent Transactions ({filteredTransactions.length})
+      <div className="terminal-window overflow-hidden">
+        <div className="p-6 border-b-2 border-terminal-border">
+          <h2 className="text-xl font-semibold text-terminal-green terminal-text">
+            [📋] Recent Transactions ({filteredTransactions.length})
           </h2>
         </div>
 
-        <div className="divide-y divide-slate-700/50">
+        <div className="divide-y divide-terminal-border">
           {filteredTransactions.length === 0 ? (
             <div className="p-12 text-center">
-              <Clock className="w-12 h-12 text-slate-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">Building Transaction History</h3>
-              <p className="text-slate-400">
+              <Clock className="w-12 h-12 text-terminal-green mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-terminal-green mb-2 terminal-text">Building Transaction History</h3>
+              <p className="text-terminal-cyan terminal-text">
                 EmotionalChain is actively mining blocks and processing transactions. 
                 Authentic transaction data will appear here as the network grows.
               </p>
@@ -164,48 +164,48 @@ export default function ExplorerTransactionsPage() {
           ) : filteredTransactions.map((tx: any) => (
             <div
               key={tx.id || tx.hash}
-              className="p-6 hover:bg-slate-900/30 transition-colors"
+              className="p-6 hover:bg-terminal-surface transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   {/* Status Icon */}
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                     tx.status === 'confirmed' || tx.status === 'mined'
-                      ? 'bg-green-500/20 border border-green-500/30' 
-                      : 'bg-yellow-500/20 border border-yellow-500/30'
+                      ? 'bg-terminal-success/20 border border-terminal-success/30' 
+                      : 'bg-terminal-warning/20 border border-terminal-warning/30'
                   }`}>
                     {tx.status === 'confirmed' || tx.status === 'mined' ? (
-                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <CheckCircle className="w-5 h-5 text-terminal-success" />
                     ) : (
-                      <Clock className="w-5 h-5 text-yellow-400" />
+                      <Clock className="w-5 h-5 text-terminal-warning" />
                     )}
                   </div>
 
                   <div className="min-w-0 flex-1">
                     {/* Transaction Hash */}
                     <div className="flex items-center space-x-2 mb-1">
-                      <h3 className="text-white font-mono text-sm">
+                      <h3 className="text-terminal-green terminal-text font-mono text-sm">
                         {formatAddress(tx.hash, 12, 8)}
                       </h3>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        tx.type === 'transfer' ? 'bg-blue-500/20 text-blue-400' :
-                        tx.type === 'stake' ? 'bg-purple-500/20 text-purple-400' :
-                        tx.type === 'unstake' ? 'bg-orange-500/20 text-orange-400' :
-                        tx.type === 'reward' ? 'bg-green-500/20 text-green-400' :
-                        'bg-pink-500/20 text-pink-400'
+                      <span className={`text-xs px-2 py-1 terminal-text ${
+                        tx.type === 'transfer' ? 'text-terminal-cyan' :
+                        tx.type === 'stake' ? 'text-terminal-orange' :
+                        tx.type === 'unstake' ? 'text-terminal-warning' :
+                        tx.type === 'reward' ? 'text-terminal-success' :
+                        'text-terminal-gold'
                       }`}>
                         {tx.type}
                       </span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        tx.status === 'confirmed' ? 'bg-green-500/20 text-green-400' :
-                        'bg-yellow-500/20 text-yellow-400'
+                      <span className={`text-xs px-2 py-1 terminal-text ${
+                        tx.status === 'confirmed' ? 'text-terminal-success' :
+                        'text-terminal-warning'
                       }`}>
                         {tx.status}
                       </span>
                     </div>
 
                     {/* From/To */}
-                    <div className="flex items-center space-x-2 text-sm text-slate-400 mb-2">
+                    <div className="flex items-center space-x-2 text-sm text-terminal-green/70 mb-2 terminal-text">
                       <span className="font-mono">{formatAddress(tx.fromAddress || tx.from || 'EmotionalChain-Network')}</span>
                       <ArrowRight className="w-3 h-3" />
                       <span className="font-mono">{formatAddress(tx.toAddress || tx.to || tx.to_address || 'EmotionalChain-Validator')}</span>
@@ -215,14 +215,14 @@ export default function ExplorerTransactionsPage() {
                     {tx.emotionalData && (
                       <div className="flex items-center space-x-4 text-xs">
                         <div className="flex items-center space-x-1">
-                          <span className="text-slate-400">Authenticity:</span>
-                          <span className="text-green-400 font-medium">
+                          <span className="text-terminal-green/70 terminal-text">Authenticity:</span>
+                          <span className="text-terminal-success font-medium terminal-text">
                             {Math.round((tx.emotionalData.authenticity || 0) * 100)}%
                           </span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <span className="text-slate-400">Focus:</span>
-                          <span className="text-blue-400 font-medium">
+                          <span className="text-terminal-green/70 terminal-text">Focus:</span>
+                          <span className="text-terminal-cyan font-medium terminal-text">
                             {Math.round((tx.emotionalData.focusLevel || 0) * 100)}%
                           </span>
                         </div>
@@ -232,10 +232,10 @@ export default function ExplorerTransactionsPage() {
                 </div>
 
                 <div className="text-right">
-                  <p className="text-white font-semibold text-lg">
+                  <p className="text-terminal-gold font-semibold text-lg terminal-text">
                     {formatNumber(tx.amount)} EMO
                   </p>
-                  <p className="text-slate-400 text-sm">
+                  <p className="text-terminal-green/70 text-sm terminal-text">
                     {formatEmoToUSD(tx.amount)}
                   </p>
                   <p className="text-slate-500 text-xs mt-1">
