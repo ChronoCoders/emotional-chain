@@ -14,24 +14,24 @@ export default function ExplorerHeader() {
   ];
 
   return (
-    <header className="bg-slate-900/95 border-b border-slate-700 backdrop-blur-sm sticky top-0 z-50">
+    <header className="bg-terminal-surface border-b-2 border-terminal-border sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Back Link */}
           <div className="flex items-center space-x-4">
             <Link href="/">
-              <div className="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors">
+              <div className="flex items-center space-x-2 text-terminal-green hover:text-terminal-cyan transition-colors terminal-text">
                 <ArrowLeft className="w-4 h-4" />
-                <span className="text-sm">Back to Terminal</span>
+                <span className="text-sm">[&lt; Back to Terminal]</span>
               </div>
             </Link>
             
-            <div className="w-px h-6 bg-slate-600"></div>
+            <div className="w-px h-6 bg-terminal-border"></div>
             
             <Link href="/explorer">
               <div className="text-center">
-                <h1 className="text-xl font-bold text-white">EmotionalChain</h1>
-                <p className="text-xs text-slate-400">Explorer</p>
+                <h1 className="text-xl font-bold text-terminal-green terminal-text">&gt; EmotionalChain</h1>
+                <p className="text-xs text-terminal-green/70 terminal-text">Explorer</p>
               </div>
             </Link>
           </div>
@@ -45,10 +45,10 @@ export default function ExplorerHeader() {
               
               return (
                 <Link key={item.name} href={item.href}>
-                  <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  <div className={`flex items-center space-x-2 px-3 py-2 transition-colors terminal-text ${
                     isActive 
-                      ? "bg-green-500/20 text-green-400 border border-green-500/30" 
-                      : "text-slate-300 hover:text-white hover:bg-slate-800"
+                      ? "text-terminal-success border border-terminal-border bg-terminal-surface" 
+                      : "text-terminal-green hover:text-terminal-cyan"
                   }`}>
                     <Icon className="w-4 h-4" />
                     <span className="text-sm font-medium">{item.name}</span>
@@ -61,8 +61,8 @@ export default function ExplorerHeader() {
           {/* Network Status */}
           <div className="flex items-center space-x-3">
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-slate-300">Live</span>
+              <div className="status-online status-indicator"></div>
+              <span className="text-sm text-terminal-success terminal-text">[LIVE]</span>
             </div>
           </div>
         </div>
@@ -77,10 +77,10 @@ export default function ExplorerHeader() {
               
               return (
                 <Link key={item.name} href={item.href}>
-                  <div className={`flex items-center space-x-1 px-3 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                  <div className={`flex items-center space-x-1 px-3 py-2 whitespace-nowrap transition-colors terminal-text ${
                     isActive 
-                      ? "bg-green-500/20 text-green-400 border border-green-500/30" 
-                      : "text-slate-300 hover:text-white hover:bg-slate-800"
+                      ? "text-terminal-success border border-terminal-border bg-terminal-surface" 
+                      : "text-terminal-green hover:text-terminal-cyan"
                   }`}>
                     <Icon className="w-4 h-4" />
                     <span className="text-sm">{item.name}</span>
