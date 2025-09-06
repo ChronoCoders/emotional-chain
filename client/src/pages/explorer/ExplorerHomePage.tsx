@@ -93,9 +93,6 @@ export default function ExplorerHomePage() {
       {/* Hero Section */}
       <div className="text-center py-12 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700">
         <div className="flex items-center justify-center mb-4">
-          <div className="mr-4">
-            <EmotionalChainLogo size={48} className="text-green-400 animate-pulse" />
-          </div>
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">EmotionalChain Explorer</h1>
             <p className="text-slate-300 text-lg">World's First Emotion-Powered Blockchain</p>

@@ -29,14 +29,9 @@ export default function ExplorerHeader() {
             <div className="w-px h-6 bg-slate-600"></div>
             
             <Link href="/explorer">
-              <div className="flex items-center justify-center space-x-3">
-                <div className="flex-shrink-0">
-                  <EmotionalChainLogo size={32} className="text-green-400" />
-                </div>
-                <div className="text-center">
-                  <h1 className="text-xl font-bold text-white">EmotionalChain</h1>
-                  <p className="text-xs text-slate-400">Explorer</p>
-                </div>
+              <div className="text-center">
+                <h1 className="text-xl font-bold text-white">EmotionalChain</h1>
+                <p className="text-xs text-slate-400">Explorer</p>
               </div>
             </Link>
           </div>
