@@ -45,70 +45,70 @@ export default function ExplorerValidatorsPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Validators</h1>
-        <p className="text-slate-400">
+      <div className="terminal-window p-6">
+        <h1 className="text-3xl font-bold text-terminal-green mb-2 terminal-text">&gt; Validators</h1>
+        <p className="text-terminal-cyan terminal-text">
           EmotionalChain validators securing the network through Proof of Emotion consensus
         </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Total Validators</h3>
-            <Users className="w-5 h-5 text-blue-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">TOTAL VALIDATORS</h3>
+            <span className="text-terminal-cyan terminal-text">[👥]</span>
           </div>
-          <p className="text-2xl font-bold text-white">{(wallets || []).length}</p>
-          <p className="text-green-400 text-sm">{activeValidators.length} active</p>
+          <p className="text-2xl font-bold text-terminal-cyan terminal-text">{(wallets || []).length}</p>
+          <p className="text-terminal-success text-sm terminal-text">{activeValidators.length} active</p>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Total EMO Earned</h3>
-            <DollarSign className="w-5 h-5 text-green-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">TOTAL EMO EARNED</h3>
+            <span className="text-terminal-gold terminal-text">[$]</span>
           </div>
-          <p className="text-2xl font-bold text-white">{formatNumber(totalEmoEarned)} EMO</p>
-          <p className="text-slate-400 text-sm">${formatNumber(totalEmoEarned * 0.01)} USD</p>
+          <p className="text-2xl font-bold text-terminal-gold terminal-text">{formatNumber(totalEmoEarned)} EMO</p>
+          <p className="text-terminal-green/70 text-sm terminal-text">${formatNumber(totalEmoEarned * 0.01)} USD</p>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Avg Block Rewards</h3>
-            <TrendingUp className="w-5 h-5 text-green-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">AVG BLOCK REWARDS</h3>
+            <span className="text-terminal-orange terminal-text">[↗]</span>
           </div>
-          <p className="text-2xl font-bold text-white">{avgBlockReward} EMO</p>
-          <p className="text-green-400 text-sm">53-71 EMO range</p>
+          <p className="text-2xl font-bold text-terminal-orange terminal-text">{avgBlockReward} EMO</p>
+          <p className="text-terminal-green/70 text-sm terminal-text">53-71 EMO range</p>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Network Health</h3>
-            <Shield className="w-5 h-5 text-purple-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">NETWORK HEALTH</h3>
+            <span className="text-terminal-success terminal-text">[🛡]</span>
           </div>
-          <p className="text-2xl font-bold text-white">
+          <p className="text-2xl font-bold text-terminal-success terminal-text">
             {Math.round(networkStats?.stats?.consensusQuality || 92)}%
           </p>
-          <p className="text-purple-400 text-sm">Excellent</p>
+          <p className="text-terminal-success text-sm terminal-text">Excellent</p>
         </div>
       </div>
 
       {/* Validators Table */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-slate-700">
-          <h2 className="text-xl font-semibold text-white">All Validators</h2>
+      <div className="terminal-window overflow-hidden">
+        <div className="p-6 border-b-2 border-terminal-border">
+          <h2 className="text-xl font-semibold text-terminal-green terminal-text">[📋] All Validators</h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-900/50">
+            <thead className="bg-terminal-surface">
               <tr>
-                <th className="text-left p-4 text-slate-300 font-medium">Validator</th>
-                <th className="text-left p-4 text-slate-300 font-medium">EMO Earned</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Emotional Score</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Performance</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Block Rewards</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Status</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Validator</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">EMO Earned</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Emotional Score</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Performance</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Block Rewards</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -122,16 +122,16 @@ export default function ExplorerValidatorsPage() {
                   return (
                     <tr
                       key={validator.validatorId}
-                      className="border-b border-slate-700/50 hover:bg-slate-900/30 transition-colors"
+                      className="border-b border-terminal-border hover:bg-terminal-surface transition-colors"
                     >
                       <td className="p-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-green-600 rounded-lg flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 bg-terminal-border flex items-center justify-center text-terminal-green font-bold terminal-text">
                             #{index + 1}
                           </div>
                           <div>
-                            <p className="text-white font-medium">{validator.validatorId}</p>
-                            <p className="text-slate-400 text-sm font-mono">
+                            <p className="text-terminal-green font-medium terminal-text">{validator.validatorId}</p>
+                            <p className="text-terminal-green/70 text-sm terminal-text">
                               {formatAddress(validator.address || `0x${validator.validatorId.toLowerCase()}`)}
                             </p>
                           </div>
@@ -139,10 +139,10 @@ export default function ExplorerValidatorsPage() {
                       </td>
                       <td className="p-4">
                         <div>
-                          <p className="text-white font-semibold">
+                          <p className="text-terminal-gold font-semibold terminal-text">
                             {formatNumber(validator.balance)} EMO
                           </p>
-                          <p className="text-slate-400 text-sm">
+                          <p className="text-terminal-green/70 text-sm terminal-text">
                             ${formatNumber(validator.balance * 0.01)}
                           </p>
                         </div>
