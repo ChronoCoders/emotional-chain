@@ -73,46 +73,46 @@ export default function ExplorerTransactionsPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Transactions</h1>
-        <p className="text-slate-400">
+      <div className="terminal-window p-6">
+        <h1 className="text-3xl font-bold text-terminal-green mb-2 terminal-text">&gt; Transactions</h1>
+        <p className="text-terminal-cyan terminal-text">
           {statsData ? `${formatNumber(statsData.totalTransactions)} authentic transactions on the EmotionalChain network - showing most recent ${transactions?.length || 0}` : 'Loading transaction count...'}
         </p>
       </div>
 
       {/* Transaction Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-slate-300 text-sm font-medium mb-2">Total Transactions</h3>
-          <p className="text-2xl font-bold text-white">{statsData ? formatNumber(statsData.totalTransactions) : 'Loading...'}</p>
-          <p className="text-green-400 text-sm">Database verified count</p>
+        <div className="terminal-window p-6">
+          <h3 className="text-terminal-green text-sm font-medium mb-2 terminal-text">TOTAL TRANSACTIONS</h3>
+          <p className="text-2xl font-bold text-terminal-cyan terminal-text">{statsData ? formatNumber(statsData.totalTransactions) : 'Loading...'}</p>
+          <p className="text-terminal-success text-sm terminal-text">Database verified count</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-slate-300 text-sm font-medium mb-2">Total Volume</h3>
-          <p className="text-2xl font-bold text-white">{statsData ? `${formatNumber(Math.round(statsData.totalVolume))} EMO` : 'Loading...'}</p>
-          <p className="text-slate-400 text-sm">{statsData ? `$${formatNumber(Math.round(statsData.totalVolume * 0.01))} USD` : 'Calculating...'}</p>
+        <div className="terminal-window p-6">
+          <h3 className="text-terminal-green text-sm font-medium mb-2 terminal-text">TOTAL VOLUME</h3>
+          <p className="text-2xl font-bold text-terminal-gold terminal-text">{statsData ? `${formatNumber(Math.round(statsData.totalVolume))} EMO` : 'Loading...'}</p>
+          <p className="text-terminal-green/70 text-sm terminal-text">{statsData ? `$${formatNumber(Math.round(statsData.totalVolume * 0.01))} USD` : 'Calculating...'}</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-slate-300 text-sm font-medium mb-2">Avg. Transaction Size</h3>
-          <p className="text-2xl font-bold text-green-400">
+        <div className="terminal-window p-6">
+          <h3 className="text-terminal-green text-sm font-medium mb-2 terminal-text">AVG TRANSACTION SIZE</h3>
+          <p className="text-2xl font-bold text-terminal-success terminal-text">
             {statsData && statsData.totalTransactions > 0 ? 
               `${formatNumber(Math.round(statsData.totalVolume / statsData.totalTransactions))} EMO` : 
               'Loading...'}
           </p>
-          <p className="text-green-400 text-sm">Per transaction average</p>
+          <p className="text-terminal-success text-sm terminal-text">Per transaction average</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-slate-300 text-sm font-medium mb-2">Network Status</h3>
-          <p className="text-2xl font-bold text-green-400">Active</p>
-          <p className="text-slate-400 text-sm">All transactions confirmed</p>
+        <div className="terminal-window p-6">
+          <h3 className="text-terminal-green text-sm font-medium mb-2 terminal-text">NETWORK STATUS</h3>
+          <p className="text-2xl font-bold text-terminal-success terminal-text">[ACTIVE]</p>
+          <p className="text-terminal-green/70 text-sm terminal-text">All transactions confirmed</p>
         </div>
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+      <div className="terminal-window p-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
