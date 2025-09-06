@@ -69,40 +69,40 @@ export default function ExplorerWellnessPage() {
 
       {/* Wellness Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Network Wellness</h3>
-            <Heart className="w-5 h-5 text-green-400 animate-pulse" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">NETWORK WELLNESS</h3>
+            <Heart className="w-5 h-5 text-terminal-success animate-pulse" />
           </div>
-          <p className="text-2xl font-bold text-green-400">{networkWellnessScore}%</p>
-          <p className="text-green-400 text-sm">+2.1% this week</p>
+          <p className="text-2xl font-bold text-terminal-success terminal-text">{networkWellnessScore}%</p>
+          <p className="text-terminal-success text-sm terminal-text">+2.1% this week</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Avg Heart Rate</h3>
-            <Activity className="w-5 h-5 text-red-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">AVG HEART RATE</h3>
+            <Activity className="w-5 h-5 text-terminal-orange" />
           </div>
-          <p className="text-2xl font-bold text-white">72 BPM</p>
-          <p className="text-green-400 text-sm">Healthy range</p>
+          <p className="text-2xl font-bold text-terminal-orange terminal-text">72 BPM</p>
+          <p className="text-terminal-success text-sm terminal-text">Healthy range</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Stress Level</h3>
-            <Brain className="w-5 h-5 text-purple-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">STRESS LEVEL</h3>
+            <Brain className="w-5 h-5 text-terminal-cyan" />
           </div>
-          <p className="text-2xl font-bold text-white">Low</p>
-          <p className="text-green-400 text-sm">25% avg stress</p>
+          <p className="text-2xl font-bold text-terminal-cyan terminal-text">Low</p>
+          <p className="text-terminal-success text-sm terminal-text">25% avg stress</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Focus Score</h3>
-            <Shield className="w-5 h-5 text-blue-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">FOCUS SCORE</h3>
+            <Shield className="w-5 h-5 text-terminal-gold" />
           </div>
-          <p className="text-2xl font-bold text-white">85%</p>
-          <p className="text-blue-400 text-sm">High concentration</p>
+          <p className="text-2xl font-bold text-terminal-gold terminal-text">85%</p>
+          <p className="text-terminal-gold text-sm terminal-text">High concentration</p>
         </div>
       </div>
 

@@ -157,58 +157,58 @@ export default function ExplorerBlocksPage() {
               {blocks?.map((block: any) => (
                 <tr
                   key={block.height}
-                  className="border-b border-slate-700/50 hover:bg-slate-900/30 transition-colors"
+                  className="border-b border-terminal-border hover:bg-terminal-surface transition-colors"
                 >
                   <td className="p-4">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-500/20 border border-blue-500/30 rounded-lg flex items-center justify-center">
-                        <Hash className="w-4 h-4 text-blue-400" />
+                      <div className="w-8 h-8 bg-terminal-cyan/20 border border-terminal-cyan/30 flex items-center justify-center">
+                        <Hash className="w-4 h-4 text-terminal-cyan" />
                       </div>
                       <div>
-                        <p className="text-white font-medium">#{block.height}</p>
-                        <p className="text-slate-400 text-xs font-mono">
+                        <p className="text-terminal-green font-medium terminal-text">#{block.height}</p>
+                        <p className="text-terminal-green/70 text-xs font-mono terminal-text">
                           {block.hash.substring(0, 12)}...{block.hash.substring(58)}
                         </p>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <p className="text-slate-300">{formatTimeAgo(new Date(block.timestamp).getTime())}</p>
+                    <p className="text-terminal-cyan terminal-text">{formatTimeAgo(new Date(block.timestamp).getTime())}</p>
                   </td>
                   <td className="p-4">
                     <div className="flex items-center space-x-2">
-                      <User className="w-4 h-4 text-slate-400" />
-                      <span className="text-white">{block.validator || '⚠️ Missing Validator'}</span>
+                      <User className="w-4 h-4 text-terminal-green" />
+                      <span className="text-terminal-green terminal-text">{block.validator || '⚠️ Missing Validator'}</span>
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className="text-white font-medium">{block.transactions?.length || 1}</span>
+                    <span className="text-terminal-gold font-medium terminal-text">{block.transactions?.length || 1}</span>
                   </td>
                   <td className="p-4">
                     <div>
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className="text-green-400 font-medium">
+                        <span className="text-terminal-success font-medium terminal-text">
                           {Math.round(parseFloat(block.emotionalScore) || 0)}%
                         </span>
-                        <span className="text-slate-400 text-sm">
+                        <span className="text-terminal-green/70 text-sm terminal-text">
                           ({Math.round(parseFloat(block.consensusScore) || 0)}% consensus)
                         </span>
                       </div>
-                      <div className="w-full bg-slate-700 rounded-full h-1.5">
+                      <div className="w-full bg-terminal-surface h-1.5">
                         <div
-                          className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-1.5 rounded-full"
+                          className="bg-gradient-to-r from-terminal-warning via-terminal-gold to-terminal-success h-1.5"
                           style={{ width: `${parseFloat(block.emotionalScore) || 0}%` }}
                         ></div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4">
-                    <span className="text-green-400 font-medium">
+                    <span className="text-terminal-success font-medium terminal-text">
                       +{formatNumber(block.transactions?.[0]?.amount || 0)} EMO
                     </span>
                   </td>
                   <td className="p-4">
-                    <span className="text-slate-300">{formatBytes(JSON.stringify(block).length)}</span>
+                    <span className="text-terminal-cyan terminal-text">{formatBytes(JSON.stringify(block).length)}</span>
                   </td>
                 </tr>
               ))}
