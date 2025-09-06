@@ -30,9 +30,9 @@ export default function ExplorerBlocksPage() {
         </div>
         <div className="space-y-4">
           {[...Array(10)].map((_, i) => (
-            <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-pulse">
-              <div className="h-4 bg-slate-700 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-slate-700 rounded w-1/2"></div>
+            <div key={i} className="terminal-window p-6 animate-pulse">
+              <div className="h-4 bg-terminal-surface rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-terminal-surface rounded w-1/2"></div>
             </div>
           ))}
         </div>
@@ -218,26 +218,26 @@ export default function ExplorerBlocksPage() {
       </div>
 
       {/* Block Production Info */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-          <Zap className="w-5 h-5 mr-2 text-yellow-400" />
+      <div className="terminal-window rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-terminal-green terminal-text mb-4 flex items-center">
+          <Zap className="w-5 h-5 mr-2 text-terminal-gold" />
           Block Production
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <h4 className="text-white font-medium mb-2">Consensus Mechanism</h4>
-            <p className="text-green-400 text-lg font-semibold">Proof of Emotion</p>
-            <p className="text-slate-400 text-sm">Biometric validation required</p>
+            <h4 className="text-terminal-green terminal-text font-medium mb-2">Consensus Mechanism</h4>
+            <p className="text-terminal-success text-lg font-semibold">Proof of Emotion</p>
+            <p className="text-terminal-cyan text-sm">Biometric validation required</p>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-2">Block Reward</h4>
-            <p className="text-green-400 text-lg font-semibold">50-75 EMO</p>
-            <p className="text-slate-400 text-sm">Based on emotional contribution</p>
+            <h4 className="text-terminal-green terminal-text font-medium mb-2">Block Reward</h4>
+            <p className="text-terminal-success text-lg font-semibold">50-75 EMO</p>
+            <p className="text-terminal-cyan text-sm">Based on emotional contribution</p>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-2">Finality</h4>
+            <h4 className="text-terminal-green terminal-text font-medium mb-2">Finality</h4>
             <p className="text-blue-400 text-lg font-semibold">1 Block</p>
-            <p className="text-slate-400 text-sm">Instant finality</p>
+            <p className="text-terminal-cyan text-sm">Instant finality</p>
           </div>
         </div>
       </div>

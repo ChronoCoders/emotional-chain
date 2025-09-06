@@ -56,10 +56,10 @@ export default function ExplorerFooter() {
             © 2025 EmotionalChain. Revolutionizing blockchain with human emotion.
           </p>
           <div className="flex items-center space-x-6 mt-4 md:mt-0">
-            <span className="text-slate-500 text-sm">Powered by Proof of Emotion</span>
+            <span className="text-terminal-green/50 terminal-text text-sm">Powered by Proof of Emotion</span>
             <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-green-500 text-sm font-medium">Network Active</span>
+              <div className="w-2 h-2 bg-terminal-success rounded-full animate-pulse"></div>
+              <span className="text-terminal-success text-sm font-medium">Network Active</span>
             </div>
           </div>
         </div>

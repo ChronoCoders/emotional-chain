@@ -108,9 +108,9 @@ export default function ExplorerWellnessPage() {
 
       {/* Wellness Trends */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2 text-green-400" />
+        <div className="terminal-window rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-terminal-green terminal-text mb-4 flex items-center">
+            <TrendingUp className="w-5 h-5 mr-2 text-terminal-success" />
             Wellness Trends (24h)
           </h3>
           <div className="h-64">
@@ -162,8 +162,8 @@ export default function ExplorerWellnessPage() {
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
+        <div className="terminal-window rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-terminal-green terminal-text mb-4 flex items-center">
             <Users className="w-5 h-5 mr-2 text-blue-400" />
             Emotional State Distribution
           </h3>
@@ -202,9 +202,9 @@ export default function ExplorerWellnessPage() {
                     className="w-3 h-3 rounded-full" 
                     style={{ backgroundColor: item.color }}
                   ></div>
-                  <span className="text-slate-300 text-sm">{item.name}</span>
+                  <span className="text-terminal-green terminal-text text-sm">{item.name}</span>
                 </div>
-                <span className="text-white font-medium">{item.value}%</span>
+                <span className="text-terminal-green terminal-text font-medium">{item.value}%</span>
               </div>
             ))}
           </div>
@@ -212,44 +212,44 @@ export default function ExplorerWellnessPage() {
       </div>
 
       {/* Biometric Devices Status */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-6 flex items-center">
+      <div className="terminal-window rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-terminal-green terminal-text mb-6 flex items-center">
           <Activity className="w-5 h-5 mr-2 text-red-400" />
           Connected Biometric Devices
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+          <div className="bg-terminal-surface border-2 border-terminal-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-white font-medium">Heart Rate Monitors</h4>
+              <h4 className="text-terminal-green terminal-text font-medium">Heart Rate Monitors</h4>
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{activeValidators}</p>
-            <p className="text-slate-400 text-sm">Polar H10, Garmin, Fitbit</p>
-            <div className="mt-3 text-xs text-green-400">
+            <p className="text-2xl font-bold text-terminal-green terminal-text mb-1">{activeValidators}</p>
+            <p className="text-terminal-cyan terminal-text text-sm">Polar H10, Garmin, Fitbit</p>
+            <div className="mt-3 text-xs text-terminal-success">
               Avg: 72 BPM • Range: 60-85 BPM
             </div>
           </div>
 
-          <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+          <div className="bg-terminal-surface border-2 border-terminal-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-white font-medium">Stress Sensors</h4>
+              <h4 className="text-terminal-green terminal-text font-medium">Stress Sensors</h4>
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{Math.floor(activeValidators * 0.8)}</p>
-            <p className="text-slate-400 text-sm">Empatica E4, BioHarness</p>
+            <p className="text-2xl font-bold text-terminal-green terminal-text mb-1">{Math.floor(activeValidators * 0.8)}</p>
+            <p className="text-terminal-cyan terminal-text text-sm">Empatica E4, BioHarness</p>
             <div className="mt-3 text-xs text-yellow-400">
               Avg: 25% stress • HRV: Normal
             </div>
           </div>
 
-          <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+          <div className="bg-terminal-surface border-2 border-terminal-border rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-white font-medium">EEG Devices</h4>
+              <h4 className="text-terminal-green terminal-text font-medium">EEG Devices</h4>
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             </div>
-            <p className="text-2xl font-bold text-white mb-1">{Math.floor(activeValidators * 0.6)}</p>
-            <p className="text-slate-400 text-sm">Muse 2, OpenBCI, Emotiv</p>
+            <p className="text-2xl font-bold text-terminal-green terminal-text mb-1">{Math.floor(activeValidators * 0.6)}</p>
+            <p className="text-terminal-cyan terminal-text text-sm">Muse 2, OpenBCI, Emotiv</p>
             <div className="mt-3 text-xs text-blue-400">
               Focus: 85% • Alpha waves: High
             </div>
@@ -258,61 +258,61 @@ export default function ExplorerWellnessPage() {
       </div>
 
       {/* Wellness Incentives */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-6 flex items-center">
-          <Heart className="w-5 h-5 mr-2 text-green-400" />
+      <div className="terminal-window rounded-xl p-6">
+        <h3 className="text-lg font-semibold text-terminal-green terminal-text mb-6 flex items-center">
+          <Heart className="w-5 h-5 mr-2 text-terminal-success" />
           Wellness Incentive Programs
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <h4 className="text-white font-medium">Active Programs</h4>
+            <h4 className="text-terminal-green terminal-text font-medium">Active Programs</h4>
             
-            <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+            <div className="bg-terminal-surface border-2 border-terminal-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-green-400 font-medium">Daily Meditation Bonus</span>
-                <span className="text-green-400 text-sm">+5 EMO</span>
+                <span className="text-terminal-success font-medium">Daily Meditation Bonus</span>
+                <span className="text-terminal-success text-sm">+5 EMO</span>
               </div>
-              <p className="text-slate-400 text-sm">
+              <p className="text-terminal-cyan terminal-text text-sm">
                 Reward for maintaining focused meditation state for 20+ minutes
               </p>
-              <div className="mt-2 text-xs text-slate-500">
+              <div className="mt-2 text-xs text-terminal-green/50 terminal-text">
                 Participants: {Math.floor(activeValidators * 0.7)} validators
               </div>
             </div>
             
-            <div className="bg-slate-900/50 border border-slate-600 rounded-lg p-4">
+            <div className="bg-terminal-surface border-2 border-terminal-border rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-blue-400 font-medium">Low Stress Achievement</span>
-                <span className="text-green-400 text-sm">+3 EMO</span>
+                <span className="text-terminal-success text-sm">+3 EMO</span>
               </div>
-              <p className="text-slate-400 text-sm">
+              <p className="text-terminal-cyan terminal-text text-sm">
                 Bonus for maintaining stress levels below 30% during validation
               </p>
-              <div className="mt-2 text-xs text-slate-500">
+              <div className="mt-2 text-xs text-terminal-green/50 terminal-text">
                 Participants: {Math.floor(activeValidators * 0.5)} validators
               </div>
             </div>
           </div>
           
           <div className="space-y-4">
-            <h4 className="text-white font-medium">Impact Statistics</h4>
+            <h4 className="text-terminal-green terminal-text font-medium">Impact Statistics</h4>
             
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-slate-300">Total wellness rewards distributed</span>
-                <span className="text-green-400 font-semibold">{formatNumber(2847)} EMO</span>
+                <span className="text-terminal-green terminal-text">Total wellness rewards distributed</span>
+                <span className="text-terminal-success font-semibold">{formatNumber(2847)} EMO</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-300">Average wellness score improvement</span>
-                <span className="text-green-400 font-semibold">+15.2%</span>
+                <span className="text-terminal-green terminal-text">Average wellness score improvement</span>
+                <span className="text-terminal-success font-semibold">+15.2%</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-300">Validators participating in programs</span>
+                <span className="text-terminal-green terminal-text">Validators participating in programs</span>
                 <span className="text-blue-400 font-semibold">{Math.floor(activeValidators * 0.85)}/{activeValidators}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-300">Network emotional authenticity</span>
+                <span className="text-terminal-green terminal-text">Network emotional authenticity</span>
                 <span className="text-purple-400 font-semibold">96.8%</span>
               </div>
             </div>
