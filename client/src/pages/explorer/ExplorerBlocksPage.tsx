@@ -84,73 +84,73 @@ export default function ExplorerBlocksPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Blocks</h1>
-        <p className="text-slate-400">
+      <div className="terminal-window p-6">
+        <h1 className="text-3xl font-bold text-terminal-green mb-2 terminal-text">&gt; Blocks</h1>
+        <p className="text-terminal-cyan terminal-text">
           EmotionalChain blocks produced through Proof of Emotion consensus
         </p>
       </div>
 
       {/* Block Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Latest Block</h3>
-            <Database className="w-5 h-5 text-blue-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">LATEST BLOCK</h3>
+            <span className="text-terminal-cyan terminal-text">[DB]</span>
           </div>
-          <p className="text-2xl font-bold text-white">#{formatNumber(totalBlocks)}</p>
-          <p className="text-slate-400 text-sm">
+          <p className="text-2xl font-bold text-terminal-cyan terminal-text">#{formatNumber(totalBlocks)}</p>
+          <p className="text-terminal-green/70 text-sm terminal-text">
             {latestBlock ? formatTimeAgo(new Date(latestBlock.timestamp).getTime()) : 'Just now'}
           </p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Avg Block Time</h3>
-            <Clock className="w-5 h-5 text-green-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">AVG BLOCK TIME</h3>
+            <span className="text-terminal-success terminal-text">[⏰]</span>
           </div>
-          <p className="text-2xl font-bold text-white">{avgBlockTime}s</p>
-          <p className="text-green-400 text-sm">Consistent timing</p>
+          <p className="text-2xl font-bold text-terminal-success terminal-text">{avgBlockTime}s</p>
+          <p className="text-terminal-success text-sm terminal-text">Consistent timing</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Transactions (24h)</h3>
-            <Zap className="w-5 h-5 text-yellow-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">TRANSACTIONS (24H)</h3>
+            <span className="text-terminal-gold terminal-text">[⚡]</span>
           </div>
-          <p className="text-2xl font-bold text-white">{formatNumber(blocks?.length * 24 || 0)}</p>
-          <p className="text-slate-400 text-sm">{blocks?.length || 0} blocks/hour avg</p>
+          <p className="text-2xl font-bold text-terminal-gold terminal-text">{formatNumber(blocks?.length * 24 || 0)}</p>
+          <p className="text-terminal-green/70 text-sm terminal-text">{blocks?.length || 0} blocks/hour avg</p>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+        <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-slate-300 text-sm font-medium">Avg Emotional Score</h3>
-            <Hash className="w-5 h-5 text-green-400" />
+            <h3 className="text-terminal-green text-sm font-medium terminal-text">AVG EMOTIONAL SCORE</h3>
+            <span className="text-terminal-orange terminal-text">[#]</span>
           </div>
-          <p className="text-2xl font-bold text-green-400">
+          <p className="text-2xl font-bold text-terminal-orange terminal-text">
             {Math.round(blocks?.reduce((sum: number, block: any) => sum + parseFloat(block.emotionalScore || 0), 0) / (blocks?.length || 1))}%
           </p>
-          <p className="text-green-400 text-sm">Real-time average</p>
+          <p className="text-terminal-orange text-sm terminal-text">Real-time average</p>
         </div>
       </div>
 
       {/* Blocks List */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-slate-700">
-          <h2 className="text-xl font-semibold text-white">Recent Blocks</h2>
+      <div className="terminal-window overflow-hidden">
+        <div className="p-6 border-b-2 border-terminal-border">
+          <h2 className="text-xl font-semibold text-terminal-green terminal-text">[📦] Recent Blocks</h2>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-slate-900/50">
+            <thead className="bg-terminal-surface">
               <tr>
-                <th className="text-left p-4 text-slate-300 font-medium">Block</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Age</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Validator</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Transactions</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Emotional Consensus</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Reward</th>
-                <th className="text-left p-4 text-slate-300 font-medium">Size</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Block</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Age</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Validator</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Transactions</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Emotional Consensus</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Reward</th>
+                <th className="text-left p-4 text-terminal-green font-medium terminal-text">Size</th>
               </tr>
             </thead>
             <tbody>

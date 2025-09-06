@@ -149,46 +149,46 @@ export default function ExplorerValidatorsPage() {
                       </td>
                       <td className="p-4">
                         <div className="flex items-center space-x-2">
-                          <Heart className={`w-4 h-4 ${
-                            emotionalScore >= 85 ? 'text-green-500' :
-                            emotionalScore >= 75 ? 'text-yellow-500' :
-                            'text-orange-500'
-                          }`} />
-                          <span className={`font-medium ${
-                            emotionalScore >= 85 ? 'text-green-500' :
-                            emotionalScore >= 75 ? 'text-yellow-500' :
-                            'text-orange-500'
+                          <span className={`terminal-text ${
+                            emotionalScore >= 85 ? 'text-terminal-success' :
+                            emotionalScore >= 75 ? 'text-terminal-warning' :
+                            'text-terminal-orange'
+                          }`}>♥</span>
+                          <span className={`font-medium terminal-text ${
+                            emotionalScore >= 85 ? 'text-terminal-success' :
+                            emotionalScore >= 75 ? 'text-terminal-warning' :
+                            'text-terminal-orange'
                           }`}>
                             {Math.round(emotionalScore)}%
                           </span>
                         </div>
-                        <div className="w-full bg-slate-700 rounded-full h-1.5 mt-1">
+                        <div className="w-full bg-terminal-border h-1.5 mt-1">
                           <div
-                            className="bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 h-1.5 rounded-full"
+                            className="bg-terminal-success h-1.5"
                             style={{ width: `${emotionalScore}%` }}
                           ></div>
                         </div>
                       </td>
                       <td className="p-4">
                         <div>
-                          <p className="text-white font-medium">{Math.round(performance)}%</p>
-                          <p className="text-slate-400 text-sm">Uptime</p>
+                          <p className="text-terminal-cyan font-medium terminal-text">{Math.round(performance)}%</p>
+                          <p className="text-terminal-green/70 text-sm terminal-text">Uptime</p>
                         </div>
                       </td>
                       <td className="p-4">
                         <div>
-                          <p className="text-green-400 font-semibold">
+                          <p className="text-terminal-success font-semibold terminal-text">
                             +{formatNumber(dailyRewards)} EMO
                           </p>
-                          <p className="text-slate-400 text-sm">
+                          <p className="text-terminal-green/70 text-sm terminal-text">
                             Daily EMO rewards
                           </p>
                         </div>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          <span className="text-green-400 text-sm font-medium">Active</span>
+                          <div className="status-online status-indicator"></div>
+                          <span className="text-terminal-success text-sm font-medium terminal-text">[ACTIVE]</span>
                         </div>
                       </td>
                     </tr>
@@ -200,7 +200,7 @@ export default function ExplorerValidatorsPage() {
       </div>
 
       {/* Emotional Mining Information */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
+      <div className="terminal-window p-6">
         <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
           <Heart className="w-5 h-5 mr-2 text-pink-400" />
           Earn Through Emotional Mining
