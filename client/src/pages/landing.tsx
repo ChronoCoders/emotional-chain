@@ -36,10 +36,10 @@ export default function LandingPage() {
   const stats = realtimeStats || networkStatus?.stats;
   
   // Calculate live statistics from blockchain data
-  const circulatingSupply = tokenEconomics?.circulatingSupply || stats?.circulatingSupply || 0;
+  const circulatingSupply = (tokenEconomics as any)?.circulatingSupply || (stats as any)?.circulatingSupply || 0;
   const blockHeight = stats?.blockHeight || 0;
-  const activeValidators = wallets?.filter((wallet: any) => wallet.balance > 0).length || 21;
-  const consensusHealth = stats?.consensusQuality || stats?.emotionalAverage || 100;
+  const activeValidators = (wallets as any)?.filter((wallet: any) => wallet.balance > 0).length || 21;
+  const consensusHealth = (stats as any)?.consensusQuality || (stats as any)?.emotionalAverage || 100;
 
   // Typing animation effect
   useEffect(() => {
