@@ -18,6 +18,14 @@ export default function LandingPage() {
     queryKey: ['/api/network/status']
   });
 
+  const { data: tokenEconomics } = useQuery({
+    queryKey: ['/api/token/economics']
+  });
+
+  const { data: wallets } = useQuery({
+    queryKey: ['/api/wallets']
+  });
+
   // Update with real-time data from WebSocket
   useEffect(() => {
     if (lastMessage?.type === 'update' && lastMessage.data?.networkStatus?.stats) {
@@ -26,6 +34,12 @@ export default function LandingPage() {
   }, [lastMessage]);
 
   const stats = realtimeStats || networkStatus?.stats;
+  
+  // Calculate live statistics from blockchain data
+  const circulatingSupply = tokenEconomics?.circulatingSupply || stats?.circulatingSupply || 0;
+  const blockHeight = stats?.blockHeight || 0;
+  const activeValidators = wallets?.filter((wallet: any) => wallet.balance > 0).length || 21;
+  const consensusHealth = stats?.consensusQuality || stats?.emotionalAverage || 100;
 
   // Typing animation effect
   useEffect(() => {
@@ -240,7 +254,7 @@ export default function LandingPage() {
                 <span className="text-sm text-terminal-green/60">EMO SUPPLY</span>
               </div>
               <div className="text-2xl font-bold text-terminal-gold">
-                {stats?.circulatingSupply ? formatNumber(stats.circulatingSupply) : '633K+'}
+                {formatNumber(circulatingSupply)}
               </div>
               <div className="text-sm text-terminal-green/60">Circulating EMO</div>
             </div>
@@ -251,7 +265,7 @@ export default function LandingPage() {
                 <span className="text-sm text-terminal-green/60">BLOCKS</span>
               </div>
               <div className="text-2xl font-bold text-terminal-cyan">
-                {stats ? formatNumber(stats.blockHeight) : '10,896+'}
+                {formatNumber(blockHeight)}
               </div>
               <div className="text-sm text-terminal-green/60">Block Height</div>
             </div>
@@ -261,7 +275,7 @@ export default function LandingPage() {
                 <Users className="w-8 h-8 text-terminal-success mr-2" />
                 <span className="text-sm text-terminal-green/60">VALIDATORS</span>
               </div>
-              <div className="text-2xl font-bold text-terminal-success">21</div>
+              <div className="text-2xl font-bold text-terminal-success">{activeValidators}</div>
               <div className="text-sm text-terminal-green/60">Active</div>
             </div>
 
@@ -271,7 +285,7 @@ export default function LandingPage() {
                 <span className="text-sm text-terminal-green/60">CONSENSUS</span>
               </div>
               <div className="text-2xl font-bold text-terminal-orange">
-                {stats?.consensusPercentage ? `${Math.round(parseFloat(stats.consensusPercentage))}%` : '98%'}
+                {Math.round(consensusHealth)}%
               </div>
               <div className="text-sm text-terminal-green/60">Emotional Fitness</div>
             </div>
