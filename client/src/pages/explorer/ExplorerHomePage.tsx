@@ -91,102 +91,98 @@ export default function ExplorerHomePage() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <div className="text-center py-12 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-2xl border border-slate-700">
-        <div className="flex items-center justify-center mb-4">
-          <div>
-            <h1 className="text-4xl font-bold text-white mb-2">EmotionalChain Explorer</h1>
-            <p className="text-slate-300 text-lg">World's First Emotion-Powered Blockchain</p>
-          </div>
+      <div className="terminal-window p-8 text-center">
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-terminal-green mb-2 terminal-text">
+            &gt; EmotionalChain Explorer
+          </h1>
+          <p className="text-terminal-cyan terminal-text">World's First Emotion-Powered Blockchain</p>
         </div>
-        <div className="flex items-center justify-center space-x-2 mt-6">
-          <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <p className="text-green-400 font-medium">Network Active • Proof of Emotion Consensus</p>
+        <div className="flex items-center justify-center space-x-2">
+          <div className="status-online status-indicator"></div>
+          <p className="text-terminal-success terminal-text">[NETWORK ACTIVE] • Proof of Emotion Consensus</p>
         </div>
       </div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          title="Network Status"
-          value={networkStats?.isRunning ? "Active" : "Inactive"}
-          change={`${stats?.uptime || 0}s uptime`}
-          icon={Activity}
-          trend="up"
-          color={networkStats?.isRunning ? "green" : "red"}
+        <TerminalMetricCard
+          title="NETWORK STATUS"
+          value={networkStats?.isRunning ? "ONLINE" : "OFFLINE"}
+          change={`uptime: ${stats?.uptime || 0}s`}
+          icon="[*]"
+          color="success"
         />
-        <MetricCard
-          title="Total Supply"
+        <TerminalMetricCard
+          title="TOTAL SUPPLY"
           value={`${formatNumber(totalEMO)} EMO`}
-          change={`${formatNumber(circulatingSupply)} circulating • ${formatEmoToUSD(totalEMO)}`}
-          icon={DollarSign}
-          trend="up"
-          color="blue"
+          change={`${formatNumber(circulatingSupply)} circulating`}
+          icon="[$]"
+          color="gold"
         />
-        <MetricCard
-          title="Block Height"
+        <TerminalMetricCard
+          title="BLOCK HEIGHT"
           value={formatLargeNumber(stats?.blockHeight || 1163)}
           change={`${stats?.avgBlockTime || 30}s avg time`}
-          icon={Zap}
-          trend="neutral"
-          color="purple"
+          icon="[#]"
+          color="cyan"
         />
-        <MetricCard
-          title="Emotional Health"
+        <TerminalMetricCard
+          title="EMOTIONAL HEALTH"
           value={`${Math.round(stats?.emotionalAverage || 78)}%`}
-          change={`${Math.round(stats?.consensusQuality || 92)}% consensus quality`}
-          icon={Heart}
-          trend="up"
-          color="emotional"
+          change={`consensus: ${Math.round(stats?.consensusQuality || 92)}%`}
+          icon="[♥]"
+          color="orange"
         />
       </div>
 
       {/* Network Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-            <TrendingUp className="w-5 h-5 mr-2 text-green-400" />
-            Network Activity
+        <div className="terminal-window p-6">
+          <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
+            [📈] Network Activity
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(0, 0%, 20%)" />
                 <XAxis 
                   dataKey="time" 
-                  stroke="#9CA3AF"
-                  fontSize={12}
-                  tick={{ fill: '#9CA3AF' }}
+                  stroke="hsl(120, 100%, 50%)"
+                  fontSize={10}
+                  tick={{ fill: 'hsl(120, 100%, 50%)', fontFamily: 'monospace' }}
                 />
                 <YAxis 
-                  stroke="#9CA3AF"
-                  fontSize={12}
-                  tick={{ fill: '#9CA3AF' }}
+                  stroke="hsl(120, 100%, 50%)"
+                  fontSize={10}
+                  tick={{ fill: 'hsl(120, 100%, 50%)', fontFamily: 'monospace' }}
                 />
                 <Tooltip 
                   contentStyle={{
-                    backgroundColor: '#1F2937',
-                    border: '1px solid #374151',
-                    borderRadius: '8px',
-                    color: '#F9FAFB'
+                    backgroundColor: 'hsl(0, 0%, 6.7%)',
+                    border: '2px solid hsl(0, 0%, 20%)',
+                    borderRadius: '0px',
+                    color: 'hsl(120, 100%, 50%)',
+                    fontFamily: 'monospace'
                   }}
-                  labelStyle={{ color: '#D1D5DB' }}
+                  labelStyle={{ color: 'hsl(180, 100%, 50%)' }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="emotional" 
-                  stroke="#22C55E" 
+                  stroke="hsl(120, 100%, 50%)" 
                   strokeWidth={2}
-                  dot={{ fill: '#22C55E', strokeWidth: 0, r: 3 }}
-                  activeDot={{ r: 5, fill: '#22C55E' }}
+                  dot={{ fill: 'hsl(120, 100%, 50%)', strokeWidth: 0, r: 3 }}
+                  activeDot={{ r: 5, fill: 'hsl(120, 100%, 50%)' }}
                   name="Emotional Score (%)"
                 />
                 <Line 
                   type="monotone" 
                   dataKey="validators" 
-                  stroke="#3B82F6" 
+                  stroke="hsl(180, 100%, 50%)" 
                   strokeWidth={2}
-                  dot={{ fill: '#3B82F6', strokeWidth: 0, r: 3 }}
-                  activeDot={{ r: 5, fill: '#3B82F6' }}
+                  dot={{ fill: 'hsl(180, 100%, 50%)', strokeWidth: 0, r: 3 }}
+                  activeDot={{ r: 5, fill: 'hsl(180, 100%, 50%)' }}
                   name="Active Validators"
                 />
               </LineChart>
@@ -194,32 +190,31 @@ export default function ExplorerHomePage() {
           </div>
         </div>
         
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-            <Shield className="w-5 h-5 mr-2 text-green-400" />
-            Security Metrics
+        <div className="terminal-window p-6">
+          <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
+            [🔒] Security Metrics
           </h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <span className="text-slate-300">P2P Connections</span>
-              <span className="text-white font-medium">{stats?.p2pConnections || 0}</span>
+              <span className="text-terminal-green terminal-text">P2P Connections:</span>
+              <span className="text-terminal-cyan terminal-text font-medium">{stats?.p2pConnections || 0}</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-300">Network Hashrate</span>
-              <span className="text-white font-medium">12.5 MH/s</span>
+              <span className="text-terminal-green terminal-text">Network Hashrate:</span>
+              <span className="text-terminal-cyan terminal-text font-medium">12.5 MH/s</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-300">Consensus Quality</span>
-              <span className={`font-medium ${
-                (stats?.consensusQuality || 92) >= 95 ? 'text-green-400' : 
-                (stats?.consensusQuality || 92) >= 85 ? 'text-yellow-400' : 'text-red-400'
+              <span className="text-terminal-green terminal-text">Consensus Quality:</span>
+              <span className={`terminal-text font-medium ${
+                (stats?.consensusQuality || 92) >= 95 ? 'text-terminal-success' : 
+                (stats?.consensusQuality || 92) >= 85 ? 'text-terminal-warning' : 'text-terminal-error'
               }`}>
                 {Math.round(stats?.consensusQuality || 92)}%
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-slate-300">Byzantine Tolerance</span>
-              <span className="text-green-400 font-medium">33% fault tolerance</span>
+              <span className="text-terminal-green terminal-text">Byzantine Tolerance:</span>
+              <span className="text-terminal-success terminal-text font-medium">33% fault tolerance</span>
             </div>
           </div>
         </div>
@@ -227,10 +222,9 @@ export default function ExplorerHomePage() {
 
       {/* Validator Leaderboard & Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-            <Users className="w-5 h-5 mr-2 text-yellow-400" />
-            Top Validators
+        <div className="terminal-window p-6">
+          <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
+            [👥] Top Validators
           </h3>
           
           <div className="space-y-3">
@@ -244,27 +238,27 @@ export default function ExplorerHomePage() {
                 return (
                   <div
                     key={validator.validatorId}
-                    className="flex items-center justify-between p-4 bg-slate-900/50 rounded-lg border border-slate-600/50"
+                    className="flex items-center justify-between p-4 bg-terminal-surface border border-terminal-border"
                   >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                        rank === 1 ? 'bg-yellow-500/20 text-yellow-400' :
-                        rank === 2 ? 'bg-slate-400/20 text-slate-300' :
-                        rank === 3 ? 'bg-orange-500/20 text-orange-400' :
-                        'bg-slate-700 text-slate-400'
+                      <div className={`w-8 h-8 flex items-center justify-center text-sm font-bold terminal-text ${
+                        rank === 1 ? 'text-terminal-gold' :
+                        rank === 2 ? 'text-terminal-cyan' :
+                        rank === 3 ? 'text-terminal-orange' :
+                        'text-terminal-green'
                       }`}>
-                        {rank}
+                        #{rank}
                       </div>
                       <div>
-                        <h4 className="text-white font-medium">{validator.validatorId}</h4>
-                        <p className="text-slate-400 text-sm">{Math.round(emotionalScore)}% emotional consensus</p>
+                        <h4 className="text-terminal-green font-medium terminal-text">{validator.validatorId}</h4>
+                        <p className="text-terminal-green/70 text-sm terminal-text">{Math.round(emotionalScore)}% emotional consensus</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-white font-semibold">
+                      <p className="text-terminal-cyan font-semibold terminal-text">
                         {formatNumber(validator.balance)} EMO
                       </p>
-                      <p className="text-slate-400 text-sm">
+                      <p className="text-terminal-green/70 text-sm terminal-text">
                         {formatEmoToUSD(validator.balance)}
                       </p>
                     </div>
@@ -274,38 +268,37 @@ export default function ExplorerHomePage() {
           </div>
         </div>
 
-        <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center">
-            <Activity className="w-5 h-5 mr-2 text-blue-400" />
-            Network Statistics
+        <div className="terminal-window p-6">
+          <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
+            [📊] Network Statistics
           </h3>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="text-center">
-              <p className="text-slate-400 text-sm">Total Network Value</p>
-              <p className="text-white font-semibold text-lg">
+              <p className="text-terminal-green/70 text-sm terminal-text">Total Network Value:</p>
+              <p className="text-terminal-gold font-semibold text-lg terminal-text">
                 {formatNumber(totalEMO)} EMO
               </p>
-              <p className="text-slate-400 text-sm">
+              <p className="text-terminal-green/70 text-sm terminal-text">
                 {formatEmoToUSD(totalEMO)}
               </p>
             </div>
             <div className="text-center">
-              <p className="text-slate-400 text-sm">Avg Block Rewards</p>
-              <p className="text-green-400 font-semibold text-lg">
+              <p className="text-terminal-green/70 text-sm terminal-text">Avg Block Rewards:</p>
+              <p className="text-terminal-success font-semibold text-lg terminal-text">
                 {tokenEconomics?.miningHistory?.averageBlockReward ? 
                   formatNumber(tokenEconomics.miningHistory.averageBlockReward) : '61'} EMO
               </p>
             </div>
             <div className="text-center">
-              <p className="text-slate-400 text-sm">Total Blocks</p>
-              <p className="text-blue-400 font-semibold text-lg">
+              <p className="text-terminal-green/70 text-sm terminal-text">Total Blocks:</p>
+              <p className="text-terminal-cyan font-semibold text-lg terminal-text">
                 {formatLargeNumber(stats?.blockHeight || 1163)}
               </p>
             </div>
             <div className="text-center">
-              <p className="text-slate-400 text-sm">Total Transactions</p>
-              <p className="text-purple-400 font-semibold text-lg">
+              <p className="text-terminal-green/70 text-sm terminal-text">Total Transactions:</p>
+              <p className="text-terminal-orange font-semibold text-lg terminal-text">
                 {formatLargeNumber(transactionStats?.totalTransactions || 0)}
               </p>
             </div>
@@ -316,41 +309,32 @@ export default function ExplorerHomePage() {
   );
 }
 
-interface MetricCardProps {
+interface TerminalMetricCardProps {
   title: string;
   value: string;
   change: string;
-  icon: React.ComponentType<{ className?: string }>;
-  trend: "up" | "down" | "neutral";
-  color: "green" | "red" | "blue" | "purple" | "emotional";
+  icon: string;
+  color: "success" | "gold" | "cyan" | "orange" | "error";
 }
 
-function MetricCard({ title, value, change, icon: Icon, trend, color }: MetricCardProps) {
+function TerminalMetricCard({ title, value, change, icon, color }: TerminalMetricCardProps) {
   const colorClasses = {
-    green: "text-green-400 bg-green-400/10 border-green-400/20",
-    red: "text-red-400 bg-red-400/10 border-red-400/20",
-    blue: "text-blue-400 bg-blue-400/10 border-blue-400/20",
-    purple: "text-purple-400 bg-purple-400/10 border-purple-400/20",
-    emotional: "text-green-400 bg-green-400/10 border-green-400/20",
-  };
-
-  const trendColors = {
-    up: "text-green-400",
-    down: "text-red-400",
-    neutral: "text-slate-400",
+    success: "text-terminal-success",
+    gold: "text-terminal-gold", 
+    cyan: "text-terminal-cyan",
+    orange: "text-terminal-orange",
+    error: "text-terminal-error",
   };
 
   return (
-    <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:bg-slate-800/70 transition-colors">
+    <div className="terminal-window p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-slate-300 text-sm font-medium">{title}</h3>
-        <div className={`p-2 rounded-lg border ${colorClasses[color]}`}>
-          <Icon className="w-4 h-4" />
-        </div>
+        <h3 className="text-terminal-green text-sm terminal-text">{title}</h3>
+        <span className={`terminal-text text-lg ${colorClasses[color]}`}>{icon}</span>
       </div>
       <div className="space-y-1">
-        <p className="text-2xl font-bold text-white">{value}</p>
-        <p className={`text-sm ${trendColors[trend]}`}>{change}</p>
+        <p className={`text-2xl font-bold terminal-text ${colorClasses[color]}`}>{value}</p>
+        <p className="text-sm text-terminal-green/70 terminal-text">&gt; {change}</p>
       </div>
     </div>
   );
