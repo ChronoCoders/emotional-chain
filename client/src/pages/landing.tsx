@@ -46,24 +46,24 @@ export default function LandingPage() {
   }, [lastMessage]);
 
   const stats = realtimeStats || networkStatus?.stats;
-  
+
   // Calculate live statistics from blockchain data with WebSocket updates
   const circulatingSupply = lastMessage?.data?.tokenEconomics?.circulatingSupply || 
                            (tokenEconomics as any)?.circulatingSupply || 
                            (stats as any)?.circulatingSupply || 0;
-  
+
   const blockHeight = stats?.blockHeight || 0;
-  
+
   const activeValidators = lastMessage?.data?.validators?.filter((validator: any) => validator.balance > 0).length ||
                           (wallets as any)?.filter((wallet: any) => wallet.balance > 0).length || 21;
-  
+
   const consensusHealth = (stats as any)?.consensusQuality || (stats as any)?.emotionalAverage || 100;
 
   // Typing animation effect
   useEffect(() => {
     const text = 'EmotionalChain Network Initialized...';
     let index = 0;
-    
+
     const typeInterval = setInterval(() => {
       if (index < text.length) {
         setTypingText(text.slice(0, index + 1));
@@ -133,20 +133,18 @@ export default function LandingPage() {
               <Link href="/whitepaper" className="text-terminal-green hover:text-terminal-cyan transition-colors">
                 Whitepaper
               </Link>
-              <a href="#get-started">
-                <button 
-                  className="border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  Get Started
-                </button>
-              </a>
+              <button 
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Get Started
+              </button>
             </nav>
-            
+
             {/* Mobile menu button */}
             <button 
               className="md:hidden text-terminal-green hover:text-terminal-cyan"
@@ -156,7 +154,7 @@ export default function LandingPage() {
             </button>
           </div>
         </div>
-        
+
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-terminal-border bg-terminal-surface/90 backdrop-blur-sm">
@@ -175,18 +173,16 @@ export default function LandingPage() {
               >
                 Whitepaper
               </Link>
-              <a href="#get-started">
-                <button 
-                  className="w-full border-2 border-terminal-border text-terminal-green hover:bg-terminal-cyan hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
-                    setMobileMenuOpen(false);
-                  }}
-                >
-                  Get Started
-                </button>
-              </a>
+              <button 
+                className="w-full border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Get Started
+              </button>
             </div>
           </div>
         )}
@@ -221,7 +217,7 @@ export default function LandingPage() {
           <h1 className="text-3xl md:text-5xl font-bold mb-6 text-terminal-green">
             World's First <span className="text-terminal-cyan">Emotion-Driven</span> Blockchain
           </h1>
-          
+
           <p className="text-lg md:text-xl mb-8 text-terminal-green/80 max-w-3xl mx-auto">
             Revolutionary Proof of Emotion (PoE) consensus mechanism powered by real-time biometric validation.
             <br />Enterprise-grade blockchain with Bitcoin/Ethereum-level immutability.
@@ -230,7 +226,7 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <button 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-terminal-bg hover:bg-terminal-success hover:border-terminal-success hover:text-terminal-bg focus:bg-terminal-success focus:border-terminal-success focus:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
               onClick={(e) => {
                 e.preventDefault();
                 document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
@@ -241,11 +237,11 @@ export default function LandingPage() {
             </button>
             <Link href="/explorer">
               <button 
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
-              >
-                <Globe className="w-5 h-5 mr-2" />
-                <span className="font-bold">Explore Network</span>
-              </button>
+              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
+            >
+              <Globe className="w-5 h-5 mr-2" />
+              <span className="font-bold">Explore Network</span>
+            </button>
             </Link>
           </div>
         </div>
@@ -417,10 +413,10 @@ export default function LandingPage() {
             Become a validator in the world's first emotion-driven blockchain. 
             Connect your wearable device and start earning EMO coins.
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-terminal-bg hover:bg-terminal-success hover:border-terminal-success hover:text-terminal-bg focus:bg-terminal-success focus:border-terminal-success focus:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
               onClick={() => setLocation('/access')}
             >
               <Heart className="w-5 h-5" />
@@ -428,7 +424,7 @@ export default function LandingPage() {
             </button>
             <a href="/docs">
               <button 
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
                 onClick={(e) => {
                   e.preventDefault();
                   window.location.href = '/docs';
