@@ -73,9 +73,9 @@ EmotionalChain is a fully functional blockchain network implementing Proof of Em
 - **Fault Tolerance**: Automatic failover and recovery systems
 
 ### Performance Optimization
-- **Transaction Throughput**: Target 1000+ TPS
-- **Block Time Reduction**: 3-5 second block times
-- **State Channel Integration**: Off-chain transaction processing
+- **Transaction Throughput**: Target 15-30 TPS (realistic with biometric validation)
+- **Block Time Optimization**: 30-45 second block times (allows proper biometric processing)
+- **State Channel Integration**: Off-chain transaction processing for simple transfers
 - **Cross-Chain Bridges**: Ethereum, Polygon, BSC interoperability
 
 ### Monitoring and Analytics

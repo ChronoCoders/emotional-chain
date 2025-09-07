@@ -436,7 +436,7 @@ export class AIConsensusEngine extends EventEmitter {
       networkState.averageEmotionalScore / 100,
       networkState.consensusRounds / 1000, // Normalize to reasonable range
       Math.min(networkState.networkLatency / 1000, 1), // Max 1 second
-      Math.min(networkState.transactionVolume / 10000, 1), // Max 10k TPS
+      Math.min(networkState.transactionVolume / 100, 1), // Max 100 TPS (realistic)
       this.calculateGiniCoefficient(networkState.stakeDistribution),
       Object.keys(networkState.geographicDistribution).length / 10, // Max 10 regions
       this.calculateNetworkHealth(networkState),

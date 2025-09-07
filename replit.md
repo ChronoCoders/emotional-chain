@@ -36,7 +36,7 @@ Preferred communication style: Simple, everyday language.
 ### Consensus Architecture
 - **Algorithm**: Proof of Emotion with Byzantine fault tolerance
 - **Committee Selection**: Dynamic validator selection based on emotional fitness scores
-- **Rounds**: Three-phase consensus (PROPOSE → VOTE → COMMIT) with 30-second epochs
+- **Rounds**: Three-phase consensus (PROPOSE → VOTE → COMMIT) with 30-second epochs (realistic for biometric processing)
 - **Thresholds**: 75% minimum emotional score, 67% honest validator requirement
 - **Anti-Gaming**: Multi-device biometric validation with authenticity proofs
 

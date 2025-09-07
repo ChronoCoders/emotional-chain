@@ -103,17 +103,17 @@ EmotionalChain implements a novel blockchain architecture that combines traditio
 
 ## Performance Specifications
 
-### Current Performance
-- **Block Time**: 10 seconds average
-- **Transaction Throughput**: 100+ TPS theoretical
+### Current Performance (Actual)
+- **Block Time**: 30 seconds with PoE consensus
+- **Transaction Throughput**: 5-10 TPS (ecosystem simulation mode)
 - **Validator Count**: 21 active validators
-- **Finality**: 6 block confirmations
+- **Finality**: 2-3 block confirmations (~60-90 seconds)
 
-### Production Targets
-- **Block Time**: 3-5 seconds
-- **Transaction Throughput**: 1000+ TPS
-- **Validator Count**: 100+ distributed validators
-- **Finality**: Near-instant with BFT consensus
+### Realistic Production Targets
+- **Block Time**: 30-60 seconds (allows biometric processing & consensus)
+- **Transaction Throughput**: 15-30 TPS (realistic with biometric validation overhead)
+- **Validator Count**: 50-100 distributed validators (manageable consensus)
+- **Finality**: 2-3 blocks (~90-180 seconds) with emotional consensus
 
 ## Integration Points
 
