@@ -230,14 +230,29 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <a href="#get-started">
               <button 
-                className="bg-terminal-cyan text-black hover:bg-terminal-green hover:text-black border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                className="border-2 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                style={{ 
+                  backgroundColor: '#00ffff', 
+                  color: '#000000', 
+                  borderColor: '#00ffff' 
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#00ff00';
+                  e.target.style.borderColor = '#00ff00';
+                  e.target.style.color = '#000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#00ffff';
+                  e.target.style.borderColor = '#00ffff';
+                  e.target.style.color = '#000000';
+                }}
                 onClick={(e) => {
                   e.preventDefault();
                   document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
-                <Zap className="w-5 h-5 mr-2" />
-                <span className="font-bold">Start Validating</span>
+                <Zap className="w-5 h-5 mr-2" style={{ color: '#000000' }} />
+                <span style={{ color: '#000000', fontWeight: 'bold' }}>Start Validating</span>
               </button>
             </a>
             <Link href="/explorer">
@@ -422,14 +437,29 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/access">
               <button 
-                className="bg-terminal-cyan text-black hover:bg-terminal-green hover:text-black border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                className="border-2 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                style={{ 
+                  backgroundColor: '#00ffff', 
+                  color: '#000000', 
+                  borderColor: '#00ffff' 
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = '#00ff00';
+                  e.target.style.borderColor = '#00ff00';
+                  e.target.style.color = '#000000';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = '#00ffff';
+                  e.target.style.borderColor = '#00ffff';
+                  e.target.style.color = '#000000';
+                }}
                 onClick={(e) => {
                   e.preventDefault();
                   window.location.href = '/access';
                 }}
               >
-                <Heart className="w-5 h-5 mr-2" />
-                <span className="font-bold">Get Started</span>
+                <Heart className="w-5 h-5 mr-2" style={{ color: '#000000' }} />
+                <span style={{ color: '#000000', fontWeight: 'bold' }}>Get Started</span>
               </button>
             </a>
             <a href="/docs">
