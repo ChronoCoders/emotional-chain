@@ -1,6 +1,6 @@
 import { ProductionCrypto } from './ProductionCrypto';
 import { TransactionCrypto, SignedTransaction } from './TransactionCrypto';
-import { KeyPair } from './KeyPair';
+import type { KeyPair } from './KeyPair';
 export interface BiometricData {
   heartRate: number;
   stressLevel: number;
