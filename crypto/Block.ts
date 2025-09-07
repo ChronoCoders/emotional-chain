@@ -2,16 +2,24 @@ import * as crypto from 'crypto';
 import { Transaction } from './Transaction';
 import { MerkleTree } from './MerkleTree';
 import { EmotionalValidator, EmotionalValidatorUtils } from './EmotionalValidator';
+import { 
+  EmotionalCommitment, 
+  EmotionalCommitmentData, 
+  AuthenticityCommitmentData,
+  ConsensusCommitmentData 
+} from './EmotionalCommitment';
+
 export interface BlockHeader {
   index: number;
   timestamp: number;
   previousHash: string;
   merkleRoot: string;
   validator: string;
-  emotionalScore: string;
-  consensusScore: string;
-  authenticity: string;
-  // Removed PoW elements for pure PoE consensus
+  // Privacy-preserving commitments instead of raw emotional data
+  emotionalCommitment: string;
+  authenticityCommitment: string;
+  consensusEligible: boolean;
+  consensusWeight: number;
 }
 export class Block {
   public index: number;
@@ -20,11 +28,18 @@ export class Block {
   public previousHash: string;
   public merkleRoot: string;
   public validator: string;
-  public emotionalScore: string;
-  public consensusScore: string;
-  public authenticity: string;
+  // Privacy-preserving commitments
+  public emotionalCommitment: string;
+  public authenticityCommitment: string;
+  public consensusEligible: boolean;
+  public consensusWeight: number;
   public hash: string;
   private merkleTree: MerkleTree;
+  
+  // Store commitment data for validation (not on-chain)
+  private emotionalCommitmentData?: EmotionalCommitmentData;
+  private authenticityCommitmentData?: AuthenticityCommitmentData;
+  private consensusCommitmentData?: ConsensusCommitmentData;
   constructor(
     index: number,
     transactions: Transaction[],
@@ -37,14 +52,42 @@ export class Block {
     this.transactions = transactions;
     this.previousHash = previousHash;
     this.validator = validator.id;
-    this.emotionalScore = validator.emotionalScore.toString();
-    this.consensusScore = consensusScore.toString();
-    this.authenticity = (validator.authenticity * 100).toFixed(2);
+
+    // Create cryptographic commitments for privacy
+    this.emotionalCommitmentData = EmotionalCommitment.createEmotionalCommitment(
+      validator.emotionalScore,
+      validator.id,
+      this.timestamp
+    );
+
+    this.authenticityCommitmentData = EmotionalCommitment.createAuthenticityCommitment(
+      validator.authenticity,
+      EmotionalCommitment.generateDeviceFingerprint(validator.biometricData || {}),
+      validator.id,
+      this.timestamp
+    );
+
+    this.consensusCommitmentData = EmotionalCommitment.createConsensusCommitment(
+      consensusScore,
+      validator.emotionalScore,
+      validator.id,
+      this.timestamp
+    );
+
+    // Store only commitment hashes on-chain (not raw data)
+    this.emotionalCommitment = this.emotionalCommitmentData.commitment;
+    this.authenticityCommitment = this.authenticityCommitmentData.commitment;
+    this.consensusEligible = this.consensusCommitmentData.consensusEligible;
+    this.consensusWeight = this.consensusCommitmentData.consensusWeight;
+
     // Build merkle tree for transaction integrity
     this.merkleTree = new MerkleTree(transactions);
     this.merkleRoot = this.merkleTree.getRoot();
-    // Calculate block hash (will be updated during mining)
+    
+    // Calculate block hash with privacy-preserving data
     this.hash = this.calculateHash();
+    
+    console.log(`🔒 Block ${index} created with cryptographic commitments - privacy preserved!`);
   }
   /**
    * Calculate cryptographic hash of the block
@@ -56,9 +99,11 @@ export class Block {
       previousHash: this.previousHash,
       merkleRoot: this.merkleRoot,
       validator: this.validator,
-      emotionalScore: this.emotionalScore,
-      consensusScore: this.consensusScore,
-      authenticity: this.authenticity
+      // Privacy-preserving commitments only
+      emotionalCommitment: this.emotionalCommitment,
+      authenticityCommitment: this.authenticityCommitment,
+      consensusEligible: this.consensusEligible,
+      consensusWeight: this.consensusWeight
     };
     const dataString = JSON.stringify(blockData);
     return crypto.createHash('sha256').update(dataString).digest('hex');
@@ -171,28 +216,41 @@ export class Block {
     return true;
   }
   /**
-   * Validate emotional consensus requirements
+   * Validate emotional consensus using cryptographic commitments
    */
   private validateEmotionalConsensus(): boolean {
-    const emotionalScore = parseFloat(this.emotionalScore);
-    const authenticity = parseFloat(this.authenticity) / 100;
-    // Emotional score threshold
-    if (!EmotionalValidatorUtils.isValidEmotionalProof(emotionalScore)) {
-      console.error('Validator emotional score too low:', emotionalScore);
+    // Validate using commitment-based eligibility (privacy-preserving)
+    if (!this.consensusEligible) {
+      console.error('Validator not eligible for consensus based on commitments');
       return false;
     }
-    // Authenticity threshold
-    if (authenticity < 0.7) {
-      console.error('Validator authenticity too low:', authenticity);
+    
+    // Validate consensus weight (should be binary: 0 or 1)
+    if (this.consensusWeight !== 0 && this.consensusWeight !== 1) {
+      console.error('Invalid consensus weight - must be binary (0 or 1):', this.consensusWeight);
       return false;
     }
-    // Consensus score should be reasonable
-    const consensusScore = parseFloat(this.consensusScore);
-    if (consensusScore < 60 || consensusScore > 100) {
-      console.error('Invalid consensus score:', consensusScore);
+    
+    // Validate commitment format (should be valid hex hashes)
+    if (!this.isValidCommitmentHash(this.emotionalCommitment)) {
+      console.error('Invalid emotional commitment format');
       return false;
     }
+    
+    if (!this.isValidCommitmentHash(this.authenticityCommitment)) {
+      console.error('Invalid authenticity commitment format');
+      return false;
+    }
+    
     return true;
+  }
+  
+  /**
+   * Validate commitment hash format
+   */
+  private isValidCommitmentHash(commitment: string): boolean {
+    // Should be 64-character hex string (SHA-256 hash)
+    return /^[a-fA-F0-9]{64}$/.test(commitment);
   }
   /**
    * Validate block hash for PoE consensus
@@ -217,9 +275,10 @@ export class Block {
       previousHash: this.previousHash,
       merkleRoot: this.merkleRoot,
       validator: this.validator,
-      emotionalScore: this.emotionalScore,
-      consensusScore: this.consensusScore,
-      authenticity: this.authenticity
+      emotionalCommitment: this.emotionalCommitment,
+      authenticityCommitment: this.authenticityCommitment,
+      consensusEligible: this.consensusEligible,
+      consensusWeight: this.consensusWeight
     };
   }
   /**
@@ -260,9 +319,10 @@ export class Block {
       previousHash: this.previousHash,
       merkleRoot: this.merkleRoot,
       validator: this.validator,
-      emotionalScore: this.emotionalScore,
-      consensusScore: this.consensusScore,
-      authenticity: this.authenticity,
+      emotionalCommitment: this.emotionalCommitment,
+      authenticityCommitment: this.authenticityCommitment,
+      consensusEligible: this.consensusEligible,
+      consensusWeight: this.consensusWeight,
       hash: this.hash
     };
   }
@@ -272,33 +332,43 @@ export class Block {
   public static fromJSON(data: any): Block {
     // Reconstruct transactions
     const transactions = data.transactions.map((txData: any) => Transaction.fromJSON(txData));
-    // Create validator object (minimal for reconstruction)
+    
+    // For commitment-based blocks, we can't reconstruct exact original values
+    // Instead, create a minimal validator for reconstruction
     const validator = {
       id: data.validator,
-      emotionalScore: parseFloat(data.emotionalScore),
-      authenticity: parseFloat(data.authenticity) / 100,
+      emotionalScore: data.consensusEligible ? 75 : 60, // Approximate based on eligibility
+      authenticity: 0.8, // Safe assumption for committed blocks
       address: '',
       biometricData: {
         heartRate: 80,
         stressLevel: 30,
         focusLevel: 85,
-        authenticity: parseFloat(data.authenticity) / 100,
+        authenticity: 0.8,
         timestamp: data.timestamp
       },
       lastActive: data.timestamp,
       blocksValidated: 0
     } as EmotionalValidator;
-    // Create block
+    
+    // Create block with approximate consensus score
+    const consensusScore = data.consensusEligible ? 75 : 60;
     const block = new Block(
       data.index,
       transactions,
       data.previousHash,
       validator,
-      parseFloat(data.consensusScore)
+      consensusScore
     );
-    // Set block values
+    
+    // Override with actual committed values from JSON
     block.timestamp = data.timestamp;
     block.hash = data.hash;
+    block.emotionalCommitment = data.emotionalCommitment;
+    block.authenticityCommitment = data.authenticityCommitment;
+    block.consensusEligible = data.consensusEligible;
+    block.consensusWeight = data.consensusWeight;
+    
     return block;
   }
   /**

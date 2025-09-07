@@ -53,24 +53,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/config/websocket", async (req, res) => {
     try {
       const { CONFIG } = await import('../shared/config');
+      // Use same port as HTTP server for WebSocket
+      const serverPort = parseInt(process.env.PORT || CONFIG.network.ports.http.toString(), 10);
+      
       res.json({
         heartbeatInterval: CONFIG.network.protocols.websocket.heartbeatInterval || 30000,
         reconnectAttempts: CONFIG.network.protocols.websocket.reconnectAttempts || 5,
         reconnectDelay: CONFIG.network.protocols.websocket.reconnectDelay || 2000,
         fallbackHost: 'localhost',
-        fallbackPort: CONFIG.network.ports.websocket || 5000,
+        fallbackPort: serverPort, // Use same port as HTTP server
         retryLimit: CONFIG.network.protocols.websocket.retryLimit || 10,
         exponentialBackoffEnabled: true,
         maxBackoffDelay: 30000,
       });
     } catch (error) {
       console.error('WebSocket config error:', error);
+      // Use environment port or default
+      const serverPort = parseInt(process.env.PORT || '5000', 10);
       res.json({
         heartbeatInterval: 30000,
         reconnectAttempts: 5,
         reconnectDelay: 2000,
         fallbackHost: 'localhost',
-        fallbackPort: 5000,
+        fallbackPort: serverPort,
         retryLimit: 10,
         exponentialBackoffEnabled: true,
         maxBackoffDelay: 30000,
