@@ -14,6 +14,7 @@ export class EmotionalChain extends EventEmitter {
   private validators: Map<string, any> = new Map();
   private wallets: Map<string, number> = new Map(); // Validator wallets for EMO storage
   private validatorKeys: Map<string, { privateKey: Uint8Array; publicKey: Uint8Array }> = new Map();
+  private isInitialized: boolean = false; // Track blockchain initialization status
   
   // Future: Distributed Consensus Components (when implemented)
   private isDistributedMode: boolean = false;
@@ -55,17 +56,33 @@ export class EmotionalChain extends EventEmitter {
     console.log('📁 Full P2P network and Byzantine consensus available in /network and /consensus directories');
     this.isDistributedMode = false; // Keep false for now
   }
+
+  /**
+   * Wait for blockchain to be fully initialized before proceeding with operations
+   */
+  public async waitForInitialization(maxWaitMs: number = 10000): Promise<boolean> {
+    const startTime = Date.now();
+    while (!this.isInitialized && (Date.now() - startTime) < maxWaitMs) {
+      await new Promise(resolve => setTimeout(resolve, 100)); // Wait 100ms
+    }
+    return this.isInitialized;
+  }
   private async initializeBlockchain() {
     try {
       // Try to load existing blockchain from database
       const existingBlocks = await this.loadBlockchainFromDatabase();
       if (existingBlocks.length > 0) {
         this.chain = existingBlocks;
+        console.log(`🔗 BLOCKCHAIN: Loaded ${existingBlocks.length} blocks from database`);
       } else {
         await this.createGenesisBlock();
+        console.log('🔗 BLOCKCHAIN: Created genesis block - blockchain initialized');
       }
+      this.isInitialized = true;
     } catch (error) {
+      console.error('🔗 BLOCKCHAIN: Error during initialization, creating genesis block:', error);
       await this.createGenesisBlock();
+      this.isInitialized = true;
     }
   }
   private async loadBlockchainFromDatabase(): Promise<any[]> {
@@ -110,6 +127,7 @@ export class EmotionalChain extends EventEmitter {
     }, genesisKeyPair.privateKey);
     
     this.chain.push(genesisBlock);
+    console.log('🔗 GENESIS: Genesis block created and added to chain');
   }
   private calculateHash(index: number, timestamp: number, transactions: any[], previousHash: string, nonce: number): string {
     // Use production cryptography for block hashing
@@ -347,13 +365,19 @@ export class EmotionalChain extends EventEmitter {
     return selectedValidator;
   }
   private async mineBlock(): Promise<boolean> {
+    if (!this.isInitialized) {
+      console.log('MINING: Waiting for blockchain initialization...');
+      return false;
+    }
     const selectedValidator = this.selectValidator();
     if (!selectedValidator) {
       return false;
     }
     const previousBlock = this.getLatestBlock();
     if (!previousBlock) {
-      console.error('MINING ERROR: No previous block found - blockchain may be empty');
+      console.error('MINING ERROR: No previous block found - blockchain may be empty (blocks in chain:', this.chain.length, ')');
+      console.error('MINING ERROR: This should not happen after proper initialization. Forcing re-initialization...');
+      await this.initializeBlockchain();
       return false;
     }
     const newBlock = {
@@ -527,6 +551,14 @@ export class EmotionalChain extends EventEmitter {
     return Math.round(averageScore * 100) / 100;
   }
   public startMining(): any {
+    if (!this.isInitialized) {
+      return {
+        status: "error",
+        message: "Cannot start mining - blockchain not yet initialized",
+        validators: this.validators.size,
+        difficulty: this.difficulty
+      };
+    }
     if (this.isMining) {
       return {
         status: "already_running",
