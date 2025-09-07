@@ -9,6 +9,7 @@ import { eq, sql } from 'drizzle-orm';
 export class PersistentTokenEconomics {
   private static instance: PersistentTokenEconomics;
   private initialized = false;
+  private lastLoggedSupply?: number; // Track last logged supply to reduce spam
 
   public static getInstance(): PersistentTokenEconomics {
     if (!PersistentTokenEconomics.instance) {
@@ -467,7 +468,11 @@ export class PersistentTokenEconomics {
           totalBlocks
         ]);
         
-        console.log(`PROFESSIONAL ECONOMICS: ${totalSupply.toFixed(2)} total, ${circulatingSupply.toFixed(2)} circulating (${circulationRate.toFixed(1)}%), ${totalStakedAmount.toFixed(2)} staked at block ${totalBlocks}`);
+        // Only log economics updates when there are significant changes (reduced log spam)
+        if (!this.lastLoggedSupply || Math.abs(totalSupply - this.lastLoggedSupply) > 1000) {
+          console.log(`PROFESSIONAL ECONOMICS: ${totalSupply.toFixed(2)} total, ${circulatingSupply.toFixed(2)} circulating (${circulationRate.toFixed(1)}%), ${totalStakedAmount.toFixed(2)} staked at block ${totalBlocks}`);
+          this.lastLoggedSupply = totalSupply;
+        }
       }
     } catch (error) {
       console.error('Token economics calculation failed:', error);

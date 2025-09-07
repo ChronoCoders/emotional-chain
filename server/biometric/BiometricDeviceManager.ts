@@ -29,10 +29,10 @@ export class BiometricDeviceManager extends EventEmitter {
   }
 
   private startDeviceScanning(): void {
-    // Scan for real biometric devices every 10 seconds
+    // Scan for real biometric devices every 5 minutes (reduced from 10 seconds)
     this.scanInterval = setInterval(() => {
       this.scanForDevices();
-    }, 10000);
+    }, 300000);
   }
 
   private async scanForDevices(): Promise<void> {
