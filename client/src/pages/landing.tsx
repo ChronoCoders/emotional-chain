@@ -229,25 +229,13 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <button 
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black font-bold px-8 py-3 rounded-md transition-colors flex items-center justify-center gap-2"
               onClick={(e) => {
                 e.preventDefault();
                 document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              style={{
-                backgroundColor: '#00ffff',
-                color: '#000000',
-                border: '2px solid #00ffff',
-                padding: '12px 32px',
-                borderRadius: '6px',
-                fontWeight: 'bold',
-                fontSize: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
             >
-              <Zap style={{ width: '20px', height: '20px', color: '#000000' }} />
+              <Zap className="w-5 h-5" />
               Start Validating
             </button>
             <Link href="/explorer">
@@ -431,25 +419,13 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black font-bold px-8 py-3 rounded-md transition-colors flex items-center justify-center gap-2"
               onClick={(e) => {
                 e.preventDefault();
                 window.location.href = '/access';
               }}
-              style={{
-                backgroundColor: '#00ffff',
-                color: '#000000',
-                border: '2px solid #00ffff',
-                padding: '12px 32px',
-                borderRadius: '6px',
-                fontWeight: 'bold',
-                fontSize: '16px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
             >
-              <Heart style={{ width: '20px', height: '20px', color: '#000000' }} />
+              <Heart className="w-5 h-5" />
               Get Started
             </button>
             <a href="/docs">
