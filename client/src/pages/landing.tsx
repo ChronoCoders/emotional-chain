@@ -230,7 +230,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <a href="#get-started">
               <button 
-                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green hover:text-terminal-bg border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                className="bg-terminal-cyan text-black hover:bg-terminal-green hover:text-black border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
                   document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
@@ -242,7 +242,7 @@ export default function LandingPage() {
             </a>
             <Link href="/explorer">
               <button 
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
               >
                 <Globe className="w-5 h-5 mr-2" />
                 <span className="font-bold">Explore Network</span>
@@ -422,7 +422,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/access">
               <button 
-                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green hover:text-terminal-bg border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
+                className="bg-terminal-cyan text-black hover:bg-terminal-green hover:text-black border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
                   window.location.href = '/access';
@@ -434,7 +434,7 @@ export default function LandingPage() {
             </a>
             <a href="/docs">
               <button 
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
                 onClick={(e) => {
                   e.preventDefault();
                   window.location.href = '/docs';
