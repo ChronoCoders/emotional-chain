@@ -53,9 +53,9 @@ export class WebSocketSDK extends EventEmitter {
     this.config = {
       reconnectAttempts: CONFIG.network.protocols.websocket.reconnectAttempts,
       reconnectDelay: CONFIG.network.protocols.websocket.reconnectDelay,
-      timeout: CONFIG.network.timeouts.websocket,
+      timeout: CONFIG.network.protocols.websocket.connectionTimeout,
       pingInterval: CONFIG.network.protocols.websocket.heartbeatInterval,
-      pongTimeout: CONFIG.network.timeouts.connection / 2,
+      pongTimeout: CONFIG.network.protocols.websocket.connectionTimeout / 2,
       ...config
     };
   }
