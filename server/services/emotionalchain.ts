@@ -25,6 +25,8 @@ export class EmotionalChainService {
   private calculator = new BlockchainBalanceCalculator();
   private blockchainTransactions: EmotionalTransaction[] = [];
   private blockchainInitialized = false;
+  private walletCache: { data: any[], timestamp: number } | null = null;
+  private readonly CACHE_DURATION = 10000; // 10 seconds cache
   
   // NEW: Distributed blockchain components
   private distributedIntegration?: DistributedBlockchainIntegration;
@@ -456,6 +458,12 @@ export class EmotionalChainService {
     return this.getBalance(validatorId);
   }
   async getAllWallets(): Promise<any[]> {
+    // Check cache first to reduce excessive recalculation
+    const now = Date.now();
+    if (this.walletCache && (now - this.walletCache.timestamp) < this.CACHE_DURATION) {
+      return this.walletCache.data;
+    }
+    
     console.log('BLOCKCHAIN: Getting all wallet balances from blockchain state');
     
     if (!this.blockchainInitialized) {
@@ -480,6 +488,13 @@ export class EmotionalChainService {
     });
     
     console.log(`BLOCKCHAIN: Calculated ${wallets.length} wallet balances from blockchain`);
+    
+    // Cache the result
+    this.walletCache = {
+      data: wallets,
+      timestamp: now
+    };
+    
     return wallets;
   }
   public async getWalletStatus(validatorId: string) {
@@ -997,7 +1012,7 @@ Mining rewards distributed to ecosystem validators.`;
     
     this.heartbeatInterval = setInterval(async () => {
       await this.syncTokenEconomics();
-    }, 3000); // Sync every 3 seconds for real-time updates
+    }, 30000); // Sync every 30 seconds for efficiency (reduced from 3 seconds)
   }
 
   private async syncTokenEconomics(): Promise<void> {
