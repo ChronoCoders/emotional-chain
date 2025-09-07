@@ -67,7 +67,7 @@ export class EmotionalChainService {
                                process.env.ENABLE_DISTRIBUTED === 'true';
       
       if (enableDistributed) {
-        console.log('🌐 Initializing distributed blockchain components...');
+        console.log('Initializing distributed blockchain components...');
         
         // Wait for core blockchain to initialize
         setTimeout(async () => {
@@ -75,7 +75,7 @@ export class EmotionalChainService {
             await this.enableDistributedMode();
           } catch (error) {
             console.warn('⚠️ Failed to enable distributed mode:', error.message);
-            console.log('📍 Continuing in centralized mode');
+            console.log('Continuing in centralized mode');
           }
         }, 5000); // Wait 5 seconds for blockchain initialization
       }
@@ -89,12 +89,12 @@ export class EmotionalChainService {
    */
   async enableDistributedMode(): Promise<boolean> {
     if (this.isDistributedModeEnabled) {
-      console.log('⚠️ Distributed mode already enabled');
+      console.log('Distributed mode already enabled');
       return true;
     }
 
     try {
-      console.log('🚀 Enabling distributed consensus mode...');
+      console.log('Enabling distributed consensus mode...');
 
       // Initialize distributed integration
       this.distributedIntegration = new DistributedBlockchainIntegration(
@@ -122,7 +122,7 @@ export class EmotionalChainService {
         // Start network monitoring
         this.networkMonitoring.startMonitoring(30000); // 30 second intervals
         
-        console.log('✅ Distributed consensus mode enabled successfully');
+        console.log('Distributed consensus mode enabled successfully');
         return true;
       } else {
         console.error('❌ Failed to enable distributed consensus mode');
@@ -144,7 +144,7 @@ export class EmotionalChainService {
     }
 
     try {
-      console.log('🔄 Disabling distributed consensus mode...');
+      console.log('Disabling distributed consensus mode...');
 
       // Stop network monitoring
       if (this.networkMonitoring) {
@@ -157,7 +157,7 @@ export class EmotionalChainService {
       }
 
       this.isDistributedModeEnabled = false;
-      console.log('✅ Distributed consensus mode disabled');
+      console.log('Distributed consensus mode disabled');
       
       return true;
 
