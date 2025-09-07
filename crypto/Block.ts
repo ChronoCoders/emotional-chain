@@ -11,8 +11,7 @@ export interface BlockHeader {
   emotionalScore: string;
   consensusScore: string;
   authenticity: string;
-  nonce: number;
-  difficulty: number;
+  // Removed PoW elements for pure PoE consensus
 }
 export class Block {
   public index: number;
@@ -24,8 +23,6 @@ export class Block {
   public emotionalScore: string;
   public consensusScore: string;
   public authenticity: string;
-  public nonce: number;
-  public difficulty: number;
   public hash: string;
   private merkleTree: MerkleTree;
   constructor(
@@ -33,8 +30,7 @@ export class Block {
     transactions: Transaction[],
     previousHash: string,
     validator: EmotionalValidator,
-    consensusScore: number,
-    difficulty: number = 2
+    consensusScore: number
   ) {
     this.index = index;
     this.timestamp = Date.now();
@@ -44,8 +40,6 @@ export class Block {
     this.emotionalScore = validator.emotionalScore.toString();
     this.consensusScore = consensusScore.toString();
     this.authenticity = (validator.authenticity * 100).toFixed(2);
-    this.nonce = 0;
-    this.difficulty = difficulty;
     // Build merkle tree for transaction integrity
     this.merkleTree = new MerkleTree(transactions);
     this.merkleRoot = this.merkleTree.getRoot();
@@ -64,30 +58,19 @@ export class Block {
       validator: this.validator,
       emotionalScore: this.emotionalScore,
       consensusScore: this.consensusScore,
-      authenticity: this.authenticity,
-      nonce: this.nonce,
-      difficulty: this.difficulty
+      authenticity: this.authenticity
     };
     const dataString = JSON.stringify(blockData);
     return crypto.createHash('sha256').update(dataString).digest('hex');
   }
   /**
-   * Proof of Emotion mining - Light computational work since validators are pre-selected
-   * This is NOT traditional Proof of Work - it's just a light difficulty check
+   * Pure Proof of Emotion block validation - No computational mining required
+   * Blocks are validated through emotional consensus only
    */
-  public mineBlock(): boolean {
-    // Light mining - Proof of Emotion consensus (low computational requirement)
-    const target = '0'.repeat(this.difficulty);
-    const maxNonce = 100000; // Light computational limit
-    // Light mining loop - much faster than traditional PoW
-    for (let nonce = 0; nonce <= maxNonce; nonce++) {
-      this.nonce = nonce;
-      this.hash = this.calculateHash();
-      if (this.hash.substring(0, this.difficulty) === target) {
-        return true;
-      }
-    }
-    return false; // Mining failed
+  public finalizeBlock(): boolean {
+    // Calculate final hash for pure PoE consensus
+    this.hash = this.calculateHash();
+    return true;
   }
   /**
    * Validate block using emotional consensus rules
@@ -212,7 +195,7 @@ export class Block {
     return true;
   }
   /**
-   * Validate block hash and mining proof
+   * Validate block hash for PoE consensus
    */
   private validateHash(): boolean {
     // Recalculate hash
@@ -221,12 +204,7 @@ export class Block {
       console.error('Block hash mismatch');
       return false;
     }
-    // Check mining difficulty (light proof)
-    const target = '0'.repeat(this.difficulty);
-    if (this.hash.substring(0, this.difficulty) !== target) {
-      console.error('Block does not meet difficulty requirement');
-      return false;
-    }
+    // No mining difficulty check needed for pure PoE
     return true;
   }
   /**
@@ -241,9 +219,7 @@ export class Block {
       validator: this.validator,
       emotionalScore: this.emotionalScore,
       consensusScore: this.consensusScore,
-      authenticity: this.authenticity,
-      nonce: this.nonce,
-      difficulty: this.difficulty
+      authenticity: this.authenticity
     };
   }
   /**
@@ -287,8 +263,6 @@ export class Block {
       emotionalScore: this.emotionalScore,
       consensusScore: this.consensusScore,
       authenticity: this.authenticity,
-      nonce: this.nonce,
-      difficulty: this.difficulty,
       hash: this.hash
     };
   }
@@ -320,12 +294,10 @@ export class Block {
       transactions,
       data.previousHash,
       validator,
-      parseFloat(data.consensusScore),
-      data.difficulty
+      parseFloat(data.consensusScore)
     );
-    // Set mined values
+    // Set block values
     block.timestamp = data.timestamp;
-    block.nonce = data.nonce;
     block.hash = data.hash;
     return block;
   }
@@ -342,11 +314,10 @@ export class Block {
       [], // No transactions in genesis
       '0'.repeat(64), // No previous hash
       genesisValidator,
-      100.0, // Perfect consensus for genesis
-      2
+      100.0 // Perfect consensus for genesis
     );
-    // Mine the genesis block
-    genesisBlock.mineBlock();
+    // Finalize the genesis block
+    genesisBlock.finalizeBlock();
     console.log(' Genesis block created with Proof of Emotion consensus!');
     return genesisBlock;
   }
