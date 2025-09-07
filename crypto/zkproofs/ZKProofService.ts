@@ -4,6 +4,9 @@
  */
 
 import { EmotionalValidationCircuit, EmotionalZKProof } from './EmotionalValidationCircuit';
+
+// Re-export for external use
+export { EmotionalZKProof } from './EmotionalValidationCircuit';
 import { EmotionalValidator } from '../EmotionalValidator';
 import * as crypto from 'crypto';
 
