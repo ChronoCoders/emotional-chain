@@ -230,24 +230,22 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <a href="#get-started">
               <button 
-                className="bg-cyan-500 text-gray-900 hover:bg-green-500 border-2 border-cyan-500 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
-                style={{ color: '#0a0a0a', backgroundColor: '#00ffff', borderColor: '#00ffff' }}
+                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green hover:text-terminal-bg border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
                   document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
                 }}
               >
                 <Zap className="w-5 h-5 mr-2" />
-                <span style={{ color: '#0a0a0a', fontWeight: 'bold' }}>Start Validating</span>
+                <span className="font-bold">Start Validating</span>
               </button>
             </a>
             <Link href="/explorer">
               <button 
-                className="border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-gray-900 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
-                style={{ borderColor: '#00ff00', color: '#00ff00' }}
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
               >
                 <Globe className="w-5 h-5 mr-2" />
-                <span style={{ color: '#00ff00', fontWeight: 'bold' }}>Explore Network</span>
+                <span className="font-bold">Explore Network</span>
               </button>
             </Link>
           </div>
@@ -424,28 +422,26 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="/access">
               <button 
-                className="bg-cyan-500 text-gray-900 hover:bg-green-500 border-2 border-cyan-500 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
-                style={{ color: '#0a0a0a', backgroundColor: '#00ffff', borderColor: '#00ffff' }}
+                className="bg-terminal-cyan text-terminal-bg hover:bg-terminal-green hover:text-terminal-bg border-2 border-terminal-cyan hover:border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
                 onClick={(e) => {
                   e.preventDefault();
                   window.location.href = '/access';
                 }}
               >
                 <Heart className="w-5 h-5 mr-2" />
-                <span style={{ color: '#0a0a0a', fontWeight: 'bold' }}>Get Started</span>
+                <span className="font-bold">Get Started</span>
               </button>
             </a>
             <a href="/docs">
               <button 
-                className="border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-gray-900 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
-                style={{ borderColor: '#00ff00', color: '#00ff00' }}
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
                 onClick={(e) => {
                   e.preventDefault();
                   window.location.href = '/docs';
                 }}
               >
                 <ExternalLink className="w-5 h-5 mr-2" />
-                <span style={{ color: '#00ff00', fontWeight: 'bold' }}>View Documentation</span>
+                <span className="font-bold">View Documentation</span>
               </button>
             </a>
           </div>
