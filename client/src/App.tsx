@@ -21,7 +21,7 @@ function Router() {
   return (
     <Switch>
       {/* Role-based access routes */}
-      <Route path="/access" component={RoleBasedAccess} />
+      <Route path="/access" component={() => <RoleBasedAccess />} />
       <Route path="/dashboard" component={UserDashboard} />
       <Route path="/validator" component={ValidatorDashboard} />
       <Route path="/admin" component={AdminPanel} />
