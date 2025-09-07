@@ -9,6 +9,11 @@ import { ImmutableBlockchainService } from '../blockchain/ImmutableBlockchainSer
 import { DatabaseToBlockchainMigration } from '../blockchain/DatabaseToBlockchainMigration.js';
 import { BlockchainBalanceCalculator } from '../blockchain/BlockchainBalanceCalculator.js';
 import { EmotionalTransaction } from '../../shared/types/BlockchainTypes.js';
+import { DistributedBlockchainIntegration } from '../blockchain/DistributedBlockchainIntegration';
+import { ValidatorNodeDeployment } from '../../deployment/ValidatorNodeDeployment';
+import { NetworkMonitoringDashboard } from '../../deployment/NetworkMonitoringDashboard';
+import { ProductionConfig } from '../../deployment/ProductionConfig';
+
 export class EmotionalChainService {
   private isRunning: boolean = false;
   private heartbeatInterval: NodeJS.Timeout | null = null;
@@ -20,13 +25,27 @@ export class EmotionalChainService {
   private calculator = new BlockchainBalanceCalculator();
   private blockchainTransactions: EmotionalTransaction[] = [];
   private blockchainInitialized = false;
+  
+  // NEW: Distributed blockchain components
+  private distributedIntegration?: DistributedBlockchainIntegration;
+  private validatorDeployment?: ValidatorNodeDeployment;
+  private networkMonitoring?: NetworkMonitoringDashboard;
+  private productionConfig?: ProductionConfig;
+  private isDistributedModeEnabled = false;
 
   constructor() {
     this.emotionalStaking = new EmotionalStaking();
     this.immutableBlockchain = new ImmutableBlockchainService(); // Initialize immutable blockchain
+    
+    // Initialize production configuration
+    this.productionConfig = ProductionConfig.getInstance();
+    
     this.initializeBlockchain();
     this.startHeartbeat();
     this.initializePersistentTokenEconomics();
+    
+    // Initialize distributed components if configured
+    this.initializeDistributedComponents();
   }
 
   private async initializePersistentTokenEconomics() {
@@ -35,6 +54,116 @@ export class EmotionalChainService {
       console.log('Persistent token economics initialized');
     } catch (error) {
       console.error('Failed to initialize persistent token economics:', error);
+    }
+  }
+
+  /**
+   * Initialize distributed blockchain components
+   */
+  private async initializeDistributedComponents() {
+    try {
+      // Only initialize distributed components in production or if explicitly enabled
+      const enableDistributed = this.productionConfig?.get('NODE_ENV') === 'production' ||
+                               process.env.ENABLE_DISTRIBUTED === 'true';
+      
+      if (enableDistributed) {
+        console.log('🌐 Initializing distributed blockchain components...');
+        
+        // Wait for core blockchain to initialize
+        setTimeout(async () => {
+          try {
+            await this.enableDistributedMode();
+          } catch (error) {
+            console.warn('⚠️ Failed to enable distributed mode:', error.message);
+            console.log('📍 Continuing in centralized mode');
+          }
+        }, 5000); // Wait 5 seconds for blockchain initialization
+      }
+    } catch (error) {
+      console.warn('⚠️ Distributed components initialization failed:', error.message);
+    }
+  }
+
+  /**
+   * Enable distributed consensus mode
+   */
+  async enableDistributedMode(): Promise<boolean> {
+    if (this.isDistributedModeEnabled) {
+      console.log('⚠️ Distributed mode already enabled');
+      return true;
+    }
+
+    try {
+      console.log('🚀 Enabling distributed consensus mode...');
+
+      // Initialize distributed integration
+      this.distributedIntegration = new DistributedBlockchainIntegration(
+        this.bootstrapNode?.getBlockchain(),
+        this,
+        this.immutableBlockchain
+      );
+
+      // Initialize validator deployment manager
+      this.validatorDeployment = new ValidatorNodeDeployment(this.distributedIntegration);
+
+      // Initialize network monitoring
+      this.networkMonitoring = new NetworkMonitoringDashboard(
+        this.distributedIntegration,
+        this.validatorDeployment
+      );
+
+      // Enable distributed mode with production configuration
+      const networkConfig = this.productionConfig?.getNetworkConfig();
+      const success = await this.distributedIntegration.enableDistributedMode(networkConfig);
+
+      if (success) {
+        this.isDistributedModeEnabled = true;
+        
+        // Start network monitoring
+        this.networkMonitoring.startMonitoring(30000); // 30 second intervals
+        
+        console.log('✅ Distributed consensus mode enabled successfully');
+        return true;
+      } else {
+        console.error('❌ Failed to enable distributed consensus mode');
+        return false;
+      }
+
+    } catch (error) {
+      console.error('❌ Error enabling distributed mode:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Disable distributed consensus mode
+   */
+  async disableDistributedMode(): Promise<boolean> {
+    if (!this.isDistributedModeEnabled) {
+      return true;
+    }
+
+    try {
+      console.log('🔄 Disabling distributed consensus mode...');
+
+      // Stop network monitoring
+      if (this.networkMonitoring) {
+        this.networkMonitoring.stopMonitoring();
+      }
+
+      // Disable distributed integration
+      if (this.distributedIntegration) {
+        await this.distributedIntegration.disableDistributedMode();
+      }
+
+      this.isDistributedModeEnabled = false;
+      console.log('✅ Distributed consensus mode disabled');
+      
+      return true;
+
+    } catch (error) {
+      console.error('❌ Error disabling distributed mode:', error);
+      return false;
     }
   }
   private async initializeRealBlockchain() {
@@ -64,87 +193,119 @@ export class EmotionalChainService {
   }
   public async getNetworkStatus() {
     try {
-      // **ALWAYS USE REAL POE CONSENSUS**: Calculate authentic metrics from blockchain state
-      const validators = await this.getValidators();
-      const activeValidatorCount = validators?.filter(v => v.isActive).length || 21;
+      // Get base network status
+      const baseStatus = await this.getBaseNetworkStatus();
       
-      // Calculate real consensus percentage from active validators  
-      const consensusPercentage = ((activeValidatorCount / 21) * 100).toFixed(2);
-      
-      // Calculate real network emotional metrics from validator auth scores
-      const avgStress = validators?.reduce((sum, v) => {
-        const authScore = parseFloat(v.authScore || "85");
-        return sum + (100 - authScore) * 0.5; // Convert auth score to stress level
-      }, 0) / (validators?.length || 21);
-      
-      const avgEnergy = validators?.reduce((sum, v) => {
-        const authScore = parseFloat(v.authScore || "85");
-        return sum + Math.min(authScore + 10, 100); // Energy correlates with auth score
-      }, 0) / (validators?.length || 21);
-      
-      const avgFocus = validators?.reduce((sum, v) => {
-        const authScore = parseFloat(v.authScore || "85");
-        return sum + Math.min(authScore + 5, 100); // Focus correlates with auth score
-      }, 0) / (validators?.length || 21);
-      
-      // Real consensus metrics calculated from authentic validator data
-      
-      // Get real EMO supply from blockchain immutable state (MIGRATION LOGS DATA)
-      let realTokenEconomics = { totalSupply: 654380, circulatingSupply: 472928 };
-      let realBlockHeight = 11280;
-      try {
-        // Direct blockchain access for authentic token economics
-        if (this.bootstrapNode?.getBlockchain) {
-          const blockchain = this.bootstrapNode.getBlockchain();
-          const latestBlock = blockchain.getLatestBlock();
-          realBlockHeight = latestBlock?.index || 11280;
-          
-          // USE ACTUAL MIGRATION DATA: 654,380.70 total, 472,928.40 circulating (72.3%)
-          // The blockchain migration logs show the real supply from all transactions
-          realTokenEconomics = {
-            totalSupply: 654380, // From PROFESSIONAL ECONOMICS logs
-            circulatingSupply: 472928 // 72.3% circulating from logs
-          };
-        }
-      } catch (error) {
-        console.log('Using authentic blockchain EMO supply data');
+      // Add distributed network information if enabled
+      if (this.isDistributedModeEnabled && this.distributedIntegration) {
+        const distributedStatus = this.distributedIntegration.getNetworkStatus();
+        
+        return {
+          ...baseStatus,
+          distributed: {
+            enabled: true,
+            networkOperational: distributedStatus.networkOperational,
+            validatorCount: distributedStatus.validatorCount,
+            consensusHealth: distributedStatus.consensusHealth,
+            economicSecurity: distributedStatus.economicSecurity,
+            networkLatency: distributedStatus.networkLatency,
+            throughput: distributedStatus.throughput,
+            partitionStatus: distributedStatus.partitionStatus
+          }
+        };
+      } else {
+        return {
+          ...baseStatus,
+          distributed: {
+            enabled: false,
+            reason: 'Distributed mode not enabled'
+          }
+        };
       }
-      
-      // Calculate real TPS from transaction volume
-      let volumeData = { transactions24h: 4624, volume24h: 145311.56 };
-      try {
-        volumeData = await this.getTransactionVolume();
-      } catch (error) {
-        // Use fallback data if volume calculation fails
-      }
-      const realTPS = (volumeData.transactions24h / 86400).toFixed(4); // 24h transactions ÷ seconds in day
-      
-      return {
-        isRunning: true,
-        stats: {
-          id: crypto.randomUUID(),
-          connectedPeers: Math.max(activeValidatorCount, 16), // Real validator-based peer count
-          activeValidators: activeValidatorCount,
-          blockHeight: realBlockHeight,
-          consensusPercentage: consensusPercentage,
-          networkStress: avgStress.toFixed(2),
-          networkEnergy: avgEnergy.toFixed(2),
-          networkFocus: avgFocus.toFixed(2),
-          totalSupply: realTokenEconomics.totalSupply.toString(), // Real token supply from blockchain state
-          circulatingSupply: realTokenEconomics.circulatingSupply.toString(), // Real circulating supply from blockchain
-          tps: realTPS, // Real transactions per second
-          transactions24h: volumeData.transactions24h.toString(),
-          volume24h: volumeData.volume24h,
-          timestamp: new Date()
-        },
-        validators: validators,
-        latestBlock: await this.getLatestBlock(),
-        timestamp: new Date().toISOString()
-      };
     } catch (error) {
       console.error('Network status error:', error);
       throw error;
     }
+  }
+
+  private async getBaseNetworkStatus() {
+    // **ALWAYS USE REAL POE CONSENSUS**: Calculate authentic metrics from blockchain state
+    const validators = await this.getValidators();
+    const activeValidatorCount = validators?.filter(v => v.isActive).length || 21;
+    
+    // Calculate real consensus percentage from active validators  
+    const consensusPercentage = ((activeValidatorCount / 21) * 100).toFixed(2);
+    
+    // Calculate real network emotional metrics from validator auth scores
+    const avgStress = validators?.reduce((sum, v) => {
+      const authScore = parseFloat(v.authScore || "85");
+      return sum + (100 - authScore) * 0.5; // Convert auth score to stress level
+    }, 0) / (validators?.length || 21);
+    
+    const avgEnergy = validators?.reduce((sum, v) => {
+      const authScore = parseFloat(v.authScore || "85");
+      return sum + Math.min(authScore + 10, 100); // Energy correlates with auth score
+    }, 0) / (validators?.length || 21);
+    
+    const avgFocus = validators?.reduce((sum, v) => {
+      const authScore = parseFloat(v.authScore || "85");
+      return sum + Math.min(authScore + 5, 100); // Focus correlates with auth score
+    }, 0) / (validators?.length || 21);
+    
+    // Real consensus metrics calculated from authentic validator data
+    
+    // Get real EMO supply from blockchain immutable state (MIGRATION LOGS DATA)
+    let realTokenEconomics = { totalSupply: 654380, circulatingSupply: 472928 };
+    let realBlockHeight = 11280;
+    try {
+      // Direct blockchain access for authentic token economics
+      if (this.bootstrapNode?.getBlockchain) {
+        const blockchain = this.bootstrapNode.getBlockchain();
+        const latestBlock = blockchain.getLatestBlock();
+        realBlockHeight = latestBlock?.index || 11280;
+        
+        // USE ACTUAL MIGRATION DATA: 654,380.70 total, 472,928.40 circulating (72.3%)
+        // The blockchain migration logs show the real supply from all transactions
+        realTokenEconomics = {
+          totalSupply: 654380, // From PROFESSIONAL ECONOMICS logs
+          circulatingSupply: 472928 // 72.3% circulating from logs
+        };
+      }
+    } catch (error) {
+      console.log('Using authentic blockchain EMO supply data');
+    }
+    
+    // Calculate real TPS from transaction volume
+    let volumeData = { transactions24h: 4624, volume24h: 145311.56 };
+    try {
+      volumeData = await this.getTransactionVolume();
+    } catch (error) {
+      // Use fallback data if volume calculation fails
+    }
+    const realTPS = (volumeData.transactions24h / 86400).toFixed(4); // 24h transactions ÷ seconds in day
+    
+    return {
+      isRunning: true,
+      stats: {
+        id: crypto.randomUUID(),
+        connectedPeers: Math.max(activeValidatorCount, 16), // Real validator-based peer count
+        activeValidators: activeValidatorCount,
+        blockHeight: realBlockHeight,
+        consensusPercentage: consensusPercentage,
+        networkStress: avgStress.toFixed(2),
+        networkEnergy: avgEnergy.toFixed(2),
+        networkFocus: avgFocus.toFixed(2),
+        totalSupply: realTokenEconomics.totalSupply.toString(), // Real token supply from blockchain state
+        circulatingSupply: realTokenEconomics.circulatingSupply.toString(), // Real circulating supply from blockchain
+        tps: realTPS, // Real transactions per second
+        transactions24h: volumeData.transactions24h.toString(),
+        volume24h: volumeData.volume24h,
+        timestamp: new Date()
+      },
+      validators: validators,
+      latestBlock: await this.getLatestBlock(),
+      timestamp: new Date().toISOString()
+    };
   }
   private async getLatestBlock() {
     if (this.bootstrapNode && this.isRunning) {
@@ -413,11 +574,213 @@ export class EmotionalChainService {
           return await this.handleStatusCommand();
         case 'history':
           return await this.handleHistoryCommand();
+        case 'distributed':
+          return await this.handleDistributedCommand(args);
+        case 'deploy':
+          return await this.handleDeployCommand(args);
+        case 'monitor':
+          return await this.handleMonitorCommand(args);
         default:
           return `Unknown command: ${command}. Type 'help' for available commands.`;
       }
     } catch (error) {
       return `Error executing command: ${(error as Error).message}`;
+    }
+  }
+
+  /**
+   * Handle distributed network commands
+   */
+  private async handleDistributedCommand(args: string[]): Promise<string> {
+    const subcommand = args[0] || 'status';
+
+    switch (subcommand) {
+      case 'enable':
+        if (await this.enableDistributedMode()) {
+          return '✅ Distributed consensus mode enabled successfully';
+        } else {
+          return '❌ Failed to enable distributed consensus mode';
+        }
+
+      case 'disable':
+        if (await this.disableDistributedMode()) {
+          return '✅ Distributed consensus mode disabled successfully';
+        } else {
+          return '❌ Failed to disable distributed consensus mode';
+        }
+
+      case 'status':
+        if (!this.isDistributedModeEnabled || !this.distributedIntegration) {
+          return '⚫ Distributed mode: DISABLED';
+        }
+
+        const status = this.distributedIntegration.getNetworkStatus();
+        return `🌐 Distributed Network Status
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🟢 Status: ${status.networkOperational ? 'OPERATIONAL' : 'DEGRADED'}
+👥 Validators: ${status.validatorCount}
+🏛️ Consensus Health: ${status.consensusHealth.toFixed(1)}%
+🔒 Economic Security: ${status.economicSecurity}
+⚡ Network Latency: ${status.networkLatency}ms
+📈 Throughput: ${status.throughput.toFixed(1)} blocks/hour
+🔗 Partition Status: ${status.partitionStatus}`;
+
+      case 'readiness':
+        if (!this.distributedIntegration) {
+          return '❌ Distributed integration not initialized';
+        }
+
+        const readiness = this.distributedIntegration.getDeploymentReadiness();
+        return `📋 Deployment Readiness Assessment
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Ready: ${readiness.ready ? '✅ YES' : '❌ NO'}
+${readiness.reason ? `Reason: ${readiness.reason}` : ''}`;
+
+      default:
+        return 'Usage: distributed [enable|disable|status|readiness]';
+    }
+  }
+
+  /**
+   * Handle validator deployment commands
+   */
+  private async handleDeployCommand(args: string[]): Promise<string> {
+    const subcommand = args[0] || 'list';
+
+    if (!this.isDistributedModeEnabled || !this.validatorDeployment) {
+      return '❌ Distributed mode not enabled. Enable with: distributed enable';
+    }
+
+    switch (subcommand) {
+      case 'validator':
+        const validatorId = args[1] || `validator-${Date.now()}`;
+        const stakingAmount = parseInt(args[2] || '10000');
+        
+        try {
+          const success = await this.validatorDeployment.deployValidator({
+            validatorId,
+            stakingAmount,
+            target: { type: 'local', config: {} },
+            networkConfig: {
+              bootstrapNodes: this.productionConfig?.get('BOOTSTRAP_NODES') || ['/ip4/127.0.0.1/tcp/4001']
+            },
+            biometricConfig: {
+              enabled: true,
+              deviceTypes: ['heartRate', 'stressLevel'],
+              minAuthenticity: 0.7
+            },
+            economicConfig: {
+              minEmotionalScore: 70,
+              autoStaking: true
+            }
+          });
+
+          if (success) {
+            return `✅ Validator ${validatorId} deployed successfully with ${stakingAmount} EMO stake`;
+          } else {
+            return `❌ Failed to deploy validator ${validatorId}`;
+          }
+        } catch (error) {
+          return `❌ Deployment error: ${(error as Error).message}`;
+        }
+
+      case 'list':
+        const deployments = this.validatorDeployment.listDeployments();
+        if (deployments.length === 0) {
+          return '📋 No validator deployments found';
+        }
+
+        let result = '📋 Deployed Validators\n━━━━━━━━━━━━━━━━━━━━━━\n';
+        deployments.forEach((deployment, index) => {
+          result += `${index + 1}. ${deployment.validatorId}\n`;
+          result += `   Status: ${deployment.status}\n`;
+          result += `   Target: ${deployment.target}\n`;
+          result += `   Uptime: ${Math.floor((Date.now() - deployment.uptime) / 1000 / 60)} minutes\n`;
+          result += `   Blocks: ${deployment.metrics.blocksValidated}\n`;
+          result += `   Earnings: ${deployment.metrics.earnings.toFixed(2)} EMO\n\n`;
+        });
+        
+        return result;
+
+      case 'stop':
+        const stopValidatorId = args[1];
+        if (!stopValidatorId) {
+          return 'Usage: deploy stop <validator-id>';
+        }
+
+        if (await this.validatorDeployment.stopValidator(stopValidatorId)) {
+          return `✅ Stopped validator ${stopValidatorId}`;
+        } else {
+          return `❌ Failed to stop validator ${stopValidatorId}`;
+        }
+
+      default:
+        return 'Usage: deploy [validator <id> <stake>|list|stop <id>]';
+    }
+  }
+
+  /**
+   * Handle monitoring commands
+   */
+  private async handleMonitorCommand(args: string[]): Promise<string> {
+    const subcommand = args[0] || 'status';
+
+    if (!this.isDistributedModeEnabled || !this.networkMonitoring) {
+      return '❌ Distributed mode not enabled. Enable with: distributed enable';
+    }
+
+    switch (subcommand) {
+      case 'status':
+        const stats = this.networkMonitoring.getNetworkStatistics();
+        return `📊 Network Monitoring Statistics
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Data Points: ${stats.dataPoints}
+Time Span: ${Math.floor(stats.timespan / 1000 / 60)} minutes
+
+👥 Validators:
+   Current: ${stats.validators.current}
+   Active: ${stats.validators.active}
+   Average Active: ${stats.validators.averageActive.toFixed(1)}
+
+🏛️ Consensus:
+   Health: ${stats.consensus.currentHealth.toFixed(1)}%
+   Average: ${stats.consensus.averageHealth.toFixed(1)}%
+   Range: ${stats.consensus.minHealth.toFixed(1)}% - ${stats.consensus.maxHealth.toFixed(1)}%
+
+⚡ Network:
+   Latency: ${stats.network.currentLatency}ms (avg: ${stats.network.averageLatency.toFixed(1)}ms)
+   Throughput: ${stats.network.currentThroughput.toFixed(1)} blocks/h
+
+🚨 Alerts:
+   Active: ${stats.alerts.active}
+   Critical: ${stats.alerts.critical}
+   Warnings: ${stats.alerts.warnings}`;
+
+      case 'alerts':
+        const alerts = this.networkMonitoring.getActiveAlerts();
+        if (alerts.length === 0) {
+          return '✅ No active alerts';
+        }
+
+        let alertResult = '🚨 Active Network Alerts\n━━━━━━━━━━━━━━━━━━━━━━━━\n';
+        alerts.slice(0, 10).forEach((alert, index) => {
+          const icon = alert.type === 'critical' ? '🔴' : 
+                      alert.type === 'error' ? '🟠' : 
+                      alert.type === 'warning' ? '🟡' : 'ℹ️';
+          alertResult += `${index + 1}. ${icon} ${alert.title}\n`;
+          alertResult += `   ${alert.message}\n`;
+          alertResult += `   Time: ${new Date(alert.timestamp).toLocaleString()}\n\n`;
+        });
+        
+        return alertResult;
+
+      case 'export':
+        const format = args[1] as 'json' | 'csv' || 'json';
+        const exportData = this.networkMonitoring.exportData(format);
+        return `📁 Monitoring data exported (${format.toUpperCase()})\n${exportData.substring(0, 500)}${exportData.length > 500 ? '...\n[truncated]' : ''}`;
+
+      default:
+        return 'Usage: monitor [status|alerts|export [json|csv]]';
     }
   }
   private async handleWalletCommand(args: string[]): Promise<string> {
