@@ -8,6 +8,8 @@ import {
   AuthenticityCommitmentData,
   ConsensusCommitmentData 
 } from './EmotionalCommitment';
+import { EmotionalZKProof, ZKProofService } from './zkproofs/ZKProofService';
+import { EmotionalValidationCircuit } from './zkproofs/EmotionalValidationCircuit';
 
 export interface BlockHeader {
   index: number;
@@ -15,11 +17,11 @@ export interface BlockHeader {
   previousHash: string;
   merkleRoot: string;
   validator: string;
-  // Privacy-preserving commitments instead of raw emotional data
-  emotionalCommitment: string;
-  authenticityCommitment: string;
+  // Zero-knowledge proofs for ultimate privacy
+  zkProofHash: string;
   consensusEligible: boolean;
   consensusWeight: number;
+  zkVerified: boolean;
 }
 export class Block {
   public index: number;
@@ -28,18 +30,17 @@ export class Block {
   public previousHash: string;
   public merkleRoot: string;
   public validator: string;
-  // Privacy-preserving commitments
-  public emotionalCommitment: string;
-  public authenticityCommitment: string;
+  // Zero-knowledge proof system for ultimate privacy
+  public zkProofHash: string;
   public consensusEligible: boolean;
   public consensusWeight: number;
+  public zkVerified: boolean;
   public hash: string;
   private merkleTree: MerkleTree;
   
-  // Store commitment data for validation (not on-chain)
-  private emotionalCommitmentData?: EmotionalCommitmentData;
-  private authenticityCommitmentData?: AuthenticityCommitmentData;
-  private consensusCommitmentData?: ConsensusCommitmentData;
+  // Store ZK proof data for validation (not on-chain)
+  private zkProof?: EmotionalZKProof;
+  private zkProofService: ZKProofService;
   constructor(
     index: number,
     transactions: Transaction[],
@@ -53,41 +54,26 @@ export class Block {
     this.previousHash = previousHash;
     this.validator = validator.id;
 
-    // Create cryptographic commitments for privacy
-    this.emotionalCommitmentData = EmotionalCommitment.createEmotionalCommitment(
-      validator.emotionalScore,
-      validator.id,
-      this.timestamp
-    );
+    // Initialize ZK proof service
+    this.zkProofService = ZKProofService.getInstance();
 
-    this.authenticityCommitmentData = EmotionalCommitment.createAuthenticityCommitment(
-      validator.authenticity,
-      EmotionalCommitment.generateDeviceFingerprint(validator.biometricData || {}),
-      validator.id,
-      this.timestamp
-    );
-
-    this.consensusCommitmentData = EmotionalCommitment.createConsensusCommitment(
-      consensusScore,
-      validator.emotionalScore,
-      validator.id,
-      this.timestamp
-    );
-
-    // Store only commitment hashes on-chain (not raw data)
-    this.emotionalCommitment = this.emotionalCommitmentData.commitment;
-    this.authenticityCommitment = this.authenticityCommitmentData.commitment;
-    this.consensusEligible = this.consensusCommitmentData.consensusEligible;
-    this.consensusWeight = this.consensusCommitmentData.consensusWeight;
+    // Initialize with fallback values (will be updated with ZK proof)
+    this.zkProofHash = '0x0000000000000000000000000000000000000000000000000000000000000000';
+    this.consensusEligible = false;
+    this.consensusWeight = 0;
+    this.zkVerified = false;
 
     // Build merkle tree for transaction integrity
     this.merkleTree = new MerkleTree(transactions);
     this.merkleRoot = this.merkleTree.getRoot();
     
-    // Calculate block hash with privacy-preserving data
+    // Generate ZK proof asynchronously and update block
+    this.generateZKProof(validator, consensusScore);
+    
+    // Calculate initial hash (will be updated after ZK proof)
     this.hash = this.calculateHash();
     
-    console.log(`🔒 Block ${index} created with cryptographic commitments - privacy preserved!`);
+    console.log(`🔐 Block ${index} initialized - generating ZK proof...`);
   }
   /**
    * Calculate cryptographic hash of the block
@@ -99,11 +85,11 @@ export class Block {
       previousHash: this.previousHash,
       merkleRoot: this.merkleRoot,
       validator: this.validator,
-      // Privacy-preserving commitments only
-      emotionalCommitment: this.emotionalCommitment,
-      authenticityCommitment: this.authenticityCommitment,
+      // Zero-knowledge proof system
+      zkProofHash: this.zkProofHash,
       consensusEligible: this.consensusEligible,
-      consensusWeight: this.consensusWeight
+      consensusWeight: this.consensusWeight,
+      zkVerified: this.zkVerified
     };
     const dataString = JSON.stringify(blockData);
     return crypto.createHash('sha256').update(dataString).digest('hex');
@@ -216,12 +202,18 @@ export class Block {
     return true;
   }
   /**
-   * Validate emotional consensus using cryptographic commitments
+   * Validate emotional consensus using zero-knowledge proofs
    */
   private validateEmotionalConsensus(): boolean {
-    // Validate using commitment-based eligibility (privacy-preserving)
+    // Validate ZK proof verification
+    if (!this.zkVerified) {
+      console.error('ZK proof not verified for consensus eligibility');
+      return false;
+    }
+    
+    // Validate using ZK proof-based eligibility (ultimate privacy)
     if (!this.consensusEligible) {
-      console.error('Validator not eligible for consensus based on commitments');
+      console.error('Validator not eligible for consensus based on ZK proof');
       return false;
     }
     
@@ -231,14 +223,9 @@ export class Block {
       return false;
     }
     
-    // Validate commitment format (should be valid hex hashes)
-    if (!this.isValidCommitmentHash(this.emotionalCommitment)) {
-      console.error('Invalid emotional commitment format');
-      return false;
-    }
-    
-    if (!this.isValidCommitmentHash(this.authenticityCommitment)) {
-      console.error('Invalid authenticity commitment format');
+    // Validate ZK proof hash format
+    if (!this.isValidZKProofHash(this.zkProofHash)) {
+      console.error('Invalid ZK proof hash format');
       return false;
     }
     
@@ -246,11 +233,11 @@ export class Block {
   }
   
   /**
-   * Validate commitment hash format
+   * Validate ZK proof hash format
    */
-  private isValidCommitmentHash(commitment: string): boolean {
-    // Should be 64-character hex string (SHA-256 hash)
-    return /^[a-fA-F0-9]{64}$/.test(commitment);
+  private isValidZKProofHash(zkProofHash: string): boolean {
+    // Should be 64-character hex string (SHA-256 hash) or null proof
+    return /^(0x)?[a-fA-F0-9]{64}$/.test(zkProofHash);
   }
   /**
    * Validate block hash for PoE consensus
@@ -275,10 +262,10 @@ export class Block {
       previousHash: this.previousHash,
       merkleRoot: this.merkleRoot,
       validator: this.validator,
-      emotionalCommitment: this.emotionalCommitment,
-      authenticityCommitment: this.authenticityCommitment,
+      zkProofHash: this.zkProofHash,
       consensusEligible: this.consensusEligible,
-      consensusWeight: this.consensusWeight
+      consensusWeight: this.consensusWeight,
+      zkVerified: this.zkVerified
     };
   }
   /**
@@ -319,10 +306,10 @@ export class Block {
       previousHash: this.previousHash,
       merkleRoot: this.merkleRoot,
       validator: this.validator,
-      emotionalCommitment: this.emotionalCommitment,
-      authenticityCommitment: this.authenticityCommitment,
+      zkProofHash: this.zkProofHash,
       consensusEligible: this.consensusEligible,
       consensusWeight: this.consensusWeight,
+      zkVerified: this.zkVerified,
       hash: this.hash
     };
   }
@@ -333,12 +320,12 @@ export class Block {
     // Reconstruct transactions
     const transactions = data.transactions.map((txData: any) => Transaction.fromJSON(txData));
     
-    // For commitment-based blocks, we can't reconstruct exact original values
+    // For ZK proof blocks, we can't reconstruct exact original values
     // Instead, create a minimal validator for reconstruction
     const validator = {
       id: data.validator,
       emotionalScore: data.consensusEligible ? 75 : 60, // Approximate based on eligibility
-      authenticity: 0.8, // Safe assumption for committed blocks
+      authenticity: 0.8, // Safe assumption for ZK verified blocks
       address: '',
       biometricData: {
         heartRate: 80,
@@ -361,16 +348,86 @@ export class Block {
       consensusScore
     );
     
-    // Override with actual committed values from JSON
+    // Override with actual ZK proof values from JSON
     block.timestamp = data.timestamp;
     block.hash = data.hash;
-    block.emotionalCommitment = data.emotionalCommitment;
-    block.authenticityCommitment = data.authenticityCommitment;
-    block.consensusEligible = data.consensusEligible;
-    block.consensusWeight = data.consensusWeight;
+    block.zkProofHash = data.zkProofHash || '0x0000000000000000000000000000000000000000000000000000000000000000';
+    block.consensusEligible = data.consensusEligible || false;
+    block.consensusWeight = data.consensusWeight || 0;
+    block.zkVerified = data.zkVerified || false;
     
     return block;
   }
+  /**
+   * Create genesis block
+   */
+  /**
+   * Generate ZK proof for this block asynchronously
+   */
+  private async generateZKProof(validator: EmotionalValidator, consensusScore: number): Promise<void> {
+    try {
+      // Generate ZK proof for the validator
+      const zkProof = await this.zkProofService.generateValidatorProof(validator);
+      
+      // Store the proof
+      this.zkProof = zkProof;
+      
+      // Create proof hash for on-chain storage
+      this.zkProofHash = crypto.createHash('sha256')
+        .update(JSON.stringify(zkProof.proof))
+        .digest('hex');
+      
+      // Update consensus eligibility from ZK proof
+      this.consensusEligible = zkProof.publicSignals[0] === '1' && zkProof.publicSignals[1] === '1';
+      this.consensusWeight = this.consensusEligible ? 1 : 0;
+      
+      // Verify the proof
+      this.zkVerified = await this.zkProofService.verifyValidatorProof(validator.id, zkProof);
+      
+      // Recalculate hash with ZK proof data
+      this.hash = this.calculateHash();
+      
+      console.log(`🔐 Block ${this.index} ZK proof complete - Eligible: ${this.consensusEligible ? '✅' : '❌'}, Verified: ${this.zkVerified ? '✅' : '❌'}`);
+      
+    } catch (error) {
+      console.error(`❌ ZK proof generation failed for block ${this.index}:`, error);
+      // Set fallback values on failure
+      this.zkProofHash = '0x0000000000000000000000000000000000000000000000000000000000000000';
+      this.consensusEligible = false;
+      this.consensusWeight = 0;
+      this.zkVerified = false;
+      this.hash = this.calculateHash();
+    }
+  }
+  
+  /**
+   * Get ZK proof for external verification
+   */
+  public getZKProof(): EmotionalZKProof | undefined {
+    return this.zkProof;
+  }
+  
+  /**
+   * Check if block has valid ZK proof
+   */
+  public hasValidZKProof(): boolean {
+    return this.zkVerified && this.zkProof !== undefined;
+  }
+  
+  /**
+   * Get ZK proof metrics for this block
+   */
+  public getZKProofInfo(): any {
+    return {
+      zkProofHash: this.zkProofHash,
+      consensusEligible: this.consensusEligible,
+      consensusWeight: this.consensusWeight,
+      zkVerified: this.zkVerified,
+      hasProof: this.zkProof !== undefined,
+      proofGenerated: this.zkProofHash !== '0x0000000000000000000000000000000000000000000000000000000000000000'
+    };
+  }
+
   /**
    * Create genesis block
    */
