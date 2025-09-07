@@ -183,7 +183,7 @@ export class ProductionConfig {
       throw new Error(`Configuration validation failed:\n${errors.join('\n')}`);
     }
 
-    console.log('✅ Production configuration validated successfully');
+    console.log('Production configuration validated successfully');
   }
 
   /**
