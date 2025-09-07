@@ -1,0 +1,43 @@
+The Exact Problems in Your Code:
+1. Inline styles without hover states:
+javascriptstyle={{
+  backgroundColor: '#00ffff',
+  color: '#000000',
+  border: '2px solid #00ffff',
+  // No hover/focus states defined
+}}
+2. Missing responsive classes:
+Your styled buttons don't have w-full sm:w-auto classes like the Tailwind buttons, causing layout inconsistencies.
+The Fix:
+Replace all your inline-styled buttons with proper Tailwind classes:
+javascript// Replace the "Start Validating" button:
+<button 
+  className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
+  onClick={(e) => {
+    e.preventDefault();
+    document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+  }}
+>
+  <Zap className="w-5 h-5" />
+  Start Validating
+</button>
+
+// Replace the "Get Started" button in the final section:
+<button 
+  className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
+  onClick={(e) => {
+    e.preventDefault();
+    window.location.href = '/access';
+  }}
+>
+  <Heart className="w-5 h-5" />
+  Get Started
+</button>
+Why This Happens:
+
+Inline style={} can only define base styles
+CSS :hover and :focus pseudo-classes in your stylesheet override the inline text color
+The text becomes invisible when it changes to the same color as the background
+Tailwind classes include proper hover/focus states that prevent this
+
+The key is using hover:text-black and focus:text-black to explicitly maintain text visibility in all states.RetryClaude can make mistakes. Please double-check responses.

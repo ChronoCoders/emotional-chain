@@ -229,7 +229,7 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <button 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black font-bold px-8 py-3 rounded-md transition-colors flex items-center justify-center gap-2"
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
               onClick={(e) => {
                 e.preventDefault();
                 document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
@@ -419,7 +419,7 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black font-bold px-8 py-3 rounded-md transition-colors flex items-center justify-center gap-2"
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
               onClick={(e) => {
                 e.preventDefault();
                 window.location.href = '/access';
