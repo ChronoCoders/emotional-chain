@@ -74,13 +74,13 @@ export class EmotionalChainService {
           try {
             await this.enableDistributedMode();
           } catch (error) {
-            console.warn('⚠️ Failed to enable distributed mode:', error.message);
+            console.warn('⚠️ Failed to enable distributed mode:', error instanceof Error ? error.message : String(error));
             console.log('Continuing in centralized mode');
           }
         }, 5000); // Wait 5 seconds for blockchain initialization
       }
     } catch (error) {
-      console.warn('⚠️ Distributed components initialization failed:', error.message);
+      console.warn('⚠️ Distributed components initialization failed:', error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -97,8 +97,12 @@ export class EmotionalChainService {
       console.log('Enabling distributed consensus mode...');
 
       // Initialize distributed integration
+      const blockchain = this.bootstrapNode?.getBlockchain();
+      if (!blockchain) {
+        throw new Error('Blockchain not initialized');
+      }
       this.distributedIntegration = new DistributedBlockchainIntegration(
-        this.bootstrapNode?.getBlockchain(),
+        blockchain,
         this,
         this.immutableBlockchain
       );
@@ -822,7 +826,13 @@ Time Span: ${Math.floor(stats.timespan / 1000 / 60)} minutes
         const allWallets = this.wallet.getAllWallets();
         let result = ` EmotionalChain Validator Wallets\n\n`;
         Array.from(allWallets.entries()).forEach(([validatorId, wallet]) => {
-          result += ` ${validatorId}: ${typeof wallet === 'number' ? wallet.toFixed(2) : (wallet?.balance || wallet)} EMO\n`;
+          if (typeof wallet === 'number') {
+            result += ` ${validatorId}: ${wallet.toFixed(2)} EMO\n`;
+          } else if (wallet && typeof wallet === 'object' && 'balance' in wallet) {
+            result += ` ${validatorId}: ${wallet.balance} EMO\n`;
+          } else {
+            result += ` ${validatorId}: ${String(wallet)} EMO\n`;
+          }
         });
         return result;
       } catch (error) {
