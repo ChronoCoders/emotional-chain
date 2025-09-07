@@ -100,7 +100,7 @@ export class P2PValidatorNetwork extends EventEmitter {
       roundTimeout: 30000 // 30 second consensus rounds
     };
     
-    console.log('🌐 P2P Validator Network initializing...');
+    console.log('P2P Validator Network initializing...');
   }
 
   /**
@@ -108,7 +108,7 @@ export class P2PValidatorNetwork extends EventEmitter {
    */
   async initialize(): Promise<void> {
     try {
-      console.log('🔄 Starting libp2p node with full transport support...');
+      console.log('Starting libp2p node with full transport support...');
       
       this.libp2p = await createLibp2p({
         addresses: {
@@ -155,8 +155,8 @@ export class P2PValidatorNetwork extends EventEmitter {
       // Start the node
       await this.libp2p.start();
       
-      console.log(`🌐 P2P node started with PeerID: ${this.libp2p.peerId.toString()}`);
-      console.log(`📡 Listening on addresses:`, this.libp2p.getMultiaddrs());
+      console.log(`P2P node started with PeerID: ${this.libp2p.peerId.toString()}`);
+      console.log(`Listening on addresses:`, this.libp2p.getMultiaddrs());
       
       // Bootstrap network discovery
       await this.bootstrapNetwork();
@@ -188,7 +188,7 @@ export class P2PValidatorNetwork extends EventEmitter {
       this.startNetworkMaintenance();
       
       this.isBootstrapped = true;
-      console.log('✅ Network bootstrap complete');
+      console.log('Network bootstrap complete');
       
     } catch (error) {
       console.error('❌ Network bootstrap failed:', error);
@@ -203,13 +203,13 @@ export class P2PValidatorNetwork extends EventEmitter {
     // Peer connection events
     this.libp2p.addEventListener('peer:connect', (evt: any) => {
       const peerId = evt.detail.toString();
-      console.log(`🤝 Connected to peer: ${peerId}`);
+      console.log(`Connected to peer: ${peerId}`);
       this.emit('peer:connected', peerId);
     });
 
     this.libp2p.addEventListener('peer:disconnect', (evt: any) => {
       const peerId = evt.detail.toString();
-      console.log(`👋 Disconnected from peer: ${peerId}`);
+      console.log(`Disconnected from peer: ${peerId}`);
       this.handlePeerDisconnect(peerId);
     });
 
@@ -223,7 +223,7 @@ export class P2PValidatorNetwork extends EventEmitter {
    * Register this node as a validator in the network
    */
   async registerValidator(validator: EmotionalValidator): Promise<void> {
-    console.log(`📝 Registering validator: ${validator.id}`);
+    console.log(`Registering validator: ${validator.id}`);
     
     const networkValidator: NetworkValidator = {
       id: validator.id,
@@ -246,7 +246,7 @@ export class P2PValidatorNetwork extends EventEmitter {
       timestamp: Date.now()
     });
 
-    console.log(`✅ Validator ${validator.id} registered in P2P network`);
+    console.log(`Validator ${validator.id} registered in P2P network`);
   }
 
   /**
@@ -258,7 +258,7 @@ export class P2PValidatorNetwork extends EventEmitter {
       return false;
     }
 
-    console.log(`🚀 Starting distributed consensus round ${this.consensusState.currentRound + 1}`);
+    console.log(`Starting distributed consensus round ${this.consensusState.currentRound + 1}`);
     
     this.consensusState.currentRound++;
     this.consensusState.consensusInProgress = true;
@@ -343,7 +343,7 @@ export class P2PValidatorNetwork extends EventEmitter {
     const requiredVotes = Math.ceil(this.validators.size * this.networkConfig.consensusThreshold);
     
     if (this.consensusState.votes.size >= requiredVotes) {
-      console.log(`✅ Received ${this.consensusState.votes.size}/${requiredVotes} votes, proceeding to COMMIT`);
+      console.log(`Received ${this.consensusState.votes.size}/${requiredVotes} votes, proceeding to COMMIT`);
       
       // Send COMMIT
       await this.broadcastConsensusMessage({
@@ -492,7 +492,7 @@ export class P2PValidatorNetwork extends EventEmitter {
       if (validator.peerId === peerId) {
         validator.isActive = false;
         validator.lastSeen = Date.now();
-        console.log(`📴 Validator ${id} marked as inactive`);
+        console.log(`Validator ${id} marked as inactive`);
         break;
       }
     }
@@ -500,7 +500,7 @@ export class P2PValidatorNetwork extends EventEmitter {
 
   private handleConsensusTimeout(): void {
     if (this.consensusState.consensusInProgress) {
-      console.log(`⏰ Consensus round ${this.consensusState.currentRound} timed out`);
+      console.log(`Consensus round ${this.consensusState.currentRound} timed out`);
       this.consensusState.consensusInProgress = false;
       this.emit('consensus:timeout', this.consensusState.currentRound);
     }
@@ -523,19 +523,19 @@ export class P2PValidatorNetwork extends EventEmitter {
       }
     }
     
-    console.log(`🔧 Network maintenance: ${this.validators.size} validators, ${this.calculateNetworkHealth()}% health`);
+    console.log(`Network maintenance: ${this.validators.size} validators, ${this.calculateNetworkHealth()}% health`);
   }
 
   /**
    * Shutdown the P2P network
    */
   async shutdown(): Promise<void> {
-    console.log('🛑 Shutting down P2P validator network...');
+    console.log('Shutting down P2P validator network...');
     
     if (this.libp2p) {
       await this.libp2p.stop();
     }
     
-    console.log('✅ P2P network shutdown complete');
+    console.log('P2P network shutdown complete');
   }
 }

@@ -73,7 +73,7 @@ export class EmotionalChain extends EventEmitter {
       const existingBlocks = await this.loadBlockchainFromDatabase();
       if (existingBlocks.length > 0) {
         this.chain = existingBlocks;
-        console.log(`🔗 BLOCKCHAIN: Loaded ${existingBlocks.length} blocks from database`);
+        console.log(`BLOCKCHAIN: Loaded ${existingBlocks.length} blocks from database`);
       } else {
         await this.createGenesisBlock();
         console.log('🔗 BLOCKCHAIN: Created genesis block - blockchain initialized');
