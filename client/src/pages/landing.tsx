@@ -228,33 +228,28 @@ export default function LandingPage() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <a href="#get-started">
-              <button 
-                className="border-2 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
-                style={{ 
-                  backgroundColor: '#00ffff', 
-                  color: '#000000', 
-                  borderColor: '#00ffff' 
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#00ff00';
-                  e.target.style.borderColor = '#00ff00';
-                  e.target.style.color = '#000000';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#00ffff';
-                  e.target.style.borderColor = '#00ffff';
-                  e.target.style.color = '#000000';
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <Zap className="w-5 h-5 mr-2" style={{ color: '#000000' }} />
-                <span style={{ color: '#000000', fontWeight: 'bold' }}>Start Validating</span>
-              </button>
-            </a>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              style={{
+                backgroundColor: '#00ffff',
+                color: '#000000',
+                border: '2px solid #00ffff',
+                padding: '12px 32px',
+                borderRadius: '6px',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <Zap style={{ width: '20px', height: '20px', color: '#000000' }} />
+              Start Validating
+            </button>
             <Link href="/explorer">
               <button 
                 className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
@@ -435,33 +430,28 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/access">
-              <button 
-                className="border-2 font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors"
-                style={{ 
-                  backgroundColor: '#00ffff', 
-                  color: '#000000', 
-                  borderColor: '#00ffff' 
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = '#00ff00';
-                  e.target.style.borderColor = '#00ff00';
-                  e.target.style.color = '#000000';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = '#00ffff';
-                  e.target.style.borderColor = '#00ffff';
-                  e.target.style.color = '#000000';
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = '/access';
-                }}
-              >
-                <Heart className="w-5 h-5 mr-2" style={{ color: '#000000' }} />
-                <span style={{ color: '#000000', fontWeight: 'bold' }}>Get Started</span>
-              </button>
-            </a>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                window.location.href = '/access';
+              }}
+              style={{
+                backgroundColor: '#00ffff',
+                color: '#000000',
+                border: '2px solid #00ffff',
+                padding: '12px 32px',
+                borderRadius: '6px',
+                fontWeight: 'bold',
+                fontSize: '16px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <Heart style={{ width: '20px', height: '20px', color: '#000000' }} />
+              Get Started
+            </button>
             <a href="/docs">
               <button 
                 className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
