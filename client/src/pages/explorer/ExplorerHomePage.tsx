@@ -38,7 +38,9 @@ export default function ExplorerHomePage() {
     },
   });
 
-  const isLoading = networkLoading || walletsLoading || transactionsLoading || tokenLoading;
+  // More coordinated loading - wait for essential data before rendering
+  const isEssentialLoading = networkLoading || tokenLoading;
+  const isFullyLoaded = !networkLoading && !walletsLoading && !transactionsLoading && !tokenLoading;
   
   // Extract stats first to avoid hoisting issues
   const stats = networkStats?.stats;
@@ -73,9 +75,17 @@ export default function ExplorerHomePage() {
 
   const chartData = generateRealChartData();
 
-  if (isLoading) {
+  // Show loading skeleton only for essential data to prevent flash
+  if (isEssentialLoading) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-8" style={{ minHeight: '80vh' }}>
+        {/* Hero Section Skeleton */}
+        <div className="terminal-window p-8 text-center animate-pulse">
+          <div className="h-8 bg-slate-700 rounded w-1/2 mx-auto mb-4"></div>
+          <div className="h-4 bg-slate-700 rounded w-3/4 mx-auto"></div>
+        </div>
+
+        {/* Stats Grid Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 animate-pulse">
@@ -83,6 +93,18 @@ export default function ExplorerHomePage() {
               <div className="h-8 bg-slate-700 rounded w-3/4"></div>
             </div>
           ))}
+        </div>
+
+        {/* Chart Section Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="terminal-window p-6 animate-pulse">
+            <div className="h-6 bg-slate-700 rounded w-1/3 mb-4"></div>
+            <div className="h-64 bg-slate-700/30 rounded"></div>
+          </div>
+          <div className="terminal-window p-6 animate-pulse">
+            <div className="h-6 bg-slate-700 rounded w-1/3 mb-4"></div>
+            <div className="h-64 bg-slate-700/30 rounded"></div>
+          </div>
         </div>
       </div>
     );

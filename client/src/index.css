@@ -355,3 +355,21 @@
     box-shadow: 0 0 40px var(--terminal-success), 0 0 60px var(--terminal-success);
   }
 }
+
+/* Prevent visual flashing in explorer */
+.explorer-content {
+  opacity: 1;
+  transition: none;
+  transform: none;
+}
+
+/* Ensure smooth loading without flash */
+.explorer-content > * {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Remove any Vite HMR visual artifacts */
+[data-vite-dev-id] {
+  transition: none !important;
+}
