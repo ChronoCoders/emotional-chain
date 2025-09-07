@@ -445,6 +445,18 @@ export class Block {
     );
     // Finalize the genesis block
     genesisBlock.finalizeBlock();
+    console.log('🔐 Genesis block created with Zero-Knowledge Proof of Emotion consensus!');
+    return genesisBlock;
+  }
+    const genesisBlock = new Block(
+      0,
+      [], // No transactions in genesis
+      '0'.repeat(64), // No previous hash
+      genesisValidator,
+      100.0 // Perfect consensus for genesis
+    );
+    // Finalize the genesis block
+    genesisBlock.finalizeBlock();
     console.log(' Genesis block created with Proof of Emotion consensus!');
     return genesisBlock;
   }
