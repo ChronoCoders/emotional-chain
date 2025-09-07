@@ -448,8 +448,4 @@ export class Block {
     console.log('🔐 Genesis block created with Zero-Knowledge Proof of Emotion consensus!');
     return genesisBlock;
   }
-    genesisBlock.finalizeBlock();
-    console.log(' Genesis block created with Proof of Emotion consensus!');
-    return genesisBlock;
-  }
 }

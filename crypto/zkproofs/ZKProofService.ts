@@ -3,10 +3,11 @@
  * Manages ZK proof generation, verification, and aggregation
  */
 
-import { EmotionalValidationCircuit, EmotionalZKProof } from './EmotionalValidationCircuit';
+import { EmotionalValidationCircuit } from './EmotionalValidationCircuit';
+import type { EmotionalZKProof } from './EmotionalValidationCircuit';
 
 // Re-export for external use
-export { EmotionalZKProof } from './EmotionalValidationCircuit';
+export type { EmotionalZKProof } from './EmotionalValidationCircuit';
 import { EmotionalValidator } from '../EmotionalValidator';
 import * as crypto from 'crypto';
 
