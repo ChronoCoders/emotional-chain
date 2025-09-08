@@ -371,6 +371,11 @@ export class EmotionalChain extends EventEmitter {
     }
     const selectedValidator = this.selectValidator();
     if (!selectedValidator) {
+      console.log(`MINING: No valid validators found (${this.validators.size} total validators, need emotional score ≥ 70.0)`);
+      // Log validator statuses for debugging
+      Array.from(this.validators.values()).forEach(v => {
+        console.log(`MINING: Validator ${v.id} - Emotional Score: ${v.emotionalScore} - Valid: ${this.isValidEmotionalProof(v.emotionalScore)}`);
+      });
       return false;
     }
     const previousBlock = this.getLatestBlock();
