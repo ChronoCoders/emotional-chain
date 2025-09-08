@@ -575,6 +575,7 @@ export class EmotionalChain extends EventEmitter {
     this.isMining = true;
     // Start mining loop
     this.miningInterval = setInterval(async () => {
+      console.log(`MINING INTERVAL: Running - isMining: ${this.isMining}, isInitialized: ${this.isInitialized}, validators: ${this.validators.size}`);
       if (this.isMining) {
         // Generate emotional validation transaction if no pending transactions
         if (this.pendingTransactions.length === 0) {
@@ -595,7 +596,10 @@ export class EmotionalChain extends EventEmitter {
             });
           }
         }
+        console.log(`MINING INTERVAL: Calling mineBlock() with ${this.pendingTransactions.length} pending transactions`);
         await this.mineBlock();
+      } else {
+        console.log(`MINING INTERVAL: Skipping - isMining is false`);
       }
     }, 10000); // Attempt mining every 10 seconds
     return {
