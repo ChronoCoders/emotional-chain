@@ -260,33 +260,27 @@ export class EmotionalChainService {
     
     // Real consensus metrics calculated from authentic validator data
     
-    // Get real EMO supply from blockchain immutable state (MIGRATION LOGS DATA)
-    let realTokenEconomics = { totalSupply: 654380, circulatingSupply: 472928 };
-    let realBlockHeight = 11280;
+    // Get real EMO supply from token economics service (always current)
+    let realTokenEconomics = { totalSupply: 0, circulatingSupply: 0 };
+    let realBlockHeight = 0;
     try {
-      // Direct blockchain access for authentic token economics
-      if (this.bootstrapNode?.getBlockchain) {
-        const blockchain = this.bootstrapNode.getBlockchain();
-        const latestBlock = blockchain.getLatestBlock();
-        realBlockHeight = latestBlock?.index || 11280;
-        
-        // USE ACTUAL MIGRATION DATA: 654,380.70 total, 472,928.40 circulating (72.3%)
-        // The blockchain migration logs show the real supply from all transactions
-        realTokenEconomics = {
-          totalSupply: 654380, // From PROFESSIONAL ECONOMICS logs
-          circulatingSupply: 472928 // 72.3% circulating from logs
-        };
-      }
+      // Use token economics service which has the real blockchain data
+      const economics = await this.getTokenEconomics();
+      realTokenEconomics = {
+        totalSupply: economics.totalSupply || 0,
+        circulatingSupply: economics.circulatingSupply || 0
+      };
+      realBlockHeight = economics.lastBlockHeight || 0;
     } catch (error) {
-      console.log('Using authentic blockchain EMO supply data');
+      console.log('Error getting current token economics for network status:', error);
     }
     
-    // Calculate real TPS from transaction volume
-    let volumeData = { transactions24h: 4624, volume24h: 145311.56 };
+    // Calculate real TPS from current blockchain state
+    let volumeData = { transactions24h: 0, volume24h: 0 };
     try {
       volumeData = await this.getTransactionVolume();
     } catch (error) {
-      // Use fallback data if volume calculation fails
+      console.log('Volume calculation failed, using zeros');
     }
     const realTPS = (volumeData.transactions24h / 86400).toFixed(4); // 24h transactions ÷ seconds in day
     
