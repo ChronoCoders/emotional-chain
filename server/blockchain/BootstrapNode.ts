@@ -70,7 +70,9 @@ export class BootstrapNode {
     }
     
     // Start blockchain mining
+    console.log(`🔨 BootstrapNode: About to call blockchain.startMining()`);
     const result = this.blockchain.startMining();
+    console.log(`🔨 BootstrapNode: startMining() returned:`, result);
     console.log(`Mining started with ecosystem validators`);
     return result;
   }
