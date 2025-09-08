@@ -131,7 +131,7 @@ export default function ExplorerHomePage() {
         <TerminalMetricCard
           title="NETWORK STATUS"
           value={networkStats?.isRunning ? "ONLINE" : "OFFLINE"}
-          change={`uptime: ${Math.floor((Date.now() - new Date(stats?.timestamp || Date.now()).getTime()) / 1000)}s`}
+          change={`uptime: ${Math.floor((stats?.blockHeight || 13600) * 10 / 3600)}h`}
           icon="[*]"
           color="success"
         />
@@ -250,8 +250,8 @@ export default function ExplorerHomePage() {
           </h3>
           
           <div className="space-y-3">
-            {wallets?.filter((wallet: any) => wallet.balance > 0)
-              .sort((a: any, b: any) => b.balance - a.balance)
+            {wallets?.filter((wallet: any) => (wallet.totalEarned || wallet.balance) > 0)
+              .sort((a: any, b: any) => (b.totalEarned || b.balance) - (a.totalEarned || a.balance))
               .slice(0, 5)
               .map((validator: any, index: number) => {
                 const emotionalScore = stats?.emotionalAverage || 75;
@@ -278,10 +278,10 @@ export default function ExplorerHomePage() {
                     </div>
                     <div className="text-right">
                       <p className="text-terminal-cyan font-semibold terminal-text">
-                        {formatNumber(validator.balance)} EMO
+                        {formatNumber(validator.totalEarned || validator.balance)} EMO
                       </p>
                       <p className="text-terminal-green/70 text-sm terminal-text">
-                        {formatEmoToUSD(validator.balance)}
+                        {formatEmoToUSD(validator.totalEarned || validator.balance)}
                       </p>
                     </div>
                   </div>
