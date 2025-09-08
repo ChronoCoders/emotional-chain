@@ -4,31 +4,23 @@ import { Users, Heart, Zap, DollarSign, TrendingUp, Shield } from "lucide-react"
 
 export default function ExplorerValidatorsPage() {
   const { data: wallets, isLoading } = useQuery({
-    queryKey: ['wallets', Date.now()],
+    queryKey: ['wallets'],
     queryFn: async () => {
-      const response = await fetch(`/api/wallets?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' }
-      });
+      const response = await fetch('/api/wallets');
       return response.json();
     },
-    refetchInterval: 3000,
-    staleTime: 0,
-    refetchOnMount: 'always'
+    refetchInterval: 12000,
+    staleTime: 8000
   });
 
   const { data: networkStats } = useQuery({
-    queryKey: ['network-stats', Date.now()],
+    queryKey: ['network-stats'],
     queryFn: async () => {
-      const response = await fetch(`/api/network/status?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' }
-      });
+      const response = await fetch('/api/network/status');
       return response.json();
     },
-    refetchInterval: 3000,
-    staleTime: 0,
-    refetchOnMount: 'always'
+    refetchInterval: 15000,
+    staleTime: 10000
   });
 
   if (isLoading) {

@@ -8,31 +8,23 @@ import { RealHashrateDisplay } from '../../components/RealHashrateDisplay';
 
 export default function ExplorerHomePage() {
   const { data: networkStats, isLoading: networkLoading } = useQuery({
-    queryKey: ['network-stats', Date.now()],
+    queryKey: ['network-stats'],
     queryFn: async () => {
-      const response = await fetch(`/api/network/status?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' }
-      });
+      const response = await fetch('/api/network/status');
       return response.json();
     },
-    refetchInterval: 3000,
-    staleTime: 0,
-    refetchOnMount: 'always'
+    refetchInterval: 15000,
+    staleTime: 10000
   });
 
   const { data: wallets, isLoading: walletsLoading } = useQuery({
-    queryKey: ['wallets', Date.now()],
+    queryKey: ['wallets'],
     queryFn: async () => {
-      const response = await fetch(`/api/wallets?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' }
-      });
+      const response = await fetch('/api/wallets');
       return response.json();
     },
-    refetchInterval: 5000,
-    staleTime: 0,
-    refetchOnMount: 'always'
+    refetchInterval: 12000,
+    staleTime: 8000
   });
 
   const { data: transactionStats, isLoading: transactionsLoading } = useQuery({
@@ -46,17 +38,13 @@ export default function ExplorerHomePage() {
   });
 
   const { data: tokenEconomics, isLoading: tokenLoading } = useQuery({
-    queryKey: ['token-economics', Date.now()],
+    queryKey: ['token-economics'],
     queryFn: async () => {
-      const response = await fetch(`/api/token/economics?_t=${Date.now()}`, {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' }
-      });
+      const response = await fetch('/api/token/economics');
       return response.json();
     },
-    refetchInterval: 3000,
-    staleTime: 0,
-    refetchOnMount: 'always'
+    refetchInterval: 15000,
+    staleTime: 10000
   });
 
   // More coordinated loading - wait for essential data before rendering
