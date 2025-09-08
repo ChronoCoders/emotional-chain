@@ -116,12 +116,12 @@ export class PersistentTokenEconomics {
         // Complete mining history from genesis to present (calculated from actual blockchain data)
         miningHistory: {
           genesisBlockHeight: 1, // True genesis block
-          currentBlockHeight: parseInt(economics.lastBlockHeight || '0'),
-          totalBlocksMined: Math.max(0, parseInt(economics.lastBlockHeight || '0')),
+          currentBlockHeight: parseInt((economics.lastBlockHeight || 0).toString()),
+          totalBlocksMined: Math.max(0, parseInt((economics.lastBlockHeight || 0).toString())),
           totalMiningRewards: parseFloat(economics.totalSupply || '0'),
           circulatingSupply: parseFloat(economics.circulatingSupply || '0'),
-          averageBlockReward: parseInt(economics.lastBlockHeight || '0') > 0 ? 
-            parseFloat(economics.totalSupply || '0') / parseInt(economics.lastBlockHeight || '0') : 0,
+          averageBlockReward: parseInt((economics.lastBlockHeight || 0).toString()) > 0 ? 
+            parseFloat((economics.totalSupply || '0').toString()) / parseInt((economics.lastBlockHeight || 0).toString()) : 0,
           miningStartTimestamp: '2025-08-01T21:47:00.000Z', // Approximate start time
           miningDurationSeconds: Math.floor((Date.now() - new Date('2025-08-01T21:47:00.000Z').getTime()) / 1000),
           miningStatus: 'ACTIVE',
@@ -178,7 +178,7 @@ export class PersistentTokenEconomics {
           await tx.update(validatorStates)
             .set({
               balance: newBalance.toString(),
-              totalBlocksMined: validator.totalBlocksMined + 1,
+              totalBlocksMined: (validator.totalBlocksMined || 0) + 1,
               updatedAt: new Date()
             })
             .where(eq(validatorStates.validatorId, validatorId));
@@ -428,14 +428,17 @@ export class PersistentTokenEconomics {
       const currentWallets = await walletsResponse.json();
       
       let totalValidatorBalances = 0;
+      let realBlockchainTotal = 0;
       for (const wallet of currentWallets) {
         const balance = parseFloat(wallet.balance) || 0;
+        const totalEarned = parseFloat(wallet.totalEarned) || 0;
         if (balance > 0) {
           totalValidatorBalances += balance;
         }
+        realBlockchainTotal += totalEarned; // Use real blockchain total, not database transactions
       }
       
-      const totalSupply = parseFloat(totalMinedResult.rows[0].total_mined || '0');
+      const totalSupply = realBlockchainTotal; // Use actual blockchain total instead of database sum
       const totalBlocks = parseInt(blockResult.rows[0].total_blocks || '0');
       
       if (totalSupply > 0) {

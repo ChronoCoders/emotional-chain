@@ -1020,7 +1020,7 @@ Mining rewards distributed to ecosystem validators.`;
         if (blockHeight > 0) {
           // Only sync if significantly behind (reduce frequent recalculations)
           const currentEconomics = await persistentTokenEconomics.getTokenEconomics();
-          if (blockHeight > currentEconomics.lastBlockHeight + 100) { // Only sync when 100+ blocks behind
+          if (blockHeight > currentEconomics.lastBlockHeight + 5) { // Sync when 5+ blocks behind for real-time updates
             console.log(`SYNC: Database block ${currentEconomics.lastBlockHeight} → Blockchain block ${blockHeight} (${blockHeight - currentEconomics.lastBlockHeight} behind)`);
             await persistentTokenEconomics.recalculateFromTransactions();
             const updated = await persistentTokenEconomics.getTokenEconomics();
