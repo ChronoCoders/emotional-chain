@@ -38,8 +38,8 @@ export default function ExplorerValidatorsPage() {
     );
   }
 
-  const activeValidators = (wallets || []).filter((wallet: any) => wallet.balance > 0);
-  const totalEmoEarned = activeValidators.reduce((sum: number, validator: any) => sum + validator.balance, 0);
+  const activeValidators = (wallets || []).filter((wallet: any) => (wallet.totalEarned || wallet.balance) > 0);
+  const totalEmoEarned = activeValidators.reduce((sum: number, validator: any) => sum + (validator.totalEarned || validator.balance), 0);
   const avgBlockReward = 61; // Average 53-71 EMO per selection based on live data
 
   return (
@@ -113,7 +113,7 @@ export default function ExplorerValidatorsPage() {
             </thead>
             <tbody>
               {wallets
-                .sort((a: any, b: any) => b.balance - a.balance)
+                .sort((a: any, b: any) => (b.totalEarned || b.balance) - (a.totalEarned || a.balance))
                 .map((validator: any, index: number) => {
                   const emotionalScore = 70 + Math.random() * 25;
                   const performance = 85 + Math.random() * 12;
@@ -140,10 +140,10 @@ export default function ExplorerValidatorsPage() {
                       <td className="p-4">
                         <div>
                           <p className="text-terminal-gold font-semibold terminal-text">
-                            {formatNumber(validator.balance)} EMO
+                            {formatNumber(validator.totalEarned || validator.balance)} EMO
                           </p>
                           <p className="text-terminal-green/70 text-sm terminal-text">
-                            ${formatNumber(validator.balance * 0.01)}
+                            ${formatNumber((validator.totalEarned || validator.balance) * 0.01)}
                           </p>
                         </div>
                       </td>
