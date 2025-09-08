@@ -1,0 +1,464 @@
+> Validators
+EmotionalChain validators securing the network through Proof of Emotion consensus
+
+TOTAL VALIDATORS
+[👥]
+21
+
+21 active
+
+TOTAL EMO EARNED
+[$]
+692,585 EMO
+
+$6,925.85 USD
+
+AVG BLOCK REWARDS
+[↗]
+61 EMO
+
+53-71 EMO range
+
+NETWORK HEALTH
+[🛡]
+92%
+
+Excellent
+
+[📋] All Validators
+Validator	EMO Earned	Emotional Score	Performance	Block Rewards	Status
+#1
+StellarNode
+
+0xstel...node
+
+48,833 EMO
+
+$488.33
+
+♥
+89%
+87%
+
+Uptime
+
++62.38 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#2
+NebulaForge
+
+0xnebu...orge
+
+47,782 EMO
+
+$477.82
+
+♥
+85%
+92%
+
+Uptime
+
++63.82 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#3
+GravityCore
+
+0xgrav...core
+
+46,521 EMO
+
+$465.21
+
+♥
+80%
+93%
+
+Uptime
+
++56.29 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#4
+OrionPulse
+
+0xorio...ulse
+
+45,938 EMO
+
+$459.38
+
+♥
+72%
+90%
+
+Uptime
+
++70.85 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#5
+DarkMatterLabs
+
+0xdark...labs
+
+45,747 EMO
+
+$457.47
+
+♥
+71%
+95%
+
+Uptime
+
++64.65 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#6
+QuantumReach
+
+0xquan...each
+
+45,729 EMO
+
+$457.29
+
+♥
+94%
+94%
+
+Uptime
+
++56.27 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#7
+ByteGuardians
+
+0xbyte...ians
+
+44,328 EMO
+
+$443.28
+
+♥
+76%
+88%
+
+Uptime
+
++62.92 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#8
+AstroSentinel
+
+0xastr...inel
+
+43,973 EMO
+
+$439.73
+
+♥
+79%
+85%
+
+Uptime
+
++54.04 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#9
+ChainFlux
+
+0xchai...flux
+
+43,848 EMO
+
+$438.48
+
+♥
+88%
+92%
+
+Uptime
+
++58.33 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#10
+ZeroLagOps
+
+0xzero...gops
+
+38,434 EMO
+
+$384.34
+
+♥
+75%
+94%
+
+Uptime
+
++56.11 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#11
+BlockNerve
+
+0xbloc...erve
+
+34,059 EMO
+
+$340.59
+
+♥
+89%
+93%
+
+Uptime
+
++59.89 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#12
+ValidatorX
+
+0xvali...torx
+
+30,918 EMO
+
+$309.18
+
+♥
+94%
+92%
+
+Uptime
+
++63.24 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#13
+IronNode
+
+0xironnode
+
+30,665 EMO
+
+$306.65
+
+♥
+82%
+92%
+
+Uptime
+
++62.16 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#14
+NovaSync
+
+0xnovasync
+
+30,065 EMO
+
+$300.65
+
+♥
+94%
+89%
+
+Uptime
+
++66.4 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#15
+SentinelTrust
+
+0xsent...rust
+
+29,810 EMO
+
+$298.1
+
+♥
+91%
+95%
+
+Uptime
+
++59.87 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#16
+VaultProof
+
+0xvaul...roof
+
+29,261 EMO
+
+$292.61
+
+♥
+90%
+88%
+
+Uptime
+
++69.5 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#17
+SecureMesh
+
+0xsecu...mesh
+
+28,674 EMO
+
+$286.74
+
+♥
+71%
+86%
+
+Uptime
+
++56.65 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#18
+WatchtowerOne
+
+0xwatc...rone
+
+7,000 EMO
+
+$70
+
+♥
+72%
+94%
+
+Uptime
+
++68.98 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#19
+AetherRunes
+
+0xaeth...unes
+
+7,000 EMO
+
+$70
+
+♥
+71%
+86%
+
+Uptime
+
++61.65 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#20
+ChronoKeep
+
+0xchro...keep
+
+7,000 EMO
+
+$70
+
+♥
+94%
+89%
+
+Uptime
+
++57.19 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+#21
+SolForge
+
+0xsolforge
+
+7,000 EMO
+
+$70
+
+♥
+84%
+88%
+
+Uptime
+
++65.8 EMO
+
+Daily EMO rewards
+
+[ACTIVE]
+Earn Through Emotional Mining
+Base Mining Reward
+50 EMO
+
+Per block mined with PoE
+
+Emotional Bonus
+0-25 EMO
+
+Based on wellness score
+
+Validation Reward
+5 EMO
+
+Per consensus validation
