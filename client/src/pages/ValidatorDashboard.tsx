@@ -6,12 +6,14 @@ import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 export default function ValidatorDashboard() {
   const { data: networkStats } = useQuery({
     queryKey: ['/api/network/status'],
+    refetchInterval: 5000,
+    staleTime: 0
   });
 
   const { data: allWallets } = useQuery<Array<{ validatorId: string; balance: number; currency: string }>>({
     queryKey: ['/api/wallets'],
-    staleTime: 30000,
-    refetchInterval: 30000
+    staleTime: 0,
+    refetchInterval: 5000
   });
 
   // For demo purposes, showing StellarNode validator

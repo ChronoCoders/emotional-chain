@@ -13,6 +13,8 @@ export default function ExplorerHomePage() {
       const response = await fetch('/api/network/status');
       return response.json();
     },
+    refetchInterval: 5000,
+    staleTime: 0
   });
 
   const { data: wallets, isLoading: walletsLoading } = useQuery({
@@ -21,6 +23,8 @@ export default function ExplorerHomePage() {
       const response = await fetch('/api/wallets');
       return response.json();
     },
+    refetchInterval: 5000,
+    staleTime: 0
   });
 
   const { data: transactionStats, isLoading: transactionsLoading } = useQuery({
@@ -29,6 +33,8 @@ export default function ExplorerHomePage() {
       const response = await fetch('/api/transactions/stats');
       return response.json();
     },
+    refetchInterval: 5000,
+    staleTime: 0
   });
 
   const { data: tokenEconomics, isLoading: tokenLoading } = useQuery({
@@ -37,6 +43,8 @@ export default function ExplorerHomePage() {
       const response = await fetch('/api/token/economics');
       return response.json();
     },
+    refetchInterval: 5000,
+    staleTime: 0
   });
 
   // More coordinated loading - wait for essential data before rendering
