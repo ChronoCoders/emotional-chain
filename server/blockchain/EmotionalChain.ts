@@ -4,6 +4,7 @@ import { EventEmitter } from 'events';
 import { ProductionCrypto } from '../../crypto/ProductionCrypto';
 import { BlockCrypto, CryptographicBlock } from '../../crypto/BlockCrypto';
 import { storage } from '../storage';
+import { CryptoPerformanceMonitor } from '../monitoring/CryptoPerformanceMonitor';
 import * as crypto from 'crypto';
 export class EmotionalChain extends EventEmitter {
   private chain: CryptographicBlock[] = [];
@@ -11,6 +12,7 @@ export class EmotionalChain extends EventEmitter {
   private difficulty: number = 2;
   private isMining: boolean = false;
   private miningInterval: NodeJS.Timeout | null = null;
+  private cryptoMonitor: CryptoPerformanceMonitor;
   private validators: Map<string, any> = new Map();
   private wallets: Map<string, number> = new Map(); // Validator wallets for EMO storage
   private validatorKeys: Map<string, { privateKey: Uint8Array; publicKey: Uint8Array }> = new Map();
@@ -44,6 +46,7 @@ export class EmotionalChain extends EventEmitter {
   };
   constructor() {
     super();
+    this.cryptoMonitor = CryptoPerformanceMonitor.getInstance();
     // Note: initializeBlockchain is async but we can't await in constructor
     // This will be called immediately but blockchain might not be fully loaded initially
     this.initializeBlockchain().catch(() => {});
@@ -130,8 +133,11 @@ export class EmotionalChain extends EventEmitter {
     console.log('🔗 GENESIS: Genesis block created and added to chain');
   }
   private calculateHash(index: number, timestamp: number, transactions: any[], previousHash: string, nonce: number): string {
+    // Track hash operation for real performance metrics
+    this.cryptoMonitor.recordHashOperation();
     // Use production cryptography for block hashing
     const merkleRoot = BlockCrypto.calculateMerkleRoot(transactions);
+    this.cryptoMonitor.recordMerkleTreeOperation(); // Track merkle tree calculation
     return BlockCrypto.generateBlockHash({
       index,
       timestamp,
@@ -397,12 +403,14 @@ export class EmotionalChain extends EventEmitter {
       consensusScore: this.calculateConsensusScore().toString(),
       authenticity: selectedValidator.biometricData?.authenticity ? (selectedValidator.biometricData.authenticity * 100).toFixed(2) : "90.00"
     };
-    // Proof of Emotion mining process
+    // Proof of Emotion mining process with real performance tracking
     let nonce = 0;
     let hash = '';
     const target = '0'.repeat(this.difficulty);
+    const miningStartTime = Date.now();
     do {
       nonce++;
+      this.cryptoMonitor.recordNonceAttempt(); // Track each nonce attempt
       hash = this.calculateHash(
         newBlock.index,
         newBlock.timestamp,
@@ -411,6 +419,8 @@ export class EmotionalChain extends EventEmitter {
         nonce
       );
     } while (!hash.startsWith(target) && nonce < 1000000);
+    const miningTime = Date.now() - miningStartTime;
+    console.log(`MINING PERFORMANCE: ${nonce} nonce attempts in ${miningTime}ms (${(nonce / (miningTime / 1000)).toFixed(0)} attempts/sec)`);
     if (hash.startsWith(target)) {
       newBlock.nonce = nonce;
       newBlock.hash = hash;
