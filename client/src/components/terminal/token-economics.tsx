@@ -39,8 +39,8 @@ export default function TokenEconomics() {
 
   const { data: economics } = useQuery<TokenEconomics>({
     queryKey: ['/api/token/economics'],
-    staleTime: 30000, // Refresh every 30 seconds to match wallet data
-    refetchInterval: 30000
+    staleTime: 5000, // Refresh every 5 seconds to match mining frequency  
+    refetchInterval: 5000
   });
 
   // Update with real-time data from WebSocket
@@ -57,7 +57,7 @@ export default function TokenEconomics() {
     return (
       <div className="p-4 bg-terminal-bg border border-terminal-border">
         <div className="text-terminal-warning text-sm">
-          {currentEconomics?.error ? `Error: ${currentEconomics.error}` : 'Loading token economics...'}
+          Loading token economics...
         </div>
       </div>
     );

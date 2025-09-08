@@ -14,8 +14,8 @@ export default function ValidatorDashboard() {
   // Fetch real wallet balances for all validators
   const { data: walletBalances = [] } = useQuery<Array<{ validatorId: string; balance: number; currency: string }>>({
     queryKey: ['/api/wallets'],
-    staleTime: 30000,
-    refetchInterval: 30000
+    staleTime: 5000,
+    refetchInterval: 5000
   });
 
   // Update with real-time data from WebSocket
