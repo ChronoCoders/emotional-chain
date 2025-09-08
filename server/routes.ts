@@ -7,6 +7,21 @@ import { advancedFeaturesService } from "./services/advanced-features";
 import { dataIntegrityAudit } from "./services/data-integrity-audit";
 import configRouter from "./routes/config";
 import { CONFIG } from "../shared/config";
+
+// **FIX: Add wallet caching to prevent spam**
+let walletCache: { data: any; timestamp: number } | null = null;
+const WALLET_CACHE_DURATION = 10000; // 10 seconds
+
+async function getCachedWallets() {
+  const now = Date.now();
+  if (walletCache && (now - walletCache.timestamp) < WALLET_CACHE_DURATION) {
+    return walletCache.data;
+  }
+  
+  const wallets = await emotionalChainService.getAllWallets();
+  walletCache = { data: wallets, timestamp: now };
+  return wallets;
+}
 export async function registerRoutes(app: Express): Promise<Server> {
   // Internal configuration management API (admin-only)
   app.use("/internal", configRouter);
@@ -139,7 +154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   app.get("/api/wallets/database", async (req, res) => {
     try {
-      const wallets = await emotionalChainService.getAllWallets();
+      const wallets = await getCachedWallets();
       const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
         validatorId,
         balance,
@@ -213,7 +228,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const balance = await emotionalChainService.getWalletBalance(validatorId);
       
       // Get all wallets for debugging
-      const allWallets = await emotionalChainService.getAllWallets();
+      const allWallets = await getCachedWallets();
       console.log(`Wallet request for ${validatorId}: balance=${balance}, total wallets=${allWallets.size}`);
       
       res.json({
@@ -300,7 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/wallets', async (req, res) => {
     try {
       // BLOCKCHAIN IMMUTABILITY: Get wallets directly from blockchain calculation
-      const wallets = await emotionalChainService.getAllWallets();
+      const wallets = await getCachedWallets();
       
       // Debug: Removed verbose logging after fix confirmed
       
@@ -631,6 +646,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get delegator dashboard' });
     }
   });
+
+  // **FIX: Start BootstrapNode and Mining Process**
+  const { BootstrapNode } = await import("./blockchain/BootstrapNode");
+  const bootstrapNode = new BootstrapNode(8000);
+  console.log('🚀 Starting EmotionalChain BootstrapNode...');
+  await bootstrapNode.start();
+  console.log('✅ BootstrapNode started and mining initiated');
 
   const httpServer = createServer(app);
   // WebSocket server for real-time updates - using centralized CONFIG
