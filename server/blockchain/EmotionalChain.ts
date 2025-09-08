@@ -403,28 +403,35 @@ export class EmotionalChain extends EventEmitter {
       consensusScore: this.calculateConsensusScore().toString(),
       authenticity: selectedValidator.biometricData?.authenticity ? (selectedValidator.biometricData.authenticity * 100).toFixed(2) : "90.00"
     };
-    // Proof of Emotion mining process with real performance tracking
-    let nonce = 0;
-    let hash = '';
-    const target = '0'.repeat(this.difficulty);
-    const miningStartTime = Date.now();
-    do {
-      nonce++;
-      this.cryptoMonitor.recordNonceAttempt(); // Track each nonce attempt
-      hash = this.calculateHash(
-        newBlock.index,
-        newBlock.timestamp,
-        newBlock.transactions,
-        newBlock.previousHash,
-        nonce
-      );
-    } while (!hash.startsWith(target) && nonce < 1000000);
-    const miningTime = Date.now() - miningStartTime;
-    console.log(`MINING PERFORMANCE: ${nonce} nonce attempts in ${miningTime}ms (${(nonce / (miningTime / 1000)).toFixed(0)} attempts/sec)`);
-    if (hash.startsWith(target)) {
-      newBlock.nonce = nonce;
-      newBlock.hash = hash;
-      // Note: Fork resolution available when distributed consensus is enabled
+    // Pure Proof of Emotion consensus - NO computational mining required
+    const consensusStartTime = Date.now();
+    
+    // Validate emotional fitness and biometric authenticity
+    if (!this.isValidEmotionalProof(selectedValidator.emotionalScore)) {
+      console.error('POE CONSENSUS: Selected validator failed emotional fitness check');
+      return false;
+    }
+    
+    if (selectedValidator.biometricData && selectedValidator.biometricData.authenticity < 0.7) {
+      console.error('POE CONSENSUS: Selected validator failed biometric authenticity check');
+      return false;
+    }
+    
+    // Generate cryptographic hash for block integrity (NOT for mining difficulty)
+    newBlock.nonce = Math.floor(Math.random() * 1000000); // Random nonce (no mining required)
+    newBlock.hash = this.calculateHash(
+      newBlock.index,
+      newBlock.timestamp,
+      newBlock.transactions,
+      newBlock.previousHash,
+      newBlock.nonce
+    );
+    
+    const consensusTime = Date.now() - consensusStartTime;
+    console.log(`POE CONSENSUS: Block validated through emotional fitness in ${consensusTime}ms (no computational mining)`);
+    
+    // Emotional consensus achieved - finalize block
+    // Note: Fork resolution available when distributed consensus is enabled
       
       // Add block to chain with proper cryptographic structure
       const cryptographicBlock = {
@@ -554,9 +561,6 @@ export class EmotionalChain extends EventEmitter {
       // Emit mining event
       this.emit('blockMined', newBlock);
       return true;
-    } else {
-      return false;
-    }
   }
   private calculateConsensusScore(): number {
     if (this.validators.size === 0) return 95.0;
