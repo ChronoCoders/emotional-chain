@@ -441,7 +441,6 @@ export class DatabaseStorage implements IStorage {
         const estimatedTx24h = Math.max(blocksLast24h, 8640); // At least estimate full day rate
         const estimatedVolume = estimatedTx24h * 53; // Average reward per transaction
         
-        console.log(`Transaction volume estimation: ${estimatedTx24h} transactions, ${estimatedVolume} EMO volume`);
         
         return {
           volume24h: estimatedVolume,
