@@ -316,7 +316,7 @@ export class IndependentValidatorNode {
       } catch (error) {
         console.error('❌ Emotional monitoring error:', error);
       }
-    }, 30000); // Every 30 seconds
+    }, 300000); // Every 5 minutes (reduced from 30 seconds)
   }
 
   /**
@@ -395,7 +395,7 @@ export class IndependentValidatorNode {
       if (this.status.isEligible && this.isRunning) {
         await this.participateInConsensus();
       }
-    }, 30000); // Every 30 seconds
+    }, 120000); // Every 2 minutes (reduced from 30 seconds)
   }
 
   /**

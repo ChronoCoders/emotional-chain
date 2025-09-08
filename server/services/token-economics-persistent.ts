@@ -469,7 +469,7 @@ export class PersistentTokenEconomics {
         ]);
         
         // Only log economics updates when there are significant changes (reduced log spam)
-        if (!this.lastLoggedSupply || Math.abs(totalSupply - this.lastLoggedSupply) > 1000) {
+        if (!this.lastLoggedSupply || Math.abs(totalSupply - this.lastLoggedSupply) > 10000) {
           console.log(`PROFESSIONAL ECONOMICS: ${totalSupply.toFixed(2)} total, ${circulatingSupply.toFixed(2)} circulating (${circulationRate.toFixed(1)}%), ${totalStakedAmount.toFixed(2)} staked at block ${totalBlocks}`);
           this.lastLoggedSupply = totalSupply;
         }

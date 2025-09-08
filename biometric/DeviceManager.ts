@@ -22,8 +22,8 @@ export class BiometricDeviceManager extends EventEmitter {
   private deviceGroups: Map<string, DeviceGroup> = new Map();
   private discoveryInterval?: NodeJS.Timeout;
   private healthCheckInterval?: NodeJS.Timeout;
-  private readonly discoveryIntervalMs = 30000; // 30 seconds
-  private readonly healthCheckIntervalMs = 10000; // 10 seconds
+  private readonly discoveryIntervalMs = 300000; // 5 minutes (reduced from 30 seconds)
+  private readonly healthCheckIntervalMs = 60000; // 1 minute (reduced from 10 seconds)
   private readonly maxDataAge = 60000; // 1 minute
   constructor() {
     super();
