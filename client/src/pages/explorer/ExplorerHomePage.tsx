@@ -4,6 +4,7 @@ import { Activity, Users, Zap, TrendingUp, Shield, Timer, DollarSign, Heart } fr
 import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 import { formatEmoToUSD, calculateUSDValue, EMO_PRICE_USD } from "@shared/constants";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { RealHashrateDisplay } from '../../components/RealHashrateDisplay';
 
 export default function ExplorerHomePage() {
   const { data: networkStats, isLoading: networkLoading } = useQuery({
@@ -223,7 +224,7 @@ export default function ExplorerHomePage() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-terminal-green terminal-text">Network Hashrate:</span>
-              <span className="text-terminal-cyan terminal-text font-medium">{((stats?.activeValidators || 21) * 0.6).toFixed(1)} MH/s</span>
+              <RealHashrateDisplay />
             </div>
             <div className="flex justify-between items-center">
               <span className="text-terminal-green terminal-text">Consensus Quality:</span>

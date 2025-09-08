@@ -46,6 +46,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const monitoringRouter = await import("./routes/monitoring");
   app.use("/api/monitoring", monitoringRouter.default);
   
+  // Crypto Performance Metrics API
+  const cryptoPerformanceRouter = await import("./routes/crypto-performance");
+  app.use("/api/crypto", cryptoPerformanceRouter.default);
+  
   // Immutable Blockchain API
   const blockchainRouter = await import("./routes/blockchain-immutable");
   app.use("/api/blockchain", blockchainRouter.default);
