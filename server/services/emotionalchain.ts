@@ -334,12 +334,13 @@ export class EmotionalChainService {
     if (this.blockchain && this.isRunning) {
       try {
         const chain = this.blockchain.getChain();
-        return chain.slice(-limit).map((block: any) => ({
+        // Return real-time blockchain data with current timestamps in reverse order (newest first)
+        return chain.slice(-limit).reverse().map((block: any) => ({
           id: block.hash || crypto.randomUUID(),
           height: block.index || 0,
           hash: block.hash || '',
           previousHash: block.previousHash || '',
-          timestamp: new Date(block.timestamp || Date.now()),
+          timestamp: block.timestamp ? new Date(block.timestamp).toISOString() : new Date().toISOString(),
           transactions: block.transactions || [],
           validator: block.validator || '',
           emotionalScore: block.emotionalScore || "0.00",
@@ -347,6 +348,7 @@ export class EmotionalChainService {
           authenticity: block.authenticity || "0.00"
         }));
       } catch (error) {
+        console.error('BLOCKS API ERROR:', error);
       }
     }
     return [];
