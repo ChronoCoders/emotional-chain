@@ -1012,7 +1012,7 @@ Mining rewards distributed to ecosystem validators.`;
     
     this.heartbeatInterval = setInterval(async () => {
       await this.syncTokenEconomics();
-    }, 30000); // Sync every 30 seconds for efficiency (reduced from 3 seconds)
+    }, 300000); // Sync every 5 minutes for efficiency (reduced from 30 seconds)
   }
 
   private async syncTokenEconomics(): Promise<void> {
