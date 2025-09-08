@@ -10,6 +10,8 @@ export default function ExplorerBlocksPage() {
       const response = await fetch('/api/blocks');
       return response.json();
     },
+    refetchInterval: 10000,
+    staleTime: 0
   });
 
   // Fetch network stats for additional data
@@ -19,6 +21,8 @@ export default function ExplorerBlocksPage() {
       const response = await fetch('/api/network/status');
       return response.json();
     },
+    refetchInterval: 5000,
+    staleTime: 0
   });
 
   if (isLoading) {

@@ -15,6 +15,8 @@ export default function ExplorerTransactionsPage() {
       const response = await fetch('/api/transactions');
       return response.json();
     },
+    refetchInterval: 10000,
+    staleTime: 0
   });
 
   // Fetch real transaction stats from database
@@ -24,6 +26,8 @@ export default function ExplorerTransactionsPage() {
       const response = await fetch('/api/transactions/stats');
       return response.json();
     },
+    refetchInterval: 10000,
+    staleTime: 0
   });
 
   if (isLoading) {
