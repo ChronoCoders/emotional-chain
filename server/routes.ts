@@ -647,14 +647,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // **FIX: Start BootstrapNode and Mining Process with proper initialization**
+  // Start BootstrapNode and mining process
   const { BootstrapNode } = await import("./blockchain/BootstrapNode");
   const bootstrapNode = new BootstrapNode(8000);
-  console.log('🚀 Starting EmotionalChain BootstrapNode...');
   
   // Wait for blockchain to be fully initialized before starting mining
   const blockchain = bootstrapNode.getBlockchain();
-  console.log('⏳ Waiting for blockchain initialization before starting mining...');
   
   // Check if blockchain is initialized, if not wait for it
   let attempts = 0;
@@ -664,14 +662,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     attempts++;
   }
   
-  if (blockchain.isInitialized) {
-    console.log('✅ Blockchain initialized, starting BootstrapNode...');
-    await bootstrapNode.start();
-    console.log('✅ BootstrapNode started and mining initiated');
-  } else {
-    console.log('⚠️ Blockchain initialization timeout, starting BootstrapNode anyway...');
-    await bootstrapNode.start();
-  }
+  await bootstrapNode.start();
 
   const httpServer = createServer(app);
   // WebSocket server for real-time updates - using centralized CONFIG

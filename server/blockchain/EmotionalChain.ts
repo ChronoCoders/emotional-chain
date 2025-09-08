@@ -557,7 +557,6 @@ export class EmotionalChain extends EventEmitter {
   }
   public startMining(): any {
     if (!this.isInitialized) {
-      console.log(`⚠️ MINING ERROR: Cannot start mining - blockchain not yet initialized (isInitialized: ${this.isInitialized})`);
       return {
         status: "error",
         message: "Cannot start mining - blockchain not yet initialized",
@@ -566,7 +565,6 @@ export class EmotionalChain extends EventEmitter {
       };
     }
     if (this.isMining) {
-      console.log(`⚠️ MINING ALREADY RUNNING: isMining=${this.isMining}, validators=${this.validators.size}`);
       return {
         status: "already_running",
         message: "Mining is already active",
@@ -574,10 +572,8 @@ export class EmotionalChain extends EventEmitter {
         difficulty: this.difficulty
       };
     }
-    console.log(`🚀 MINING STARTUP: Setting isMining=true, validators=${this.validators.size}, isInitialized=${this.isInitialized}`);
     this.isMining = true;
     // Start mining loop
-    console.log(`🔨 MINING STARTUP: Creating setInterval for mining loop...`);
     this.miningInterval = setInterval(async () => {
       console.log(`MINING INTERVAL: Running - isMining: ${this.isMining}, isInitialized: ${this.isInitialized}, validators: ${this.validators.size}`);
       if (this.isMining) {
