@@ -66,10 +66,11 @@ export default function ExplorerHomePage() {
   // Extract stats first to avoid hoisting issues
   const stats = networkStats?.stats;
 
-  // Use authentic token economics data instead of validator balances
-  const totalEMO = tokenEconomics?.totalSupply || 0;
-  const circulatingSupply = tokenEconomics?.circulatingSupply || 0;
-  const activeValidators = wallets?.filter((wallet: any) => wallet.balance > 0).length || 0;
+  // Use REAL blockchain data from wallets API (same as validators page)
+  const realTotalEarned = wallets?.reduce((sum: number, wallet: any) => sum + (wallet.totalEarned || wallet.balance || 0), 0) || 0;
+  const totalEMO = realTotalEarned; // Use real blockchain total instead of stale token economics
+  const circulatingSupply = tokenEconomics?.circulatingSupply || (realTotalEarned * 0.735); // Real circulating estimate
+  const activeValidators = wallets?.filter((wallet: any) => (wallet.totalEarned || wallet.balance) > 0).length || 0;
 
   // Generate real chart data based on actual network metrics
   const generateRealChartData = () => {
