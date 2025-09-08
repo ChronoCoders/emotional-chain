@@ -8,23 +8,31 @@ import { RealHashrateDisplay } from '../../components/RealHashrateDisplay';
 
 export default function ExplorerHomePage() {
   const { data: networkStats, isLoading: networkLoading } = useQuery({
-    queryKey: ['network-stats'],
+    queryKey: ['network-stats', Date.now()],
     queryFn: async () => {
-      const response = await fetch('/api/network/status');
+      const response = await fetch(`/api/network/status?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       return response.json();
     },
-    refetchInterval: 5000,
-    staleTime: 0
+    refetchInterval: 3000,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   const { data: wallets, isLoading: walletsLoading } = useQuery({
-    queryKey: ['wallets'],
+    queryKey: ['wallets', Date.now()],
     queryFn: async () => {
-      const response = await fetch('/api/wallets');
+      const response = await fetch(`/api/wallets?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       return response.json();
     },
     refetchInterval: 5000,
-    staleTime: 0
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   const { data: transactionStats, isLoading: transactionsLoading } = useQuery({
@@ -38,13 +46,17 @@ export default function ExplorerHomePage() {
   });
 
   const { data: tokenEconomics, isLoading: tokenLoading } = useQuery({
-    queryKey: ['token-economics'],
+    queryKey: ['token-economics', Date.now()],
     queryFn: async () => {
-      const response = await fetch('/api/token/economics');
+      const response = await fetch(`/api/token/economics?_t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' }
+      });
       return response.json();
     },
-    refetchInterval: 5000,
-    staleTime: 0
+    refetchInterval: 3000,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   // More coordinated loading - wait for essential data before rendering
