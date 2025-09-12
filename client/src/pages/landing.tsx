@@ -235,14 +235,15 @@ export default function LandingPage() {
               <Zap className="w-5 h-5" />
               Start Validating
             </button>
-            <Link href="/explorer">
-              <button 
-              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
+            <Button 
+              asChild 
+              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent"
             >
-              <Globe className="w-5 h-5 mr-2" />
-              <span className="font-bold">Explore Network</span>
-            </button>
-            </Link>
+              <Link href="/explorer">
+                <Globe className="w-5 h-5" />
+                <span>Explore Network</span>
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -422,18 +423,15 @@ export default function LandingPage() {
               <Heart className="w-5 h-5" />
               Get Started
             </button>
-            <a href="/docs">
-              <button 
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors bg-transparent"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.location.href = '/docs';
-                }}
-              >
-                <ExternalLink className="w-5 h-5 mr-2" />
-                <span className="font-bold">View Documentation</span>
-              </button>
-            </a>
+            <Button 
+              asChild 
+              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent"
+            >
+              <a href="/docs">
+                <ExternalLink className="w-5 h-5" />
+                <span>View Documentation</span>
+              </a>
+            </Button>
           </div>
         </div>
       </section>
