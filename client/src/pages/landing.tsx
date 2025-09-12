@@ -218,7 +218,7 @@ export default function LandingPage() {
             World's First <span className="text-terminal-cyan">Emotion-Driven</span> Blockchain
           </h1>
 
-          <p className="text-lg md:text-xl mb-8 text-terminal-green/80 max-w-3xl mx-auto">
+          <p className="text-lg md:text-xl mb-8 text-terminal-green opacity-90 max-w-3xl mx-auto">
             Revolutionary Proof of Emotion (PoE) consensus mechanism powered by real-time biometric validation.
             <br />Enterprise-grade blockchain with Bitcoin/Ethereum-level immutability.
           </p>
@@ -255,50 +255,50 @@ export default function LandingPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
               &gt; Network Status: <span className="text-terminal-success">ONLINE</span>
             </h2>
-            <p className="text-terminal-green/80">Real-time statistics from the EmotionalChain network</p>
+            <p className="text-terminal-green opacity-90">Real-time statistics from the EmotionalChain network</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="terminal-window p-6 text-center">
+            <div className="terminal-window p-6 text-center text-terminal-green">
               <div className="flex items-center justify-center mb-2">
                 <Coins className="w-8 h-8 text-terminal-gold mr-2" />
-                <span className="text-sm text-terminal-green/60">EMO SUPPLY</span>
+                <span className="text-sm text-terminal-green opacity-80">EMO SUPPLY</span>
               </div>
               <div className="text-2xl font-bold text-terminal-gold">
                 {formatNumber(circulatingSupply)}
               </div>
-              <div className="text-sm text-terminal-green/60">Circulating EMO</div>
+              <div className="text-sm text-terminal-green opacity-80">Circulating EMO</div>
             </div>
 
-            <div className="terminal-window p-6 text-center">
+            <div className="terminal-window p-6 text-center text-terminal-green">
               <div className="flex items-center justify-center mb-2">
                 <BarChart3 className="w-8 h-8 text-terminal-cyan mr-2" />
-                <span className="text-sm text-terminal-green/60">BLOCKS</span>
+                <span className="text-sm text-terminal-green opacity-80">BLOCKS</span>
               </div>
               <div className="text-2xl font-bold text-terminal-cyan">
                 {formatNumber(blockHeight)}
               </div>
-              <div className="text-sm text-terminal-green/60">Block Height</div>
+              <div className="text-sm text-terminal-green opacity-80">Block Height</div>
             </div>
 
-            <div className="terminal-window p-6 text-center">
+            <div className="terminal-window p-6 text-center text-terminal-green">
               <div className="flex items-center justify-center mb-2">
                 <Users className="w-8 h-8 text-terminal-success mr-2" />
-                <span className="text-sm text-terminal-green/60">VALIDATORS</span>
+                <span className="text-sm text-terminal-green opacity-80">VALIDATORS</span>
               </div>
               <div className="text-2xl font-bold text-terminal-success">{activeValidators}</div>
-              <div className="text-sm text-terminal-green/60">Active</div>
+              <div className="text-sm text-terminal-green opacity-80">Active</div>
             </div>
 
-            <div className="terminal-window p-6 text-center">
+            <div className="terminal-window p-6 text-center text-terminal-green">
               <div className="flex items-center justify-center mb-2">
                 <Activity className="w-8 h-8 text-terminal-orange mr-2" />
-                <span className="text-sm text-terminal-green/60">CONSENSUS</span>
+                <span className="text-sm text-terminal-green opacity-80">CONSENSUS</span>
               </div>
               <div className="text-2xl font-bold text-terminal-orange">
                 {Math.round(consensusHealth)}%
               </div>
-              <div className="text-sm text-terminal-green/60">Emotional Fitness</div>
+              <div className="text-sm text-terminal-green opacity-80">Emotional Fitness</div>
             </div>
           </div>
         </div>
@@ -311,21 +311,21 @@ export default function LandingPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
               &gt; How Proof of Emotion Works
             </h2>
-            <p className="text-terminal-green/80 max-w-3xl mx-auto">
+            <p className="text-terminal-green opacity-90 max-w-3xl mx-auto">
               Revolutionary consensus mechanism that validates blocks based on real-time emotional fitness metrics
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="terminal-window p-6">
+            <div className="terminal-window p-6 text-terminal-green">
               <div className="flex items-center mb-4">
                 <Heart className="w-8 h-8 text-terminal-error mr-3" />
                 <h3 className="text-xl font-bold text-terminal-green">Biometric Monitoring</h3>
               </div>
-              <p className="text-terminal-green/80 mb-4">
+              <p className="text-terminal-green opacity-90 mb-4">
                 Validators connect wearable devices to provide real-time heart rate, stress levels, and focus metrics.
               </p>
-              <ul className="text-sm text-terminal-green/70 space-y-1">
+              <ul className="text-sm text-terminal-green opacity-80 space-y-1">
                 <li>&gt; Heart Rate Variability</li>
                 <li>&gt; Stress Detection</li>
                 <li>&gt; Focus & Attention</li>
@@ -333,15 +333,15 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            <div className="terminal-window p-6">
+            <div className="terminal-window p-6 text-terminal-green">
               <div className="flex items-center mb-4">
                 <Brain className="w-8 h-8 text-terminal-cyan mr-3" />
                 <h3 className="text-xl font-bold text-terminal-green">7-Metric Processing</h3>
               </div>
-              <p className="text-terminal-green/80 mb-4">
+              <p className="text-terminal-green opacity-90 mb-4">
                 Advanced emotional intelligence system processes multiple physiological signals for consensus.
               </p>
-              <ul className="text-sm text-terminal-green/70 space-y-1">
+              <ul className="text-sm text-terminal-green opacity-80 space-y-1">
                 <li>&gt; Primary: Stress, Focus, Authenticity</li>
                 <li>&gt; Secondary: Valence, Arousal</li>
                 <li>&gt; Additional: Fatigue, Confidence</li>
@@ -349,15 +349,15 @@ export default function LandingPage() {
               </ul>
             </div>
 
-            <div className="terminal-window p-6">
+            <div className="terminal-window p-6 text-terminal-green">
               <div className="flex items-center mb-4">
                 <Shield className="w-8 h-8 text-terminal-gold mr-3" />
                 <h3 className="text-xl font-bold text-terminal-green">Secure Validation</h3>
               </div>
-              <p className="text-terminal-green/80 mb-4">
+              <p className="text-terminal-green opacity-90 mb-4">
                 Only emotionally fit validators can participate in block creation and consensus voting.
               </p>
-              <ul className="text-sm text-terminal-green/70 space-y-1">
+              <ul className="text-sm text-terminal-green opacity-80 space-y-1">
                 <li>&gt; Anti-spoofing Measures</li>
                 <li>&gt; Byzantine Fault Tolerance</li>
                 <li>&gt; Zero-knowledge Privacy</li>
@@ -375,7 +375,7 @@ export default function LandingPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
               &gt; Device Ecosystem
             </h2>
-            <p className="text-terminal-green/80">
+            <p className="text-terminal-green opacity-90">
               Fair mining regardless of hardware quality - consumer and professional devices compete equally
             </p>
           </div>
@@ -387,12 +387,12 @@ export default function LandingPage() {
                   <category.icon className="w-8 h-8 text-terminal-cyan mr-3" />
                   <div>
                     <h3 className="text-xl font-bold text-terminal-green">{category.name}</h3>
-                    <span className="text-sm text-terminal-green/60">{category.count} devices supported</span>
+                    <span className="text-sm text-terminal-green opacity-80">{category.count} devices supported</span>
                   </div>
                 </div>
                 <ul className="space-y-2">
                   {category.devices.map((device, idx) => (
-                    <li key={idx} className="text-terminal-green/80 flex items-center">
+                    <li key={idx} className="text-terminal-green opacity-90 flex items-center">
                       <span className="text-terminal-cyan mr-2">&gt;</span>
                       {device}
                     </li>
@@ -410,7 +410,7 @@ export default function LandingPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
             &gt; Ready to Join the Network?
           </h2>
-          <p className="text-terminal-green/80 mb-8 max-w-2xl mx-auto">
+          <p className="text-terminal-green opacity-90 mb-8 max-w-2xl mx-auto">
             Become a validator in the world's first emotion-driven blockchain. 
             Connect your wearable device and start earning EMO coins.
           </p>
