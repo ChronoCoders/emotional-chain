@@ -227,10 +227,16 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <button 
               className="bg-terminal-cyan border-2 border-terminal-cyan text-terminal-bg hover:bg-terminal-success hover:border-terminal-success hover:text-terminal-bg focus:bg-terminal-success focus:border-terminal-success focus:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+              onClick={() => {
+                const element = document.getElementById('get-started');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  // Fallback: navigate to access page if get-started section doesn't exist
+                  window.location.href = '/access';
+                }
               }}
+              data-testid="button-start-validating"
             >
               <Zap className="w-5 h-5" />
               Start Validating
