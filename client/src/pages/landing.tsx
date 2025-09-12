@@ -134,7 +134,7 @@ export default function LandingPage() {
                 Whitepaper
               </Link>
               <button 
-                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
+                className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
                 onClick={(e) => {
                   e.preventDefault();
                   document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
@@ -174,7 +174,7 @@ export default function LandingPage() {
                 Whitepaper
               </Link>
               <button 
-                className="w-full border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
+                className="w-full border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg px-4 py-2 rounded-md transition-colors bg-transparent font-medium"
                 onClick={(e) => {
                   e.preventDefault();
                   document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
@@ -226,7 +226,7 @@ export default function LandingPage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <button 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-terminal-bg hover:bg-terminal-success hover:border-terminal-success hover:text-terminal-bg focus:bg-terminal-success focus:border-terminal-success focus:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
               onClick={() => {
                 const element = document.getElementById('get-started');
                 if (element) {
@@ -243,7 +243,7 @@ export default function LandingPage() {
             </button>
             <Button 
               asChild 
-              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent"
+              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent"
             >
               <Link href="/explorer">
                 <Globe className="w-5 h-5" />
@@ -423,7 +423,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-terminal-bg hover:bg-terminal-success hover:border-terminal-success hover:text-terminal-bg focus:bg-terminal-success focus:border-terminal-success focus:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
               onClick={() => setLocation('/access')}
             >
               <Heart className="w-5 h-5" />
@@ -431,7 +431,7 @@ export default function LandingPage() {
             </button>
             <Button 
               asChild 
-              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent"
+              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent"
             >
               <a href="/docs">
                 <ExternalLink className="w-5 h-5" />
