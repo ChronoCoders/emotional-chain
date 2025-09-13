@@ -422,22 +422,20 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-terminal-bg hover:bg-terminal-success hover:border-terminal-success hover:text-terminal-bg focus:bg-terminal-success focus:border-terminal-success focus:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2"
+            <div 
+              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2 cursor-pointer"
               onClick={() => setLocation('/access')}
             >
-              <Heart className="w-5 h-5" />
+              <Heart className="w-5 h-5 text-black" />
               Get Started
-            </button>
-            <Button 
-              asChild 
-              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-bg font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent"
+            </div>
+            <div 
+              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent cursor-pointer flex items-center justify-center gap-2"
+              onClick={() => window.location.href = '/docs'}
             >
-              <a href="/docs">
-                <ExternalLink className="w-5 h-5" />
-                <span>View Documentation</span>
-              </a>
-            </Button>
+              <ExternalLink className="w-5 h-5" />
+              View Documentation
+            </div>
           </div>
         </div>
       </section>

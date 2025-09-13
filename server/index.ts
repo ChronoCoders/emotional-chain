@@ -4,7 +4,18 @@ process.env.TF_CPP_MIN_LOG_LEVEL = '2';
 import express, { type Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, serveStatic } from "./vite";
+
+// Local log function (the one in vite.ts is broken)
+function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+  console.log(`[${formattedTime}] ${source}: ${message}`);
+}
 import { CONFIG } from "../shared/config";
 import security from "./middleware/security";
 const app = express();
