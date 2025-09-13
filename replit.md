@@ -1,5 +1,7 @@
 # EmotionalChain - Proof of Emotion Blockchain
 
+**Official Website:** https://emotionalchain.com
+
 ## Overview
 
 EmotionalChain is a revolutionary blockchain network that implements "Proof of Emotion" consensus, where validators participate in consensus based on their authenticated emotional and biometric states rather than computational power or stake alone. The system combines real-time biometric data from multiple devices (heart rate monitors, stress sensors, EEG devices) with cryptographic proofs to create a unique consensus mechanism that prioritizes human wellness and authentic participation.

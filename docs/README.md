@@ -1,5 +1,7 @@
 # EmotionalChain Documentation
 
+**🌐 Official Website:** https://emotionalchain.com
+
 ## Overview
 
 Welcome to the comprehensive documentation for EmotionalChain, the world's first blockchain network implementing Proof of Emotion consensus. EmotionalChain revolutionizes blockchain technology by integrating real-time biometric authentication with traditional cryptographic security, creating a human-centric validation system that prioritizes wellness and authentic participation.
@@ -12,6 +14,9 @@ Welcome to the comprehensive documentation for EmotionalChain, the world's first
 # Clone the repository
 git clone https://github.com/emotionalchain/emotionalchain.git
 cd emotionalchain
+
+# Visit our website for more information
+# https://emotionalchain.com
 
 # Install dependencies
 npm install

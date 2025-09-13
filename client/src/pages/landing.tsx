@@ -423,18 +423,28 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <div 
-              className="bg-terminal-cyan border-2 border-terminal-cyan text-black hover:bg-terminal-success hover:border-terminal-success hover:text-black focus:bg-terminal-success focus:border-terminal-success focus:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2 cursor-pointer"
+              className="bg-terminal-cyan border-2 border-terminal-cyan font-bold px-8 py-3 rounded-md w-full sm:w-auto flex items-center justify-center transition-colors gap-2 cursor-pointer"
+              style={{ 
+                color: '#000000',
+                backgroundColor: 'rgb(34, 197, 194)',
+                borderColor: 'rgb(34, 197, 194)'
+              }}
               onClick={() => setLocation('/access')}
             >
-              <Heart className="w-5 h-5 text-black" />
-              Get Started
+              <Heart className="w-5 h-5" style={{ color: '#000000' }} />
+              <span style={{ color: '#000000', fontSize: '16px', fontWeight: 'bold' }}>Get Started</span>
             </div>
             <div 
-              className="border-2 border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-black font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent cursor-pointer flex items-center justify-center gap-2"
+              className="border-2 border-terminal-green font-bold px-8 py-3 rounded-md w-full sm:w-auto transition-colors bg-transparent cursor-pointer flex items-center justify-center gap-2"
+              style={{ 
+                color: 'rgb(34, 197, 94)',
+                borderColor: 'rgb(34, 197, 94)',
+                backgroundColor: 'transparent'
+              }}
               onClick={() => window.location.href = '/docs'}
             >
-              <ExternalLink className="w-5 h-5" />
-              View Documentation
+              <ExternalLink className="w-5 h-5" style={{ color: 'rgb(34, 197, 94)' }} />
+              <span style={{ color: 'rgb(34, 197, 94)', fontSize: '16px', fontWeight: 'bold' }}>View Documentation</span>
             </div>
           </div>
         </div>

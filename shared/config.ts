@@ -267,7 +267,12 @@ export const CONFIG: EmotionalChainConfig = {
     },
     api: {
       port: 5000,
-      corsOrigins: ['http://localhost:3000', 'https://*.replit.app'],
+      corsOrigins: [
+        'http://localhost:3000', 
+        'https://emotionalchain.com',
+        'https://www.emotionalchain.com',
+        'https://*.replit.app'
+      ],
       rateLimit: 100
     },
     websocket: {
