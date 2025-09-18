@@ -26,6 +26,46 @@ export class ProductionCrypto {
     return Buffer.from(this.generateSecureRandom(32)).toString('hex');
   }
 
+  // In-memory storage for used nonces (in production, use Redis or database)
+  private static usedNonces: Set<string> = new Set();
+  private static readonly NONCE_EXPIRY = 5 * 60 * 1000; // 5 minutes
+  
+  /**
+   * Verify nonce to prevent replay attacks
+   */
+  static verifyNonce(nonce: string): boolean {
+    // Check if nonce format is valid (64 hex characters for 32 bytes)
+    if (!nonce || typeof nonce !== 'string' || !/^[0-9a-fA-F]{64}$/.test(nonce)) {
+      return false;
+    }
+
+    // Check if nonce has been used before
+    if (this.usedNonces.has(nonce)) {
+      return false;
+    }
+
+    // Mark nonce as used
+    this.usedNonces.add(nonce);
+
+    // Clean up old nonces periodically to prevent memory leaks
+    if (this.usedNonces.size > 10000) {
+      this.cleanupOldNonces();
+    }
+
+    return true;
+  }
+
+  /**
+   * Clean up old nonces to prevent memory leaks
+   */
+  private static cleanupOldNonces(): void {
+    // In production, this would use timestamps stored with nonces
+    // For now, just clear when size gets too large
+    if (this.usedNonces.size > 50000) {
+      this.usedNonces.clear();
+    }
+  }
+
   /**
    * Create SHA-256 hash
    */
@@ -98,7 +138,7 @@ export class ProductionCrypto {
     try {
       const hash = this.hash(data);
       const sig = secp256k1.Signature.fromCompact(signature.signature);
-      return secp256k1.verify(sig, hash, publicKey);
+      return secp256k1.verify(signature.signature, hash, publicKey);
     } catch (error) {
       return false;
     }
