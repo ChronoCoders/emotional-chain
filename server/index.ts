@@ -38,6 +38,11 @@ app.use(security.securityHeaders);
 app.use(security.securityLogger);
 app.use(security.sanitizeQuery);
 
+// Handle HEAD requests to root path explicitly to prevent rate limiting
+app.head('/', (req, res) => {
+  res.status(200).end();
+});
+
 // Rate limiting for API routes (more lenient for development)
 app.use('/api/', security.apiRateLimit);
 
