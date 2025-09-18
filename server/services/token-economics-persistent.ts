@@ -419,9 +419,13 @@ export class PersistentTokenEconomics {
       
       const blockResult = await pool.query(`SELECT COUNT(*) as total_blocks FROM blocks`);
       
-      // **CRITICAL FIX**: Calculate REAL circulating supply like professional blockchains
+      // **CRITICAL FIX**: Calculate REAL circulating supply like professional blockchains  
       // Get current wallet balances from the wallets API endpoint
-      const walletsResponse = await fetch('http://localhost:5000/api/wallets');
+      const walletsResponse = await fetch('http://localhost:5000/api/wallets', {
+        headers: {
+          'X-Internal-Request': 'true' // Bypass rate limiting for internal requests
+        }
+      });
       if (!walletsResponse.ok) {
         throw new Error('Failed to fetch current wallet balances');
       }

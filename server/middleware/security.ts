@@ -19,6 +19,10 @@ export const apiRateLimit = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting for internal server-to-server requests
+  skip: (req: Request) => {
+    return req.headers['x-internal-request'] === 'true';
+  }
 });
 
 // Strict rate limiting for sensitive operations
