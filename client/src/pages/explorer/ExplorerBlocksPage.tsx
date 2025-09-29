@@ -25,6 +25,17 @@ export default function ExplorerBlocksPage() {
     staleTime: 0
   });
 
+  // Fetch real 24-hour transaction data
+  const { data: txVolume } = useQuery({
+    queryKey: ['transaction-volume'],
+    queryFn: async () => {
+      const response = await fetch('/api/transactions/volume');
+      return response.json();
+    },
+    refetchInterval: 10000,
+    staleTime: 0
+  });
+
   if (isLoading) {
     return (
       <div className="space-y-8">
@@ -122,7 +133,7 @@ export default function ExplorerBlocksPage() {
             <h3 className="text-terminal-green text-sm font-medium terminal-text">TRANSACTIONS (24H)</h3>
             <span className="text-terminal-gold terminal-text">[⚡]</span>
           </div>
-          <p className="text-2xl font-bold text-terminal-gold terminal-text">{formatNumber(blocks?.length * 24 || 0)}</p>
+          <p className="text-2xl font-bold text-terminal-gold terminal-text">{formatNumber(txVolume?.transactions24h || 0)}</p>
           <p className="text-terminal-green/70 text-sm terminal-text">360 blocks/hour avg</p>
         </div>
         
