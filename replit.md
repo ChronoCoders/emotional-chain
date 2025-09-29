@@ -1,12 +1,10 @@
 # EmotionalChain - Proof of Emotion Blockchain
 
-**Official Website:** https://emotionalchain.com
-
 ## Overview
 
-EmotionalChain is a revolutionary blockchain network that implements "Proof of Emotion" consensus, where validators participate in consensus based on their authenticated emotional and biometric states rather than computational power or stake alone. The system combines real-time biometric data from multiple devices (heart rate monitors, stress sensors, EEG devices) with cryptographic proofs to create a unique consensus mechanism that prioritizes human wellness and authentic participation.
+EmotionalChain is a revolutionary blockchain network implementing Proof of Emotion (PoE) consensus - the world's first biometric-validated blockchain that uses real-time emotional and physiological data from validators to secure the network. Unlike traditional Proof of Work or Proof of Stake, EmotionalChain validators must maintain specific emotional fitness levels measured through connected biometric devices (heart rate monitors, EEG sensors, stress detectors) to participate in consensus.
 
-The project is built as a full-stack application with a React/TypeScript frontend, Express.js backend, and PostgreSQL database. It includes comprehensive biometric device integration, advanced cryptography using @noble/curves, cross-chain bridge infrastructure, AI-powered consensus optimization, and enterprise-grade security features.
+The system combines cutting-edge cryptography, zero-knowledge proofs, Byzantine fault tolerance, and distributed P2P networking to create a human-centric blockchain where emotional authenticity and wellness are core to network security.
 
 ## User Preferences
 
@@ -15,91 +13,153 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Frontend Architecture
-- **Framework**: React 18 with TypeScript and Vite build system
-- **UI Components**: Shadcn/ui component library with Radix UI primitives
-- **Styling**: Tailwind CSS with CSS variables for theming
-- **State Management**: React hooks and context for biometric data and validator states
-- **Real-time Updates**: WebSocket connections for live biometric streaming and consensus monitoring
+
+**Technology Stack:**
+- React with TypeScript for UI components
+- Vite as the build tool and development server
+- Shadcn UI component library (New York style) with Radix UI primitives
+- TailwindCSS for styling with custom design tokens
+- React Hook Form with Zod/Joi validation for form handling
+
+**Project Structure:**
+- Client code isolated in `/client` directory with separate build output
+- Centralized path aliases (@/, @shared, @assets) configured in both TypeScript and Vite
+- Component-based architecture following atomic design principles
+- CSS variables for theming with dark mode support
 
 ### Backend Architecture
-- **Runtime**: Node.js with Express.js framework using ES modules
-- **Language**: TypeScript with strict type checking
-- **API Design**: RESTful endpoints with real-time WebSocket support
-- **Middleware**: CORS, compression, and custom biometric authentication middleware
-- **Service Layer**: Modular services for validator management, biometric processing, and consensus coordination
 
-### Database Design
-- **Primary Database**: PostgreSQL with Drizzle ORM for type-safe database operations
-- **Schema Management**: Drizzle migrations with version control
-- **Tables**: Validators, biometric readings, consensus rounds, blocks, transactions, cross-chain bridges
-- **Indexing**: Optimized indexes for high-frequency biometric data queries and validator lookups
-- **Privacy**: Biometric data stored as cryptographic hashes with ZK proof references
+**Core Framework:**
+- Node.js with TypeScript (ES Modules)
+- Express.js server (implied from package name "rest-express")
+- Production runtime using esbuild-bundled server code
 
-### Consensus Architecture
-- **Algorithm**: Proof of Emotion with Byzantine fault tolerance
-- **Committee Selection**: Dynamic validator selection based on emotional fitness scores
-- **Rounds**: Three-phase consensus (PROPOSE → VOTE → COMMIT) with 30-second epochs (realistic for biometric processing)
-- **Thresholds**: 75% minimum emotional score, 67% honest validator requirement
-- **Anti-Gaming**: Multi-device biometric validation with authenticity proofs
+**Blockchain Implementation:**
+- Custom Proof of Emotion consensus engine with Byzantine fault tolerance
+- Real-time biometric data validation from hardware devices
+- Zero-knowledge proof system for privacy-preserving emotional validation
+- Multi-phase consensus: PROPOSE → VOTE → COMMIT
+- Fork resolution with longest valid emotional chain rule
+- Dynamic validator committee selection with anti-collusion mechanisms
 
-### Cryptographic Systems
-- **Key Management**: ECDSA key pairs using @noble/curves secp256k1
-- **Signatures**: Production-grade ECDSA signatures replacing amateur implementations
-- **Hashing**: SHA-256 for all cryptographic operations
-- **Biometric Proofs**: Cryptographic proofs of emotional authenticity with anti-spoofing
-- **Zero-Knowledge**: Privacy-preserving biometric validation using ZK proofs
+**Biometric Integration:**
+- Support for multiple device types: heart rate monitors, EEG sensors, stress detectors, focus monitors
+- Real hardware device connectivity via Web Bluetooth and USB APIs
+- Cryptographic authenticity proofs for biometric readings
+- Multi-device fusion for enhanced validation
+- Anti-spoofing and device attestation mechanisms
 
-### P2P Network
-- **Library**: libp2p with multiple transport protocols (TCP, WebSockets, WebRTC)
-- **Discovery**: Kademlia DHT for peer discovery and routing
-- **Messaging**: Protobuf-based emotional protocol for validator communication
-- **Security**: Noise protocol for encrypted peer communication
-- **Topology**: Mesh network with bootstrap nodes and reputation-based peer management
+**Cryptographic Layer:**
+- Production-grade cryptography using @noble/curves and @noble/hashes
+- ECDSA signatures with secp256k1 for transactions and blocks
+- Merkle tree implementation for transaction verification
+- Zero-knowledge proof circuits (Circom/SnarkJS) for privacy
+- Post-quantum cryptography support (CRYSTALS-Dilithium, CRYSTALS-Kyber)
+- Biometric wallet with encrypted key storage
 
-### Advanced Features
-- **Quantum Resistance**: NIST-approved post-quantum cryptographic algorithms
-- **Cross-Chain Bridges**: Multi-protocol bridges to Ethereum, Polygon, BSC, and other networks
-- **Smart Contracts**: EVM-compatible emotional-aware smart contracts
-- **AI Integration**: TensorFlow.js models for consensus optimization and anomaly detection
-- **Privacy Layer**: Zero-knowledge proofs for biometric data privacy
+**Consensus Architecture:**
+- Emotional scoring algorithm combining heart rate, stress, focus, and authenticity
+- Validator selection based on emotional fitness (75%+ threshold)
+- Byzantine fault detection with pattern analysis
+- Dynamic reward calculation based on emotional contribution
+- Slashing mechanisms for poor emotional behavior
+- Real-time consensus metrics and monitoring
 
-### Performance Optimizations
-- **Parallel Processing**: Worker threads for validator batch processing
-- **Caching**: LRU caches for validator data and emotional scores
-- **Database**: Connection pooling and optimized queries for 10,000+ validators
-- **WebAssembly**: Crypto acceleration for high-performance operations
-- **Batch Operations**: Batched database writes and signature verification
+**P2P Network Layer:**
+- libp2p-based peer-to-peer networking
+- Multiple transport protocols: TCP, WebSockets, WebRTC
+- DHT for peer discovery (Kademlia)
+- Pub/Sub messaging (FloodSub) for block propagation
+- Network partition detection and recovery
+- Distributed validator coordination
 
-## External Dependencies
+**Advanced Features:**
+- Smart contract layer with EVM compatibility
+- Cross-chain bridges to Ethereum, Polygon, BSC, etc.
+- AI-powered consensus optimization using TensorFlow
+- Quantum-resistant cryptographic migration
+- Privacy layer with zero-knowledge proofs
+- Wellness goals and biometric triggers
 
-### Core Infrastructure
-- **Database**: Neon PostgreSQL serverless database with connection pooling
-- **ORM**: Drizzle ORM with PostgreSQL driver for type-safe database operations
-- **Monitoring**: Prometheus metrics integration for system observability
+### Data Storage Solutions
 
-### Biometric Integration
-- **Device APIs**: Web Bluetooth API for heart rate monitors and biometric devices
-- **Signal Processing**: Real-time biometric data processing and quality assessment
-- **Machine Learning**: TensorFlow.js for emotional pattern recognition
+**Primary Database:**
+- PostgreSQL via Neon serverless (@neondatabase/serverless)
+- Drizzle ORM for type-safe database operations
+- Schema defined in `/shared/schema.ts`
+- Migration system using drizzle-kit
 
-### Cryptography
-- **@noble/curves**: Production-grade ECDSA operations with secp256k1
-- **@noble/hashes**: SHA-256, HMAC, and PBKDF2 implementations
+**Database Schema Highlights:**
+- Validators table with emotional scores and reputation
+- Blocks table with emotional data and ZK proof references
+- Transactions with biometric metadata
+- Biometric readings stored as privacy-preserving hashes
+- ZK proof records for verification
+- Smart contracts and wellness goals
+- Bridge transactions for cross-chain operations
+- Quantum key pairs for post-quantum migration
+- AI model training data
 
-### P2P Networking
-- **libp2p**: Complete P2P networking stack with multiple transport protocols
-- **Multiaddr**: Protocol-agnostic network addressing
+**Storage Patterns:**
+- Immutable blockchain data with cryptographic integrity
+- Privacy-safe biometric storage (hashes only, not raw data)
+- Advanced features backed by real database persistence
+- No mock or simulation data in production paths
 
-### Cloud Services
-- **AWS SDK**: EC2, ECS, and S3 integration for validator infrastructure
-- **Google Cloud**: Compute Engine and storage for global validator deployment
-- **Monitoring**: OpenTelemetry for distributed tracing and observability
+### Authentication and Authorization
 
-### Cross-Chain Infrastructure
-- **Bridge Protocols**: LayerZero, Axelar, and Wormhole for multi-chain interoperability
-- **Token Standards**: ERC-20 compatible tokens with biometric authentication features
+**Biometric Wallet System:**
+- Private key encryption using biometric seed derivation
+- Multi-factor biometric authentication
+- Device fingerprinting for security
+- Recovery mechanisms with cryptographic hashing
+- Nonce-based replay attack prevention
 
-### Development Tools
-- **Build System**: Vite for fast development and optimized production builds
-- **Type Checking**: TypeScript with strict configuration
-- **Code Quality**: ESBuild for fast bundling and module processing
+**Validator Authentication:**
+- Cryptographic key pairs for validator identity
+- Emotional authenticity as consensus requirement
+- Reputation scoring system
+- Anti-collusion and anti-gaming measures
+
+### External Dependencies
+
+**Cloud Providers (Infrastructure):**
+- AWS SDK: EC2, ECS, S3 for cloud deployment
+- Google Cloud: Compute Engine, Storage, Monitoring
+- Multi-cloud support for validator node deployment
+
+**Blockchain Integrations:**
+- Polkadot API for potential parachain integration
+- LayerZero, Axelar, Wormhole for cross-chain bridges
+- EVM-compatible smart contract support
+
+**AI/ML Services:**
+- TensorFlow.js for consensus optimization
+- Custom neural networks for anomaly detection
+- Pattern recognition for Byzantine fault detection
+
+**Monitoring and Observability:**
+- OpenTelemetry for distributed tracing
+- Prometheus metrics (custom EmotionalChain metrics)
+- Custom monitoring dashboard for network health
+
+**Cryptographic Libraries:**
+- @noble/curves and @noble/hashes (production crypto)
+- Circomlib and SnarkJS (zero-knowledge proofs)
+- Babel for advanced JavaScript transformations
+
+**Development Tools:**
+- TypeScript with strict mode enabled
+- Vite with HMR and runtime error overlay
+- Replit-specific plugins for development environment
+- ESBuild for production bundling
+
+**Smart Contract Development:**
+- Hardhat framework for contract deployment
+- OpenZeppelin contracts for standards
+- Multi-chain deployment scripts
+
+**Testing and Compliance:**
+- GDPR compliance systems for biometric data
+- SOC 2 Type II compliance controls
+- Automated vulnerability management
