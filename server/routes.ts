@@ -224,6 +224,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to get token economics' });
     }
   });
+  
+  app.get('/api/token/emission-projection', async (req, res) => {
+    try {
+      const { emissionSchedule } = await import('./services/EmissionSchedule');
+      const economics = await emotionalChainService.getTokenEconomics();
+      
+      // ✅ SECURITY FIX: Clamp years to safe range (1-50) to prevent DoS
+      const requestedYears = parseInt(req.query.years as string) || 20;
+      const yearsToProject = Math.max(1, Math.min(50, requestedYears));
+      const projection = emissionSchedule.generateProjection(
+        economics.totalSupply, 
+        economics.lastBlockHeight || 0,
+        yearsToProject
+      );
+      
+      const halvingSchedule = emissionSchedule.getHalvingSchedule();
+      const metrics = emissionSchedule.getEmissionMetrics(
+        economics.totalSupply,
+        economics.lastBlockHeight || 0
+      );
+      
+      res.json({
+        projection,
+        halvingSchedule,
+        metrics,
+        currentSupply: economics.totalSupply,
+        maxSupply: economics.maxSupply,
+        currentBlock: economics.lastBlockHeight || 0
+      });
+    } catch (error) {
+      console.error('Emission projection error:', error);
+      res.status(500).json({ error: 'Failed to generate emission projection' });
+    }
+  });
+  
   // Wallet and transfer endpoints
   app.get('/api/wallet/:validatorId', async (req, res) => {
     try {

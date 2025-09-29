@@ -1,6 +1,7 @@
 import { db, pool } from '../db';
 import { tokenEconomics, validatorStates } from '@shared/schema';
 import { eq, sql } from 'drizzle-orm';
+import { emissionSchedule } from './EmissionSchedule';
 
 /**
  * Persistent Token Economics Service
@@ -113,6 +114,9 @@ export class PersistentTokenEconomics {
         contractStatus: 'AUTHENTIC_DISTRIBUTION_ACTIVE',
         lastBlockHeight: economics.lastBlockHeight,
         
+        // Emission schedule metrics
+        emissionMetrics: emissionSchedule.getEmissionMetrics(totalSupply, economics.lastBlockHeight || 0),
+        
         // Complete mining history from genesis to present (calculated from actual blockchain data)
         miningHistory: {
           genesisBlockHeight: 1, // True genesis block
@@ -136,17 +140,40 @@ export class PersistentTokenEconomics {
 
   /**
    * Issue new tokens for block rewards and update state
+   * NOW WITH EMISSION SCHEDULE: Rewards decay over time and enforce max supply cap
    */
   public async issueBlockReward(validatorId: string, rewardAmount: number, blockHeight: number): Promise<void> {
     await this.initialize();
 
     try {
+      let cappedReward = 0;
+      let epoch = 0;
+      
       await db.transaction(async (tx) => {
         // Update token economics
         const [economics] = await tx.select().from(tokenEconomics).limit(1);
         if (!economics) throw new Error('Token economics not found');
 
-        const newTotalSupply = parseFloat(economics.totalSupply) + rewardAmount;
+        const currentSupply = parseFloat(economics.totalSupply);
+        const maxSupply = parseFloat(economics.maxSupply);
+        
+        // ✅ EMISSION SCHEDULE ENFORCEMENT
+        // Calculate actual reward based on emission schedule (with halving and cap)
+        const scheduledReward = emissionSchedule.calculateBlockReward(currentSupply, blockHeight);
+        const finalReward = Math.min(rewardAmount, scheduledReward);
+        
+        // ✅ MAX SUPPLY CAP ENFORCEMENT
+        const remainingCapacity = maxSupply - currentSupply;
+        cappedReward = Math.min(finalReward, remainingCapacity);
+        epoch = emissionSchedule.getEpoch(blockHeight);
+        
+        // If we're at cap, no more rewards
+        if (cappedReward <= 0) {
+          console.log(`⛔ MAX SUPPLY REACHED: No rewards issued at block ${blockHeight}`);
+          return;
+        }
+        
+        const newTotalSupply = currentSupply + cappedReward;
         // **PROFESSIONAL ECONOMICS**: Mining rewards are liquid, but we track realistic staking
         // Calculate proper circulating supply by subtracting estimated staked amounts
         const currentStakingRate = 0.30; // 30% average staking rate (professional level)
@@ -174,7 +201,7 @@ export class PersistentTokenEconomics {
           .limit(1);
 
         if (validator) {
-          const newBalance = parseFloat(validator.balance) + rewardAmount;
+          const newBalance = parseFloat(validator.balance) + cappedReward;
           await tx.update(validatorStates)
             .set({
               balance: newBalance.toString(),
@@ -186,7 +213,7 @@ export class PersistentTokenEconomics {
           // Create new validator state
           await tx.insert(validatorStates).values({
             validatorId,
-            balance: rewardAmount.toString(),
+            balance: cappedReward.toString(),
             emotionalScore: "85.0",
             lastActivity: Date.now(),
             publicKey: `pubkey_${validatorId}`,
@@ -197,7 +224,7 @@ export class PersistentTokenEconomics {
         }
       });
 
-      console.log(`Issued ${rewardAmount} EMO to ${validatorId} for block ${blockHeight}`);
+      console.log(`💰 Issued ${cappedReward.toFixed(2)} EMO to ${validatorId} for block ${blockHeight} (Epoch ${epoch})`);
     } catch (error) {
       console.error('Failed to issue block reward:', error);
       throw error;

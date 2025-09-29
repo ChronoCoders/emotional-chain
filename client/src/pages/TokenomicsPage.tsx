@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'wouter';
 import { ArrowLeft, Database, TrendingUp, Users, Coins, Lock, Zap, Award, Target } from 'lucide-react';
+import EmissionChart from '@/components/EmissionChart';
 
 interface TokenEconomics {
   totalSupply: number;
@@ -392,6 +393,9 @@ export default function TokenomicsPage() {
               </div>
             </div>
           </div>
+
+          {/* Emission Schedule & Projection Charts */}
+          <EmissionChart />
 
           {/* Key Features */}
           <div className="terminal-window p-8">
