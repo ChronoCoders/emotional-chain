@@ -46,7 +46,7 @@ export default function ExplorerBlocksPage() {
 
   const stats = networkStats?.stats;
   const totalBlocks = stats?.blockHeight || blocks?.length || 0;
-  const avgBlockTime = 30; // Real EmotionalChain block time
+  const avgBlockTime = 10; // Real EmotionalChain block time (10 seconds)
   const latestBlock = blocks?.[0]; // Most recent block
   
   if (!blocks) {
@@ -123,7 +123,7 @@ export default function ExplorerBlocksPage() {
             <span className="text-terminal-gold terminal-text">[⚡]</span>
           </div>
           <p className="text-2xl font-bold text-terminal-gold terminal-text">{formatNumber(blocks?.length * 24 || 0)}</p>
-          <p className="text-terminal-green/70 text-sm terminal-text">{blocks?.length || 0} blocks/hour avg</p>
+          <p className="text-terminal-green/70 text-sm terminal-text">360 blocks/hour avg</p>
         </div>
         
         <div className="terminal-window p-6">
