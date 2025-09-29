@@ -101,17 +101,8 @@ export default function BlockchainExplorer() {
   };
 
   const formatHash = (hash: string) => {
-    // **CRITICAL FIX**: Never show "N/A" - generate realistic addresses for professional display
     if (!hash || hash === '' || hash === 'N/A' || hash === 'undefined') {
-      // Generate realistic EmotionalChain validator addresses
-      const validatorAddresses = [
-        'StellarNode...A7B2C9',
-        'IronNode...3D4E5F',
-        'GravityCore...8B9CA1',
-        'QuantumReach...E5F6A7',
-        'ZeroLagOps...1C2D3E'
-      ];
-      return validatorAddresses[Math.floor(Math.random() * validatorAddresses.length)];
+      return 'N/A';
     }
     return hash.substring(0, 12) + '...';
   };
