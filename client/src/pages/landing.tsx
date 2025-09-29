@@ -130,6 +130,9 @@ export default function LandingPage() {
               <Link href="/explorer" className="text-terminal-green hover:text-terminal-cyan transition-colors">
                 Explorer
               </Link>
+              <Link href="/tokenomics" className="text-terminal-green hover:text-terminal-cyan transition-colors">
+                Tokenomics
+              </Link>
               <Link href="/whitepaper" className="text-terminal-green hover:text-terminal-cyan transition-colors">
                 Whitepaper
               </Link>
@@ -165,6 +168,13 @@ export default function LandingPage() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Explorer
+              </Link>
+              <Link 
+                href="/tokenomics" 
+                className="block text-terminal-green hover:text-terminal-cyan transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Tokenomics
               </Link>
               <Link 
                 href="/whitepaper" 
