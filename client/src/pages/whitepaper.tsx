@@ -140,9 +140,9 @@ export default function WhitepaperPage() {
                 </p>
                 <p>
                   This whitepaper presents the technical architecture, cryptographic security measures, 
-                  zero-knowledge privacy implementation, and performance evaluation of EmotionalChain's 
-                  642K+ EMO coin ecosystem with 11,070+ validated blocks and 21 active validators 
-                  maintaining 100% consensus.
+                  zero-knowledge privacy implementation, sustainable emission schedule, and performance 
+                  evaluation of EmotionalChain's 1.14M+ EMO coin ecosystem with 16,500+ validated blocks 
+                  and 21 active validators maintaining 100% consensus.
                 </p>
               </div>
             </section>
@@ -550,7 +550,8 @@ template EmotionalFitnessProof() {
                       <li>&gt; Proof of Emotion consensus rewards</li>
                       <li>&gt; Staking and validation requirements</li>
                       <li>&gt; Gas fees for smart contracts</li>
-                      <li>&gt; Current supply: 643,041+ EMO</li>
+                      <li>&gt; Max supply: 1,000,000,000 EMO</li>
+                      <li>&gt; Current supply: 1,144,657+ EMO</li>
                     </ul>
                   </div>
                   <div className="border border-terminal-border p-4 rounded">
@@ -589,12 +590,54 @@ template EmotionalFitnessProof() {
                   </p>
                 </div>
 
-                <h3 className="text-xl font-bold text-terminal-green mb-3">9.3 Economic Incentives</h3>
+                <h3 className="text-xl font-bold text-terminal-green mb-3">9.3 Emission Schedule & Supply Model</h3>
+                <p className="text-terminal-green/80 mb-4">
+                  EmotionalChain implements a sustainable emission schedule with Bitcoin-inspired halving 
+                  mechanics combined with supply-based decay to ensure long-term network security.
+                </p>
+                
+                <div className="space-y-4">
+                  <div className="border border-terminal-border p-4 rounded">
+                    <h4 className="text-terminal-cyan font-bold mb-2">Halving Mechanism</h4>
+                    <ul className="space-y-2 text-terminal-green/80 text-sm">
+                      <li>&gt; Epoch-based halving every 3,153,600 blocks (~1 year at 10s blocks)</li>
+                      <li>&gt; Exponential decay: 50% reward reduction per epoch</li>
+                      <li>&gt; Genesis reward: 70 EMO → 35 EMO → 17.5 EMO → ...</li>
+                      <li>&gt; Minimum tail emission: 0.01 EMO (permanent network security)</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="border border-terminal-border p-4 rounded">
+                    <h4 className="text-terminal-cyan font-bold mb-2">Supply-Based Reduction</h4>
+                    <ul className="space-y-2 text-terminal-green/80 text-sm">
+                      <li>&gt; Hard cap: 1 billion EMO (enforced at protocol level)</li>
+                      <li>&gt; Quadratic tapering as supply approaches max cap</li>
+                      <li>&gt; Mining timeline: 10-20+ years (vs. traditional 4.5 years)</li>
+                      <li>&gt; Sustainable validator incentives through fee distribution</li>
+                    </ul>
+                  </div>
+                  
+                  <div className="border border-terminal-border p-4 rounded">
+                    <h4 className="text-terminal-cyan font-bold mb-2">Projection Model</h4>
+                    <p className="text-terminal-green/80 text-sm mb-2">
+                      Interactive emission charts visualize the 20-year supply trajectory:
+                    </p>
+                    <ul className="space-y-1 text-terminal-green/80 text-sm">
+                      <li>&gt; Total supply growth curve with halving events</li>
+                      <li>&gt; Block reward decay over time</li>
+                      <li>&gt; Annual inflation rate (decreasing from ~52% to &lt;1%)</li>
+                      <li>&gt; Estimated years to reach max supply cap</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <h3 className="text-xl font-bold text-terminal-green mb-3 mt-6">9.4 Economic Incentives</h3>
                 <ul className="space-y-2 text-terminal-green/80">
                   <li>&gt; <strong>Wellness Rewards:</strong> Higher emotional fitness = higher mining probability</li>
                   <li>&gt; <strong>Consistency Bonus:</strong> Stable emotional patterns receive additional rewards</li>
                   <li>&gt; <strong>Device Diversity:</strong> Support for multiple device types promotes inclusivity</li>
                   <li>&gt; <strong>Network Effects:</strong> More validators increase security and decentralization</li>
+                  <li>&gt; <strong>Long-term Security:</strong> Tail emission ensures perpetual validator participation</li>
                 </ul>
               </div>
             </section>
@@ -607,7 +650,7 @@ template EmotionalFitnessProof() {
                 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                   <div className="border border-terminal-border p-4 rounded">
-                    <h4 className="text-terminal-gold font-bold text-xl">11,070+</h4>
+                    <h4 className="text-terminal-gold font-bold text-xl">16,500+</h4>
                     <p className="text-terminal-green/80 text-sm">Validated Blocks</p>
                   </div>
                   <div className="border border-terminal-border p-4 rounded">
@@ -619,7 +662,7 @@ template EmotionalFitnessProof() {
                     <p className="text-terminal-green/80 text-sm">Consensus Rate</p>
                   </div>
                   <div className="border border-terminal-border p-4 rounded">
-                    <h4 className="text-terminal-green font-bold text-xl">2.5s</h4>
+                    <h4 className="text-terminal-green font-bold text-xl">10s</h4>
                     <p className="text-terminal-green/80 text-sm">Block Time</p>
                   </div>
                 </div>
@@ -665,12 +708,12 @@ template EmotionalFitnessProof() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="border border-terminal-border p-4 rounded text-center">
-                    <h4 className="text-terminal-cyan font-bold text-2xl">2.5s</h4>
+                    <h4 className="text-terminal-cyan font-bold text-2xl">10s</h4>
                     <p className="text-terminal-green/80">Average Block Time</p>
                   </div>
                   <div className="border border-terminal-border p-4 rounded text-center">
-                    <h4 className="text-terminal-cyan font-bold text-2xl">5,000+</h4>
-                    <p className="text-terminal-green/80">Transactions/Second</p>
+                    <h4 className="text-terminal-cyan font-bold text-2xl">100+</h4>
+                    <p className="text-terminal-green/80">Transactions/Block</p>
                   </div>
                   <div className="border border-terminal-border p-4 rounded text-center">
                     <h4 className="text-terminal-cyan font-bold text-2xl">99.9%</h4>
@@ -723,7 +766,8 @@ template EmotionalFitnessProof() {
                 <h3 className="text-xl font-bold text-terminal-green mb-3">12.1 Key Achievements</h3>
                 <ul className="space-y-2 text-terminal-green/80">
                   <li>&gt; First production blockchain utilizing biometric emotional validation</li>
-                  <li>&gt; 643,041+ EMO coin ecosystem with 11,070+ validated blocks</li>
+                  <li>&gt; 1.14M+ EMO coin ecosystem with 16,500+ validated blocks</li>
+                  <li>&gt; Sustainable emission schedule with 10-20+ year mining timeline</li>
                   <li>&gt; 100% consensus rate across 21 active validators</li>
                   <li>&gt; Zero-knowledge privacy preservation for sensitive biometric data</li>
                   <li>&gt; Device-agnostic fairness across 21 hardware categories</li>
