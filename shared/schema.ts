@@ -56,6 +56,7 @@ export const validatorStates = pgTable("validator_states", {
   reputation: decimal("reputation", { precision: 5, scale: 2 }).default("100"),
   totalBlocksMined: integer("total_blocks_mined").default(0),
   totalValidations: integer("total_validations").default(0),
+  deviceTrustLevel: integer("device_trust_level").default(1), // 1, 2, or 3
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -231,6 +232,37 @@ export const storageMetrics = pgTable("storage_metrics", {
   timestamp: bigint("timestamp", { mode: "number" }).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Validator stakes table for hybrid consensus (PoE + PoS)
+export const validatorStakes = pgTable("validator_stakes", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  validatorAddress: text("validator_address").notNull().unique(),
+  stakedAmount: text("staked_amount").notNull(), // Store as string for bigint
+  stakeTimestamp: timestamp("stake_timestamp").notNull(),
+  lockedUntil: timestamp("locked_until").notNull(),
+  slashingEvents: integer("slashing_events").default(0),
+  totalSlashed: text("total_slashed").default("0"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Device registrations for three-tier attestation
+export const deviceRegistrations = pgTable("device_registrations", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  deviceId: text("device_id").notNull().unique(),
+  deviceType: text("device_type").notNull(), // 'commodity' | 'medical' | 'hsm'
+  manufacturer: text("manufacturer").notNull(),
+  serialNumber: text("serial_number"),
+  attestationProof: text("attestation_proof"),
+  trustLevel: integer("trust_level").notNull(), // 1, 2, or 3
+  validatorAddress: text("validator_address").notNull(),
+  registeredAt: timestamp("registered_at").notNull(),
+  lastActivityAt: timestamp("last_activity_at"),
+  isActive: boolean("is_active").default(true),
+  oauthProvider: text("oauth_provider"), // 'fitbit' | 'apple' | 'garmin' for Level 1
+  deviceModel: text("device_model"), // Specific model for Level 2+
+  createdAt: timestamp("created_at").defaultNow(),
+});
 // Insert schemas for all tables
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -295,6 +327,17 @@ export const insertStorageMetricsSchema = createInsertSchema(storageMetrics).omi
   id: true,
   createdAt: true,
 });
+
+export const insertValidatorStakeSchema = createInsertSchema(validatorStakes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertDeviceRegistrationSchema = createInsertSchema(deviceRegistrations).omit({
+  id: true,
+  createdAt: true,
+});
 // Type exports for all tables
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -326,6 +369,10 @@ export type PeerReputation = typeof peerReputation.$inferSelect;
 export type InsertPeerReputation = z.infer<typeof insertPeerReputationSchema>;
 export type StorageMetrics = typeof storageMetrics.$inferSelect;
 export type InsertStorageMetrics = z.infer<typeof insertStorageMetricsSchema>;
+export type ValidatorStake = typeof validatorStakes.$inferSelect;
+export type InsertValidatorStake = z.infer<typeof insertValidatorStakeSchema>;
+export type DeviceRegistration = typeof deviceRegistrations.$inferSelect;
+export type InsertDeviceRegistration = z.infer<typeof insertDeviceRegistrationSchema>;
 
 // Token Economics types
 export type TokenEconomics = typeof tokenEconomics.$inferSelect;

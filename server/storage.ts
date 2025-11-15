@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Block, type InsertBlock, type Transaction, type InsertTransaction, type Validator, type InsertValidator, type BiometricData, type InsertBiometricData, type NetworkStats, type InsertNetworkStats } from "@shared/schema";
+import { type User, type InsertUser, type Block, type InsertBlock, type Transaction, type InsertTransaction, type Validator, type InsertValidator, type BiometricData, type InsertBiometricData, type NetworkStats, type InsertNetworkStats, type ValidatorStake, type InsertValidatorStake, type DeviceRegistration, type InsertDeviceRegistration } from "@shared/schema";
 import { randomUUID } from "crypto";
 export interface IStorage {
   // User methods
@@ -29,6 +29,17 @@ export interface IStorage {
   createNetworkStats(stats: InsertNetworkStats): Promise<NetworkStats>;
   // Wallet methods for database sync
   getWalletsFromDatabase(): Promise<any[]>;
+  // Validator stake methods (Hybrid Consensus - PoE + PoS)
+  getValidatorStake(validatorAddress: string): Promise<ValidatorStake | undefined>;
+  createValidatorStake(stake: InsertValidatorStake): Promise<ValidatorStake>;
+  updateValidatorStake(validatorAddress: string, updates: Partial<ValidatorStake>): Promise<void>;
+  getAllValidatorStakes(): Promise<ValidatorStake[]>;
+  // Device registration methods (Three-Tier Attestation)
+  getDeviceRegistration(deviceId: string): Promise<DeviceRegistration | undefined>;
+  getDevicesByValidator(validatorAddress: string): Promise<DeviceRegistration[]>;
+  createDeviceRegistration(device: InsertDeviceRegistration): Promise<DeviceRegistration>;
+  updateDeviceActivity(deviceId: string): Promise<void>;
+  deactivateDevice(deviceId: string): Promise<void>;
 }
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
@@ -181,7 +192,7 @@ export class MemStorage implements IStorage {
 // Import database storage
 import { db } from "./db";
 import { eq, desc, gte, sql, count, sum } from "drizzle-orm";
-import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable } from "@shared/schema";
+import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable, validatorStakes as stakesTable, deviceRegistrations as devicesTable } from "@shared/schema";
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
   // User methods
@@ -464,6 +475,59 @@ export class DatabaseStorage implements IStorage {
         transactions24h: estimatedTx24h
       };
     }
+  }
+
+  // Validator stake methods (Hybrid Consensus - PoE + PoS)
+  async getValidatorStake(validatorAddress: string): Promise<ValidatorStake | undefined> {
+    const results = await db.select().from(stakesTable)
+      .where(eq(stakesTable.validatorAddress, validatorAddress))
+      .limit(1);
+    return results[0];
+  }
+
+  async createValidatorStake(stake: InsertValidatorStake): Promise<ValidatorStake> {
+    const [result] = await db.insert(stakesTable).values(stake).returning();
+    return result;
+  }
+
+  async updateValidatorStake(validatorAddress: string, updates: Partial<ValidatorStake>): Promise<void> {
+    await db.update(stakesTable)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(stakesTable.validatorAddress, validatorAddress));
+  }
+
+  async getAllValidatorStakes(): Promise<ValidatorStake[]> {
+    return await db.select().from(stakesTable);
+  }
+
+  // Device registration methods (Three-Tier Attestation)
+  async getDeviceRegistration(deviceId: string): Promise<DeviceRegistration | undefined> {
+    const results = await db.select().from(devicesTable)
+      .where(eq(devicesTable.deviceId, deviceId))
+      .limit(1);
+    return results[0];
+  }
+
+  async getDevicesByValidator(validatorAddress: string): Promise<DeviceRegistration[]> {
+    return await db.select().from(devicesTable)
+      .where(eq(devicesTable.validatorAddress, validatorAddress));
+  }
+
+  async createDeviceRegistration(device: InsertDeviceRegistration): Promise<DeviceRegistration> {
+    const [result] = await db.insert(devicesTable).values(device).returning();
+    return result;
+  }
+
+  async updateDeviceActivity(deviceId: string): Promise<void> {
+    await db.update(devicesTable)
+      .set({ lastActivityAt: new Date() })
+      .where(eq(devicesTable.deviceId, deviceId));
+  }
+
+  async deactivateDevice(deviceId: string): Promise<void> {
+    await db.update(devicesTable)
+      .set({ isActive: false })
+      .where(eq(devicesTable.deviceId, deviceId));
   }
 }
 export const storage = new DatabaseStorage();

@@ -689,6 +689,187 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Hybrid Consensus - Validator Staking Routes
+  app.post('/api/validators/stake', async (req, res) => {
+    try {
+      const { validatorAddress, amount, lockPeriod } = req.body;
+      
+      if (!validatorAddress || !amount) {
+        return res.status(400).json({ error: 'Missing required fields: validatorAddress, amount' });
+      }
+
+      const { hybridConsensus } = await import('../shared/consensus/hybridConsensus');
+      const stake = await hybridConsensus.stakeTokens({
+        validatorAddress,
+        amount: BigInt(amount),
+        lockPeriod: lockPeriod || 14
+      });
+
+      const created = await storage.createValidatorStake(stake);
+      res.json(created);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/validators/stake/:address', async (req, res) => {
+    try {
+      const stake = await storage.getValidatorStake(req.params.address);
+      if (!stake) {
+        return res.status(404).json({ error: 'No stake found for validator' });
+      }
+      res.json(stake);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/validators/stakes', async (req, res) => {
+    try {
+      const stakes = await storage.getAllValidatorStakes();
+      res.json(stakes);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post('/api/validators/unstake', async (req, res) => {
+    try {
+      const { validatorAddress } = req.body;
+      
+      if (!validatorAddress) {
+        return res.status(400).json({ error: 'Missing required field: validatorAddress' });
+      }
+
+      const stake = await storage.getValidatorStake(validatorAddress);
+      if (!stake) {
+        return res.status(404).json({ error: 'No stake found for validator' });
+      }
+
+      const { hybridConsensus } = await import('../shared/consensus/hybridConsensus');
+      const result = await hybridConsensus.unstakeTokens(stake);
+      
+      if (!result.allowed) {
+        return res.status(400).json({ error: result.reason });
+      }
+
+      res.json({ success: true, message: 'Unstake request approved' });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  // Three-Tier Device Attestation Routes
+  app.post('/api/devices/register/commodity', async (req, res) => {
+    try {
+      const { validatorAddress, oauthToken, provider } = req.body;
+      
+      if (!validatorAddress || !oauthToken || !provider) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: validatorAddress, oauthToken, provider' 
+        });
+      }
+
+      const { deviceAttestationService } = await import('../shared/biometric/deviceAttestation');
+      const device = await deviceAttestationService.registerCommodityDevice(
+        validatorAddress,
+        oauthToken,
+        provider
+      );
+
+      const created = await storage.createDeviceRegistration(device);
+      res.json(created);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post('/api/devices/register/medical', async (req, res) => {
+    try {
+      const { validatorAddress, serialNumber, deviceModel } = req.body;
+      
+      if (!validatorAddress || !serialNumber || !deviceModel) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: validatorAddress, serialNumber, deviceModel' 
+        });
+      }
+
+      const { deviceAttestationService } = await import('../shared/biometric/deviceAttestation');
+      const device = await deviceAttestationService.registerMedicalDevice(
+        validatorAddress,
+        serialNumber,
+        deviceModel
+      );
+
+      const created = await storage.createDeviceRegistration(device);
+      res.json(created);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post('/api/devices/register/hsm', async (req, res) => {
+    try {
+      const { validatorAddress, attestationProof } = req.body;
+      
+      if (!validatorAddress || !attestationProof) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: validatorAddress, attestationProof' 
+        });
+      }
+
+      const { deviceAttestationService } = await import('../shared/biometric/deviceAttestation');
+      const device = await deviceAttestationService.registerHSMDevice(
+        validatorAddress,
+        attestationProof
+      );
+
+      const created = await storage.createDeviceRegistration(device);
+      res.json(created);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/devices/:deviceId', async (req, res) => {
+    try {
+      const device = await storage.getDeviceRegistration(req.params.deviceId);
+      if (!device) {
+        return res.status(404).json({ error: 'Device not found' });
+      }
+      res.json(device);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/devices/validator/:address', async (req, res) => {
+    try {
+      const devices = await storage.getDevicesByValidator(req.params.address);
+      res.json(devices);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post('/api/devices/:deviceId/activity', async (req, res) => {
+    try {
+      await storage.updateDeviceActivity(req.params.deviceId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post('/api/devices/:deviceId/deactivate', async (req, res) => {
+    try {
+      await storage.deactivateDevice(req.params.deviceId);
+      res.json({ success: true, message: 'Device deactivated' });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
   // Start BootstrapNode and mining process
   const { BootstrapNode } = await import("./blockchain/BootstrapNode");
   const bootstrapNode = new BootstrapNode(8000);
