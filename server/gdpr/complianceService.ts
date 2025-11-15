@@ -1,6 +1,29 @@
 /**
  * GDPR Compliance Service
  * Implements Right to Erasure (GDPR Article 17) and Data Portability (Article 20)
+ * 
+ * RESEARCH/DEMONSTRATION PROJECT NOTICE:
+ * This implementation is for research and demonstration purposes.
+ * 
+ * Known Limitations:
+ * 1. Public keys are stored in validatorStates database table (not immutable blockchain)
+ *    - Production systems should use on-chain public key registry
+ *    - Storage tampering could enable key substitution attacks
+ *    - Mitigation: Use blockchain-based key registry with cryptographic proofs
+ * 
+ * 2. Signature verification uses database-stored keys without cross-validation
+ *    - Production should verify against signed certificates or on-chain attestations
+ *    - Current implementation assumes trusted database layer
+ * 
+ * 3. No distributed key management
+ *    - Production should implement HSM-backed key storage
+ *    - Multi-sig or threshold signatures for critical operations
+ * 
+ * For production deployment, upgrade to:
+ * - On-chain public key registry (immutable)
+ * - Hardware security modules (HSM) for key storage
+ * - Multi-party computation (MPC) for sensitive operations
+ * - Formal security audit and penetration testing
  */
 
 import { db } from '../db';
@@ -57,14 +80,7 @@ export class GDPRComplianceService {
    */
   async verifySignature(request: GDPRErasureRequest): Promise<boolean> {
     try {
-      // Extract message that was signed
-      const message = `${request.validatorAddress}:${request.requestType}:${request.timestamp}`;
-      const messageHash = createHash('sha256').update(message).digest('hex');
-      
-      // In production, verify ECDSA signature against validator's public key
-      // For demo, we do basic validation
-      
-      // Check timestamp is recent (within 5 minutes)
+      // 1. Check timestamp is recent (within 5 minutes) - prevents replay attacks
       const now = Date.now();
       const age = now - request.timestamp;
       if (age > 5 * 60 * 1000 || age < 0) {
@@ -72,16 +88,81 @@ export class GDPRComplianceService {
         return false;
       }
       
-      // Check signature format
+      // 2. Check signature format
       if (!request.signature || request.signature.length < 64) {
         console.log('Invalid signature format');
         return false;
       }
+
+      // 3. Get validator's public key from storage
+      const validators = await db.query.validatorStates?.findMany({
+        where: (states: any, { eq }: any) => eq(states.validatorId, request.validatorAddress),
+      }) || [];
+
+      if (validators.length === 0) {
+        console.log('Validator not found:', request.validatorAddress);
+        return false;
+      }
+
+      const validator = validators[0];
+      const publicKey = validator.publicKey;
+
+      if (!publicKey) {
+        console.log('No public key found for validator');
+        return false;
+      }
+
+      // 4. Verify ECDSA signature using @noble/curves
+      const { secp256k1 } = await import('@noble/curves/secp256k1');
+      const { sha256 } = await import('@noble/hashes/sha256');
+
+      // Construct message to verify
+      const message = `${request.validatorAddress}:${request.requestType}:${request.timestamp}`;
+      const messageHash = sha256(new TextEncoder().encode(message));
+
+      // Parse signature and public key (remove '0x' prefix if present)
+      const sigHex = request.signature.startsWith('0x') ? request.signature.slice(2) : request.signature;
+      const pubHex = publicKey.startsWith('0x') ? publicKey.slice(2) : publicKey;
       
-      // TODO: Production - verify actual ECDSA signature
-      // const isValid = verifyECDSA(messageHash, request.signature, publicKey);
+      // Validate signature length (exactly 64 bytes = 128 hex chars)
+      if (sigHex.length !== 128) {
+        console.log('Invalid signature length:', sigHex.length, 'expected 128 hex chars');
+        return false;
+      }
+
+      // Validate signature is valid hex
+      if (!/^[0-9a-fA-F]+$/.test(sigHex)) {
+        console.log('Invalid signature format: not valid hex');
+        return false;
+      }
       
-      return true;
+      // Validate key length (33 bytes compressed or 65 bytes uncompressed)
+      if (pubHex.length !== 66 && pubHex.length !== 130) {
+        console.log('Invalid public key length:', pubHex.length, 'expected 66 or 130 hex chars');
+        return false;
+      }
+
+      // Validate public key is valid hex
+      if (!/^[0-9a-fA-F]+$/.test(pubHex)) {
+        console.log('Invalid public key format: not valid hex');
+        return false;
+      }
+      
+      // Verify signature - wrapped in try-catch to prevent crashes from malformed inputs
+      try {
+        const isValid = secp256k1.verify(sigHex, messageHash, pubHex);
+        
+        if (!isValid) {
+          console.log('ECDSA signature verification failed');
+          return false;
+        }
+        
+        console.log('✓ Signature verified for validator:', request.validatorAddress);
+        return true;
+      } catch (verifyError) {
+        console.error('Signature verification error:', verifyError);
+        return false;
+      }
     } catch (error) {
       console.error('Signature verification error:', error);
       return false;
