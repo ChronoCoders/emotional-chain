@@ -980,6 +980,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Batch Proof Routes (Inference Attack Prevention)
+  app.post('/api/batch-proofs/submit', async (req, res) => {
+    try {
+      const { batchId, validatorCommitments, aggregatedProof, timestamp, validatorCount, thresholdsPassed } = req.body;
+      
+      if (!batchId || !validatorCommitments || !aggregatedProof || !timestamp || !validatorCount || thresholdsPassed === undefined) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: batchId, validatorCommitments, aggregatedProof, timestamp, validatorCount, thresholdsPassed' 
+        });
+      }
+
+      // Verify batch proof
+      const { BatchProofCoordinator } = await import('../shared/zk/batchProofs');
+      const coordinator = new BatchProofCoordinator();
+      
+      const batchProof = {
+        batchId,
+        validatorCommitments: Array.isArray(validatorCommitments) ? validatorCommitments : [validatorCommitments],
+        aggregatedProof,
+        timestamp: Number(timestamp),
+        validatorCount: Number(validatorCount),
+        thresholdsPassed: Number(thresholdsPassed),
+        isValid: true,
+      };
+      
+      const isValid = await coordinator.verifyBatchProof(batchProof);
+      
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid batch proof' });
+      }
+
+      // Store verified batch proof
+      const stored = await storage.verifyAndStoreBatchProof({
+        batchId,
+        validatorCommitments: Array.isArray(validatorCommitments) ? validatorCommitments : [validatorCommitments],
+        aggregatedProof,
+        timestamp: Number(timestamp),
+        validatorCount: Number(validatorCount),
+        thresholdsPassed: Number(thresholdsPassed),
+        isValid: true,
+      });
+
+      res.json(stored);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/batch-proofs/:batchId', async (req, res) => {
+    try {
+      const batchProof = await storage.getBatchProofById(req.params.batchId);
+      if (!batchProof) {
+        return res.status(404).json({ error: 'Batch proof not found' });
+      }
+      res.json(batchProof);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/batch-proofs', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const batchProofs = await storage.getRecentBatchProofs(limit);
+      res.json(batchProofs);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post('/api/batch-proofs/verify', async (req, res) => {
+    try {
+      const { batchId, validatorCommitments, aggregatedProof, timestamp, validatorCount, thresholdsPassed } = req.body;
+      
+      if (!batchId || !validatorCommitments || !aggregatedProof || !timestamp || !validatorCount || thresholdsPassed === undefined) {
+        return res.status(400).json({ 
+          error: 'Missing required fields' 
+        });
+      }
+
+      const { BatchProofCoordinator } = await import('../shared/zk/batchProofs');
+      const coordinator = new BatchProofCoordinator();
+      
+      const batchProof = {
+        batchId,
+        validatorCommitments: Array.isArray(validatorCommitments) ? validatorCommitments : [validatorCommitments],
+        aggregatedProof,
+        timestamp: Number(timestamp),
+        validatorCount: Number(validatorCount),
+        thresholdsPassed: Number(thresholdsPassed),
+        isValid: true,
+      };
+      
+      const isValid = await coordinator.verifyBatchProof(batchProof);
+      
+      res.json({ isValid, batchProof });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
   // Start BootstrapNode and mining process
   const { BootstrapNode } = await import("./blockchain/BootstrapNode");
   const bootstrapNode = new BootstrapNode(8000);

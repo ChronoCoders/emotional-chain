@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Block, type InsertBlock, type Transaction, type InsertTransaction, type Validator, type InsertValidator, type BiometricData, type InsertBiometricData, type NetworkStats, type InsertNetworkStats, type ValidatorStake, type InsertValidatorStake, type DeviceRegistration, type InsertDeviceRegistration, type ThresholdProof, type InsertThresholdProof } from "@shared/schema";
+import { type User, type InsertUser, type Block, type InsertBlock, type Transaction, type InsertTransaction, type Validator, type InsertValidator, type BiometricData, type InsertBiometricData, type NetworkStats, type InsertNetworkStats, type ValidatorStake, type InsertValidatorStake, type DeviceRegistration, type InsertDeviceRegistration, type ThresholdProof, type InsertThresholdProof, type BatchProof, type InsertBatchProof } from "@shared/schema";
 import { randomUUID } from "crypto";
 export interface IStorage {
   // User methods
@@ -46,6 +46,11 @@ export interface IStorage {
   getLatestThresholdProof(validatorAddress: string): Promise<ThresholdProof | undefined>;
   verifyAndStoreProof(proof: InsertThresholdProof): Promise<ThresholdProof>;
   getRecentProofs(minutes?: number): Promise<ThresholdProof[]>;
+  // Batch proof methods (Inference Attack Prevention)
+  createBatchProof(proof: InsertBatchProof): Promise<BatchProof>;
+  getBatchProofById(batchId: string): Promise<BatchProof | undefined>;
+  getRecentBatchProofs(limit?: number): Promise<BatchProof[]>;
+  verifyAndStoreBatchProof(proof: InsertBatchProof): Promise<BatchProof>;
 }
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
@@ -198,7 +203,7 @@ export class MemStorage implements IStorage {
 // Import database storage
 import { db } from "./db";
 import { eq, desc, gte, sql, count, sum } from "drizzle-orm";
-import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable, validatorStakes as stakesTable, deviceRegistrations as devicesTable, thresholdProofs as proofsTable } from "@shared/schema";
+import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable, validatorStakes as stakesTable, deviceRegistrations as devicesTable, thresholdProofs as proofsTable, batchProofs as batchProofsTable } from "@shared/schema";
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
   // User methods
@@ -578,6 +583,37 @@ export class DatabaseStorage implements IStorage {
       .from(proofsTable)
       .where(gte(proofsTable.timestamp, cutoffTime))
       .orderBy(desc(proofsTable.timestamp));
+  }
+
+  // Batch proof methods (Inference Attack Prevention)
+  async createBatchProof(proof: InsertBatchProof): Promise<BatchProof> {
+    const [result] = await db.insert(batchProofsTable).values(proof).returning();
+    return result;
+  }
+
+  async getBatchProofById(batchId: string): Promise<BatchProof | undefined> {
+    const results = await db.select()
+      .from(batchProofsTable)
+      .where(eq(batchProofsTable.batchId, batchId))
+      .limit(1);
+    return results[0];
+  }
+
+  async getRecentBatchProofs(limit: number = 10): Promise<BatchProof[]> {
+    return await db.select()
+      .from(batchProofsTable)
+      .orderBy(desc(batchProofsTable.timestamp))
+      .limit(limit);
+  }
+
+  async verifyAndStoreBatchProof(proof: InsertBatchProof): Promise<BatchProof> {
+    // Store batch proof with verified timestamp
+    const proofWithVerification = {
+      ...proof,
+      verifiedAt: new Date(),
+    };
+    const [result] = await db.insert(batchProofsTable).values(proofWithVerification).returning();
+    return result;
   }
 }
 export const storage = new DatabaseStorage();
