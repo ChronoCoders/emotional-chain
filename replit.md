@@ -205,10 +205,67 @@ Preferred communication style: Simple, everyday language.
 - Personal data stored separately and deletable without affecting blockchain
 - Research/demonstration project (not production GDPR-compliant yet)
 
+### Phase 4: Realistic Token Economics & Gaming Prevention (November 15, 2025)
+
+**Token Economics Model:**
+- **Total Supply**: 100,000,000 EMO (fixed cap, no inflation)
+- **Distribution**: 50% validator rewards, 30% ecosystem, 15% team, 5% investors
+- **Block Rewards**: Start at 50 EMO, halve every 2,100,000 blocks (~2 years)
+- **Halving Schedule**: Emission decreases by 50% every era until minimum 1 EMO/block
+- **Staking Lock**: 30 days minimum (updated from 14 days for stability)
+
+**Emission Schedule** (`shared/tokenomics/emissionSchedule.ts`):
+- Dynamic block reward calculation based on block height
+- Total supply tracking across all halving eras
+- Validator ROI calculator with halving-aware projections
+- Vesting schedule calculations (4-year with 1-year cliff)
+
+**Validator ROI Calculator** (`client/src/pages/TokenomicsPage.tsx`):
+- Interactive calculator: stake amount, device cost, monthly costs, token price
+- Daily/monthly reward projections (adjusts for current halving era)
+- Break-even analysis (handles negative profit scenarios)
+- Annual ROI calculations with cost deductions
+- Emission schedule visualization showing halving progress
+- Token distribution breakdown charts
+
+**Vesting Schedules** (`shared/schema.ts` - vestingSchedules table):
+- Team allocation: 15M EMO, 4-year vesting, 1-year cliff
+- Investor allocation: 5M EMO, 4-year vesting, 1-year cliff
+- Linear monthly release after cliff period
+- Database-tracked release history
+
+**Multi-Signal Gaming Prevention** (`shared/biometric/multiSignalValidation.ts`):
+- **6+ Correlated Signals**: Heart rate, HRV, stress, coherence, skin conductance, respiration
+- **Cross-Correlation Analysis**: Detects unrealistic signal patterns (e.g., perfect inverse correlation)
+- **Anomaly Detection**: Flags suspiciously perfect or fake biometric data
+- **Device Normalization**: 6 device types with accuracy-based multipliers (0.4x to 1.0x)
+  - Fitness trackers: 0.4x (least accurate)
+  - Medical-grade chest straps: 1.0x (baseline)
+  - Hospital equipment: 0.95x (most accurate)
+- **Coherence Scoring**: Validates heart-brain synchronization authenticity
+- **Historical Pattern Analysis**: Detects replay attacks and spoofed sequences
+
+**Biometric Processor Updates** (`client/services/biometricProcessor.ts`):
+- Integrated multi-signal validation
+- Device normalization applied to all readings
+- Gaming detection active on all biometric submissions
+
+**Documentation** (`client/src/pages/TokenomicsDocs.tsx`):
+- Comprehensive tokenomics guide for users
+- Explains supply distribution, halving, staking, vesting
+- Gaming prevention mechanisms explained
+- Validator economics and break-even analysis
+
+**Integration Points:**
+- Consensus rewards use `emissionSchedule.calculateBlockReward(blockHeight)`
+- Frontend calculator reflects real-time halving impact
+- Multi-signal validation prevents single-metric gaming
+- Device normalization ensures hardware fairness
+
 ### Phase 1 & 2: Hybrid Consensus (Complete - November 15, 2025)
 
 **Hybrid PoE+PoS Consensus:**
-- Minimum stake: 10,000 EMO, 14-day lock period
+- Minimum stake: 10,000 EMO
 - Emotional fitness: 75% threshold (soft requirement for optimal rewards)
 - Reward calculation: 50% PoS + 50% PoE
 
