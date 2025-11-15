@@ -263,6 +263,21 @@ export const deviceRegistrations = pgTable("device_registrations", {
   deviceModel: text("device_model"), // Specific model for Level 2+
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+// Threshold proofs table for privacy-preserving ZK system
+export const thresholdProofs = pgTable("threshold_proofs", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  validatorAddress: text("validator_address").notNull(),
+  commitment: text("commitment").notNull(), // Cryptographic commitment (never reveals actual score)
+  proofData: text("proof_data").notNull(), // ZK-SNARK proof
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  scoreAboveThreshold: boolean("score_above_threshold").notNull(), // Only reveals boolean
+  threshold: integer("threshold").notNull(),
+  isValid: boolean("is_valid").default(true),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas for all tables
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -338,6 +353,13 @@ export const insertDeviceRegistrationSchema = createInsertSchema(deviceRegistrat
   id: true,
   createdAt: true,
 });
+
+export const insertThresholdProofSchema = createInsertSchema(thresholdProofs).omit({
+  id: true,
+  createdAt: true,
+  verifiedAt: true,
+});
+
 // Type exports for all tables
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -373,6 +395,8 @@ export type ValidatorStake = typeof validatorStakes.$inferSelect;
 export type InsertValidatorStake = z.infer<typeof insertValidatorStakeSchema>;
 export type DeviceRegistration = typeof deviceRegistrations.$inferSelect;
 export type InsertDeviceRegistration = z.infer<typeof insertDeviceRegistrationSchema>;
+export type ThresholdProof = typeof thresholdProofs.$inferSelect;
+export type InsertThresholdProof = z.infer<typeof insertThresholdProofSchema>;
 
 // Token Economics types
 export type TokenEconomics = typeof tokenEconomics.$inferSelect;

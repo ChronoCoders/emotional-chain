@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Block, type InsertBlock, type Transaction, type InsertTransaction, type Validator, type InsertValidator, type BiometricData, type InsertBiometricData, type NetworkStats, type InsertNetworkStats, type ValidatorStake, type InsertValidatorStake, type DeviceRegistration, type InsertDeviceRegistration } from "@shared/schema";
+import { type User, type InsertUser, type Block, type InsertBlock, type Transaction, type InsertTransaction, type Validator, type InsertValidator, type BiometricData, type InsertBiometricData, type NetworkStats, type InsertNetworkStats, type ValidatorStake, type InsertValidatorStake, type DeviceRegistration, type InsertDeviceRegistration, type ThresholdProof, type InsertThresholdProof } from "@shared/schema";
 import { randomUUID } from "crypto";
 export interface IStorage {
   // User methods
@@ -40,6 +40,12 @@ export interface IStorage {
   createDeviceRegistration(device: InsertDeviceRegistration): Promise<DeviceRegistration>;
   updateDeviceActivity(deviceId: string): Promise<void>;
   deactivateDevice(deviceId: string): Promise<void>;
+  // Threshold proof methods (Privacy-Preserving ZK Proofs)
+  createThresholdProof(proof: InsertThresholdProof): Promise<ThresholdProof>;
+  getThresholdProofsByValidator(validatorAddress: string, limit?: number): Promise<ThresholdProof[]>;
+  getLatestThresholdProof(validatorAddress: string): Promise<ThresholdProof | undefined>;
+  verifyAndStoreProof(proof: InsertThresholdProof): Promise<ThresholdProof>;
+  getRecentProofs(minutes?: number): Promise<ThresholdProof[]>;
 }
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
@@ -192,7 +198,7 @@ export class MemStorage implements IStorage {
 // Import database storage
 import { db } from "./db";
 import { eq, desc, gte, sql, count, sum } from "drizzle-orm";
-import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable, validatorStakes as stakesTable, deviceRegistrations as devicesTable } from "@shared/schema";
+import { blocks as blocksTable, transactions as transactionsTable, validatorStates as validatorsTable, biometricData as biometricTable, validatorStakes as stakesTable, deviceRegistrations as devicesTable, thresholdProofs as proofsTable } from "@shared/schema";
 // Database Storage Implementation
 export class DatabaseStorage implements IStorage {
   // User methods
@@ -528,6 +534,50 @@ export class DatabaseStorage implements IStorage {
     await db.update(devicesTable)
       .set({ isActive: false })
       .where(eq(devicesTable.deviceId, deviceId));
+  }
+
+  // Threshold proof methods (Privacy-Preserving ZK Proofs)
+  async createThresholdProof(proof: InsertThresholdProof): Promise<ThresholdProof> {
+    const [result] = await db.insert(proofsTable).values(proof).returning();
+    return result;
+  }
+
+  async getThresholdProofsByValidator(
+    validatorAddress: string,
+    limit: number = 10
+  ): Promise<ThresholdProof[]> {
+    return await db.select()
+      .from(proofsTable)
+      .where(eq(proofsTable.validatorAddress, validatorAddress))
+      .orderBy(desc(proofsTable.timestamp))
+      .limit(limit);
+  }
+
+  async getLatestThresholdProof(validatorAddress: string): Promise<ThresholdProof | undefined> {
+    const results = await db.select()
+      .from(proofsTable)
+      .where(eq(proofsTable.validatorAddress, validatorAddress))
+      .orderBy(desc(proofsTable.timestamp))
+      .limit(1);
+    return results[0];
+  }
+
+  async verifyAndStoreProof(proof: InsertThresholdProof): Promise<ThresholdProof> {
+    // Store proof with verified timestamp
+    const proofWithVerification = {
+      ...proof,
+      verifiedAt: new Date(),
+    };
+    const [result] = await db.insert(proofsTable).values(proofWithVerification).returning();
+    return result;
+  }
+
+  async getRecentProofs(minutes: number = 15): Promise<ThresholdProof[]> {
+    const cutoffTime = Date.now() - (minutes * 60 * 1000);
+    return await db.select()
+      .from(proofsTable)
+      .where(gte(proofsTable.timestamp, cutoffTime))
+      .orderBy(desc(proofsTable.timestamp));
   }
 }
 export const storage = new DatabaseStorage();
