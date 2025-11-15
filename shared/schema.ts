@@ -82,6 +82,9 @@ export const tokenEconomics = pgTable("token_economics", {
   lastBlockHeight: integer("last_block_height").notNull().default(0),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+// DEPRECATED: Raw biometric data storage (GDPR VIOLATION)
+// Kept for backward compatibility only - DO NOT USE for new data
+// Use biometricCommitments table instead
 export const biometricData = pgTable("biometric_data", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   validatorId: text("validator_id").references(() => validatorStates.validatorId).notNull(),
@@ -91,8 +94,39 @@ export const biometricData = pgTable("biometric_data", {
   quality: decimal("quality", { precision: 3, scale: 2 }).notNull(),
   timestamp: bigint("timestamp", { mode: "number" }).notNull(),
   authenticityProof: jsonb("authenticity_proof").notNull(),
-  rawData: jsonb("raw_data"),
+  rawData: jsonb("raw_data"), // DEPRECATED: GDPR violation
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// GDPR-COMPLIANT: Commitment-only biometric storage
+// Stores only cryptographic commitments, NOT raw biometric data
+// Implements data minimization principle (GDPR Article 5)
+export const biometricCommitments = pgTable("biometric_commitments", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  validatorAddress: text("validator_address").notNull(),
+  deviceId: text("device_id").notNull(),
+  commitment: text("commitment").notNull(), // Hash(score + nonce)
+  zkProof: text("zk_proof").notNull(), // Zero-knowledge threshold proof
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  blockHeight: integer("block_height"),
+  scoreAboveThreshold: boolean("score_above_threshold"), // Only boolean, never actual score
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// OFF-CHAIN DATA: Can be deleted for GDPR compliance
+// Separates personal data from immutable blockchain data
+export const offChainProfiles = pgTable("off_chain_profiles", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  validatorAddress: text("validator_address").notNull().unique(),
+  email: text("email"),
+  name: text("name"),
+  country: text("country"),
+  consentTimestamp: timestamp("consent_timestamp").notNull(),
+  consentVersion: text("consent_version").notNull(), // e.g., "v1.0"
+  consentActive: boolean("consent_active").default(true),
+  dataProcessingPurpose: text("data_processing_purpose"), // Required by GDPR
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 // Smart contracts table
 export const smartContracts = pgTable("smart_contracts", {
@@ -312,6 +346,17 @@ export const insertBiometricDataSchema = createInsertSchema(biometricData).omit(
   id: true,
   createdAt: true,
 });
+
+export const insertBiometricCommitmentSchema = createInsertSchema(biometricCommitments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertOffChainProfileSchema = createInsertSchema(offChainProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export const insertSmartContractSchema = createInsertSchema(smartContracts).omit({
   id: true,
   deployedAt: true,
@@ -391,6 +436,10 @@ export type ValidatorState = typeof validatorStates.$inferSelect;
 export type InsertValidatorState = z.infer<typeof insertValidatorStateSchema>;
 export type BiometricDataRecord = typeof biometricData.$inferSelect;
 export type InsertBiometricData = z.infer<typeof insertBiometricDataSchema>;
+export type BiometricCommitment = typeof biometricCommitments.$inferSelect;
+export type InsertBiometricCommitment = z.infer<typeof insertBiometricCommitmentSchema>;
+export type OffChainProfile = typeof offChainProfiles.$inferSelect;
+export type InsertOffChainProfile = z.infer<typeof insertOffChainProfileSchema>;
 export type SmartContract = typeof smartContracts.$inferSelect;
 export type InsertSmartContract = z.infer<typeof insertSmartContractSchema>;
 export type WellnessGoal = typeof wellnessGoals.$inferSelect;

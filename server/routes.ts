@@ -54,6 +54,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const blockchainRouter = await import("./routes/blockchain-immutable");
   app.use("/api/blockchain", blockchainRouter.default);
   
+  // GDPR Compliance API
+  const gdprRouter = await import("./routes/gdpr");
+  app.use("/api/gdpr", gdprRouter.default);
+  
   // Production Prometheus metrics endpoint
   app.get('/metrics', async (req, res) => {
     try {
