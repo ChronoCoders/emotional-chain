@@ -104,7 +104,8 @@ export class BatchProofCoordinator {
       console.log(`Adding ${dummyCount} dummy proofs to maintain batch size`);
       for (let i = 0; i < dummyCount; i++) {
         const dummyProof = this.createDummyProof();
-        this.proofQueue.set(`dummy_${i}_${Date.now()}`, dummyProof);
+        // CRITICAL: Use validatorAddress as queue key to ensure cleanup works
+        this.proofQueue.set(dummyProof.validatorAddress, dummyProof);
       }
     }
 

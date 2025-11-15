@@ -91,8 +91,28 @@ This project is positioned as a **research/demonstration platform** exploring hu
 - Provides clear upgrade path to production ZK-SNARKs
 - Avoids complexity of trusted setup ceremony for demo
 
+## Architecture Notes
+
+**Batch Proof Coordinator is In-Memory:**
+The `BatchProofCoordinator` class maintains an in-memory queue of proofs. It does **not** automatically pull from database tables. To use batch proofs:
+1. Create a coordinator instance: `const coordinator = new BatchProofCoordinator()`
+2. Queue proofs programmatically: `await coordinator.queueProof(thresholdProof)`
+3. Or submit via API: `POST /api/batch-proofs/submit`
+
+**Integration with Threshold Proofs:**
+Currently, threshold proofs and batch proofs are separate systems:
+- Threshold proofs are stored in `threshold_proofs` table
+- Batch proofs are in-memory queued, then stored in `batch_proofs` table
+- No automatic batching of threshold proofs (intentional for demo)
+
+For production, you would integrate these by:
+- Running a background service that monitors threshold proof submissions
+- Automatically queuing them in the batch coordinator
+- Periodically creating and submitting batches
+
 ## Files
 
 - `thresholdProofs.ts` - Mock proof system (TypeScript)
+- `batchProofs.ts` - Batch proof coordinator (in-memory queue)
 - `emotionalThreshold.circom` - Circuit definition (ready for compilation)
 - `README.md` - This file (implementation status)
