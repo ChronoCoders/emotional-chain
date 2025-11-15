@@ -278,6 +278,20 @@ export const thresholdProofs = pgTable("threshold_proofs", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Batch proofs table for inference attack prevention
+export const batchProofs = pgTable("batch_proofs", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  batchId: text("batch_id").notNull().unique(),
+  validatorCommitments: text("validator_commitments").array().notNull(), // Array of commitments
+  aggregatedProof: text("aggregated_proof").notNull(), // Single aggregated proof
+  timestamp: bigint("timestamp", { mode: "number" }).notNull(),
+  validatorCount: integer("validator_count").notNull(),
+  thresholdsPassed: integer("thresholds_passed").notNull(), // Aggregate statistic only
+  isValid: boolean("is_valid").default(true),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas for all tables
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -360,6 +374,12 @@ export const insertThresholdProofSchema = createInsertSchema(thresholdProofs).om
   verifiedAt: true,
 });
 
+export const insertBatchProofSchema = createInsertSchema(batchProofs).omit({
+  id: true,
+  createdAt: true,
+  verifiedAt: true,
+});
+
 // Type exports for all tables
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -397,6 +417,8 @@ export type DeviceRegistration = typeof deviceRegistrations.$inferSelect;
 export type InsertDeviceRegistration = z.infer<typeof insertDeviceRegistrationSchema>;
 export type ThresholdProof = typeof thresholdProofs.$inferSelect;
 export type InsertThresholdProof = z.infer<typeof insertThresholdProofSchema>;
+export type BatchProof = typeof batchProofs.$inferSelect;
+export type InsertBatchProof = z.infer<typeof insertBatchProofSchema>;
 
 // Token Economics types
 export type TokenEconomics = typeof tokenEconomics.$inferSelect;
