@@ -1,0 +1,63 @@
+# Technical Questions About EmotionalChain
+
+## Core Consensus Mechanism
+
+**1. Anti-Spoofing Implementation**
+How exactly do you prevent sensor spoofing? You mention "device attestation mechanisms" but:
+- How do you cryptographically verify that biometric data comes from a legitimate, unmodified sensor?
+- What prevents someone from running a software-emulated sensor sending fake but valid-looking data?
+- Do you require hardware security modules (HSMs) in sensors? If so, what's your supply chain trust model?
+
+**2. Byzantine Validators Under Stress**
+- If a validator becomes stressed/unhealthy during consensus, do they get ejected mid-round?
+- What happens during network-wide events (e.g., natural disaster) where many validators simultaneously fail emotional fitness?
+- How do you prevent the "emotional fitness" requirement from creating a liveness problem?
+
+**3. Sybil Attack Defense**
+- Traditional blockchains use PoW (computational cost) or PoS (economic cost). What's the cost barrier here?
+- Can't an attacker buy 100 legitimate sensors and run them with simulated/controlled biometric inputs?
+- How do you tie validators to unique humans without creating a centralized identity registry?
+
+## Privacy vs. Validation Trade-off
+
+**4. Zero-Knowledge Proof Granularity**
+- You store biometric hashes, but validators must prove *real-time* emotional state. What exactly goes into the ZK circuit?
+- Are you proving "I have heart rate between X-Y" or revealing the actual value?
+- How do you prevent inference attacks where someone correlates blockchain activity with validator emotional patterns?
+
+**5. GDPR Compliance Reality**
+- Biometric data is "special category" under GDPR requiring explicit consent and minimization
+- Real-time processing for consensus seems incompatible with data minimization
+- How do you handle right-to-erasure when data is on an immutable blockchain?
+
+## Network Performance
+
+**6. Bandwidth and Latency**
+- What's your expected biometric data transmission rate per validator? (Hz, KB/s?)
+- With libp2p pub/sub, how do you handle the n-to-n broadcast problem at scale?
+- What's your target block time with all this biometric validation overhead?
+
+**7. Validator Economics**
+- What incentivizes someone to run a validator with expensive biometric hardware?
+- Rewards based on "emotional contribution" - how does this not just encourage gaming the metrics?
+- What's the slashing mechanism if someone can't help being stressed?
+
+## Integration Complexity
+
+**8. EVM Compatibility**
+- You mention EVM compatibility for smart contracts. How does Proof of Emotion consensus interface with EVM's assumptions about deterministic execution?
+- Do smart contracts have access to emotional state data? Privacy implications?
+
+**9. Cross-Chain Bridges**
+- Bridging to Ethereum/Polygon - how do those chains validate your PoE blocks?
+- Is there a trusted relayer, or do you have a novel trustless bridge design?
+
+## Practical Architecture
+
+**10. The Real Question**
+Is this actually intended as a production blockchain for financial transactions, or is it:
+- A research project exploring human-centric consensus?
+- A wellness/gamification platform using blockchain-like structures?
+- A proof-of-concept to demonstrate biometric integration possibilities?
+
+**What's the actual use case** where Proof of Emotion provides better security/properties than existing consensus mechanisms?
