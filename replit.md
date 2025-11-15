@@ -163,3 +163,62 @@ Preferred communication style: Simple, everyday language.
 - GDPR compliance systems for biometric data
 - SOC 2 Type II compliance controls
 - Automated vulnerability management
+
+## Recent Implementations
+
+### Phase 3: GDPR Compliance (November 15, 2025)
+
+**GDPR-Compliant Privacy Architecture:**
+- **Client-Side Biometric Processing** (`client/services/biometricProcessor.ts`)
+  - All raw biometric data processed on-device
+  - Zero-knowledge proofs generated locally
+  - Only cryptographic commitments transmitted to blockchain
+  
+- **Commitment-Only Storage** (`shared/schema.ts`)
+  - New `biometricCommitments` table: stores SHA-256 hash(score + nonce)
+  - New `offChainProfiles` table: separates personal data from blockchain
+  - Deprecated `biometric_data.rawData` field (marked as GDPR violation)
+  - Data minimization: only boolean disclosure (score above threshold)
+
+- **GDPR Compliance Service** (`server/gdpr/complianceService.ts`)
+  - Right to Erasure (GDPR Article 17): signature-verified deletion workflow
+  - Right to Access (Article 15): full data export functionality
+  - Right to Data Portability (Article 20): machine-readable export
+  - Consent Management: version tracking, revocation, purpose specification
+
+- **GDPR API Endpoints** (`server/routes/gdpr.ts`)
+  - `POST /api/gdpr/erasure`: Delete personal data (retains blockchain commitments)
+  - `GET /api/gdpr/data/:address`: Export all personal data
+  - `POST /api/gdpr/consent`: Record consent with version tracking
+  - `POST /api/gdpr/consent/revoke`: Revoke consent (triggers unstaking)
+  - `GET /api/gdpr/consent/:address`: Check consent status
+
+- **BiometricConsent Smart Contract** (`shared/contracts/BiometricConsent.ts`)
+  - Required before validator registration and staking
+  - Consent versioning for policy updates
+  - Event log for audit trail
+  - Integrated into `/api/validators/stake` (returns 403 if no consent)
+
+**Privacy Model:**
+- Three-layer privacy: threshold proofs + batch aggregation + dummy transactions
+- Commitments are meaningless without nonce (computationally infeasible to reverse)
+- Personal data stored separately and deletable without affecting blockchain
+- Research/demonstration project (not production GDPR-compliant yet)
+
+### Phase 1 & 2: Hybrid Consensus (Complete - November 15, 2025)
+
+**Hybrid PoE+PoS Consensus:**
+- Minimum stake: 10,000 EMO, 14-day lock period
+- Emotional fitness: 75% threshold (soft requirement for optimal rewards)
+- Reward calculation: 50% PoS + 50% PoE
+
+**Three-Tier Device Attestation:**
+- Tier 1: Commodity devices (OAuth, 0.5x multiplier)
+- Tier 2: Medical devices (Serial verified, 1.0x multiplier)
+- Tier 3: HSM devices (Cryptographic attestation, 1.5x multiplier)
+
+**ZK Privacy System:**
+- Threshold proofs: hide individual scores, reveal only "above threshold"
+- Batch proof aggregation: 10 validators per block
+- Dummy transaction injection for noise generation
+- DEMO/MOCK implementation with production upgrade path

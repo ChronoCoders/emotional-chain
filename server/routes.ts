@@ -702,6 +702,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Missing required fields: validatorAddress, amount' });
       }
 
+      // GDPR COMPLIANCE: Check consent before allowing staking
+      const { gdprService } = await import('./gdpr/complianceService');
+      const hasConsent = await gdprService.hasValidConsent(validatorAddress);
+      
+      if (!hasConsent) {
+        return res.status(403).json({ 
+          error: 'GDPR consent required',
+          message: 'You must provide consent for biometric data processing before staking. Please register consent at /api/gdpr/consent',
+          validatorAddress
+        });
+      }
+
       const { hybridConsensus } = await import('../shared/consensus/hybridConsensus');
       const stake = await hybridConsensus.stakeTokens({
         validatorAddress,
