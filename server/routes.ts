@@ -870,6 +870,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Privacy-Preserving Threshold Proof Routes (Phase 2)
+  app.post('/api/proofs/submit', async (req, res) => {
+    try {
+      const { validatorAddress, commitment, proofData, timestamp, scoreAboveThreshold, threshold } = req.body;
+      
+      if (!validatorAddress || !commitment || !proofData || !timestamp || scoreAboveThreshold === undefined || !threshold) {
+        return res.status(400).json({ 
+          error: 'Missing required fields: validatorAddress, commitment, proofData, timestamp, scoreAboveThreshold, threshold' 
+        });
+      }
+
+      // Import threshold proof system for verification
+      const { ThresholdProofSystem } = await import('../shared/zk/thresholdProofs');
+      const proofSystem = new ThresholdProofSystem(validatorAddress, threshold);
+      
+      // Verify the proof before storing
+      const proofToVerify = {
+        validatorAddress,
+        commitment,
+        proofData,
+        timestamp: Number(timestamp),
+        scoreAboveThreshold: Boolean(scoreAboveThreshold),
+        isValid: true,
+      };
+      
+      const isValid = await proofSystem.verifyThresholdProof(proofToVerify, threshold);
+      
+      if (!isValid) {
+        return res.status(400).json({ error: 'Invalid threshold proof' });
+      }
+
+      // Store verified proof
+      const stored = await storage.verifyAndStoreProof({
+        validatorAddress,
+        commitment,
+        proofData,
+        timestamp: Number(timestamp),
+        scoreAboveThreshold: Boolean(scoreAboveThreshold),
+        threshold: Number(threshold),
+        isValid: true,
+      });
+
+      res.json(stored);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/proofs/validator/:address', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 10;
+      const proofs = await storage.getThresholdProofsByValidator(req.params.address, limit);
+      res.json(proofs);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/proofs/validator/:address/latest', async (req, res) => {
+    try {
+      const proof = await storage.getLatestThresholdProof(req.params.address);
+      if (!proof) {
+        return res.status(404).json({ error: 'No proofs found for validator' });
+      }
+      res.json(proof);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.get('/api/proofs/recent', async (req, res) => {
+    try {
+      const minutes = parseInt(req.query.minutes as string) || 15;
+      const proofs = await storage.getRecentProofs(minutes);
+      res.json(proofs);
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
+  app.post('/api/proofs/verify', async (req, res) => {
+    try {
+      const { validatorAddress, commitment, proofData, timestamp, scoreAboveThreshold, threshold } = req.body;
+      
+      if (!validatorAddress || !commitment || !proofData || !timestamp || scoreAboveThreshold === undefined || !threshold) {
+        return res.status(400).json({ 
+          error: 'Missing required fields' 
+        });
+      }
+
+      const { ThresholdProofSystem } = await import('../shared/zk/thresholdProofs');
+      const proofSystem = new ThresholdProofSystem(validatorAddress, threshold);
+      
+      const proof = {
+        validatorAddress,
+        commitment,
+        proofData,
+        timestamp: Number(timestamp),
+        scoreAboveThreshold: Boolean(scoreAboveThreshold),
+        isValid: true,
+      };
+      
+      const isValid = await proofSystem.verifyThresholdProof(proof, threshold);
+      
+      res.json({ isValid, proof });
+    } catch (error) {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  });
+
   // Start BootstrapNode and mining process
   const { BootstrapNode } = await import("./blockchain/BootstrapNode");
   const bootstrapNode = new BootstrapNode(8000);
