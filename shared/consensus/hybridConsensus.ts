@@ -2,6 +2,7 @@
 // Combines Proof of Stake economic security with Proof of Emotion biometric bonuses
 
 import type { ValidatorState, ValidatorStake, DeviceRegistration } from '../schema';
+import { emissionSchedule } from '../tokenomics/emissionSchedule';
 
 export interface ValidatorRequirements {
   minimumStake: bigint; // 10,000 EMO
@@ -25,7 +26,7 @@ export interface RewardCalculation {
 export class HybridConsensus {
   private static readonly MINIMUM_STAKE = BigInt(10000); // 10,000 EMO
   private static readonly EMOTIONAL_FITNESS_THRESHOLD = 75; // 75%
-  private static readonly LOCK_PERIOD_DAYS = 14; // 14 days minimum lock
+  private static readonly LOCK_PERIOD_DAYS = 30; // 30 days minimum lock
   
   // Device trust level multipliers
   private static readonly DEVICE_MULTIPLIERS = {
@@ -66,13 +67,16 @@ export class HybridConsensus {
 
   /**
    * Calculate block reward based on stake + emotional performance + device trust
+   * Uses emission schedule with halving mechanism
    */
   calculateBlockReward(
-    baseReward: bigint,
+    blockHeight: number,
     emotionalScore: number,
     deviceTrustLevel: 1 | 2 | 3
   ): RewardCalculation {
-    // Base: 50 EMO
+    // Get base reward from emission schedule (includes halving)
+    const baseRewardAmount = emissionSchedule.calculateBlockReward(blockHeight);
+    const baseReward = BigInt(baseRewardAmount);
     let reward = baseReward;
     
     // Emotional bonus: -25% to +25%

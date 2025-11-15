@@ -82,6 +82,24 @@ export const tokenEconomics = pgTable("token_economics", {
   lastBlockHeight: integer("last_block_height").notNull().default(0),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Vesting schedules for team and investor allocations
+// Implements 4-year vesting with 1-year cliff
+export const vestingSchedules = pgTable("vesting_schedules", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  beneficiaryAddress: text("beneficiary_address").notNull(),
+  beneficiaryType: text("beneficiary_type").notNull(), // 'team' or 'investor'
+  totalAllocation: decimal("total_allocation", { precision: 18, scale: 8 }).notNull(),
+  vestedAmount: decimal("vested_amount", { precision: 18, scale: 8 }).notNull().default("0"),
+  claimedAmount: decimal("claimed_amount", { precision: 18, scale: 8 }).notNull().default("0"),
+  startTimestamp: bigint("start_timestamp", { mode: "number" }).notNull(),
+  cliffPeriod: integer("cliff_period").notNull().default(31536000), // 1 year in seconds
+  vestingPeriod: integer("vesting_period").notNull().default(126144000), // 4 years in seconds
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // DEPRECATED: Raw biometric data storage (GDPR VIOLATION)
 // Kept for backward compatibility only - DO NOT USE for new data
 // Use biometricCommitments table instead
@@ -394,6 +412,12 @@ export const insertTokenEconomicsSchema = createInsertSchema(tokenEconomics).omi
   id: true,
   updatedAt: true,
 });
+
+export const insertVestingScheduleSchema = createInsertSchema(vestingSchedules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
 export const insertPeerReputationSchema = createInsertSchema(peerReputation).omit({
   updatedAt: true,
 });
@@ -472,6 +496,8 @@ export type InsertBatchProof = z.infer<typeof insertBatchProofSchema>;
 // Token Economics types
 export type TokenEconomics = typeof tokenEconomics.$inferSelect;
 export type InsertTokenEconomics = z.infer<typeof insertTokenEconomicsSchema>;
+export type VestingSchedule = typeof vestingSchedules.$inferSelect;
+export type InsertVestingSchedule = z.infer<typeof insertVestingScheduleSchema>;
 // Legacy type aliases for backward compatibility
 export type Validator = ValidatorState;
 export type InsertValidator = InsertValidatorState;

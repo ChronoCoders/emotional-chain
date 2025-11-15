@@ -2,9 +2,12 @@
  * Client-Side Biometric Processor
  * GDPR Compliance: All processing happens on-device
  * RAW BIOMETRIC DATA NEVER LEAVES THE CLIENT
+ * 
+ * Phase 4 Enhancement: Multi-signal validation with gaming prevention
  */
 
 import { createHash, randomBytes } from 'crypto';
+import { multiSignalValidator, type AdvancedBiometricData } from '@shared/biometric/multiSignalValidation';
 
 export interface RawBiometricData {
   heartRate: number;
@@ -76,36 +79,42 @@ export class BiometricProcessor {
   /**
    * Compute emotional score from raw biometric data
    * PRIVATE: Score never exposed outside this class
+   * Phase 4: Uses multi-signal validation with gaming prevention
    */
   private computeEmotionalScore(rawData: RawBiometricData): BiometricScore {
-    // Heart rate contribution (optimal range: 60-80 bpm)
-    const hrScore = this.normalizeHeartRate(rawData.heartRate);
+    // Phase 4: Use advanced multi-signal validation
+    const advancedData: AdvancedBiometricData = {
+      heartRate: rawData.heartRate,
+      hrv: rawData.hrv,
+      stressLevel: rawData.stressLevel,
+      coherence: rawData.focusLevel || 75, // Use focus as coherence proxy
+    };
     
-    // HRV contribution (higher is better, indicates parasympathetic activity)
-    const hrvScore = this.normalizeHRV(rawData.hrv);
+    // Compute score with gaming prevention
+    const scoreResult = multiSignalValidator.computeEmotionalScore(advancedData);
     
-    // Stress level (inverse - lower is better)
-    const stressScore = 100 - rawData.stressLevel;
-    
-    // Calculate coherence (consistency between metrics)
-    const coherence = this.calculateCoherence(rawData);
-    
-    // Weighted emotional score
-    const emotional = (
-      hrScore * 0.3 +
-      hrvScore * 0.3 +
-      stressScore * 0.4
-    );
-    
-    // Overall score combines emotional state and coherence
-    const overall = emotional * coherence;
+    // Device normalization (if device type is known)
+    const deviceType = this.getDeviceType();
+    const normalizedResult = deviceType
+      ? multiSignalValidator.normalizeForDevice(scoreResult, deviceType)
+      : scoreResult;
     
     return {
-      emotional,
-      coherence,
+      emotional: normalizedResult.finalScore,
+      coherence: scoreResult.components.coherenceScore / 100,
       authenticity: this.calculateAuthenticity(rawData),
-      overall: Math.min(100, Math.max(0, overall)),
+      overall: Math.min(100, Math.max(0, normalizedResult.finalScore)),
     };
+  }
+
+  /**
+   * Get device type for normalization
+   * In production, this would come from device attestation
+   */
+  private getDeviceType(): string | null {
+    // This is a demo - in production, device type comes from attestation
+    // For now, assume a default device type
+    return 'polar_h10'; // Medical-grade baseline device
   }
 
   /**

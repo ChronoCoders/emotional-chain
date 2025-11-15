@@ -1,0 +1,183 @@
+PHASE 4: ECONOMIC MODEL FIXES
+Task 4.1: Realistic Token Economics
+File: /shared/tokenomics/emissionSchedule.ts
+Update token economics with realistic numbers:
+typescriptconst TOKENOMICS = {
+  totalSupply: 100_000_000, // 100M EMO
+  
+  distribution: {
+    validatorRewards: 50_000_000, // 50% over 10 years
+    ecosystem: 30_000_000,        // 30% for grants/development
+    team: 15_000_000,             // 15% with 4-year vesting
+    investors: 5_000_000,         // 5% with 4-year vesting
+  },
+  
+  blockReward: {
+    initial: 50, // EMO per block
+    halvingInterval: 2_100_000, // ~2 years at 30s blocks
+    minimumReward: 1,
+  },
+  
+  stakingRequirements: {
+    minimumStake: 10_000, // EMO
+    lockPeriod: 30 * 24 * 60 * 60, // 30 days in seconds
+  },
+};
+
+class EmissionSchedule {
+  calculateBlockReward(blockHeight: number): number {
+    let reward = TOKENOMICS.blockReward.initial;
+    const halvings = Math.floor(blockHeight / TOKENOMICS.blockReward.halvingInterval);
+    
+    for (let i = 0; i < halvings; i++) {
+      reward = reward / 2;
+    }
+    
+    return Math.max(reward, TOKENOMICS.blockReward.minimumReward);
+  }
+  
+  // Validator ROI calculation
+  calculateValidatorROI(
+    stakedAmount: number,
+    deviceCost: number,
+    monthlyCost: number,
+    tokenPrice: number
+  ): { 
+    dailyReward: number;
+    monthlyReward: number;
+    breakEvenMonths: number;
+    annualROI: number;
+  } {
+    const blocksPerDay = (24 * 60 * 60) / 30; // 2,880 blocks
+    const validators = 21;
+    const blocksPerValidator = blocksPerDay / validators; // ~137 blocks/day
+    
+    const dailyReward = blocksPerValidator * 50; // ~6,850 EMO/day
+    const monthlyReward = dailyReward * 30;
+    const monthlyValue = monthlyReward * tokenPrice;
+    
+    const initialInvestment = stakedAmount * tokenPrice + deviceCost;
+    const breakEvenMonths = initialInvestment / (monthlyValue - monthlyCost);
+    
+    const annualRevenue = monthlyValue * 12;
+    const annualCost = monthlyCost * 12;
+    const annualProfit = annualRevenue - annualCost;
+    const annualROI = (annualProfit / initialInvestment) * 100;
+    
+    return {
+      dailyReward,
+      monthlyReward,
+      breakEvenMonths,
+      annualROI,
+    };
+  }
+}
+Action Items:
+
+ Update emission schedule with halving mechanism
+ Create validator ROI calculator dashboard
+ Implement vesting schedules for team/investors
+ Add staking lock period enforcement
+ Create tokenomics documentation page
+
+
+Task 4.2: Multi-Signal Gaming Prevention
+File: /shared/biometric/multiSignalValidation.ts
+Make emotional scoring harder to manipulate by using multiple correlated signals:
+typescriptinterface AdvancedBiometricData {
+  heartRate: number;
+  hrv: number; // Heart Rate Variability
+  stressLevel: number;
+  coherence: number; // Heart-brain coherence
+  respirationRate?: number;
+  skinConductance?: number;
+}
+
+class MultiSignalValidator {
+  computeEmotionalScore(data: AdvancedBiometricData): number {
+    // Single metric = easy to fake
+    // Multiple correlated metrics = much harder
+    
+    // 1. Heart Rate Score (normalized)
+    const hrScore = this.normalizeHeartRate(data.heartRate);
+    
+    // 2. HRV Score (high HRV = good stress management)
+    const hrvScore = this.normalizeHRV(data.hrv);
+    
+    // 3. Stress Score (inverted - low stress = high score)
+    const stressScore = 100 - data.stressLevel;
+    
+    // 4. Coherence Score (heart-brain synchronization)
+    const coherenceScore = data.coherence;
+    
+    // 5. Cross-correlation check (detect artificial manipulation)
+    const correlationPenalty = this.detectAnomalousCorrelation({
+      hr: data.heartRate,
+      hrv: data.hrv,
+      stress: data.stressLevel,
+    });
+    
+    // Weighted average
+    const rawScore = (
+      hrScore * 0.25 +
+      hrvScore * 0.25 +
+      stressScore * 0.25 +
+      coherenceScore * 0.25
+    );
+    
+    // Apply correlation penalty (0-20 points)
+    return Math.max(0, rawScore - correlationPenalty);
+  }
+  
+  // Detect if metrics are too perfect (likely fake)
+  private detectAnomalousCorrelation(data: {
+    hr: number;
+    hrv: number;
+    stress: number;
+  }): number {
+    // Real biometric data has natural variability
+    // Fake data often has suspiciously stable patterns
+    
+    const expectedHRVForHR = this.expectedHRV(data.hr);
+    const hrvDeviation = Math.abs(data.hrv - expectedHRVForHR);
+    
+    // If HRV is too perfect for the HR, penalize
+    if (hrvDeviation < 5) {
+      return 20; // Suspicious - too perfect
+    }
+    
+    // Check stress-HR correlation
+    const expectedStressForHR = this.expectedStress(data.hr);
+    const stressDeviation = Math.abs(data.stress - expectedStressForHR);
+    
+    if (stressDeviation < 5) {
+      return 15; // Also suspicious
+    }
+    
+    return 0; // Normal variation
+  }
+  
+  // Device normalization (prevent hardware advantage)
+  normalizeForDevice(
+    score: number,
+    deviceType: string
+  ): number {
+    // Different devices have different accuracy
+    const deviceFactors = {
+      'fitbit': 0.9,      // Consumer grade
+      'polar_h10': 1.0,   // Medical grade baseline
+      'muse_s': 1.0,      // EEG baseline
+      'empatica_e4': 1.1, // Research grade
+    };
+    
+    return score * (deviceFactors[deviceType] || 1.0);
+  }
+}
+Action Items:
+
+ Implement multi-signal scoring algorithm
+ Add HRV calculation from heart rate data
+ Implement coherence calculation
+ Add anomaly detection for fake data patterns
+ Create device normalization factors
+ Add historical pattern analysis (detect sudden "perfect" behavior)
