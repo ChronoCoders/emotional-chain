@@ -58,6 +58,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const gdprRouter = await import("./routes/gdpr");
   app.use("/api/gdpr", gdprRouter.default);
   
+  // Hierarchical Validators API (Phase 5)
+  const validatorsRouter = await import("./routes/validators");
+  app.use("/api/validators", validatorsRouter.default);
+  
   // Production Prometheus metrics endpoint
   app.get('/metrics', async (req, res) => {
     try {

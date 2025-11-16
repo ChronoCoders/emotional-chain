@@ -1,0 +1,172 @@
+PHASE 5: SCALABILITY SOLUTIONS
+Task 5.1: Hierarchical Validator Network
+File: /shared/consensus/hierarchicalValidators.ts
+Create three tiers to solve bandwidth problem:
+typescriptenum ValidatorTier {
+  PRIMARY = 1,   // 21 validators - full consensus participation
+  SECONDARY = 2, // 100 validators - checkpoint validation
+  LIGHT = 3,     // Unlimited - transaction validation only
+}
+
+interface TieredValidator {
+  address: string;
+  tier: ValidatorTier;
+  stakedAmount: bigint;
+  bandwidth: number; // KB/s
+  uptime: number; // percentage
+}
+
+class HierarchicalConsensus {
+  // Tier 1: Primary validators (high bandwidth required)
+  async selectPrimaryValidators(): Promise<TieredValidator[]> {
+    // Requirements:
+    // - Minimum 1 Mbps bandwidth
+    // - 99.9% uptime
+    // - 50,000+ EMO staked
+    
+    const candidates = await this.getAllValidators();
+    const qualified = candidates.filter(v => 
+      v.bandwidth >= 1000 && // 1 Mbps
+      v.uptime >= 99.9 &&
+      v.stakedAmount >= 50_000n
+    );
+    
+    // Select top 21 by stake
+    return qualified
+      .sort((a, b) => Number(b.stakedAmount - a.stakedAmount))
+      .slice(0, 21);
+  }
+  
+  // Tier 2: Secondary validators (checkpoint every 10 minutes)
+  async selectSecondaryValidators(): Promise<TieredValidator[]> {
+    // Requirements:
+    // - Minimum 100 Kbps bandwidth
+    // - 95% uptime
+    // - 20,000+ EMO staked
+    
+    const candidates = await this.getAllValidators();
+    return candidates.filter(v =>
+      v.bandwidth >= 100 &&
+      v.uptime >= 95 &&
+      v.stakedAmount >= 20_000n &&
+      v.tier !== ValidatorTier.PRIMARY
+    ).slice(0, 100);
+  }
+  
+  // Tier 3: Light validators (transaction validation only)
+  async registerLightValidator(
+    address: string,
+    stake: bigint
+  ): Promise<void> {
+    // Requirements:
+    // - Minimum 10 Kbps bandwidth
+    // - 10,000 EMO staked
+    // - NO biometric requirement
+    
+    if (stake < 10_000n) {
+      throw new Error('Insufficient stake for light validator');
+    }
+    
+    await this.registerValidator({
+      address,
+      tier: ValidatorTier.LIGHT,
+      stakedAmount: stake,
+      requiresBiometric: false,
+    });
+  }
+  
+  // Bandwidth usage per tier
+  getBandwidthRequirements(): Record<ValidatorTier, string> {
+    return {
+      [ValidatorTier.PRIMARY]: '1 Mbps (continuous biometric + consensus)',
+      [ValidatorTier.SECONDARY]: '100 Kbps (10-min checkpoints)',
+      [ValidatorTier.LIGHT]: '10 Kbps (tx validation only)',
+    };
+  }
+}
+Action Items:
+
+ Implement tier-based validator selection
+ Add bandwidth testing endpoint
+ Create automatic tier promotion/demotion based on performance
+ Update rewards based on tier (Primary > Secondary > Light)
+ Add tier information to validator dashboard
+
+
+Task 5.2: LibP2P Gossipsub Optimization
+File: /server/p2p/optimizedGossip.ts
+Replace FloodSub with GossipSub for better scaling:
+typescriptimport { gossipsub } from '@chainsafe/libp2p-gossipsub';
+
+class OptimizedP2PNetwork {
+  async initializeGossipSub() {
+    // Configure GossipSub for hierarchical topology
+    const gossipSubConfig = {
+      // Target number of peers to gossip with
+      D: 6, // Optimal degree
+      
+      // Bounds for gossip degree
+      Dlo: 4,  // Lower bound
+      Dhi: 12, // Upper bound
+      
+      // Lazy push gossip factor
+      Dlazy: 6,
+      
+      // Heartbeat interval (ms)
+      heartbeatInterval: 1000,
+      
+      // Fanout TTL (ms)
+      fanoutTTL: 60000,
+      
+      // Message cache
+      mcacheLength: 5,
+      mcacheGossip: 3,
+      
+      // Score thresholds for peer management
+      scoreThresholds: {
+        gossipThreshold: -100,
+        publishThreshold: -500,
+        graylistThreshold: -1000,
+      },
+    };
+    
+    return gossipsub(gossipSubConfig);
+  }
+  
+  // Topic-based routing for different message types
+  setupTopics() {
+    return {
+      blocks: '/emotionalchain/blocks/1.0.0',
+      transactions: '/emotionalchain/txs/1.0.0',
+      consensus: '/emotionalchain/consensus/1.0.0',
+      biometricProofs: '/emotionalchain/proofs/1.0.0',
+    };
+  }
+  
+  // Reduce bandwidth by only sending block headers to most peers
+  async propagateBlock(block: Block) {
+    const primaryValidators = await this.getPrimaryValidators();
+    const secondaryValidators = await this.getSecondaryValidators();
+    
+    // Send full block to primary validators
+    await this.pubsub.publish('blocks', {
+      type: 'full',
+      data: block,
+      recipients: primaryValidators,
+    });
+    
+    // Send only header to secondary validators
+    await this.pubsub.publish('blocks', {
+      type: 'header',
+      data: { header: block.header, hash: block.hash },
+      recipients: secondaryValidators,
+    });
+  }
+}
+Action Items:
+
+ Replace FloodSub with GossipSub
+ Configure optimal parameters (D, Dlo, Dhi)
+ Implement topic-based message routing
+ Add header-only propagation for secondary validators
+ Monitor bandwidth usage per validator tier

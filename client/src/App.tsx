@@ -18,6 +18,7 @@ import ValidatorDashboard from "@/pages/ValidatorDashboard";
 import AdminPanel from "@/pages/AdminPanel";
 import TokenomicsPage from "@/pages/TokenomicsPage";
 import TokenomicsDocs from "@/pages/TokenomicsDocs";
+import ScalabilityPage from "@/pages/ScalabilityPage";
 
 function Router() {
   return (
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/whitepaper" component={WhitepaperPage} />
       <Route path="/tokenomics" component={TokenomicsPage} />
       <Route path="/tokenomics/docs" component={TokenomicsDocs} />
+      <Route path="/scalability" component={ScalabilityPage} />
       <Route path="/explorer" component={ExplorerApp} />
       <Route path="/explorer/*" component={ExplorerApp} />
       <Route path="/ai-consensus" component={AIConsensusPage} />
