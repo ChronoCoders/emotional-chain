@@ -15,6 +15,7 @@ import PrivacyDashboard from "@/pages/PrivacyDashboard";
 import RoleBasedAccess from "@/components/auth/RoleBasedAccess";
 import UserDashboard from "@/pages/UserDashboard";
 import ValidatorDashboard from "@/pages/ValidatorDashboard";
+import ValidatorDistribution from "@/pages/ValidatorDistribution";
 import AdminPanel from "@/pages/AdminPanel";
 import TokenomicsPage from "@/pages/TokenomicsPage";
 import TokenomicsDocs from "@/pages/TokenomicsDocs";
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/access" component={() => <RoleBasedAccess />} />
       <Route path="/dashboard" component={UserDashboard} />
       <Route path="/validator" component={ValidatorDashboard} />
+      <Route path="/validators/distribution" component={ValidatorDistribution} />
       <Route path="/admin" component={AdminPanel} />
       {/* Legacy terminal route for direct admin access */}
       <Route path="/terminal" component={TerminalInterface} />

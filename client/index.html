@@ -25,75 +25,35 @@
   <body>
     <div id="root"></div>
     <script>
-      // NUCLEAR HMR SUPPRESSION - Runs BEFORE everything else
+      // CLEAN HMR SUPPRESSION - Intercept at error boundaries
       const hmrPatterns = ['wss://localhost:undefined', 'Failed to construct', '@vite/client'];
       
-      // INTERCEPT #1: Block console completely for HMR errors
+      function isHMRError(msg) {
+        const str = String(msg || '');
+        return hmrPatterns.some(p => str.includes(p));
+      }
+      
+      // INTERCEPT #1: Block console.error for HMR errors
       const origError = console.error;
       console.error = function(...args) {
-        const msg = String(args[0] || args[1] || '');
-        if (hmrPatterns.some(p => msg.includes(p))) return;
-        origError.apply(console, args);
+        if (!isHMRError(args[0])) origError.apply(console, args);
       };
       
-      // INTERCEPT #2: Global error handler at CAPTURE phase
-      window.addEventListener('error', e => {
-        const msg = String(e?.message || e?.reason || '');
-        if (hmrPatterns.some(p => msg.includes(p))) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          return true;
-        }
-      }, true);
-      
-      // INTERCEPT #3: Unhandled rejection BEFORE it bubbles
+      // INTERCEPT #2: Unhandled rejection at capture phase
       window.addEventListener('unhandledrejection', e => {
-        const msg = (e?.reason?.message || String(e?.reason || ''));
-        if (hmrPatterns.some(p => msg.includes(p))) {
+        if (isHMRError(e?.reason?.message || e?.reason)) {
           e.preventDefault();
           e.stopImmediatePropagation();
-          return true;
         }
       }, true);
       
-      // INTERCEPT #4: Replace WebSocket constructor to prevent localhost:undefined
-      const OriginalWebSocket = window.WebSocket;
-      window.WebSocket = class extends OriginalWebSocket {
-        constructor(url, ...args) {
-          // Block invalid HMR URLs silently
-          if (String(url).includes('localhost:undefined')) {
-            // Return a fake WebSocket that never connects
-            const fake = Object.create(OriginalWebSocket.prototype);
-            fake.readyState = 3; // CLOSED
-            fake.onopen = null;
-            fake.onerror = null;
-            fake.onclose = null;
-            fake.onmessage = null;
-            return fake;
-          }
-          try {
-            super(url, ...args);
-          } catch (e) {
-            if (!String(e).includes('localhost:undefined')) throw e;
-          }
+      // INTERCEPT #3: Global error at capture phase  
+      window.addEventListener('error', e => {
+        if (isHMRError(e?.message)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
         }
-      };
-      
-      // INTERCEPT #5: Block Promise rejections in unhandled path
-      const origAddEventListener = window.addEventListener;
-      window.addEventListener = function(type, listener, ...args) {
-        if (type === 'unhandledrejection') {
-          return origAddEventListener.call(window, type, (e) => {
-            const msg = (e?.reason?.message || String(e?.reason || ''));
-            if (hmrPatterns.some(p => msg.includes(p))) {
-              e.preventDefault();
-              return;
-            }
-            listener(e);
-          }, ...args);
-        }
-        return origAddEventListener.call(window, type, listener, ...args);
-      };
+      }, true);
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
