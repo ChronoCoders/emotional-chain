@@ -438,6 +438,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch validator distribution' });
     }
   });
+
+  // Toggle validator device status (for testing tiered rewards/voting)
+  app.post('/api/validators/device-status', async (req, res) => {
+    try {
+      const { validatorId, hasDevice } = req.body;
+      if (!validatorId || typeof hasDevice !== 'boolean') {
+        return res.status(400).json({ error: 'Missing validatorId or hasDevice' });
+      }
+      
+      await emotionalChainService.setValidatorDeviceStatus(validatorId, hasDevice);
+      const updatedValidator = await emotionalChainService.getValidators()
+        .then(validators => validators.find(v => v.id === validatorId));
+      
+      res.json({
+        validatorId,
+        hasDevice,
+        newStatus: hasDevice ? 'online' : 'offline',
+        votingPower: updatedValidator?.votingPower || (hasDevice ? 5 : 2),
+        message: `${validatorId} device status updated to ${hasDevice ? 'ACTIVE' : 'OFFLINE'}`
+      });
+    } catch (error) {
+      console.error('Device status update error:', error);
+      res.status(500).json({ error: 'Failed to update device status' });
+    }
+  });
   
   // ===== ADVANCED FEATURES API ENDPOINTS =====
   // Smart Contracts
