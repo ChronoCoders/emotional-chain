@@ -170,9 +170,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/wallets/database", async (req, res) => {
     try {
       const wallets = await getCachedWallets();
-      const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]: [any, any]) => ({
-        validatorId,
-        balance,
+      const walletsArray = Array.from(wallets.entries()).map((entry: any) => ({
+        validatorId: entry[0],
+        balance: entry[1],
         currency: 'EMO'
       }));
       res.json(walletsArray);
