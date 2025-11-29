@@ -24,7 +24,15 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Suppress Vite HMR fallback error (wss://localhost:undefined)
+      window.addEventListener('unhandledrejection', (event) => {
+        if (event.reason?.message?.includes('wss://localhost:undefined')) {
+          event.preventDefault();
+          console.debug('[HMR] Ignoring fallback connection error - using primary WebSocket');
+        }
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
-    <!-- Replit dev banner disabled to prevent WebSocket conflicts -->
   </body>
 </html>
