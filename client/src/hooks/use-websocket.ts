@@ -103,7 +103,9 @@ export function useWebSocket(): UseWebSocketReturn {
         let wsUrl: string;
         
         if (useFallback && config) {
-          wsUrl = `${protocol}//${config.fallbackHost || 'localhost'}:${config.fallbackPort || 5000}/ws`;
+          const port = config?.fallbackPort ?? 5000;
+          const host = config?.fallbackHost ?? 'localhost';
+          wsUrl = `${protocol}//${host}:${port}/ws`;
         } else {
           const hostname = window.location.hostname;
           const port = window.location.port;

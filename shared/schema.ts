@@ -363,18 +363,18 @@ export const insertValidatorStateSchema = createInsertSchema(validatorStates).om
 export const insertBiometricDataSchema = createInsertSchema(biometricData).omit({
   id: true,
   createdAt: true,
-} as const);
+} as const as any);
 
 export const insertBiometricCommitmentSchema = createInsertSchema(biometricCommitments).omit({
   id: true,
   createdAt: true,
-} as const);
+} as const as any);
 
 export const insertOffChainProfileSchema = createInsertSchema(offChainProfiles).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-} as const);
+} as const as any);
 export const insertSmartContractSchema = createInsertSchema(smartContracts).omit({
   id: true,
   deployedAt: true,
@@ -411,43 +411,43 @@ export const insertConsensusRoundSchema = createInsertSchema(consensusRounds).om
 export const insertTokenEconomicsSchema = createInsertSchema(tokenEconomics).omit({
   id: true,
   updatedAt: true,
-});
+} as const);
 
 export const insertVestingScheduleSchema = createInsertSchema(vestingSchedules).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-} as const);
+} as const as any);
 export const insertPeerReputationSchema = createInsertSchema(peerReputation).omit({
   updatedAt: true,
-} as const);
+} as const as any);
 export const insertStorageMetricsSchema = createInsertSchema(storageMetrics).omit({
   id: true,
   createdAt: true,
-} as const);
+} as const as any);
 
 export const insertValidatorStakeSchema = createInsertSchema(validatorStakes).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
-} as const);
+} as const as any);
 
 export const insertDeviceRegistrationSchema = createInsertSchema(deviceRegistrations).omit({
   id: true,
   createdAt: true,
-} as const);
+} as const as any);
 
 export const insertThresholdProofSchema = createInsertSchema(thresholdProofs).omit({
   id: true,
   createdAt: true,
   verifiedAt: true,
-} as const);
+} as const as any);
 
 export const insertBatchProofSchema = createInsertSchema(batchProofs).omit({
   id: true,
   createdAt: true,
   verifiedAt: true,
-} as const);
+} as const as any);
 
 // Type exports for all tables
 export type User = typeof users.$inferSelect;
@@ -533,7 +533,7 @@ export const configSnapshots = pgTable("config_snapshots", {
 export const insertConfigSnapshotSchema = createInsertSchema(configSnapshots).omit({
   id: true,
   createdAt: true,
-} as const);
+} as const as any);
 export type ConfigSnapshot = typeof configSnapshots.$inferSelect;
 export type InsertConfigSnapshot = z.infer<typeof insertConfigSnapshotSchema>;
 

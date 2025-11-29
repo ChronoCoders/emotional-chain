@@ -170,7 +170,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/wallets/database", async (req, res) => {
     try {
       const wallets = await getCachedWallets();
-      const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]) => ({
+      const walletsArray = Array.from(wallets.entries()).map(([validatorId, balance]: [any, any]) => ({
         validatorId,
         balance,
         currency: 'EMO'
@@ -1111,7 +1111,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Check if blockchain is initialized, if not wait for it
   let attempts = 0;
   const maxAttempts = 50; // 10 seconds max wait
-  while (!blockchain.isInitialized && attempts < maxAttempts) {
+  while (!(blockchain as any).isInitialized && attempts < maxAttempts) {
     await new Promise(resolve => setTimeout(resolve, 200)); // Wait 200ms
     attempts++;
   }
