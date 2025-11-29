@@ -25,16 +25,24 @@
   <body>
     <div id="root"></div>
     <script>
-      // Suppress Vite HMR fallback error (wss://localhost:undefined) BEFORE any scripts load
-      if (!window.__hmrErrorHandled) {
-        window.__hmrErrorHandled = true;
-        const originalAddEventListener = window.addEventListener;
-        window.addEventListener('unhandledrejection', function hmrErrorHandler(event) {
+      // AGGRESSIVE: Suppress Vite HMR fallback error BEFORE any code runs
+      (function() {
+        // Override console.error to suppress HMR errors
+        const origError = console.error;
+        console.error = function(...args) {
+          const msg = args[0]?.message || String(args[0]);
+          if (msg?.includes('wss://localhost:undefined')) return;
+          return origError.apply(console, args);
+        };
+        
+        // Catch unhandledrejection events
+        window.addEventListener('unhandledrejection', (event) => {
           if (event.reason?.message?.includes('wss://localhost:undefined')) {
             event.preventDefault();
+            return false;
           }
         }, true);
-      }
+      })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
