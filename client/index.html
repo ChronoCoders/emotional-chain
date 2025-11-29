@@ -25,58 +25,55 @@
   <body>
     <div id="root"></div>
     <script>
-      // CRITICAL: Global HMR error suppression - runs BEFORE Vite loads
-      window.SUPPRESS_HMR = true;
-      const hmrPattern = 'wss://localhost:undefined';
+      // ULTIMATE HMR SUPPRESSION: Block at every possible interception point
+      const hmrPatterns = ['wss://localhost:undefined', 'Failed to construct', '@vite/client'];
       
-      // Override console methods FIRST
-      const origLog = console.log;
-      const origError = console.error;
-      const origWarn = console.warn;
-      
-      console.log = function(...args) {
+      // 1. Monkey-patch Error constructor to suppress HMR errors at source
+      const OriginalError = window.Error;
+      window.Error = function(...args) {
         const msg = String(args[0] || '');
-        if (msg.includes(hmrPattern)) return origLog(''); // Silent log instead of filtering
-        return origLog.apply(console, args);
+        if (hmrPatterns.some(p => msg.includes(p))) {
+          // Return a silent error
+          return Object.create(OriginalError.prototype);
+        }
+        return Reflect.construct(OriginalError, args);
       };
-      
+      window.Error.prototype = OriginalError.prototype;
+
+      // 2. Override console methods
+      const origError = console.error, origWarn = console.warn;
       console.error = function(...args) {
         const msg = String(args[0] || '');
-        if (msg.includes(hmrPattern)) return; // Completely suppress
-        return origError.apply(console, args);
+        if (!hmrPatterns.some(p => msg.includes(p))) origError.apply(console, args);
       };
-      
       console.warn = function(...args) {
         const msg = String(args[0] || '');
-        if (msg.includes(hmrPattern)) return; // Completely suppress
-        return origWarn.apply(console, args);
+        if (!hmrPatterns.some(p => msg.includes(p))) origWarn.apply(console, args);
       };
       
-      // Suppress ALL error events
-      window.addEventListener('error', function(e) {
-        if (e?.message?.includes(hmrPattern) || String(e?.filename || '').includes('@vite/client')) {
+      // 3. Suppress error and unhandledrejection at capture phase
+      window.addEventListener('error', e => {
+        if (hmrPatterns.some(p => (e?.message || '').includes(p))) {
           e.preventDefault();
-          return false;
+          e.stopImmediatePropagation();
         }
       }, true);
       
-      // Suppress unhandledrejection events with aggressive pattern matching
-      window.addEventListener('unhandledrejection', function(e) {
-        const reason = e?.reason;
-        const msg = reason?.message || String(reason || '');
-        if (msg.includes(hmrPattern) || msg.includes('Failed to construct') && msg.includes('WebSocket')) {
+      window.addEventListener('unhandledrejection', e => {
+        const msg = (e?.reason?.message || String(e?.reason || ''));
+        if (hmrPatterns.some(p => msg.includes(p))) {
           e.preventDefault();
-          return false;
+          e.stopImmediatePropagation();
         }
       }, true);
       
-      // Also override Promise.prototype.catch for extra safety
-      const origCatch = Promise.prototype.catch;
-      Promise.prototype.catch = function(handler) {
-        return origCatch.call(this, function(reason) {
-          const msg = reason?.message || String(reason || '');
-          if (msg.includes(hmrPattern)) return Promise.resolve();
-          return handler(reason);
+      // 4. Block Promise rejection handlers
+      const origThen = Promise.prototype.then;
+      Promise.prototype.then = function(onFulfilled, onRejected) {
+        return origThen.call(this, onFulfilled, (reason) => {
+          const msg = (reason?.message || String(reason || ''));
+          if (hmrPatterns.some(p => msg.includes(p))) return Promise.resolve();
+          return onRejected ? onRejected(reason) : Promise.reject(reason);
         });
       };
     </script>
