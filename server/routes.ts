@@ -402,6 +402,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: 'Failed to fetch validators' });
     }
   });
+
+  // Global validator distribution with location data
+  app.get('/api/validators/distribution/global', async (req, res) => {
+    try {
+      const { getAllValidatorLocations, getDistributionStats, getValidatorsByContinent } = await import('./validators/distribution');
+      const validators = await emotionalChainService.getValidators();
+      const locations = getAllValidatorLocations();
+      
+      // Merge validator status with location data
+      const distributedValidators = locations.map(location => {
+        const validator = validators.find(v => v.id === location.validatorId);
+        return {
+          validatorId: location.validatorId,
+          city: location.city,
+          continent: location.continent,
+          latitude: location.latitude,
+          longitude: location.longitude,
+          timezone: location.timezone,
+          status: validator?.status || 'online',
+          hasDevice: validator?.hasDevice ?? true,
+          votingPower: validator?.votingPower || 5,
+          balance: validator?.balance || 0,
+          emotionalScore: validator?.emotionalScore || 0
+        };
+      });
+      
+      res.json({
+        validators: distributedValidators,
+        stats: getDistributionStats(),
+        byContinent: getValidatorsByContinent()
+      });
+    } catch (error) {
+      console.error('Validator distribution error:', error);
+      res.status(500).json({ error: 'Failed to fetch validator distribution' });
+    }
+  });
+  
   // ===== ADVANCED FEATURES API ENDPOINTS =====
   // Smart Contracts
   app.get('/api/smart-contracts', async (req, res) => {

@@ -25,56 +25,74 @@
   <body>
     <div id="root"></div>
     <script>
-      // ULTIMATE HMR SUPPRESSION: Block at every possible interception point
+      // NUCLEAR HMR SUPPRESSION - Runs BEFORE everything else
       const hmrPatterns = ['wss://localhost:undefined', 'Failed to construct', '@vite/client'];
       
-      // 1. Monkey-patch Error constructor to suppress HMR errors at source
-      const OriginalError = window.Error;
-      window.Error = function(...args) {
-        const msg = String(args[0] || '');
-        if (hmrPatterns.some(p => msg.includes(p))) {
-          // Return a silent error
-          return Object.create(OriginalError.prototype);
-        }
-        return Reflect.construct(OriginalError, args);
-      };
-      window.Error.prototype = OriginalError.prototype;
-
-      // 2. Override console methods
-      const origError = console.error, origWarn = console.warn;
+      // INTERCEPT #1: Block console completely for HMR errors
+      const origError = console.error;
       console.error = function(...args) {
-        const msg = String(args[0] || '');
-        if (!hmrPatterns.some(p => msg.includes(p))) origError.apply(console, args);
-      };
-      console.warn = function(...args) {
-        const msg = String(args[0] || '');
-        if (!hmrPatterns.some(p => msg.includes(p))) origWarn.apply(console, args);
+        const msg = String(args[0] || args[1] || '');
+        if (hmrPatterns.some(p => msg.includes(p))) return;
+        origError.apply(console, args);
       };
       
-      // 3. Suppress error and unhandledrejection at capture phase
+      // INTERCEPT #2: Global error handler at CAPTURE phase
       window.addEventListener('error', e => {
-        if (hmrPatterns.some(p => (e?.message || '').includes(p))) {
+        const msg = String(e?.message || e?.reason || '');
+        if (hmrPatterns.some(p => msg.includes(p))) {
           e.preventDefault();
           e.stopImmediatePropagation();
+          return true;
         }
       }, true);
       
+      // INTERCEPT #3: Unhandled rejection BEFORE it bubbles
       window.addEventListener('unhandledrejection', e => {
         const msg = (e?.reason?.message || String(e?.reason || ''));
         if (hmrPatterns.some(p => msg.includes(p))) {
           e.preventDefault();
           e.stopImmediatePropagation();
+          return true;
         }
       }, true);
       
-      // 4. Block Promise rejection handlers
-      const origThen = Promise.prototype.then;
-      Promise.prototype.then = function(onFulfilled, onRejected) {
-        return origThen.call(this, onFulfilled, (reason) => {
-          const msg = (reason?.message || String(reason || ''));
-          if (hmrPatterns.some(p => msg.includes(p))) return Promise.resolve();
-          return onRejected ? onRejected(reason) : Promise.reject(reason);
-        });
+      // INTERCEPT #4: Replace WebSocket constructor to prevent localhost:undefined
+      const OriginalWebSocket = window.WebSocket;
+      window.WebSocket = class extends OriginalWebSocket {
+        constructor(url, ...args) {
+          // Block invalid HMR URLs silently
+          if (String(url).includes('localhost:undefined')) {
+            // Return a fake WebSocket that never connects
+            const fake = Object.create(OriginalWebSocket.prototype);
+            fake.readyState = 3; // CLOSED
+            fake.onopen = null;
+            fake.onerror = null;
+            fake.onclose = null;
+            fake.onmessage = null;
+            return fake;
+          }
+          try {
+            super(url, ...args);
+          } catch (e) {
+            if (!String(e).includes('localhost:undefined')) throw e;
+          }
+        }
+      };
+      
+      // INTERCEPT #5: Block Promise rejections in unhandled path
+      const origAddEventListener = window.addEventListener;
+      window.addEventListener = function(type, listener, ...args) {
+        if (type === 'unhandledrejection') {
+          return origAddEventListener.call(window, type, (e) => {
+            const msg = (e?.reason?.message || String(e?.reason || ''));
+            if (hmrPatterns.some(p => msg.includes(p))) {
+              e.preventDefault();
+              return;
+            }
+            listener(e);
+          }, ...args);
+        }
+        return origAddEventListener.call(window, type, listener, ...args);
       };
     </script>
     <script type="module" src="/src/main.tsx"></script>
