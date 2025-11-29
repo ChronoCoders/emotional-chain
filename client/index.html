@@ -25,13 +25,16 @@
   <body>
     <div id="root"></div>
     <script>
-      // Suppress Vite HMR fallback error (wss://localhost:undefined)
-      window.addEventListener('unhandledrejection', (event) => {
-        if (event.reason?.message?.includes('wss://localhost:undefined')) {
-          event.preventDefault();
-          console.debug('[HMR] Ignoring fallback connection error - using primary WebSocket');
-        }
-      });
+      // Suppress Vite HMR fallback error (wss://localhost:undefined) BEFORE any scripts load
+      if (!window.__hmrErrorHandled) {
+        window.__hmrErrorHandled = true;
+        const originalAddEventListener = window.addEventListener;
+        window.addEventListener('unhandledrejection', function hmrErrorHandler(event) {
+          if (event.reason?.message?.includes('wss://localhost:undefined')) {
+            event.preventDefault();
+          }
+        }, true);
+      }
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
