@@ -352,14 +352,14 @@ export const insertUserSchema = createInsertSchema(users).pick({
 export const insertBlockSchema = createInsertSchema(blocks).omit({
   id: true,
   createdAt: true,
-});
+} as const);
 export const insertTransactionSchema = createInsertSchema(transactions).omit({
   id: true,
   createdAt: true,
-});
+} as const);
 export const insertValidatorStateSchema = createInsertSchema(validatorStates).omit({
   updatedAt: true,
-});
+} as const);
 export const insertBiometricDataSchema = createInsertSchema(biometricData).omit({
   id: true,
   createdAt: true,
@@ -379,34 +379,34 @@ export const insertSmartContractSchema = createInsertSchema(smartContracts).omit
   id: true,
   deployedAt: true,
   updatedAt: true,
-});
+} as const);
 export const insertWellnessGoalSchema = createInsertSchema(wellnessGoals).omit({
   id: true,
   createdAt: true,
-});
+} as const);
 export const insertQuantumKeyPairSchema = createInsertSchema(quantumKeyPairs).omit({
   id: true,
   createdAt: true,
-});
+} as const);
 export const insertPrivacyProofSchema = createInsertSchema(privacyProofs).omit({
   id: true,
   createdAt: true,
-});
+} as const);
 export const insertBridgeTransactionSchema = createInsertSchema(bridgeTransactions).omit({
   id: true,
   createdAt: true,
-});
+} as const);
 export const insertAiModelDataSchema = createInsertSchema(aiModelData).omit({
   id: true,
   lastTraining: true,
-});
+} as const);
 export const insertBiometricDeviceSchema = createInsertSchema(biometricDevices).omit({
   id: true,
   registeredAt: true,
-});
+} as const);
 export const insertConsensusRoundSchema = createInsertSchema(consensusRounds).omit({
   createdAt: true,
-});
+} as const);
 
 export const insertTokenEconomicsSchema = createInsertSchema(tokenEconomics).omit({
   id: true,

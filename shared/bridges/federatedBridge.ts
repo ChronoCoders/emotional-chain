@@ -60,11 +60,11 @@ export class FederatedBridge extends EventEmitter {
   
   // Bridge statistics
   private bridgeStats = {
-    totalBridged: 0n,
-    totalMinted: 0n,
+    totalBridged: BigInt(0),
+    totalMinted: BigInt(0),
     successfulBridges: 0,
     failedBridges: 0,
-    totalFeeCollected: 0n,
+    totalFeeCollected: BigInt(0),
   };
 
   constructor(validators: BridgeValidator[]) {
