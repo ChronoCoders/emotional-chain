@@ -1,0 +1,343 @@
+# BLOCK TIME VERIFICATION - CRITICAL AUDIT
+
+I need you to investigate the ACTUAL block time used in the EmotionalChain codebase. There's a discrepancy and I need to know the TRUTH.
+
+## Investigation Required:
+
+### 1. Check Configuration Files
+
+**File: `shared/config.ts`**
+```bash
+# Show me the EXACT line
+cat shared/config.ts | grep -A 2 -B 2 blockTime
+```
+
+**Expected findings:**
+- What is the `blockTime` value? (10 or 30?)
+- Any comments explaining the value?
+
+---
+
+### 2. Check Mining/Consensus Code
+
+**File: `server/blockchain/index.ts` or `server/consensus/`**
+
+Search for:
+```typescript
+// Mining interval
+setInterval(() => {
+  mineBlock();
+}, BLOCK_TIME);
+
+// OR
+setTimeout(() => mineBlock(), blockTime * 1000);
+
+// OR any reference to block time
+```
+
+**Questions:**
+- What interval is ACTUALLY used in the mining loop?
+- Is it using `config.blockTime` or a hardcoded value?
+- Show me the EXACT code that determines mining frequency
+
+---
+
+### 3. Check Emission Schedule
+
+**File: `server/services/EmissionSchedule.ts` or `shared/tokenomics/emissionSchedule.ts`**
+```bash
+# Find the daily blocks calculation
+cat server/services/EmissionSchedule.ts | grep -A 5 -B 5 "8640\|blocks.*day\|daily"
+```
+
+**Questions:**
+- What is `BLOCKS_PER_DAY` set to?
+- Is it 2,880 (30s blocks) or 8,640 (10s blocks)?
+- Show me the calculation and any comments
+
+---
+
+### 4. Check Actual Runtime Behavior
+
+**Query the database:**
+```sql
+-- Get last 100 blocks with timestamps
+SELECT 
+  height,
+  timestamp,
+  timestamp - LAG(timestamp) OVER (ORDER BY height) as time_diff_seconds
+FROM blocks
+ORDER BY height DESC
+LIMIT 100;
+```
+
+**Analysis needed:**
+- What is the AVERAGE time difference between consecutive blocks?
+- What is the MIN and MAX time difference?
+- Are there any patterns or anomalies?
+
+---
+
+### 5. Check Mining Service/Scheduler
+
+**File: `server/services/mining.ts` or similar**
+
+Search for:
+```typescript
+// Any setInterval, setTimeout, or cron-like scheduling
+setInterval
+setTimeout
+schedule
+mining
+mineBlock
+```
+
+**Questions:**
+- What is the ACTUAL interval code executing?
+- Is there a mining delay/sleep between blocks?
+- Show me the exact function that schedules mining
+
+---
+
+### 6. Check Recent Blocks Empirically
+
+**API call:**
+```bash
+# Get latest 10 blocks
+curl http://localhost:5000/api/blocks?limit=10&sort=desc
+
+# OR query database
+SELECT height, timestamp FROM blocks ORDER BY height DESC LIMIT 10;
+```
+
+**Calculate:**
+```
+Block 18,659 timestamp: [SHOW]
+Block 18,658 timestamp: [SHOW]
+Block 18,657 timestamp: [SHOW]
+...
+Block 18,650 timestamp: [SHOW]
+
+Average difference: [CALCULATE]
+```
+
+---
+
+### 7. Configuration Hierarchy Check
+
+Search entire codebase for ALL references to block time:
+```bash
+# Search all files
+grep -r "blockTime\|block_time\|BLOCK_TIME" --include="*.ts" --include="*.js"
+
+# Look for any overrides
+grep -r "30.*second\|10.*second" --include="*.ts" --include="*.js"
+```
+
+**Questions:**
+- Are there multiple definitions?
+- Is config.blockTime being overridden somewhere?
+- Any environment variables affecting it?
+
+---
+
+## DELIVERABLE:
+
+Provide a detailed report with:
+
+### 1. Configuration Value
+```
+shared/config.ts: blockTime = [VALUE]
+Any overrides found: [YES/NO]
+If yes, where and what value: [DETAILS]
+```
+
+### 2. Code Implementation
+```
+Mining interval in code: [VALUE] milliseconds
+Corresponds to: [VALUE] seconds
+Code location: [FILE:LINE]
+```
+
+### 3. Emission Schedule Alignment
+```
+BLOCKS_PER_DAY: [VALUE]
+Implies block time: 86400 / [VALUE] = [CALCULATED] seconds
+```
+
+### 4. Empirical Evidence (Database)
+```
+Average block time (last 100 blocks): [VALUE] seconds
+Standard deviation: [VALUE] seconds
+Min: [VALUE] seconds
+Max: [VALUE] seconds
+```
+
+### 5. Verdict
+```
+ACTUAL block time in operation: [VALUE] seconds
+Configuration says: [VALUE] seconds
+Match: [YES/NO]
+
+If mismatch:
+- Root cause: [EXPLANATION]
+- Which value is being used: [ANSWER]
+- Why the discrepancy: [EXPLANATION]
+```
+
+---
+
+## EXAMPLE OUTPUT FORMAT:
+```
+╔══════════════════════════════════════════════════════════════╗
+║              BLOCK TIME AUDIT REPORT                        ║
+╚══════════════════════════════════════════════════════════════╝
+
+1. CONFIGURATION FILES:
+   shared/config.ts line 188:
+   ✓ blockTime: 10  // seconds
+
+2. MINING CODE:
+   server/blockchain/index.ts line 234:
+   ✓ setInterval(() => mineBlock(), config.blockTime * 1000);
+   → Using 10,000 milliseconds (10 seconds)
+
+3. EMISSION SCHEDULE:
+   server/services/EmissionSchedule.ts line 45:
+   ✓ BLOCKS_PER_DAY = 8640  // 10s block time
+   → Calculation: 86400 / 8640 = 10 seconds
+
+4. DATABASE ANALYSIS (last 100 blocks):
+   ✓ Average time between blocks: 9.8 seconds
+   ✓ Standard deviation: 1.2 seconds
+   ✓ Min: 8.1 seconds
+   ✓ Max: 12.3 seconds
+
+5. VERDICT:
+   ✅ ACTUAL BLOCK TIME: 10 seconds
+   ✅ Configuration matches reality
+   ✅ No discrepancies found
+```
+
+---
+
+## CRITICAL QUESTIONS TO ANSWER:
+
+1. Is the code ACTUALLY mining blocks every 10 seconds or 30 seconds?
+2. Does the database timestamp evidence support 10s or 30s?
+3. Is there ANY code path that could be using 30 seconds?
+4. Was the configuration recently changed from 30→10 or vice versa?
+5. Are there any conditional branches that might use different times?
+
+---
+
+## PRIORITY: URGENT
+
+This affects:
+- ✅ Performance claims
+- ✅ Tokenomics calculations
+- ✅ Validator economics
+- ✅ TPS estimates
+- ✅ Investor materials
+
+I need the TRUTH, not assumptions. Show me actual code, actual data, actual timestamps.
+
+**Start the investigation now.**
+```
+
+---
+
+## 🎯 What We Need to Know
+
+**The fundamental questions:**
+
+1. **What does `shared/config.ts` say NOW?**
+   - Is it 10 or 30?
+   - Was it changed recently?
+
+2. **What does the mining code ACTUALLY use?**
+   - Does it read `config.blockTime`?
+   - Or is there a hardcoded value?
+
+3. **What do the timestamps prove?**
+   - Last 100 blocks average time difference?
+   - Is it ~10s or ~30s empirically?
+
+4. **Is there a mismatch between:**
+   - Config (what it should be)
+   - Code (what it does)
+   - Reality (what happens)
+
+---
+
+## 🔥 Why This Matters
+
+**If block time is actually 30s (not 10s):**
+```
+Daily blocks: 2,880 (not 8,640)
+Daily emission: 144,000 EMO (not 432,000)
+TPS: 0.13 (not 0.4)
+Validator rewards: 6,850 EMO/day (not 20,550)
+Days running: 6.5 days (not 2.16)
+```
+
+**If block time is actually 10s:**
+```
+All previous calculations correct ✅
+Performance claims accurate ✅
+Faster than Ethereum ✅
+```
+
+---
+
+## 📊 Expected Agent Response
+
+**Best case:**
+```
+✅ Config: 10s
+✅ Code: Uses config.blockTime (10s)
+✅ Database: Average 9.8s between blocks
+✅ Verdict: Everything aligned at 10s
+```
+
+**Worst case:**
+```
+❌ Config: 10s
+❌ Code: Hardcoded 30s (overrides config)
+❌ Database: Average 29.2s between blocks
+❌ Verdict: Code ignores config, using 30s
+```
+
+**Mixed case:**
+```
+⚠️ Config: 10s
+⚠️ Code: Uses config.blockTime
+⚠️ Database: Average 30s (???)
+⚠️ Verdict: Something's wrong with mining logic
+```
+
+---
+
+## 🚨 Action Based on Results
+
+### If Agent Reports 10s Everywhere:
+```
+✅ All good, just update README.md manually
+✅ Keep all performance claims
+✅ No code changes needed
+```
+
+### If Agent Reports 30s Everywhere:
+```
+⚠️ Previous "fix" didn't work or was wrong
+⚠️ Need to decide: keep 30s or change to 10s?
+⚠️ Update ALL documentation accordingly
+⚠️ Recalculate tokenomics
+```
+
+### If Agent Reports Mismatch:
+```
+❌ CRITICAL: Config vs code conflict
+❌ Fix the code to match config
+❌ Or fix config to match code
+❌ Test after fix
