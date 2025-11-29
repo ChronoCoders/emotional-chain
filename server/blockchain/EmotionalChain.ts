@@ -40,6 +40,10 @@ export class EmotionalChain extends EventEmitter {
   private lastValidatorAssessment: Map<string, number> = new Map(); // SECURITY: Cache assessment timestamps
   private scoreHistory: Map<string, Array<{score: number, timestamp: number}>> = new Map(); // SECURITY: Score manipulation detection
   
+  // PERMANENT + TIERED VALIDATOR ARCHITECTURE
+  private validatorStatus: Map<string, 'online' | 'offline' | 'standby'> = new Map(); // Validator device status
+  private validatorDeviceStatus: Map<string, boolean> = new Map(); // Track if validator has active biometric device
+  
   // Future: Distributed Consensus Components (when implemented)
   private isDistributedMode: boolean = false;
   // Token Economics from attached specification
@@ -318,12 +322,28 @@ export class EmotionalChain extends EventEmitter {
     const baseReward = this.tokenEconomics.rewards.baseValidationReward;
     const consensusMultiplier = Math.max(0.6, consensusScore / 100); // 0.6-1.0 based on consensus
     const authenticityMultiplier = Math.max(0.7, validator.biometricData?.authenticity || 0.7);
-    return Math.round(baseReward * consensusMultiplier * authenticityMultiplier * 100) / 100;
+    let reward = Math.round(baseReward * consensusMultiplier * authenticityMultiplier * 100) / 100;
+    
+    // TIERED REWARDS: Apply 50% penalty if validator has no device (offline)
+    const hasDevice = this.validatorDeviceStatus.get(validator.id) ?? true; // Default to online
+    if (!hasDevice) {
+      reward = reward * 0.5; // 50% penalty for offline validators
+    }
+    
+    return Math.round(reward * 100) / 100;
   }
   private calculateMiningReward(validator: any, transactionFees: number = 0): number {
     const baseReward = this.tokenEconomics.rewards.baseBlockReward;
     const consensusBonus = this.calculateConsensusBonus(validator.emotionalScore);
-    return baseReward + transactionFees + consensusBonus;
+    let reward = baseReward + transactionFees + consensusBonus;
+    
+    // TIERED REWARDS: Apply 50% penalty if validator has no device (offline)
+    const hasDevice = this.validatorDeviceStatus.get(validator.id) ?? true; // Default to online
+    if (!hasDevice) {
+      reward = reward * 0.5; // 50% penalty for offline validators
+    }
+    
+    return Math.round(reward * 100) / 100;
   }
   private calculateConsensusBonus(emotionalScore: number): number {
     // FAIR CONSENSUS BONUS: Device-agnostic reward calculation
@@ -487,13 +507,52 @@ export class EmotionalChain extends EventEmitter {
     });
     // Initialize validator wallet with 0 EMO balance
     this.wallets.set(validatorId, 0);
+    
+    // PERMANENT VALIDATOR: Initialize status and device tracking
+    this.validatorStatus.set(validatorId, 'online'); // Default to online
+    this.validatorDeviceStatus.set(validatorId, !!biometricData); // Has device if biometric data provided
+    
     return true;
   }
+  
   public removeValidator(validatorId: string): void {
-    this.validators.delete(validatorId);
+    // PERMANENT VALIDATOR ARCHITECTURE: Never actually remove validators
+    // Instead, mark them as offline/standby
+    const validator = this.validators.get(validatorId);
+    if (validator) {
+      this.validatorStatus.set(validatorId, 'standby');
+      this.validatorDeviceStatus.set(validatorId, false); // Mark as having no device
+      console.log(`VALIDATOR: ${validatorId} marked as STANDBY (permanent, not removed)`);
+    }
+  }
+  
+  public setValidatorDeviceStatus(validatorId: string, hasDevice: boolean): void {
+    // Update device availability for tiered rewards
+    if (this.validators.has(validatorId)) {
+      this.validatorDeviceStatus.set(validatorId, hasDevice);
+      const status = hasDevice ? 'online' : 'offline';
+      this.validatorStatus.set(validatorId, status);
+      console.log(`VALIDATOR: ${validatorId} device status: ${status}`);
+    }
+  }
+  
+  public getValidatorVotingPower(validatorId: string): number {
+    // TIERED VOTING POWER: Based on device availability
+    const hasDevice = this.validatorDeviceStatus.get(validatorId) ?? true;
+    
+    if (hasDevice) {
+      return 5; // Full voting power with device (5 votes)
+    } else {
+      return 2; // Reduced voting power without device (2 votes)
+    }
   }
   public getValidators(): any[] {
-    return Array.from(this.validators.values());
+    return Array.from(this.validators.values()).map(v => ({
+      ...v,
+      status: this.validatorStatus.get(v.id) || 'online',
+      hasDevice: this.validatorDeviceStatus.get(v.id) ?? true,
+      votingPower: this.getValidatorVotingPower(v.id)
+    }));
   }
   private selectValidator(): any | null {
     const allValidators = Array.from(this.validators.values())
