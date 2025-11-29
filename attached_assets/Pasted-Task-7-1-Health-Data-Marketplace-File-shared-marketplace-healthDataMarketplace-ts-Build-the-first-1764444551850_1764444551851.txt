@@ -1,0 +1,260 @@
+Task 7.1: Health Data Marketplace
+File: /shared/marketplace/healthDataMarketplace.ts
+Build the first real use case:
+typescriptinterface DataListing {
+  dataType: 'heart_rate' | 'stress' | 'sleep' | 'activity' | 'combined';
+  duration: number; // days
+  frequency: number; // samples per day
+  anonymizationLevel: 'high' | 'medium' | 'low';
+  priceInEMO: bigint;
+  sellerAddress: string;
+  dataCommitment: string; // ZK proof of data quality
+}
+
+class HealthDataMarketplace {
+  // Users list their anonymized data
+  async listData(listing: DataListing): Promise<string> {
+    // Verify user has consent to sell data
+    const hasConsent = await this.checkConsent(listing.sellerAddress);
+    if (!hasConsent) throw new Error('No consent given');
+    
+    // Verify data quality with ZK proof
+    const isQualityValid = await this.verifyDataQuality(listing.dataCommitment);
+    if (!isQualityValid) throw new Error('Invalid data quality proof');
+    
+    // Create listing
+    const listingId = await this.createListing(listing);
+    
+    return listingId;
+  }
+  
+  // Researchers/companies buy data
+  async purchaseData(
+    listingId: string,
+    buyerAddress: string
+  ): Promise<{ encryptedData: string; decryptionKey: string }> {
+    const listing = await this.getListing(listingId);
+    
+    // Transfer EMO from buyer to seller
+    await this.transferEMO(buyerAddress, listing.sellerAddress, listing.priceInEMO);
+    
+    // Release encrypted data to buyer
+    const encryptedData = await this.getEncryptedData(listingId);
+    const decryptionKey = await this.generateDecryptionKey(buyerAddress);
+    
+    return { encryptedData, decryptionKey };
+  }
+  
+  // Platform takes 5% commission
+  private calculateFees(price: bigint): { seller: bigint; platform: bigint } {
+    const platformFee = price * 5n / 100n;
+    const sellerAmount = price - platformFee;
+    
+    return { seller: sellerAmount, platform: platformFee };
+  }
+}
+Smart Contract:
+solidity// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract HealthDataMarketplace {
+    struct DataListing {
+        address seller;
+        uint256 priceInEMO;
+        string dataCommitment;
+        bool isActive;
+    }
+    
+    mapping(uint256 => DataListing) public listings;
+    uint256 public nextListingId;
+    
+    event DataListed(uint256 indexed listingId, address indexed seller, uint256 price);
+    event DataPurchased(uint256 indexed listingId, address indexed buyer, address indexed seller);
+    
+    function listData(
+        uint256 priceInEMO,
+        string memory dataCommitment
+    ) external returns (uint256) {
+        uint256 listingId = nextListingId++;
+        
+        listings[listingId] = DataListing({
+            seller: msg.sender,
+            priceInEMO: priceInEMO,
+            dataCommitment: dataCommitment,
+            isActive: true
+        });
+        
+        emit DataListed(listingId, msg.sender, priceInEMO);
+        return listingId;
+    }
+    
+    function purchaseData(uint256 listingId) external payable {
+        DataListing storage listing = listings[listingId];
+        require(listing.isActive, "Listing not active");
+        require(msg.value >= listing.priceInEMO, "Insufficient payment");
+        
+        // 5% platform fee
+        uint256 platformFee = msg.value * 5 / 100;
+        uint256 sellerAmount = msg.value - platformFee;
+        
+        // Transfer to seller
+        payable(listing.seller).transfer(sellerAmount);
+        
+        // Mark as sold
+        listing.isActive = false;
+        
+        emit DataPurchased(listingId, msg.sender, listing.seller);
+    }
+}
+Action Items:
+
+ Create data marketplace smart contract
+ Build marketplace UI
+ Implement data anonymization pipeline
+ Add data quality verification
+ Create buyer/seller reputation system
+ Launch with pilot users (100 data providers)
+
+
+Task 7.2: Wellness Insurance Integration
+File: /shared/insurance/wellnessInsurance.ts
+Second use case - programmable insurance:
+typescriptinterface InsurancePolicy {
+  policyHolder: string;
+  baseMonthlyPremium: bigint; // in USD
+  discountTiers: {
+    bronze: { minFitness: 70; discount: 5 }; // 5% off
+    silver: { minFitness: 80; discount: 10 }; // 10% off
+    gold: { minFitness: 90; discount: 15 }; // 15% off
+  };
+  verificationFrequency: 'weekly' | 'monthly';
+}
+
+class WellnessInsurance {
+  async calculatePremium(
+    policyHolder: string,
+    month: number
+  ): Promise<bigint> {
+    const policy = await this.getPolicy(policyHolder);
+    
+    // Get average emotional fitness for the month
+    const fitnessProofs = await this.getFitnessProofs(policyHolder, month);
+    const avgFitness = this.calculateAverage(fitnessProofs);
+    
+    // Determine discount tier
+    let discount = 0;
+    if (avgFitness >= 90) discount = 15;
+    else if (avgFitness >= 80) discount = 10;
+    else if (avgFitness >= 70) discount = 5;
+    
+    // Calculate discounted premium
+    const discountAmount = policy.baseMonthlyPremium * BigInt(discount) / 100n;
+    const finalPremium = policy.baseMonthlyPremium - discountAmount;
+    
+    return finalPremium;
+  }
+  
+  // Automatic premium adjustment
+  async processMontlyPremiums(): Promise<void> {
+    const policies = await this.getAllActivePolicies();
+    
+    for (const policy of policies) {
+      const premium = await this.calculatePremium(
+        policy.policyHolder,
+        getCurrentMonth()
+      );
+      
+      // Automatically charge or refund
+      await this.chargePremium(policy.policyHolder, premium);
+    }
+  }
+}
+Action Items:
+
+ Build insurance policy smart contract
+ Partner with 1-2 insurance companies for pilot
+ Create fitness verification oracle
+ Build policyholder dashboard
+ Implement automatic premium adjustment
+ Add dispute resolution mechanism
+
+
+Task 7.3: Corporate Wellness Platform
+File: /shared/corporate/wellnessProgram.ts
+Third use case - enterprise wellness:
+typescriptinterface CorporateProgram {
+  companyId: string;
+  employeeCount: number;
+  goals: {
+    targetAvgFitness: number;
+    participationRate: number; // percentage of employees
+  };
+  rewards: {
+    individual: bigint; // EMO per employee per month
+    team: bigint; // EMO bonus if team goals met
+  };
+}
+
+class CorporateWellness {
+  async trackTeamHealth(companyId: string): Promise<{
+    avgFitness: number;
+    participationRate: number;
+    topPerformers: string[];
+    needsSupport: string[];
+  }> {
+    const program = await this.getProgram(companyId);
+    const employees = await this.getEmployees(companyId);
+    
+    // Calculate team metrics (privacy-preserved)
+    const fitnessScores = await Promise.all(
+      employees.map(e => this.getAverageFITNESS(e.address))
+    );
+    
+    const avgFitness = fitnessScores.reduce((a, b) => a + b) / fitnessScores.length;
+    const participationRate = (fitnessScores.filter(s => s > 0).length / employees.length) * 100;
+    
+    return {
+      avgFitness,
+      participationRate,
+      topPerformers: this.getTopPercentile(fitnessScores, 10),
+      needsSupport: this.getBottomPercentile(fitnessScores, 10),
+    };
+  }
+  
+  // Monthly reward distribution
+  async distributeRewards(companyId: string): Promise<void> {
+    const program = await this.getProgram(companyId);
+    const metrics = await this.trackTeamHealth(companyId);
+    
+    // Individual rewards
+    const employees = await this.getEmployees(companyId);
+    for (const employee of employees) {
+      const fitness = await this.getAverageFitness(employee.address);
+      
+      if (fitness >= 75) {
+        await this.transferEMO(companyId, employee.address, program.rewards.individual);
+      }
+    }
+    
+    // Team bonus if goals met
+    if (
+      metrics.avgFitness >= program.goals.targetAvgFitness &&
+      metrics.participationRate >= program.goals.participationRate
+    ) {
+      // Distribute team bonus equally
+      const bonusPerEmployee = program.rewards.team / BigInt(employees.length);
+      
+      for (const employee of employees) {
+        await this.transferEMO(companyId, employee.address, bonusPerEmployee);
+      }
+    }
+  }
+}
+Action Items:
+
+ Build corporate dashboard
+ Create privacy-preserving team analytics
+ Add manager view (aggregated only, no individual data)
+ Implement reward automation
+ Create wellness challenge features
+ Partner with 2-3 companies for pilot
