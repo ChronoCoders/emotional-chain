@@ -1,5 +1,4 @@
 import { EventEmitter } from 'eventemitter3';
-import { ECDSA } from '@noble/curves/secp256k1';
 import crypto from 'crypto';
 
 /**
@@ -61,11 +60,11 @@ export class FederatedBridge extends EventEmitter {
   
   // Bridge statistics
   private bridgeStats = {
-    totalBridged: BigInt(0),
-    totalMinted: BigInt(0),
+    totalBridged: 0n,
+    totalMinted: 0n,
     successfulBridges: 0,
     failedBridges: 0,
-    totalFeeCollected: BigInt(0),
+    totalFeeCollected: 0n,
   };
 
   constructor(validators: BridgeValidator[]) {
@@ -99,7 +98,7 @@ export class FederatedBridge extends EventEmitter {
     destinationAddress: string,
     senderAddress: string
   ): Promise<string> {
-    if (amount <= 0n) {
+    if (amount <= BigInt(0)) {
       throw new Error('Amount must be greater than 0');
     }
     
@@ -233,7 +232,7 @@ export class FederatedBridge extends EventEmitter {
     destinationAddress: string,
     sourceChain: BridgeChain
   ): Promise<string> {
-    if (amount <= 0n) {
+    if (amount <= BigInt(0)) {
       throw new Error('Amount must be greater than 0');
     }
     
@@ -520,7 +519,7 @@ export class BridgeValidatorNode extends EventEmitter {
    */
   private async validateLockEvent(event: LockEvent): Promise<boolean> {
     // Check basic event structure
-    if (!event.transactionHash || !event.sender || event.amount <= 0n) {
+    if (!event.transactionHash || !event.sender || event.amount <= BigInt(0)) {
       return false;
     }
     
@@ -542,7 +541,7 @@ export class BridgeValidatorNode extends EventEmitter {
    */
   private async validateBurnEvent(event: BurnEvent): Promise<boolean> {
     // Check basic event structure
-    if (!event.transactionHash || !event.from || event.amount <= 0n) {
+    if (!event.transactionHash || !event.from || event.amount <= BigInt(0)) {
       return false;
     }
     
