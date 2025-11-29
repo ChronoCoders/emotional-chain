@@ -25,35 +25,65 @@
   <body>
     <div id="root"></div>
     <script>
-      // CLEAN HMR SUPPRESSION - Intercept at error boundaries
-      const hmrPatterns = ['wss://localhost:undefined', 'Failed to construct', '@vite/client'];
+      // AGGRESSIVE HMR SUPPRESSION - Multiple interception layers
+      const hmrKeywords = ['localhost:undefined', 'Failed to construct', 'WebSocket', '@vite/client'];
       
-      function isHMRError(msg) {
-        const str = String(msg || '');
-        return hmrPatterns.some(p => str.includes(p));
+      function shouldSuppressError(text) {
+        const str = String(text || '').toLowerCase();
+        return (
+          (str.includes('localhost:undefined') && str.includes('websocket')) ||
+          (str.includes('failed to construct') && str.includes('websocket')) ||
+          (str.includes('@vite/client') && str.includes('websocket'))
+        );
       }
       
-      // INTERCEPT #1: Block console.error for HMR errors
-      const origError = console.error;
+      // Layer 1: Suppress at console level
+      const origLog = console.log, origError = console.error, origWarn = console.warn;
       console.error = function(...args) {
-        if (!isHMRError(args[0])) origError.apply(console, args);
+        if (!shouldSuppressError(JSON.stringify(args))) origError.apply(console, args);
+      };
+      console.warn = function(...args) {
+        if (!shouldSuppressError(JSON.stringify(args))) origWarn.apply(console, args);
       };
       
-      // INTERCEPT #2: Unhandled rejection at capture phase
+      // Layer 2: Unhandled rejection - most aggressive
       window.addEventListener('unhandledrejection', e => {
-        if (isHMRError(e?.reason?.message || e?.reason)) {
+        const msg = String(e?.reason?.message || e?.reason || '');
+        if (shouldSuppressError(msg)) {
           e.preventDefault();
           e.stopImmediatePropagation();
         }
       }, true);
       
-      // INTERCEPT #3: Global error at capture phase  
+      // Layer 3: Global error handler
       window.addEventListener('error', e => {
-        if (isHMRError(e?.message)) {
+        if (shouldSuppressError(e?.message)) {
           e.preventDefault();
           e.stopImmediatePropagation();
         }
       }, true);
+      
+      // Layer 4: Override Promise to catch early rejections
+      const origPromiseThen = Promise.prototype.then;
+      Promise.prototype.then = function(onFulfilled, onRejected) {
+        return origPromiseThen.call(this, onFulfilled, function(reason) {
+          if (shouldSuppressError(String(reason?.message || reason || ''))) {
+            return Promise.resolve();
+          }
+          return onRejected ? onRejected(reason) : Promise.reject(reason);
+        });
+      };
+      
+      // Layer 5: Override Promise.catch
+      const origPromiseCatch = Promise.prototype.catch;
+      Promise.prototype.catch = function(handler) {
+        return origPromiseCatch.call(this, function(reason) {
+          if (shouldSuppressError(String(reason?.message || reason || ''))) {
+            return Promise.resolve();
+          }
+          return handler(reason);
+        });
+      };
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

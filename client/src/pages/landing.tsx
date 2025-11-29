@@ -420,6 +420,82 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Global Validator Distribution */}
+      <section className="relative z-10 py-16 bg-terminal-surface/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-terminal-green">
+              &gt; Global Validator Network
+            </h2>
+            <p className="text-terminal-green opacity-90">
+              21 core validators strategically distributed across 7 continents for optimal decentralization and resilience
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div className="terminal-window p-6 border border-terminal-cyan text-center">
+              <div className="text-3xl font-bold text-terminal-cyan mb-2">21</div>
+              <div className="text-terminal-green text-sm">Core Validators</div>
+            </div>
+            <div className="terminal-window p-6 border border-terminal-orange text-center">
+              <div className="text-3xl font-bold text-terminal-orange mb-2">7</div>
+              <div className="text-terminal-green text-sm">Continents</div>
+            </div>
+            <div className="terminal-window p-6 border border-terminal-gold text-center">
+              <div className="text-3xl font-bold text-terminal-gold mb-2">21</div>
+              <div className="text-terminal-green text-sm">Strategic Cities</div>
+            </div>
+            <div className="terminal-window p-6 border border-terminal-success text-center">
+              <div className="text-3xl font-bold text-terminal-success mb-2">24/7</div>
+              <div className="text-terminal-green text-sm">Network Uptime</div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="terminal-window p-4 border border-terminal-cyan">
+              <h3 className="text-terminal-cyan font-bold mb-2">North America</h3>
+              <div className="text-terminal-green text-sm space-y-1">
+                <p>New York</p>
+                <p>San Francisco</p>
+                <p>+ 3 more</p>
+              </div>
+            </div>
+            <div className="terminal-window p-4 border border-terminal-orange">
+              <h3 className="text-terminal-orange font-bold mb-2">Europe</h3>
+              <div className="text-terminal-green text-sm space-y-1">
+                <p>Berlin</p>
+                <p>London</p>
+                <p>+ 3 more</p>
+              </div>
+            </div>
+            <div className="terminal-window p-4 border border-terminal-success">
+              <h3 className="text-terminal-success font-bold mb-2">Asia</h3>
+              <div className="text-terminal-green text-sm space-y-1">
+                <p>Singapore</p>
+                <p>Tokyo</p>
+                <p>+ 2 more</p>
+              </div>
+            </div>
+            <div className="terminal-window p-4 border border-terminal-gold">
+              <h3 className="text-terminal-gold font-bold mb-2">Other Regions</h3>
+              <div className="text-terminal-green text-sm space-y-1">
+                <p>South America</p>
+                <p>Africa & Oceania</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link 
+              href="/validators/distribution"
+              className="inline-block bg-terminal-green/20 border border-terminal-green text-terminal-green px-8 py-3 rounded-md hover:bg-terminal-green/30 transition-colors font-bold"
+            >
+              Explore Global Distribution
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Getting Started */}
       <section id="get-started" className="relative z-10 py-16">
         <div className="container mx-auto px-4 text-center">
