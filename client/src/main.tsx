@@ -2,30 +2,52 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-// CRITICAL: Suppress Vite HMR fallback error BEFORE React renders
+// CRITICAL: Suppress Vite HMR fallback error BEFORE anything loads
 (function suppressHMRError() {
-  // Monkey-patch Promise.reject to suppress HMR errors
-  const origPromiseReject = Promise.reject;
-  (Promise.reject as any) = function(reason: any) {
-    if (reason?.message?.includes('wss://localhost:undefined')) {
-      return Promise.resolve(); // Silently resolve instead of reject
+  const hmrPattern = 'wss://localhost:undefined';
+  
+  // Capture original console methods
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  
+  // Override console.error to filter HMR errors
+  console.error = function(...args: any[]) {
+    const message = args.map(arg => 
+      typeof arg === 'string' ? arg : JSON.stringify(arg)
+    ).join(' ');
+    if (!message.includes(hmrPattern)) {
+      originalError.apply(console, args);
     }
-    return origPromiseReject.call(this, reason);
+  };
+  
+  // Override console.warn to filter HMR errors
+  console.warn = function(...args: any[]) {
+    const message = args.map(arg => 
+      typeof arg === 'string' ? arg : JSON.stringify(arg)
+    ).join(' ');
+    if (!message.includes(hmrPattern)) {
+      originalWarn.apply(console, args);
+    }
   };
 
-  // Suppress unhandledrejection
-  window.addEventListener('unhandledrejection', (event) => {
-    if (event.reason?.message?.includes('wss://localhost:undefined')) {
+  // Prevent unhandledrejection events for HMR errors
+  const handleRejection = (event: PromiseRejectionEvent) => {
+    const reason = event.reason;
+    if (reason?.message?.includes(hmrPattern) || 
+        (typeof reason === 'string' && reason.includes(hmrPattern))) {
       event.preventDefault();
     }
-  }, true);
+  };
+  window.addEventListener('unhandledrejection', handleRejection, true);
 
-  // Suppress error events
-  window.addEventListener('error', (event) => {
-    if (event.message?.includes('wss://localhost:undefined')) {
+  // Prevent error events for HMR
+  const handleError = (event: ErrorEvent) => {
+    if (event.message?.includes(hmrPattern)) {
       event.preventDefault();
+      return true;
     }
-  }, true);
+  };
+  window.addEventListener('error', handleError, true);
 })();
 
 createRoot(document.getElementById("root")!).render(<App />);
