@@ -69,10 +69,10 @@ export default function ValidatorDistribution() {
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'online': return '● ONLINE';
-      case 'offline': return '◐ OFFLINE';
-      case 'standby': return '○ STANDBY';
-      default: return '? UNKNOWN';
+      case 'online': return '[ONLINE]';
+      case 'offline': return '[OFFLINE]';
+      case 'standby': return '[STANDBY]';
+      default: return '[UNKNOWN]';
     }
   };
 
@@ -139,7 +139,7 @@ export default function ValidatorDistribution() {
         {/* Continental Tabs */}
         {distributionData && (
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-4 terminal-text">[🗺️] Filter by Continent</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-4 terminal-text">[FILTER] By Continent</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <button
                 onClick={() => setSelectedContinent(null)}
@@ -221,7 +221,7 @@ export default function ValidatorDistribution() {
                     <div>
                       <p className="text-terminal-orange terminal-text font-semibold">Device</p>
                       <p className={`text-lg font-bold terminal-text ${validator.hasDevice ? 'text-terminal-success' : 'text-terminal-warn'}`}>
-                        {validator.hasDevice ? '●' : '○'}
+                        {validator.hasDevice ? '[ACTIVE]' : '[OFFLINE]'}
                       </p>
                     </div>
                   </div>
@@ -251,7 +251,7 @@ export default function ValidatorDistribution() {
         {/* Continent Summary */}
         {distributionData && !selectedContinent && (
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-4 terminal-text">[📊] Distribution Summary</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-4 terminal-text">[SUMMARY] Distribution by Region</h2>
             <div className="space-y-3">
               {Object.entries(distributionData.stats.distribution).map(([continent, validators]: any) => (
                 <div key={continent} className={`border p-4 ${CONTINENT_COLORS[continent]}`}>
