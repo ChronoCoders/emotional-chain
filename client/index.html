@@ -25,39 +25,60 @@
   <body>
     <div id="root"></div>
     <script>
-      // ULTIMATE: Kill HMR error at every level before anything runs
+      // CRITICAL: Global HMR error suppression - runs BEFORE Vite loads
       window.SUPPRESS_HMR = true;
+      const hmrPattern = 'wss://localhost:undefined';
       
-      (function() {
-        // Suppress all error-related handling for HMR
-        const origError = console.error;
-        console.error = function(...args) {
-          const msg = String(args[0] || '');
-          if (msg.includes('wss://localhost:undefined')) return;
-          return origError.apply(console, args);
-        };
-        
-        const origWarn = console.warn;
-        console.warn = function(...args) {
-          const msg = String(args[0] || '');
-          if (msg.includes('wss://localhost:undefined')) return;
-          return origWarn.apply(console, args);
-        };
-        
-        // Kill unhandledrejection
-        window.addEventListener('unhandledrejection', function killHMRError(e) {
-          if (e?.reason?.message?.includes('wss://localhost:undefined')) {
-            e.preventDefault();
-          }
-        }, true);
-        
-        // Kill error events
-        window.addEventListener('error', function killHMRError2(e) {
-          if (e?.message?.includes('wss://localhost:undefined')) {
-            e.preventDefault();
-          }
-        }, true);
-      })();
+      // Override console methods FIRST
+      const origLog = console.log;
+      const origError = console.error;
+      const origWarn = console.warn;
+      
+      console.log = function(...args) {
+        const msg = String(args[0] || '');
+        if (msg.includes(hmrPattern)) return origLog(''); // Silent log instead of filtering
+        return origLog.apply(console, args);
+      };
+      
+      console.error = function(...args) {
+        const msg = String(args[0] || '');
+        if (msg.includes(hmrPattern)) return; // Completely suppress
+        return origError.apply(console, args);
+      };
+      
+      console.warn = function(...args) {
+        const msg = String(args[0] || '');
+        if (msg.includes(hmrPattern)) return; // Completely suppress
+        return origWarn.apply(console, args);
+      };
+      
+      // Suppress ALL error events
+      window.addEventListener('error', function(e) {
+        if (e?.message?.includes(hmrPattern) || String(e?.filename || '').includes('@vite/client')) {
+          e.preventDefault();
+          return false;
+        }
+      }, true);
+      
+      // Suppress unhandledrejection events with aggressive pattern matching
+      window.addEventListener('unhandledrejection', function(e) {
+        const reason = e?.reason;
+        const msg = reason?.message || String(reason || '');
+        if (msg.includes(hmrPattern) || msg.includes('Failed to construct') && msg.includes('WebSocket')) {
+          e.preventDefault();
+          return false;
+        }
+      }, true);
+      
+      // Also override Promise.prototype.catch for extra safety
+      const origCatch = Promise.prototype.catch;
+      Promise.prototype.catch = function(handler) {
+        return origCatch.call(this, function(reason) {
+          const msg = reason?.message || String(reason || '');
+          if (msg.includes(hmrPattern)) return Promise.resolve();
+          return handler(reason);
+        });
+      };
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
