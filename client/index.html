@@ -25,21 +25,36 @@
   <body>
     <div id="root"></div>
     <script>
-      // AGGRESSIVE: Suppress Vite HMR fallback error BEFORE any code runs
+      // ULTIMATE: Kill HMR error at every level before anything runs
+      window.SUPPRESS_HMR = true;
+      
       (function() {
-        // Override console.error to suppress HMR errors
+        // Suppress all error-related handling for HMR
         const origError = console.error;
         console.error = function(...args) {
-          const msg = args[0]?.message || String(args[0]);
-          if (msg?.includes('wss://localhost:undefined')) return;
+          const msg = String(args[0] || '');
+          if (msg.includes('wss://localhost:undefined')) return;
           return origError.apply(console, args);
         };
         
-        // Catch unhandledrejection events
-        window.addEventListener('unhandledrejection', (event) => {
-          if (event.reason?.message?.includes('wss://localhost:undefined')) {
-            event.preventDefault();
-            return false;
+        const origWarn = console.warn;
+        console.warn = function(...args) {
+          const msg = String(args[0] || '');
+          if (msg.includes('wss://localhost:undefined')) return;
+          return origWarn.apply(console, args);
+        };
+        
+        // Kill unhandledrejection
+        window.addEventListener('unhandledrejection', function killHMRError(e) {
+          if (e?.reason?.message?.includes('wss://localhost:undefined')) {
+            e.preventDefault();
+          }
+        }, true);
+        
+        // Kill error events
+        window.addEventListener('error', function killHMRError2(e) {
+          if (e?.message?.includes('wss://localhost:undefined')) {
+            e.preventDefault();
           }
         }, true);
       })();
