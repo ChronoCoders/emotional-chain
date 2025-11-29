@@ -21,7 +21,7 @@ EmotionalChain is a pioneering blockchain network utilizing Proof of Emotion (Po
 - **Total Supply**: ~1.25M EMO (of 10M max supply)
 - **Circulating Supply**: ~79% (991K EMO)
 - **Staked Supply**: ~21% (263K EMO)
-- **Block Time**: ~6 seconds (Proof of Emotion consensus)
+- **Block Time**: ~10 seconds (Proof of Emotion consensus)
 - **Active Validators**: 21 ecosystem validators
 - **Transaction Count**: 8,640+ transactions per 24h
 - **Network Uptime**: 99.9%

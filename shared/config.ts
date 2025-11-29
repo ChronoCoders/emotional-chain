@@ -185,7 +185,7 @@ export const CONFIG: EmotionalChainConfig = {
   },
   consensus: {
     algorithm: 'proof-of-emotion',
-    blockTime: 30,
+    blockTime: 10,
     validators: {
       minimum: 3,
       maximum: 21,
