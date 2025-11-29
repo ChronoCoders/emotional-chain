@@ -1,0 +1,211 @@
+COMPREHENSIVE SYSTEM INTEGRATION TEST
+
+Please run the following tests and provide a detailed report:
+
+## A. Database Consistency Tests
+
+1. Validator Data Integrity:
+   - Query: SELECT COUNT(*) FROM validators WHERE stake_amount >= 10000
+   - Cross-check: validators table vs validator_stakes table
+   - Verify: Every validator in consensus has a stake record
+   - Check: device_trust_level matches device_registrations table
+
+2. Blockchain Data Integrity:
+   - Query latest 100 blocks
+   - Verify: Each block references valid validator
+   - Check: Block rewards match emission schedule for that height
+   - Validate: Transaction hashes in blocks match transactions table
+
+3. Privacy Data Integrity:
+   - Query: SELECT COUNT(*) FROM biometric_commitments
+   - Verify: NO raw biometric data in any table
+   - Check: Every threshold_proof has matching commitment
+   - Validate: Batch proofs contain 10 validator commitments
+
+4. GDPR Compliance Check:
+   - Query: offChainProfiles vs validators separation
+   - Verify: Personal data (email, name) NOT in blockchain tables
+   - Check: All validators have consent records
+   - Test: Erasure request removes off-chain but keeps commitments
+
+## B. Cross-Interface Consistency Tests
+
+1. Staking Flow End-to-End:
+   POST /api/gdpr/consent (address: 0xTEST)
+   → Check consent_records table
+   
+   POST /api/validators/stake (10000 EMO)
+   → Verify validator_stakes created
+   → Check validators.stake_amount updated
+   → Confirm lock_period set to 14 days
+   
+   GET /api/validators/:address
+   → Validate response matches database
+   → Check device_trust_level displayed
+
+2. Biometric Proof Flow:
+   Client generates proof (score: 80, threshold: 75)
+   → POST /api/proofs/submit
+   → Check threshold_proofs table has commitment
+   → Verify NO raw score stored
+   
+   10 proofs submitted
+   → POST /api/batch-proofs/submit
+   → Check batch_proofs table
+   → Validate validatorCount = 10
+   → Confirm commitments shuffled
+
+3. Reward Calculation Consistency:
+   Get current block height: GET /api/blockchain/height
+   → Calculate expected reward: emissionSchedule.calculateBlockReward(height)
+   
+   Query latest block: GET /api/blocks/latest
+   → Extract block.reward
+   → Verify: block.reward === calculated reward
+   
+   Get validator earnings: GET /api/validators/:address/earnings
+   → Check against blocks they produced
+   → Validate: total_earnings = sum(block_rewards × emotional_multiplier × device_multiplier)
+
+4. Device Attestation Flow:
+   POST /api/devices/register/commodity (Fitbit OAuth)
+   → Check device_registrations: trust_level = 1
+   
+   POST /api/devices/register/medical (Polar H10 serial)
+   → Check device_registrations: trust_level = 2
+   
+   GET /api/validators/:address
+   → Verify device_trust_level matches latest registered device
+   → Check reward_multiplier calculation
+
+## C. Business Logic Validation Tests
+
+1. Gaming Prevention Test:
+   Submit biometric data with perfect correlations:
+   {
+     heartRate: 60,
+     hrv: 50,
+     stress: 0,
+     coherence: 100
+   }
+   
+   → Check multiSignalValidation.detectAnomalousCorrelation()
+   → Verify penalty applied (should be > 0)
+   → Confirm emotional_score reduced
+
+2. Halving Mechanism Test:
+   Query blocks at key heights:
+   - Block 0-2,099,999: reward should be 50 EMO
+   - Block 2,100,000-4,199,999: reward should be 25 EMO
+   - Block 4,200,000+: reward should be 12.5 EMO
+   
+   Verify ROI calculator reflects current era
+
+3. GDPR Erasure Test:
+   Create test validator with personal data
+   → POST /api/gdpr/erasure (with signature)
+   → Check offChainProfiles: record deleted
+   → Check validators: email = '[REDACTED]'
+   → Check threshold_proofs: commitments still exist
+   → Verify blockchain integrity maintained
+
+4. Consensus Participation Test:
+   Query active validators: GET /api/validators/active
+   → For each validator:
+     - Has minimum 10K stake? ✓
+     - Has registered device? ✓
+     - Has valid consent? ✓
+     - Lock period not expired? ✓
+   
+   → Cross-check with latest block proposer
+   → Verify proposer meets all requirements
+
+## D. Frontend-Backend Consistency Tests
+
+1. TokenomicsPage UI Test:
+   Input: stake=10000, deviceCost=100, monthlyCost=10, tokenPrice=0.10
+   → Frontend calculates ROI
+   
+   Backend verification:
+   → Call emissionSchedule.calculateValidatorROI() with same inputs
+   → Compare results (should match within rounding)
+
+2. Validator Dashboard Test:
+   Open /validator-dashboard/:address
+   → Frontend displays: stake, device type, earnings, emotional score
+   
+   Backend queries:
+   → GET /api/validators/:address
+   → GET /api/validators/stake/:address
+   → GET /api/devices/validator/:address
+   → GET /api/proofs/validator/:address/latest
+   
+   → Verify all data matches frontend display
+
+3. GDPR Consent UI Test:
+   Click "Give Consent" button
+   → POST /api/gdpr/consent
+   
+   Check database:
+   → consent_records table updated
+   → consent_version recorded
+   → timestamp correct
+   
+   Frontend reflects:
+   → "Stake" button enabled
+   → Consent status shows "Active"
+
+## E. Performance & Scale Tests
+
+1. Query Performance:
+   - Time to fetch 1000 blocks: should be < 1 second
+   - Time to calculate rewards for 100 blocks: < 500ms
+   - Time to verify 10 batch proofs: < 2 seconds
+
+2. Concurrent Operations:
+   - Simulate 10 validators staking simultaneously
+   - Check for race conditions in stake table
+   - Verify all stakes recorded correctly
+
+3. Memory Leaks:
+   - BatchProofCoordinator queue cleanup after 5 batches
+   - Verify queue size returns to 0
+   - Check no dummy proofs accumulating
+
+## F. Security Tests
+
+1. Signature Verification:
+   - POST /api/gdpr/erasure with INVALID signature
+   → Should return 400 error
+   
+   - POST /api/gdpr/erasure with EXPIRED timestamp (>5 min old)
+   → Should return 400 error
+
+2. Authorization Tests:
+   - POST /api/validators/stake WITHOUT consent
+   → Should return 403 error
+   
+   - POST /api/validators/unstake BEFORE lock period
+   → Should return 400 error
+
+3. Input Validation:
+   - POST /api/validators/stake with 9999 EMO (below minimum)
+   → Should return 400 error
+   
+   - POST /api/proofs/submit with proof older than 15 min
+   → Should return 400 error
+
+---
+
+Please run ALL these tests and provide:
+1. Pass/Fail status for each test
+2. Any inconsistencies found
+3. Database query results where applicable
+4. Error logs if any test fails
+5. Performance metrics
+
+Format the report with:
+✅ Passed tests
+❌ Failed tests
+⚠️  Warnings/inconsistencies
+📊 Performance metrics
