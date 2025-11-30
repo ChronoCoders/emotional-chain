@@ -61,7 +61,7 @@ export default function ExplorerValidatorsPage() {
         <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-terminal-green text-sm font-medium terminal-text">TOTAL VALIDATORS</h3>
-            <span className="text-terminal-cyan terminal-text">[👥]</span>
+            <Users className="w-5 h-5 text-terminal-cyan" />
           </div>
           <p className="text-2xl font-bold text-terminal-cyan terminal-text">{(wallets || []).length}</p>
           <p className="text-terminal-success text-sm terminal-text">{activeValidators.length} active</p>
@@ -88,7 +88,7 @@ export default function ExplorerValidatorsPage() {
         <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-terminal-green text-sm font-medium terminal-text">NETWORK HEALTH</h3>
-            <span className="text-terminal-success terminal-text">[🛡]</span>
+            <Shield className="w-5 h-5 text-terminal-success" />
           </div>
           <p className="text-2xl font-bold text-terminal-success terminal-text">
             {Math.round(networkStats?.stats?.consensusQuality || 92)}%
@@ -100,7 +100,7 @@ export default function ExplorerValidatorsPage() {
       {/* Validators Table */}
       <div className="terminal-window overflow-hidden">
         <div className="p-6 border-b-2 border-terminal-border">
-          <h2 className="text-xl font-semibold text-terminal-green terminal-text">[📋] All Validators</h2>
+          <h2 className="text-xl font-semibold text-terminal-green terminal-text">[LIST] All Validators</h2>
         </div>
 
         <div className="overflow-x-auto">
