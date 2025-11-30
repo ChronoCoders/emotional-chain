@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Globe, MapPin, Users, Zap, Eye } from "lucide-react";
+import { Link } from "wouter";
+import { Globe, MapPin, Users, Zap, Eye, Home } from "lucide-react";
 import EmotionalChainLogo from '@/components/ui/emotional-chain-logo';
 import { useState } from "react";
 
@@ -92,7 +93,16 @@ export default function ValidatorDistribution() {
               <p className="text-terminal-cyan terminal-text">21 Validators Across 7 Continents</p>
             </div>
           </div>
-          <Globe className="w-8 h-8 text-terminal-cyan animate-spin" />
+          <div className="flex items-center space-x-4">
+            <Link 
+              href="/"
+              className="flex items-center space-x-2 bg-terminal-green/20 border border-terminal-green text-terminal-green px-4 py-2 rounded hover:bg-terminal-green/30 transition-colors font-bold terminal-text"
+            >
+              <Home className="w-4 h-4" />
+              <span>Home</span>
+            </Link>
+            <Globe className="w-8 h-8 text-terminal-cyan animate-spin" />
+          </div>
         </div>
       </header>
 

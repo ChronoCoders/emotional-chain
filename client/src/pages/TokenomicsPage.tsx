@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { Link } from 'wouter';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Coins, TrendingUp, Clock, Calculator, DollarSign } from 'lucide-react';
+import { Coins, TrendingUp, Clock, Calculator, DollarSign, Home } from 'lucide-react';
 import { TOKENOMICS, emissionSchedule } from '@shared/tokenomics/emissionSchedule';
 
 export default function TokenomicsPage() {
@@ -40,14 +41,20 @@ export default function TokenomicsPage() {
   return (
     <div className="min-h-screen bg-background dark:bg-gray-950 text-foreground dark:text-gray-100 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-            <Coins className="w-10 h-10 text-purple-600 dark:text-purple-400" />
-            EmotionalChain Tokenomics
-          </h1>
-          <p className="text-muted-foreground dark:text-gray-400">
-            Realistic token economics with halving mechanism and validator ROI calculator
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
+              <Coins className="w-10 h-10 text-purple-600 dark:text-purple-400" />
+              EmotionalChain Tokenomics
+            </h1>
+            <p className="text-muted-foreground dark:text-gray-400">
+              Realistic token economics with halving mechanism and validator ROI calculator
+            </p>
+          </div>
+          <Link href="/" className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-md transition-colors font-medium">
+            <Home className="w-4 h-4" />
+            Home
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

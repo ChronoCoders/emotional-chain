@@ -25,27 +25,34 @@
   <body>
     <div id="root"></div>
     <script>
-      // ABSOLUTE HMR SUPPRESSION
-      const hmrHandler = e => {
-        const msg = String(e?.reason?.message || e?.reason?.toString() || '');
-        if (msg.includes('localhost:undefined') || (msg.includes('Failed to construct') && msg.includes('WebSocket'))) {
+      // UNIVERSAL HMR ERROR SUPPRESSION - Catches all Vite HMR errors
+      const isSuppressedError = (err) => {
+        const msg = String(err?.message || err?.toString() || '');
+        return msg.includes('localhost:undefined') || msg.includes('Failed to construct') && msg.includes('WebSocket');
+      };
+
+      // Suppress unhandledrejection events
+      window.addEventListener('unhandledrejection', e => {
+        if (isSuppressedError(e?.reason)) {
           e.preventDefault();
-          e.stopImmediatePropagation();
-          return false;
+          e.stopPropagation();
         }
-      };
-      
-      window.addEventListener('unhandledrejection', hmrHandler, true);
-      window.addEventListener('unhandledrejection', hmrHandler);
-      
-      // Also catch at fetch level before WebSocket even tries
-      const origFetch = window.fetch;
-      window.fetch = function(...args) {
-        return origFetch.apply(this, args).catch(err => {
-          if (!String(err).includes('localhost:undefined')) throw err;
-          return Promise.resolve();
-        });
-      };
+      }, { capture: true });
+
+      window.addEventListener('unhandledrejection', e => {
+        if (isSuppressedError(e?.reason)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+
+      // Suppress error events
+      window.addEventListener('error', e => {
+        if (isSuppressedError(e?.error || e?.message)) {
+          e.preventDefault();
+          return true;
+        }
+      }, { capture: true });
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
