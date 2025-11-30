@@ -117,6 +117,9 @@ export default function LandingPage() {
       <div className="fixed inset-0 pointer-events-none opacity-10">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-terminal-green/5 to-transparent"></div>
       </div>
+      
+      {/* Scanlines Effect */}
+      <div className="scanlines"></div>
 
       {/* Header Navigation */}
       <header className="relative z-10 border-b border-terminal-border bg-terminal-surface/50 backdrop-blur-sm">
@@ -199,7 +202,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-20 pb-16">
+      <section className="relative z-10 pt-20 pb-16 hero-glow">
         <div className="container mx-auto px-4 text-center">
           {/* ASCII Banner */}
           <div className="mb-8">
