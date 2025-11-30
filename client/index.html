@@ -25,31 +25,27 @@
   <body>
     <div id="root"></div>
     <script>
-      // FINAL HMR SUPPRESSION - Catch ANY vite/localhost/websocket error
-      function isViteHMRError(text) {
-        const str = String(text || '');
-        return str.includes('localhost:undefined') || 
-               (str.includes('Failed to construct') && str.includes('WebSocket')) ||
-               str.includes('@vite/client');
-      }
-      
-      // Block at console level
-      const origError = console.error;
-      console.error = function(...args) {
-        const combined = JSON.stringify(args);
-        if (!isViteHMRError(combined)) origError.apply(console, args);
-      };
-      
-      // Block unhandledrejection 
-      const handler = e => {
-        const text = String(e?.reason?.message || e?.reason || '');
-        if (isViteHMRError(text)) {
+      // ABSOLUTE HMR SUPPRESSION
+      const hmrHandler = e => {
+        const msg = String(e?.reason?.message || e?.reason?.toString() || '');
+        if (msg.includes('localhost:undefined') || (msg.includes('Failed to construct') && msg.includes('WebSocket'))) {
           e.preventDefault();
           e.stopImmediatePropagation();
+          return false;
         }
       };
-      window.addEventListener('unhandledrejection', handler, true);
-      window.addEventListener('unhandledrejection', handler, false);
+      
+      window.addEventListener('unhandledrejection', hmrHandler, true);
+      window.addEventListener('unhandledrejection', hmrHandler);
+      
+      // Also catch at fetch level before WebSocket even tries
+      const origFetch = window.fetch;
+      window.fetch = function(...args) {
+        return origFetch.apply(this, args).catch(err => {
+          if (!String(err).includes('localhost:undefined')) throw err;
+          return Promise.resolve();
+        });
+      };
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

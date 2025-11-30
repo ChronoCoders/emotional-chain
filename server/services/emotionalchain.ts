@@ -535,6 +535,14 @@ export class EmotionalChainService {
     }
     return null;
   }
+
+  public async setValidatorDeviceStatus(validatorId: string, hasDevice: boolean): Promise<void> {
+    if (this.bootstrapNode?.getBlockchain()) {
+      const blockchain = this.bootstrapNode.getBlockchain();
+      blockchain.setValidatorDeviceStatus(validatorId, hasDevice);
+    }
+  }
+
   private getRealisticUptime(validatorId: string): string {
     // Generate consistent uptime based on validator ID hash
     const hash = validatorId.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
