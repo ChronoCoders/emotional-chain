@@ -1,0 +1,93 @@
+
+C:\emochain>npm run dev
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+'NODE_ENV' is not recognized as an internal or external command,
+operable program or batch file.
+
+C:\emochain>set NODE_ENV=development && tsx server/index.ts
+
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'express' imported from C:\emochain\server\index.ts
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:255:9)
+    at packageResolve (node:internal/modules/esm/resolve:767:81)
+    at moduleResolve (node:internal/modules/esm/resolve:853:18)
+    at defaultResolve (node:internal/modules/esm/resolve:983:11)
+    at nextResolve (node:internal/modules/esm/hooks:748:28)
+    at resolveBase (file:///C:/Users/altug/AppData/Roaming/npm/node_modules/tsx/dist/esm/index.mjs?1764464845155:2:3744)
+    at resolveDirectory (file:///C:/Users/altug/AppData/Roaming/npm/node_modules/tsx/dist/esm/index.mjs?1764464845155:2:4243)
+    at resolveTsPaths (file:///C:/Users/altug/AppData/Roaming/npm/node_modules/tsx/dist/esm/index.mjs?1764464845155:2:4984)
+    at resolve (file:///C:/Users/altug/AppData/Roaming/npm/node_modules/tsx/dist/esm/index.mjs?1764464845155:2:5361)
+    at nextResolve (node:internal/modules/esm/hooks:748:28) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v22.18.0
+
+C:\emochain>npm install express
+npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
+npm warn deprecated domexception@1.0.1: Use your platform's native DOMException instead
+npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs
+npm warn deprecated har-validator@5.1.5: this library is no longer supported
+npm warn deprecated gar@1.0.4: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated ipfs-http-gateway@0.13.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-grpc-protocol@0.8.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-grpc-server@0.12.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-daemon@0.16.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-http-server@0.15.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-http-response@6.0.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated electron-download@3.3.0: Please use @electron/get moving forward.
+npm warn deprecated home-path@1.0.7: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated orbit-db-pubsub@0.7.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated orbit-db-kvstore@2.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated orbit-db-feedstore@2.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated ipfs-cli@0.16.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated orbit-db-docstore@2.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated ipfs-log@6.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated orbit-db-counterstore@2.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated go-ipfs@0.22.0: 'go-ipfs' name has been deprecated. Please switch your dependency to 'kubo' - https://www.npmjs.com/package/kubo
+npm warn deprecated orbit-db-cache@0.5.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated orbit-db-store@5.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+npm warn deprecated gauge@3.0.2: This package is no longer supported.
+npm warn deprecated orbit-db-keystore@2.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated orbit-db-eventstore@2.0.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+npm warn deprecated ipfs@0.66.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated orbit-db-identity-provider@0.5.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated datastore-fs@8.0.0: This package is deprecated. Instead, use datastore-level in Node.js, and datastore-idb in browsers
+npm warn deprecated ipfs-core-utils@0.18.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-core-config@0.7.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-core-types@0.14.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+npm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/request/issues/3142
+npm warn deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
+npm warn deprecated level-concat-iterator@3.1.0: Superseded by abstract-level (https://github.com/Level/community#faq)
+npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated @substrate/connect@0.8.11: versions below 1.x are no longer maintained
+npm warn deprecated @hapi/formula@2.0.0: Moved to 'npm install @sideway/formula'
+npm warn deprecated @hapi/address@4.1.0: Moved to 'npm install @sideway/address'
+npm warn deprecated paypal-rest-sdk@1.8.1: Package no longer supported. The author suggests using the @paypal/paypal-server-sdk package instead: https://www.npmjs.com/package/@paypal/paypal-server-sdk. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated multiaddr@10.0.1: This module is deprecated, please upgrade to @multiformats/multiaddr
+npm warn deprecated orbit-db@0.29.0: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+npm warn deprecated ipfs-http-client@60.0.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated ipfs-core@0.18.1: js-IPFS has been deprecated in favour of Helia - please see https://github.com/ipfs/js-ipfs/issues/4336 for details
+npm warn deprecated csurf@1.11.0: This package is archived and no longer maintained. For support, visit https://github.com/expressjs/express/discussions
+npm warn deprecated coinbase-commerce-node@1.0.4: This package is no longer actively maintained.
+npm warn deprecated leveldown@6.1.1: Superseded by classic-level (https://github.com/Level/community#faq)
+npm warn deprecated abstract-leveldown@7.2.0: Superseded by abstract-level (https://github.com/Level/community#faq)
+npm warn deprecated @opentelemetry/node@0.24.0: Package renamed to @opentelemetry/sdk-trace-node
+npm warn deprecated @opentelemetry/tracing@0.24.0: Package renamed to @opentelemetry/sdk-trace-base
+npm warn deprecated @libp2p/noise@12.0.1: Please use @chainsafe/libp2p-noise instead - this module is only for testing
+npm warn deprecated @hapi/joi@17.1.1: Switch to 'npm install joi'
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
+npm warn deprecated rocksdb@5.2.1: Discontinued (https://github.com/Level/community#faq)
+|
