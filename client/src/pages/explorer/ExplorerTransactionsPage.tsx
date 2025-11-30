@@ -151,7 +151,7 @@ export default function ExplorerTransactionsPage() {
       <div className="terminal-window overflow-hidden">
         <div className="p-6 border-b-2 border-terminal-border">
           <h2 className="text-xl font-semibold text-terminal-green terminal-text">
-            [📋] Recent Transactions ({filteredTransactions.length})
+            [TXN] Recent Transactions ({filteredTransactions.length})
           </h2>
         </div>
 
