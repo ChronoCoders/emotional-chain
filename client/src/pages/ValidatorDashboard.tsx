@@ -92,7 +92,7 @@ export default function ValidatorDashboard() {
         {/* Validator Management */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[⚙️] Node Management</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[CONFIG] Node Management</h2>
             
             <div className="space-y-4">
               <div className="bg-terminal-surface border border-terminal-border p-4">
@@ -131,7 +131,7 @@ export default function ValidatorDashboard() {
           </div>
           
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[📊] Performance Metrics</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[METRICS] Performance Data</h2>
             
             <div className="space-y-4">
               <div className="bg-terminal-surface border border-terminal-border p-4">
@@ -170,7 +170,7 @@ export default function ValidatorDashboard() {
         {/* Recent Activity & Rewards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[🎯] Recent Rewards</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[REWARDS] Recent Earnings</h2>
             
             <div className="space-y-3">
               <div className="bg-terminal-surface border border-terminal-border p-3">
@@ -200,7 +200,7 @@ export default function ValidatorDashboard() {
           </div>
           
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[⚡] Network Statistics</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[STATS] Network Statistics</h2>
             
             <div className="space-y-4">
               <div className="flex justify-between">

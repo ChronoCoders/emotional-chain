@@ -76,7 +76,7 @@ export default function UserDashboard() {
 
         {/* Getting Started Section */}
         <div className="terminal-window p-6">
-          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[⚡] Getting Started with EmotionalChain</h2>
+          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[START] Getting Started with EmotionalChain</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-terminal-surface border-2 border-terminal-border p-4">
@@ -111,7 +111,7 @@ export default function UserDashboard() {
 
         {/* Quick Links */}
         <div className="terminal-window p-6">
-          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[🔗] Quick Links</h2>
+          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[LINKS] Quick Navigation</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Link href="/explorer">
@@ -149,7 +149,7 @@ export default function UserDashboard() {
 
         {/* Recent Activity */}
         <div className="terminal-window p-6">
-          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[📊] Network Activity</h2>
+          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[ACTIVITY] Network Updates</h2>
           
           <div className="space-y-3">
             <div className="bg-terminal-surface border border-terminal-border p-3">

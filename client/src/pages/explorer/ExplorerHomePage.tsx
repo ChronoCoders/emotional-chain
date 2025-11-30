@@ -172,7 +172,7 @@ export default function ExplorerHomePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="terminal-window p-6">
           <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
-            [📈] Network Activity
+            [ACTIVITY] Network Stats
           </h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -224,7 +224,7 @@ export default function ExplorerHomePage() {
         
         <div className="terminal-window p-6">
           <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
-            [🔒] Security Metrics
+            [SECURITY] Metrics
           </h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center">
@@ -256,7 +256,7 @@ export default function ExplorerHomePage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="terminal-window p-6">
           <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
-            [👥] Top Validators
+            [VALIDATORS] Top Performers
           </h3>
           
           <div className="space-y-3">
@@ -302,7 +302,7 @@ export default function ExplorerHomePage() {
 
         <div className="terminal-window p-6">
           <h3 className="text-lg font-semibold text-terminal-green mb-4 terminal-text">
-            [📊] Network Statistics
+            [STATS] Network Overview
           </h3>
           
           <div className="grid grid-cols-2 gap-4">

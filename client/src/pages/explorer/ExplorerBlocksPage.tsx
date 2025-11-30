@@ -111,7 +111,7 @@ export default function ExplorerBlocksPage() {
         <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-terminal-green text-sm font-medium terminal-text">LATEST BLOCK</h3>
-            <span className="text-terminal-cyan terminal-text">[DB]</span>
+            <Zap className="w-5 h-5 text-terminal-cyan" />
           </div>
           <p className="text-2xl font-bold text-terminal-cyan terminal-text">#{formatNumber(totalBlocks)}</p>
           <p className="text-terminal-green/70 text-sm terminal-text">
@@ -122,7 +122,7 @@ export default function ExplorerBlocksPage() {
         <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-terminal-green text-sm font-medium terminal-text">AVG BLOCK TIME</h3>
-            <span className="text-terminal-success terminal-text">[⏰]</span>
+            <Clock className="w-5 h-5 text-terminal-success" />
           </div>
           <p className="text-2xl font-bold text-terminal-success terminal-text">{avgBlockTime}s</p>
           <p className="text-terminal-success text-sm terminal-text">Consistent timing</p>
@@ -131,7 +131,7 @@ export default function ExplorerBlocksPage() {
         <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-terminal-green text-sm font-medium terminal-text">TRANSACTIONS (24H)</h3>
-            <span className="text-terminal-gold terminal-text">[⚡]</span>
+            <Zap className="w-5 h-5 text-terminal-gold" />
           </div>
           <p className="text-2xl font-bold text-terminal-gold terminal-text">{formatNumber(txVolume?.transactions24h || 0)}</p>
           <p className="text-terminal-green/70 text-sm terminal-text">360 blocks/hour avg</p>
@@ -140,7 +140,7 @@ export default function ExplorerBlocksPage() {
         <div className="terminal-window p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-terminal-green text-sm font-medium terminal-text">AVG EMOTIONAL SCORE</h3>
-            <span className="text-terminal-orange terminal-text">[#]</span>
+            <Database className="w-5 h-5 text-terminal-orange" />
           </div>
           <p className="text-2xl font-bold text-terminal-orange terminal-text">
             {Math.round(blocks?.reduce((sum: number, block: any) => sum + parseFloat(block.emotionalScore || 0), 0) / (blocks?.length || 1))}%
@@ -152,7 +152,7 @@ export default function ExplorerBlocksPage() {
       {/* Blocks List */}
       <div className="terminal-window overflow-hidden">
         <div className="p-6 border-b-2 border-terminal-border">
-          <h2 className="text-xl font-semibold text-terminal-green terminal-text">[📦] Recent Blocks</h2>
+          <h2 className="text-xl font-semibold text-terminal-green terminal-text">[BLOCKS] Recent List</h2>
         </div>
 
         <div className="overflow-x-auto">
@@ -193,7 +193,7 @@ export default function ExplorerBlocksPage() {
                   <td className="p-4">
                     <div className="flex items-center space-x-2">
                       <User className="w-4 h-4 text-terminal-green" />
-                      <span className="text-terminal-green terminal-text">{block.validator || '⚠️ Missing Validator'}</span>
+                      <span className="text-terminal-green terminal-text">{block.validator || 'Unknown Validator'}</span>
                     </div>
                   </td>
                   <td className="p-4">
