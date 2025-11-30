@@ -31,7 +31,7 @@ export default function AdminPanel() {
             <EmotionalChainLogo size={32} className="text-terminal-cyan" />
             <div>
               <h1 className="text-2xl font-bold text-terminal-green terminal-text">&gt; Admin Panel</h1>
-              <p className="text-terminal-orange terminal-text">⚠️ Administrative Access - Use with Caution</p>
+              <p className="text-terminal-orange terminal-text">Administrative Access - Use with Caution</p>
             </div>
           </div>
           <div className="flex space-x-4">
@@ -94,7 +94,7 @@ export default function AdminPanel() {
         {/* Admin Controls */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[⚙️] System Controls</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[SYSTEM] Controls</h2>
             
             <div className="space-y-4">
               <button className="w-full bg-terminal-orange/20 border border-terminal-orange text-terminal-orange px-4 py-3 hover:bg-terminal-orange/30 transition-colors terminal-text flex items-center">
@@ -120,7 +120,7 @@ export default function AdminPanel() {
           </div>
           
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[📊] System Metrics</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[METRICS] System Performance</h2>
             
             <div className="space-y-4">
               <div className="bg-terminal-surface border border-terminal-border p-3">
@@ -166,7 +166,7 @@ export default function AdminPanel() {
           </div>
           
           <div className="terminal-window p-6">
-            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[🔒] Security Status</h2>
+            <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[SECURITY] System Status</h2>
             
             <div className="space-y-4">
               <div className="bg-terminal-surface border border-terminal-success p-3">
@@ -206,7 +206,7 @@ export default function AdminPanel() {
 
         {/* Full Terminal Interface for Admins */}
         <div className="terminal-window p-6">
-          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[🖥️] Full System Terminal</h2>
+          <h2 className="text-xl font-semibold text-terminal-green mb-6 terminal-text">[TERMINAL] Full System Access</h2>
           <div className="bg-terminal-surface border-2 border-terminal-border p-4">
             <TerminalInterface />
           </div>

@@ -25,34 +25,45 @@
   <body>
     <div id="root"></div>
     <script>
-      // UNIVERSAL HMR ERROR SUPPRESSION - Catches all Vite HMR errors
-      const isSuppressedError = (err) => {
-        const msg = String(err?.message || err?.toString() || '');
-        return msg.includes('localhost:undefined') || msg.includes('Failed to construct') && msg.includes('WebSocket');
+      // AGGRESSIVE HMR ERROR SUPPRESSION
+      const isHmrError = (msg) => {
+        const str = String(msg || '');
+        return str.includes('localhost:undefined') || (str.includes('Failed to construct') && str.includes('WebSocket'));
       };
 
-      // Suppress unhandledrejection events
-      window.addEventListener('unhandledrejection', e => {
-        if (isSuppressedError(e?.reason)) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }, { capture: true });
+      // Override console to suppress HMR errors before logging
+      const consoleError = console.error;
+      const consoleWarn = console.warn;
+      console.error = function(...args) {
+        if (!isHmrError(JSON.stringify(args))) consoleError.apply(console, args);
+      };
+      console.warn = function(...args) {
+        if (!isHmrError(JSON.stringify(args))) consoleWarn.apply(console, args);
+      };
 
-      window.addEventListener('unhandledrejection', e => {
-        if (isSuppressedError(e?.reason)) {
+      // Suppress unhandledrejection with capture phase (executes first)
+      window.addEventListener('unhandledrejection', (e) => {
+        if (isHmrError(e?.reason?.message || e?.reason)) {
           e.preventDefault();
-          e.stopPropagation();
+          e.stopImmediatePropagation();
         }
-      });
+      }, true);
+
+      // Also suppress at bubble phase
+      window.addEventListener('unhandledrejection', (e) => {
+        if (isHmrError(e?.reason?.message || e?.reason)) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+        }
+      }, false);
 
       // Suppress error events
-      window.addEventListener('error', e => {
-        if (isSuppressedError(e?.error || e?.message)) {
+      window.addEventListener('error', (e) => {
+        if (isHmrError(e?.message || e?.error?.message)) {
           e.preventDefault();
           return true;
         }
-      }, { capture: true });
+      }, true);
     </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
