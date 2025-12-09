@@ -12,17 +12,23 @@ type = "community"
 
 [[analyzers]]
 name = "javascript"
-
   [analyzers.meta]
   plugins = ["react"]
   environment = [
     "nodejs",
     "vitest",
-    "jest"
+    "jest",
+    "typescript"
   ]
+
+[[analyzers]]
+name = "typescript"
 
 [[code_formatters]]
 name = "prettier"
 
 [[code_formatters]]
 name = "standardjs"
+
+[[code_formatters]]
+name = "eslint"
