@@ -23,7 +23,7 @@
     "@hapi/joi": "^17.1.1",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
-    "@libp2p/bootstrap": "^11.0.46",
+    "@libp2p/bootstrap": "^12.0.10",
     "@libp2p/floodsub": "^10.1.45",
     "@libp2p/kad-dht": "^15.1.10",
     "@libp2p/mplex": "^11.0.46",
