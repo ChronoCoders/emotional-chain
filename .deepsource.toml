@@ -17,18 +17,11 @@ name = "javascript"
   environment = [
     "nodejs",
     "vitest",
-    "jest",
-    "typescript"
+    "jest"
   ]
-
-[[analyzers]]
-name = "typescript"
 
 [[code_formatters]]
 name = "prettier"
 
 [[code_formatters]]
 name = "standardjs"
-
-[[code_formatters]]
-name = "eslint"
