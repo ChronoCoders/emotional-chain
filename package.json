@@ -111,7 +111,7 @@
     "dsp.js": "^1.0.1",
     "elliptic": "^6.6.1",
     "embla-carousel-react": "^8.6.0",
-    "ethers": "^6.15.0",
+    "ethers": "^6.16.0",
     "eventemitter3": "^5.0.1",
     "express": "^4.21.2",
     "express-rate-limit": "^8.0.1",
